@@ -5,11 +5,11 @@ appPG.use(express.json()); /*questo è quello che una volta si chiamava "bodypar
 appPG.use(express.static("public"));
 
 const client = new Client({
-    user: 'postgres',
-    password: 'rilievo',
-    host: 'localhost',
-    port: 5432,
-    database: 'Main10ance_36'
+    user: process.env.BIM_DB_USER,
+    password: process.env.BIM_DB_PASSWORD,
+    host: process.env.BIM_DB_HOST,
+    port: process.env.BIM_DB_PORT,
+    database: process.env.BIM_DB_DATABASE
 });
 
 // per testare la richiesta:
