@@ -9,7 +9,8 @@ const client = new Client({
     password: process.env.BIM_DB_PASSWORD,
     host: process.env.BIM_DB_HOST,
     port: process.env.BIM_DB_PORT,
-    database: process.env.BIM_DB_DATABASE
+    database: process.env.BIM_DB_DATABASE,
+    ssl: { rejectUnauthorized: false }
 });
 
 // per testare la richiesta:
