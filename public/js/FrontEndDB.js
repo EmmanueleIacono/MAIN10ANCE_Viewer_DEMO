@@ -112,7 +112,7 @@ async function leggiDBElemento(jsonReq) {
     try {
         cancellaFormDB(formDB);
 
-        const risultato = await fetch("http://localhost:3000/Main10ance_DB/all", {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
+        const risultato = await fetch("https://main10ance-app-demo-v1.herokuapp.com/Main10ance_DB/all", {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
         const nomeElem = jsonReq.nome;
         const categoriaElem = jsonReq.categoria;
         const idElem = jsonReq.id;
