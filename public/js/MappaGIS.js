@@ -61,25 +61,26 @@ class BottoneNavigazioneSM {
 const oggettiSacriMonti = { /*QUESTI OGGETTI DOVRANNO PROVENIRE DAL DATABASE */
     sacriMonti:
         [
-            {coord: [45.81852, 8.255573], nome: 'Varallo', sigla: 'SMV'},
-            {coord: [45.96224, 8.615456], nome: 'Ghiffa', sigla: 'SMG'},
-            {coord: [45.79683, 8.410177], nome: 'Orta', sigla: 'SMOT'},
-            {coord: [45.09435, 8.275465], nome: 'Crea', sigla: 'SMC'},
-            {coord: [45.62364, 7.982626], nome: 'Oropa', sigla: 'SMOP'},
-            {coord: [45.97477, 9.177286], nome: 'Ossuccio', sigla: 'SMOS'},
-            {coord: [45.85137, 8.796597], nome: 'Varese', sigla: 'SMVS'},
-            {coord: [46.10645, 8.288634], nome: 'Domodossola', sigla: 'SMD'},
-            {coord: [45.36900, 7.633821], nome: 'Belmonte', sigla: 'SMB'},
-            {coord: [46.17530, 8.793431], nome: 'Orselina', sigla: 'SMOR'},
-            {coord: [46.12088, 8.706110], nome: 'Brissago', sigla: 'SMBR'},
+            {coord: [45.81852, 8.255573], nome: 'Varallo', sigla: 'SMV', urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfVW5pdCVDMyVBMFZvbHVtZXRyaWNoZV8lN0IzRCU3RC5ydnQ='},
+            {coord: [45.96224, 8.615456], nome: 'Ghiffa', sigla: 'SMG', urn: ''},
+            {coord: [45.79683, 8.410177], nome: 'Orta', sigla: 'SMOT', urn: ''},
+            {coord: [45.09435, 8.275465], nome: 'Crea', sigla: 'SMC', urn: ''},
+            {coord: [45.62364, 7.982626], nome: 'Oropa', sigla: 'SMOP', urn: ''},
+            {coord: [45.97477, 9.177286], nome: 'Ossuccio', sigla: 'SMOS', urn: ''},
+            {coord: [45.85137, 8.796597], nome: 'Varese', sigla: 'SMVS', urn: ''},
+            {coord: [46.10645, 8.288634], nome: 'Domodossola', sigla: 'SMD', urn: ''},
+            {coord: [45.36900, 7.633821], nome: 'Belmonte', sigla: 'SMB', urn: ''},
+            {coord: [46.17530, 8.793431], nome: 'Orselina', sigla: 'SMOR', urn: ''},
+            {coord: [46.12088, 8.706110], nome: 'Brissago', sigla: 'SMBR', urn: ''},
         ]
 };
 
 class MarkerSacroMonte {
-    constructor(coordinate, nome, sigla) {
+    constructor(coordinate, nome, sigla, urn) {
         this.coordinate = coordinate;
         this.nome = nome;
         this.sigla = sigla;
+        this.urn = urn;
 
         const iconaSacriMonti = L.icon({
             iconUrl: '../img/logo_b.png',
@@ -94,6 +95,14 @@ class MarkerSacroMonte {
 
         const contenitorePopup = document.createElement('div');
         contenitorePopup.innerHTML = `<b>Sacro Monte di ${nome}</b><br>`;
+        const selettoreSM = document.createElement('button');
+        selettoreSM.setAttribute('id', `selettore_${sigla}`);
+        selettoreSM.innerHTML = 'APRI';
+        contenitorePopup.appendChild(selettoreSM);
+        selettoreSM.addEventListener('click', () => {
+            getModel(urn);
+            mappaGIS.closePopup();
+        });
         
         this.element.on('popupopen', () => {
             this.element._popup.setContent(contenitorePopup);
@@ -104,7 +113,7 @@ class MarkerSacroMonte {
 }
 
 oggettiSacriMonti.sacriMonti.forEach((sm) => {
-    new MarkerSacroMonte(sm.coord, sm.nome, sm.sigla);
+    new MarkerSacroMonte(sm.coord, sm.nome, sm.sigla, sm.urn);
     new BottoneNavigazioneSM(sm.nome, sm.sigla, sm.coord);
 });
 
@@ -178,8 +187,13 @@ oggettiCappelle.cappelle.forEach((c) => {
 
 // questa funzione è molto carina ma va riarrangiata per ottenere l'URN da un'altra richiesta, non va bene hardcoded dentro oggetti... oppure sì?
 function getModel(urn) {
-    document.getElementById('apriTabBIM').click();
-    launchViewer(urn);
+    if ((urn !== null) && (urn !== '')) {
+        document.getElementById('apriTabBIM').click();
+        launchViewer(urn);
+    }
+    else {
+        alert('Nessun modello presente per questo elemento');
+    }
 }
 
 // fare in modo che i geojson siano presi dal database main10ance
