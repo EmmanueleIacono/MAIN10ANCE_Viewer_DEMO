@@ -159,7 +159,7 @@ async function leggiDBElemento(jsonReq) {
 
 async function scriviParametroElemento(jsonReq) {
     try {
-        const risultato = await fetch("http://localhost:3000/Main10ance_DB/all", {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        const risultato = await fetch("https://main10ance-app-demo-v1.herokuapp.com//Main10ance_DB/all", {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
     }
     catch(e) {
         console.log('Errore nella modifica del database');
