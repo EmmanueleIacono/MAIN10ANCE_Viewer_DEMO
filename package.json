@@ -1,7 +1,7 @@
 {
-  "name": "forgesample",
+  "name": "main10ance_viewer_app",
   "version": "1.0.0",
-  "description": "main10ance viewer test",
+  "description": "Applicazione MAIN10ANCE Sacri Monti",
   "main": "start.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,7 +10,7 @@
   "keywords": [
     "forge"
   ],
-  "author": "emmanuele",
+  "author": "Emmanuele Iacono",
   "license": "MIT",
   "dependencies": {
     "autodesk.forge.designautomation": "^3.0.3",
