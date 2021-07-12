@@ -58,22 +58,22 @@ class BottoneNavigazioneSM {
 
 // MARKER SACRI MONTI
 
-const oggettiSacriMonti = { /*QUESTI OGGETTI DOVRANNO PROVENIRE DAL DATABASE */
-    sacriMonti:
-        [
-            {coord: [45.81852, 8.255573], nome: 'Varallo', sigla: 'SMV', urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfVW5pdCVDMyVBMFZvbHVtZXRyaWNoZV8lN0IzRCU3RF92Mi5ydnQ'},
-            {coord: [45.96224, 8.615456], nome: 'Ghiffa', sigla: 'SMG', urn: ''},
-            {coord: [45.79683, 8.410177], nome: 'Orta', sigla: 'SMOT', urn: ''},
-            {coord: [45.09435, 8.275465], nome: 'Crea', sigla: 'SMC', urn: ''},
-            {coord: [45.62364, 7.982626], nome: 'Oropa', sigla: 'SMOP', urn: ''},
-            {coord: [45.97477, 9.177286], nome: 'Ossuccio', sigla: 'SMOS', urn: ''},
-            {coord: [45.85137, 8.796597], nome: 'Varese', sigla: 'SMVS', urn: ''},
-            {coord: [46.10645, 8.288634], nome: 'Domodossola', sigla: 'SMD', urn: ''},
-            {coord: [45.36900, 7.633821], nome: 'Belmonte', sigla: 'SMB', urn: ''},
-            {coord: [46.17530, 8.793431], nome: 'Orselina', sigla: 'SMOR', urn: ''},
-            {coord: [46.12088, 8.706110], nome: 'Brissago', sigla: 'SMBR', urn: ''},
-        ]
-};
+// const oggettiSacriMonti = { /*QUESTI OGGETTI DOVRANNO PROVENIRE DAL DATABASE */
+//     sacriMonti:
+//         [
+//             {coord: [45.81852, 8.255573], nome: 'Varallo', sigla: 'SMV', urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfVW5pdCVDMyVBMFZvbHVtZXRyaWNoZV8lN0IzRCU3RF92Mi5ydnQ'},
+//             {coord: [45.96224, 8.615456], nome: 'Ghiffa', sigla: 'SMG', urn: ''},
+//             {coord: [45.79683, 8.410177], nome: 'Orta', sigla: 'SMOT', urn: ''},
+//             {coord: [45.09435, 8.275465], nome: 'Crea', sigla: 'SMC', urn: ''},
+//             {coord: [45.62364, 7.982626], nome: 'Oropa', sigla: 'SMOP', urn: ''},
+//             {coord: [45.97477, 9.177286], nome: 'Ossuccio', sigla: 'SMOS', urn: ''},
+//             {coord: [45.85137, 8.796597], nome: 'Varese', sigla: 'SMVS', urn: ''},
+//             {coord: [46.10645, 8.288634], nome: 'Domodossola', sigla: 'SMD', urn: ''},
+//             {coord: [45.36900, 7.633821], nome: 'Belmonte', sigla: 'SMB', urn: ''},
+//             {coord: [46.17530, 8.793431], nome: 'Orselina', sigla: 'SMOR', urn: ''},
+//             {coord: [46.12088, 8.706110], nome: 'Brissago', sigla: 'SMBR', urn: ''},
+//         ]
+// };
 
 class MarkerSacroMonte {
     constructor(coordinate, nome, sigla, urn) {
@@ -112,10 +112,10 @@ class MarkerSacroMonte {
     }
 }
 
-oggettiSacriMonti.sacriMonti.forEach((sm) => {
-    new MarkerSacroMonte(sm.coord, sm.nome, sm.sigla, sm.urn);
-    new BottoneNavigazioneSM(sm.nome, sm.sigla, sm.coord);
-});
+// oggettiSacriMonti.sacriMonti.forEach((sm) => {
+//     new MarkerSacroMonte(sm.coord, sm.nome, sm.sigla, sm.urn);
+//     new BottoneNavigazioneSM(sm.nome, sm.sigla, sm.coord);
+// });
 
 // MARKER CAPPELLE
 
@@ -181,9 +181,9 @@ class MarkerCappella {
     }
 }
 
-oggettiCappelle.cappelle.forEach((c) => {
-    const markerCappella = new MarkerCappella(c.coord, c.nome, c.sigla, c.descrizione, c.urn);
-});
+// oggettiCappelle.cappelle.forEach((c) => {
+//     const markerCappella = new MarkerCappella(c.coord, c.nome, c.sigla, c.descrizione, c.urn);
+// });
 
 // questa funzione è molto carina ma va riarrangiata per ottenere l'URN da un'altra richiesta, non va bene hardcoded dentro oggetti... oppure sì?
 function getModel(urn) {
@@ -248,6 +248,42 @@ function invertiLista(listaCoordinate) {
     });
     return listaInvertita;
 }
+
+async function leggiDBMarkerSM() {
+    try {
+        const risultato = await fetch(`${urlCorrente}/DB_Servizio/MarkerSM`, {method: "GET", headers: {"content-type": "application/json"}});
+        const sacriMontiJson = await risultato.json();
+        // console.log(sacriMontiJson);
+        sacriMontiJson.forEach((smjson) => {
+            // console.log(smjson);
+            new MarkerSacroMonte(smjson.coord, smjson.nome, smjson.sigla, smjson.urn);
+            new BottoneNavigazioneSM(smjson.nome, smjson.sigla, smjson.coord);
+        });
+    }
+    catch(e) {
+        console.log('Errore nella lettura dei marker dei Sacri Monti');
+        console.log(e);
+    }
+}
+
+async function leggiDBMarkerCapp() {
+    try {
+        const risultato = await fetch(`${urlCorrente}/DB_Servizio/MarkerCapp`, {method: "GET", headers: {"content-type": "application/json"}});
+        const cappelleJson = await risultato.json();
+        // console.log(sacriMontiJson);
+        cappelleJson.forEach((cappjson) => {
+            // console.log(cappjson);
+            new MarkerCappella(cappjson.coord, cappjson.nome, cappjson.sigla, cappjson.descrizione, cappjson.urn);
+        });
+    }
+    catch(e) {
+        console.log('Errore nella lettura dei marker delle cappelle');
+        console.log(e);
+    }
+}
+
+leggiDBMarkerSM();
+leggiDBMarkerCapp();
 
 const testPoligono = L.geoJSON(geoJSON_tester);
 testPoligono.bindPopup('<b>CIAO!</b>');
