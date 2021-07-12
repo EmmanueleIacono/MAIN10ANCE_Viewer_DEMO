@@ -15,6 +15,7 @@ app.use('/api/forge/oauth', require('./routes/oauth'));
 app.use('/api/forge/oss', require('./routes/oss'));
 app.use('/', require('./server'));
 app.use('/', require('./serverGIS'));
+app.use('/', require('./DBServizio'));
 app.use((err, req, res, next) => {
     console.error(err);
     res.status(err.statusCode).json(err);
