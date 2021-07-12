@@ -61,7 +61,7 @@ class BottoneNavigazioneSM {
 const oggettiSacriMonti = { /*QUESTI OGGETTI DOVRANNO PROVENIRE DAL DATABASE */
     sacriMonti:
         [
-            {coord: [45.81852, 8.255573], nome: 'Varallo', sigla: 'SMV', urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfVW5pdCVDMyVBMFZvbHVtZXRyaWNoZV8lN0IzRCU3RC5ydnQ='},
+            {coord: [45.81852, 8.255573], nome: 'Varallo', sigla: 'SMV', urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfVW5pdCVDMyVBMFZvbHVtZXRyaWNoZV8lN0IzRCU3RF92Mi5ydnQ'},
             {coord: [45.96224, 8.615456], nome: 'Ghiffa', sigla: 'SMG', urn: ''},
             {coord: [45.79683, 8.410177], nome: 'Orta', sigla: 'SMOT', urn: ''},
             {coord: [45.09435, 8.275465], nome: 'Crea', sigla: 'SMC', urn: ''},
