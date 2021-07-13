@@ -1,6 +1,6 @@
 import('./ForgeViewer.js');
 
-const urlCorrente = window.location.href.toString().slice(0, -1);
+// const urlCorrente = window.location.href.toString().slice(0, -1);
 
 let formDB = document.getElementById('formDB');
 
@@ -114,7 +114,8 @@ async function leggiDBElemento(jsonReq) {
     try {
         cancellaFormDB(formDB);
 
-        const risultato = await fetch(`${urlCorrente}/Main10ance_DB/all`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
+        // const risultato = await fetch(`${urlCorrente}/Main10ance_DB/all`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
+        const risultato = await fetch(`/Main10ance_DB/all`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
         const nomeElem = jsonReq.nome;
         const categoriaElem = jsonReq.categoria;
         const idElem = jsonReq.id;
@@ -161,7 +162,8 @@ async function leggiDBElemento(jsonReq) {
 
 async function scriviParametroElemento(jsonReq) {
     try {
-        const risultato = await fetch(`${urlCorrente}/Main10ance_DB/all`, {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        // const risultato = await fetch(`${urlCorrente}/Main10ance_DB/all`, {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        const risultato = await fetch(`/Main10ance_DB/all`, {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
     }
     catch(e) {
         console.log('Errore nella modifica del database');

@@ -254,7 +254,8 @@ function invertiLista(listaCoordinate) {
 
 async function leggiDBMarkerSM() {
     try {
-        const risultato = await fetch(`${urlCorrente}/DB_Servizio/MarkerSM`, {method: "GET", headers: {"content-type": "application/json"}});
+        // const risultato = await fetch(`${urlCorrente}/DB_Servizio/MarkerSM`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/DB_Servizio/MarkerSM`, {method: "GET", headers: {"content-type": "application/json"}});
         const sacriMontiJson = await risultato.json();
         // console.log(sacriMontiJson);
         sacriMontiJson.forEach((smjson) => {
@@ -271,7 +272,8 @@ async function leggiDBMarkerSM() {
 
 async function leggiDBMarkerCapp() {
     try {
-        const risultato = await fetch(`${urlCorrente}/DB_Servizio/MarkerCapp`, {method: "GET", headers: {"content-type": "application/json"}});
+        // const risultato = await fetch(`${urlCorrente}/DB_Servizio/MarkerCapp`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/DB_Servizio/MarkerCapp`, {method: "GET", headers: {"content-type": "application/json"}});
         const cappelleJson = await risultato.json();
         // console.log(sacriMontiJson);
         cappelleJson.forEach((cappjson) => {
