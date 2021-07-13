@@ -10,7 +10,7 @@ const client = new Client({
     host: process.env.BIM_DB_HOST,
     port: process.env.BIM_DB_PORT,
     database: process.env.BIM_DB_DATABASE,
-    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+    ssl: process.env.SEGNAPOSTO_LOCALE ? false : { rejectUnauthorized: false }
 });
 
 // per testare la richiesta:

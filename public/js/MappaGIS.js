@@ -1,5 +1,5 @@
 //URL CORRENTE PER RICHIESTE
-const urlCorrente = window.location.href.toString().slice(0, -1);
+// const urlCorrente = window.location.href.toString().slice(0, -1);
 
 // COORDINATE UTILI
 const posOrigine = [45.61422, 8.410177];
