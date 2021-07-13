@@ -1,3 +1,6 @@
+//URL CORRENTE PER RICHIESTE
+const urlCorrente = window.location.href.toString().slice(0, -1);
+
 // COORDINATE UTILI
 const posOrigine = [45.61422, 8.410177];
 
@@ -119,29 +122,29 @@ class MarkerSacroMonte {
 
 // MARKER CAPPELLE
 
-const oggettiCappelle = { /* ANCHE QUESTI OGGETTI DOVRANNO PROVENIRE DAL DATABASE */
-    cappelle:
-        [
-            {coord: [45.81861, 8.256836], nome: 'Cappella 5', sigla: 'Capp5', descrizione: "L'adorazione dei Magi", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
-            {coord: [45.81851, 8.256810], nome: 'Cappella 6', sigla: 'Capp6', descrizione: "La Natività", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
-            {coord: [45.81854, 8.256743], nome: 'Cappella 7', sigla: 'Capp7', descrizione: "Adorazione dei pastori", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
-            {coord: [45.81845, 8.256847], nome: 'Cappella 8', sigla: 'Capp8', descrizione: "La presentazione al tempio", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
-            {coord: [45.81847, 8.256729], nome: 'Cappella 9', sigla: 'Capp9', descrizione: "Il secondo sogno di S. Giuseppe", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
-            {coord: [45.81856, 8.255797], nome: 'Cappella 20', sigla: 'Capp20', descrizione: "L'Ultima Cena", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
-            {coord: [45.81861, 8.255662], nome: 'Cappella 21', sigla: 'Capp21', descrizione: "Gesù nell'Orto degli Ulivi", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
-            {coord: [45.81865, 8.255523], nome: 'Cappella 22', sigla: 'Capp22', descrizione: "Gesù sveglia gli Apostoli", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
-            {coord: [45.81876, 8.255385], nome: 'Cappella 23', sigla: 'Capp23', descrizione: "La cattura di Gesù", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
-            {coord: [45.81883, 8.255247], nome: 'Cappella 27', sigla: 'Capp27', descrizione: "Gesù al tribunale di Pilato", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-            {coord: [45.81883, 8.255160], nome: 'Cappella 29', sigla: 'Capp29', descrizione: "Gesù al tribunale di Pilato", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-            {coord: [45.81883, 8.255077], nome: 'Cappella 30', sigla: 'Capp30', descrizione: "La flagellazione", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-            {coord: [45.81874, 8.255077], nome: 'Cappella 31', sigla: 'Capp31', descrizione: "La coronazione di spine", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-            {coord: [45.81868, 8.255079], nome: 'Cappella 32', sigla: 'Capp32', descrizione: "Gesù sale le scale del pretorio", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-            {coord: [45.81875, 8.255335], nome: 'Cappella 33', sigla: 'Capp33', descrizione: "Ecce Homo", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-            {coord: [45.81873, 8.255269], nome: 'Cappella 34', sigla: 'Capp34', descrizione: "Pilato si lava le mani", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-            {coord: [45.81873, 8.255180], nome: 'Cappella 35', sigla: 'Capp35', descrizione: "Gesù condannato alla morte di croce", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-            {coord: [45.81826, 8.255305], nome: 'Cappella 36', sigla: 'Capp36', descrizione: "La salita al Calvario", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8zNl92MjAyMC5ydnQ='},
-        ]
-};
+// const oggettiCappelle = { /* ANCHE QUESTI OGGETTI DOVRANNO PROVENIRE DAL DATABASE */
+//     cappelle:
+//         [
+//             {coord: [45.81861, 8.256836], nome: 'Cappella 5', sigla: 'Capp5', descrizione: "L'adorazione dei Magi", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
+//             {coord: [45.81851, 8.256810], nome: 'Cappella 6', sigla: 'Capp6', descrizione: "La Natività", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
+//             {coord: [45.81854, 8.256743], nome: 'Cappella 7', sigla: 'Capp7', descrizione: "Adorazione dei pastori", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
+//             {coord: [45.81845, 8.256847], nome: 'Cappella 8', sigla: 'Capp8', descrizione: "La presentazione al tempio", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
+//             {coord: [45.81847, 8.256729], nome: 'Cappella 9', sigla: 'Capp9', descrizione: "Il secondo sogno di S. Giuseppe", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
+//             {coord: [45.81856, 8.255797], nome: 'Cappella 20', sigla: 'Capp20', descrizione: "L'Ultima Cena", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
+//             {coord: [45.81861, 8.255662], nome: 'Cappella 21', sigla: 'Capp21', descrizione: "Gesù nell'Orto degli Ulivi", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
+//             {coord: [45.81865, 8.255523], nome: 'Cappella 22', sigla: 'Capp22', descrizione: "Gesù sveglia gli Apostoli", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
+//             {coord: [45.81876, 8.255385], nome: 'Cappella 23', sigla: 'Capp23', descrizione: "La cattura di Gesù", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
+//             {coord: [45.81883, 8.255247], nome: 'Cappella 27', sigla: 'Capp27', descrizione: "Gesù al tribunale di Pilato", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
+//             {coord: [45.81883, 8.255160], nome: 'Cappella 29', sigla: 'Capp29', descrizione: "Gesù al tribunale di Pilato", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
+//             {coord: [45.81883, 8.255077], nome: 'Cappella 30', sigla: 'Capp30', descrizione: "La flagellazione", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
+//             {coord: [45.81874, 8.255077], nome: 'Cappella 31', sigla: 'Capp31', descrizione: "La coronazione di spine", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
+//             {coord: [45.81868, 8.255079], nome: 'Cappella 32', sigla: 'Capp32', descrizione: "Gesù sale le scale del pretorio", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
+//             {coord: [45.81875, 8.255335], nome: 'Cappella 33', sigla: 'Capp33', descrizione: "Ecce Homo", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
+//             {coord: [45.81873, 8.255269], nome: 'Cappella 34', sigla: 'Capp34', descrizione: "Pilato si lava le mani", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
+//             {coord: [45.81873, 8.255180], nome: 'Cappella 35', sigla: 'Capp35', descrizione: "Gesù condannato alla morte di croce", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
+//             {coord: [45.81826, 8.255305], nome: 'Cappella 36', sigla: 'Capp36', descrizione: "La salita al Calvario", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8zNl92MjAyMC5ydnQ='},
+//         ]
+// };
 
 class MarkerCappella {
     constructor(coordinate, nome, sigla, descrizione, urn) {
