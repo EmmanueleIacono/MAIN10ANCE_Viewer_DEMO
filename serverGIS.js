@@ -5,11 +5,12 @@ appGIS.use(express.json());
 appGIS.use(express.static("public"));
 
 const client = new Client({
-    user: process.env.GIS_DB_USER,
-    password: process.env.GIS_DB_PASSWORD,
-    host: process.env.GIS_DB_HOST,
-    port: process.env.GIS_DB_PORT,
-    database: process.env.GIS_DB_DATABASE
+    // user: process.env.GIS_DB_USER,
+    // password: process.env.GIS_DB_PASSWORD,
+    // host: process.env.GIS_DB_HOST,
+    // port: process.env.GIS_DB_PORT,
+    // database: process.env.GIS_DB_DATABASE
+    connectionString: process.env.MAIN10ANCE_DB_URL
 });
 
 // per testare la richiesta:
