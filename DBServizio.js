@@ -5,11 +5,6 @@ appServizio.use(express.json());
 appServizio.use(express.static("public"));
 
 const client = new Client({
-    // user: process.env.DB_SERVIZIO_USER,
-    // password: process.env.DB_SERVIZIO_PASSWORD,
-    // host: process.env.DB_SERVIZIO_HOST,
-    // port: process.env.DB_SERVIZIO_PORT,
-    // database: process.env.DB_SERVIZIO_DATABASE,
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
