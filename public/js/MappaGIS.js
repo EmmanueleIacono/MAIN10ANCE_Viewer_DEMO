@@ -1,6 +1,3 @@
-//URL CORRENTE PER RICHIESTE
-// const urlCorrente = window.location.href.toString().slice(0, -1);
-
 // COORDINATE UTILI
 const posOrigine = [45.61422, 8.410177];
 
@@ -59,25 +56,6 @@ class BottoneNavigazioneSM {
     }
 }
 
-// MARKER SACRI MONTI
-
-// const oggettiSacriMonti = { /*QUESTI OGGETTI DOVRANNO PROVENIRE DAL DATABASE */
-//     sacriMonti:
-//         [
-//             {coord: [45.81852, 8.255573], nome: 'Varallo', sigla: 'SMV', urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfVW5pdCVDMyVBMFZvbHVtZXRyaWNoZV8lN0IzRCU3RF92Mi5ydnQ'},
-//             {coord: [45.96224, 8.615456], nome: 'Ghiffa', sigla: 'SMG', urn: ''},
-//             {coord: [45.79683, 8.410177], nome: 'Orta', sigla: 'SMOT', urn: ''},
-//             {coord: [45.09435, 8.275465], nome: 'Crea', sigla: 'SMC', urn: ''},
-//             {coord: [45.62364, 7.982626], nome: 'Oropa', sigla: 'SMOP', urn: ''},
-//             {coord: [45.97477, 9.177286], nome: 'Ossuccio', sigla: 'SMOS', urn: ''},
-//             {coord: [45.85137, 8.796597], nome: 'Varese', sigla: 'SMVS', urn: ''},
-//             {coord: [46.10645, 8.288634], nome: 'Domodossola', sigla: 'SMD', urn: ''},
-//             {coord: [45.36900, 7.633821], nome: 'Belmonte', sigla: 'SMB', urn: ''},
-//             {coord: [46.17530, 8.793431], nome: 'Orselina', sigla: 'SMOR', urn: ''},
-//             {coord: [46.12088, 8.706110], nome: 'Brissago', sigla: 'SMBR', urn: ''},
-//         ]
-// };
-
 class MarkerSacroMonte {
     constructor(coordinate, nome, sigla, urn) {
         this.coordinate = coordinate;
@@ -114,37 +92,6 @@ class MarkerSacroMonte {
         this.element.addTo(gruppoMarkerSacriMonti);
     }
 }
-
-// oggettiSacriMonti.sacriMonti.forEach((sm) => {
-//     new MarkerSacroMonte(sm.coord, sm.nome, sm.sigla, sm.urn);
-//     new BottoneNavigazioneSM(sm.nome, sm.sigla, sm.coord);
-// });
-
-// MARKER CAPPELLE
-
-// const oggettiCappelle = { /* ANCHE QUESTI OGGETTI DOVRANNO PROVENIRE DAL DATABASE */
-//     cappelle:
-//         [
-//             {coord: [45.81861, 8.256836], nome: 'Cappella 5', sigla: 'Capp5', descrizione: "L'adorazione dei Magi", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
-//             {coord: [45.81851, 8.256810], nome: 'Cappella 6', sigla: 'Capp6', descrizione: "La Natività", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
-//             {coord: [45.81854, 8.256743], nome: 'Cappella 7', sigla: 'Capp7', descrizione: "Adorazione dei pastori", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
-//             {coord: [45.81845, 8.256847], nome: 'Cappella 8', sigla: 'Capp8', descrizione: "La presentazione al tempio", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
-//             {coord: [45.81847, 8.256729], nome: 'Cappella 9', sigla: 'Capp9', descrizione: "Il secondo sogno di S. Giuseppe", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF81LTlfdjIwMjAucnZ0'},
-//             {coord: [45.81856, 8.255797], nome: 'Cappella 20', sigla: 'Capp20', descrizione: "L'Ultima Cena", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
-//             {coord: [45.81861, 8.255662], nome: 'Cappella 21', sigla: 'Capp21', descrizione: "Gesù nell'Orto degli Ulivi", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
-//             {coord: [45.81865, 8.255523], nome: 'Cappella 22', sigla: 'Capp22', descrizione: "Gesù sveglia gli Apostoli", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
-//             {coord: [45.81876, 8.255385], nome: 'Cappella 23', sigla: 'Capp23', descrizione: "La cattura di Gesù", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yMC0yM192MjAyMC5ydnQ='},
-//             {coord: [45.81883, 8.255247], nome: 'Cappella 27', sigla: 'Capp27', descrizione: "Gesù al tribunale di Pilato", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-//             {coord: [45.81883, 8.255160], nome: 'Cappella 29', sigla: 'Capp29', descrizione: "Gesù al tribunale di Pilato", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-//             {coord: [45.81883, 8.255077], nome: 'Cappella 30', sigla: 'Capp30', descrizione: "La flagellazione", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-//             {coord: [45.81874, 8.255077], nome: 'Cappella 31', sigla: 'Capp31', descrizione: "La coronazione di spine", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-//             {coord: [45.81868, 8.255079], nome: 'Cappella 32', sigla: 'Capp32', descrizione: "Gesù sale le scale del pretorio", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-//             {coord: [45.81875, 8.255335], nome: 'Cappella 33', sigla: 'Capp33', descrizione: "Ecce Homo", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-//             {coord: [45.81873, 8.255269], nome: 'Cappella 34', sigla: 'Capp34', descrizione: "Pilato si lava le mani", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-//             {coord: [45.81873, 8.255180], nome: 'Cappella 35', sigla: 'Capp35', descrizione: "Gesù condannato alla morte di croce", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8yNy0zNV92MjAyMC5ydnQ='},
-//             {coord: [45.81826, 8.255305], nome: 'Cappella 36', sigla: 'Capp36', descrizione: "La salita al Calvario", urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bWFpbjEwYW5jZV9wZ18wOS0wNi0yMS9TTVZfQ2FwcF8zNl92MjAyMC5ydnQ='},
-//         ]
-// };
 
 class MarkerCappella {
     constructor(coordinate, nome, sigla, descrizione, urn) {
@@ -183,10 +130,6 @@ class MarkerCappella {
         this.element.addTo(gruppoMarkerCappelle);
     }
 }
-
-// oggettiCappelle.cappelle.forEach((c) => {
-//     const markerCappella = new MarkerCappella(c.coord, c.nome, c.sigla, c.descrizione, c.urn);
-// });
 
 // questa funzione è molto carina ma va riarrangiata per ottenere l'URN da un'altra richiesta, non va bene hardcoded dentro oggetti... oppure sì?
 function getModel(urn) {
@@ -254,12 +197,9 @@ function invertiLista(listaCoordinate) {
 
 async function leggiDBMarkerSM() {
     try {
-        // const risultato = await fetch(`${urlCorrente}/DB_Servizio/MarkerSM`, {method: "GET", headers: {"content-type": "application/json"}});
         const risultato = await fetch(`/DB_Servizio/MarkerSM`, {method: "GET", headers: {"content-type": "application/json"}});
         const sacriMontiJson = await risultato.json();
-        // console.log(sacriMontiJson);
         sacriMontiJson.forEach((smjson) => {
-            // console.log(smjson);
             new MarkerSacroMonte(smjson.coord, smjson.nome, smjson.sigla, smjson.urn);
             new BottoneNavigazioneSM(smjson.nome, smjson.sigla, smjson.coord);
         });
@@ -272,12 +212,9 @@ async function leggiDBMarkerSM() {
 
 async function leggiDBMarkerCapp() {
     try {
-        // const risultato = await fetch(`${urlCorrente}/DB_Servizio/MarkerCapp`, {method: "GET", headers: {"content-type": "application/json"}});
         const risultato = await fetch(`/DB_Servizio/MarkerCapp`, {method: "GET", headers: {"content-type": "application/json"}});
         const cappelleJson = await risultato.json();
-        // console.log(sacriMontiJson);
         cappelleJson.forEach((cappjson) => {
-            // console.log(cappjson);
             new MarkerCappella(cappjson.coord, cappjson.nome, cappjson.sigla, cappjson.descrizione, cappjson.urn);
         });
     }
