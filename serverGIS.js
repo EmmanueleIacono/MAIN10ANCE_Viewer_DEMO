@@ -15,7 +15,7 @@ const client = new Client({
 });
 
 // per testare la richiesta:
-// fetch("http://localhost:3000/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "oid": 1066778289} }).then(a => a.json()).then(console.log)
+// fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "oid": 1066778289} }).then(a => a.json()).then(console.log)
 appGIS.get('/Main10ance_DB/GIS', async (req, res) => {
     const reqJson = req.headers;
     const identificativo = await leggiGIS(reqJson.tabella, reqJson.oid);
@@ -63,7 +63,7 @@ async function prova() {
 }
 
 // per testare la richiesta:
-// fetch("http://localhost:3000/Main10ance_DB/GIS_prova", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/Main10ance_DB/GIS_prova", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appGIS.get('/Main10ance_DB/GIS_prova', async (req, res) => {
     // const reqJson = req.headers;
     const risultato = await prova();

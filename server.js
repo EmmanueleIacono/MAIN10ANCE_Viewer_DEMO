@@ -14,7 +14,7 @@ const client = new Client({
 });
 
 // per testare la richiesta:
-// fetch("http://localhost:3000/Main10ance_DB/all", {method: "GET", headers: {"content-type": "application/json", "categoria": "Walls", "id": 365029} }).then(a => a.json()).then(console.log)
+// fetch("/Main10ance_DB/all", {method: "GET", headers: {"content-type": "application/json", "categoria": "Walls", "id": 365029} }).then(a => a.json()).then(console.log)
 appPG.get('/Main10ance_DB/all', async (req, res) => {
     const reqJson = req.headers;
     const identificativo = await leggiDBAll(reqJson.categoria, reqJson.id);
@@ -23,7 +23,7 @@ appPG.get('/Main10ance_DB/all', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("http://localhost:3000/Main10ance_DB/all", {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify({"categoria": "Walls", "parametro": "Comments", "valore": "ciao", "id": 365029}) }).then(a => a.json()).then(console.log)
+// fetch("/Main10ance_DB/all", {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify({"categoria": "Walls", "parametro": "Comments", "valore": "ciao", "id": 365029}) }).then(a => a.json()).then(console.log)
 appPG.patch('/Main10ance_DB/all', async (req, res) => {
     let result = {}
     try {

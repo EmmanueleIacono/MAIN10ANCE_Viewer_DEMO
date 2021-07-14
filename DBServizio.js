@@ -15,7 +15,7 @@ const client = new Client({
 });
 
 // per testare la richiesta:
-// fetch("http://localhost:3000/DB_Servizio/MarkerSM", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/DB_Servizio/MarkerSM", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appServizio.get('/DB_Servizio/MarkerSM', async (req, res) => {
     const markerSacriMonti = await leggiMarkerSM();
     res.setHeader('content-type', 'application/json');
@@ -23,7 +23,7 @@ appServizio.get('/DB_Servizio/MarkerSM', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("http://localhost:3000/DB_Servizio/MarkerCapp", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/DB_Servizio/MarkerCapp", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appServizio.get('/DB_Servizio/MarkerCapp', async (req, res) => {
     const markerCappelle = await leggiMarkerCapp();
     res.setHeader('content-type', 'application/json');
