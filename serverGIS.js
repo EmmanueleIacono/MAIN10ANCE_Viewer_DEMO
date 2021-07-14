@@ -10,7 +10,8 @@ const client = new Client({
     // host: process.env.GIS_DB_HOST,
     // port: process.env.GIS_DB_PORT,
     // database: process.env.GIS_DB_DATABASE
-    connectionString: process.env.MAIN10ANCE_DB_URL
+    connectionString: process.env.MAIN10ANCE_DB_URL,
+    ssl: { rejectUnauthorized: false }
 });
 
 // per testare la richiesta:
