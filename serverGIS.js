@@ -57,6 +57,16 @@ async function prova() {
     }
 }
 
+async function leggiListaTabelle() {
+    try {
+        const results = await client.query(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'main10ance_sacrimonti';`);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+};
+
 // per testare la richiesta:
 // fetch("/Main10ance_DB/GIS_prova", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appGIS.get('/Main10ance_DB/GIS_prova', async (req, res) => {
@@ -66,5 +76,13 @@ appGIS.get('/Main10ance_DB/GIS_prova', async (req, res) => {
     res.send(risultato);
     // console.log(risultato);
 });
+
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabelle", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appGIS.get('/Main10ance_DB/tabelle', async (req, res) => {
+    const risposta = await leggiListaTabelle();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+})
 
 module.exports = appGIS
