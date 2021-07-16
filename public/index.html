@@ -79,26 +79,29 @@
         </div>
         <div id="tabDatabase" data-tab-content>
           <div id="filtroDB">
-            <div id="colDBCapp" class="colonnaDB"><h4>Cappella</h4></div>
-            <!-- <div id="colDBLOD3" class="colonnaDB"><h4>LOD 3</h4>
-              <input type="radio" name="radioLOD3" id="radioLOD3">
-            </div>
-            <div id="colDBLOD4" class="colonnaDB"><h4>LOD 4</h4>
-              <input type="radio" name="radioLOD4" id="radioLOD4">
+            <!-- <div id="colDBCapp" class="colonnaDB"><h4>Cappella</h4>
+              <label for="selectCappella">Seleziona una cappella</label>
+              <select name="selectCappella" id="selectCappella"></select>
             </div> -->
             <div id="colDBLOD34" class="colonnaDB">
               <form>
                 <input type="radio" name="radioLOD" id="radioLOD3">
-                <label for="radioLOD3">LOD 3</label>
+                <label for="radioLOD3">Opere immobili</label>
                 <select name="selectLOD3" id="selectLOD3" disabled></select>
+                <label for="selectEdificio">Seleziona un edificio</label>
+                <select name="selectEdificio" id="selectEdificio" disabled></select>
                 <br>
                 <input type="radio" name="radioLOD" id="radioLOD4">
-                <label for="radioLOD4">LOD 4</label>
+                <label for="radioLOD4">Opere mobili e superfici decorate</label>
                 <select name="selectLOD4" id="selectLOD4" disabled></select>
+                <label for="selectCappella">Seleziona una cappella</label>
+                <select name="selectCappella" id="selectCappella" disabled></select>
               </form>
             </div>
-            <div id="colDBLOD5" class="colonnaDB"><h4>LOD 5</h4>
-              <select name="selectLOD5" id="selectLOD5"></select>
+            <div id="colDBLOD5" class="colonnaDB">
+              <!-- <h5>Attività</h5> -->
+              <label for="selectLOD5">Attività</label>
+              <select name="selectLOD5" id="selectLOD5" disabled></select>
             </div>
           </div>
           <div id="risultatiDB"></div>
@@ -165,14 +168,24 @@
 </script>
 <!-- SCRIPT PER GESTIONE RADIO LOD DB -->
 <script>
-  if(document.getElementById('radioLOD3').checked) {
-  // abilito select lod 3
-  document.getElementById('selectLOD3').disabled = false;
-  }
-  else if(document.getElementById('radioLOD4').checked) {
-    // abilito select lod 4
-    document.getElementById('selectLOD4').disabled = false;
-  }
+  setInterval(() => {
+    if(document.getElementById('radioLOD3').checked) {
+      // abilito select lod 3
+      document.getElementById('selectLOD3').disabled = false;
+      document.getElementById('selectLOD4').disabled = true;
+      document.getElementById('selectEdificio').disabled = false;
+      document.getElementById('selectCappella').disabled = true;
+      document.getElementById('selectLOD5').disabled = false;
+    }
+    else if(document.getElementById('radioLOD4').checked) {
+      // abilito select lod 4
+      document.getElementById('selectLOD4').disabled = false;
+      document.getElementById('selectLOD3').disabled = true;
+      document.getElementById('selectCappella').disabled = false;
+      document.getElementById('selectEdificio').disabled = true;
+      document.getElementById('selectLOD5').disabled = false;
+    }
+  }, 100);
 </script>
 </body>
 </html>

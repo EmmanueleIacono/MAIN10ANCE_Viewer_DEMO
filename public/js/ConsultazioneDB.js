@@ -4,6 +4,24 @@ const listaLOD5 = ['controllo_stato_di_conservazione_livello_di_urgenza', 'danno
 const listaLOD4 = ['statua', 'arredo', 'pavimento_decorativo', 'quadro', 'dipinto_murale'];
 const listaLOD3 = ['muro', 'tetto', 'pavimento', 'pilastro', 'finestra', 'porta', 'scala', 'modello_generico'];
 
+const listaComplessiSMV = ['1', '2-3-4', '5-6-7-8-9', '10', '11', '12', '13', '14', '15', '16-24', '17', '18', '19', '20-21-22-23', '25-26', '27-29-30-31-32-33-34-35', '28', '36', '37-38-39', '40-41-42-43-44', '45'];
+
+const selezioneCapp = document.getElementById('selectCappella');
+for (let n = 1; n <= 45; n++) {
+    const opzioneCapp = document.createElement('option');
+    opzioneCapp.setAttribute('value', `${n}`);
+    opzioneCapp.innerHTML = `Cappella ${n}`;
+    selezioneCapp.appendChild(opzioneCapp);
+}
+
+const selezioneEdf = document.getElementById('selectEdificio');
+listaComplessiSMV.forEach(edf => {
+    const opzioneEdf = document.createElement('option');
+    opzioneEdf.setAttribute('value', `${edf}`);
+    opzioneEdf.innerHTML = `${edf}`;
+    selezioneEdf.appendChild(opzioneEdf);
+});
+
 async function prendiTabelle() {
     try {
         // contenitoreDB.innerHTML = "";
@@ -140,4 +158,9 @@ SELECT * FROM information_schema.table_privileges;
 SELECT * FROM information_schema.constraint_table_usage;
 SELECT * FROM information_schema.constraint_column_usage;
 SELECT * FROM information_schema.check_constraints;
+
+
+
+
+select tablename as mytable from  pg_tables where schemaname  ='main10ance_sacrimonti' --> QUESTO FA SELEZIONARE UNA PER UNA TUTTE LE TABELLE
 */
