@@ -48,9 +48,10 @@ async function leggiGIS(nomeTabella, oidElemento) {
 async function prova() {
     try {
     // const result = await client.query('SELECT ST_AsGeoJSON("geom_pol", 9, 4) FROM main10ance_sacrimonti."bosco" WHERE "oid" = 1066795976;');
-    const result = await client.query('SELECT ST_AsGeoJSON("geom_pol") FROM main10ance_sacrimonti."bosco" WHERE "oid" = 1066795976;');
-    // return result.rows;
-    return result.rows[0].st_asgeojson;
+    // const result = await client.query('SELECT ST_AsGeoJSON("geom_pun"), "loc_sg_top" FROM main10ance_sacrimonti."località_significativa";');
+    const result = await client.query('SELECT ST_AsGeoJSON("geom_pol"), "bosco_ty" FROM main10ance_sacrimonti."bosco";');
+    // return result.rows[0].st_asgeojson;
+    return result.rows;
     }
     catch(e) {
         return [];
