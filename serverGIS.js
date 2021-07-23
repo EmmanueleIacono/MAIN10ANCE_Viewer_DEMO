@@ -7,7 +7,7 @@ appGIS.use(express.static("public"));
 const client = new Client({
     // connectionString: process.env.MAIN10ANCE_DB_URL,
     // ssl: { rejectUnauthorized: false }
-    connectionString: "postgresql://postgres:rilievo@localhost:5432/Main10ance_v4",
+    connectionString: "postgresql://postgres:rilievo@localhost:5432/main10ance_v4",
 });
 
 // per testare la richiesta:
