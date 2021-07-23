@@ -143,57 +143,57 @@ function getModel(urn) {
 }
 
 // fare in modo che i geojson siano presi dal database main10ance
-const geoJSON_tester = {
-    "type": "FeatureCollection",
-    "features": [
-        {
-        "type": "Feature",
-        "properties": {},
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [
-            [
-                [
-                8.254728913307188,
-                45.81896009407471
-                ],
-                [
-                8.254761099815369,
-                45.81838434481882
-                ],
-                [
-                8.255758881568909,
-                45.81814880931642
-                ],
-                [
-                8.256434798240662,
-                45.818758208649754
-                ],
-                [
-                8.256000280380249,
-                45.819247966470186
-                ],
-                [
-                8.254728913307188,
-                45.81896009407471
-                ]
-            ]
-            ]
-        }
-        }
-    ]
-}
+// const geoJSON_tester = {
+//     "type": "FeatureCollection",
+//     "features": [
+//         {
+//         "type": "Feature",
+//         "properties": {},
+//         "geometry": {
+//             "type": "Polygon",
+//             "coordinates": [
+//             [
+//                 [
+//                 8.254728913307188,
+//                 45.81896009407471
+//                 ],
+//                 [
+//                 8.254761099815369,
+//                 45.81838434481882
+//                 ],
+//                 [
+//                 8.255758881568909,
+//                 45.81814880931642
+//                 ],
+//                 [
+//                 8.256434798240662,
+//                 45.818758208649754
+//                 ],
+//                 [
+//                 8.256000280380249,
+//                 45.819247966470186
+//                 ],
+//                 [
+//                 8.254728913307188,
+//                 45.81896009407471
+//                 ]
+//             ]
+//             ]
+//         }
+//         }
+//     ]
+// }
 
-function invertiLista(listaCoordinate) {
-    listaInvertita = [];
-    listaCoordinate.forEach((coord) => {
-        coordInvertite = [];
-        coordInvertite[0] = coord[1];
-        coordInvertite[1] = coord[0];
-        listaInvertita.push(coordInvertite);
-    });
-    return listaInvertita;
-}
+// function invertiLista(listaCoordinate) {
+//     listaInvertita = [];
+//     listaCoordinate.forEach((coord) => {
+//         coordInvertite = [];
+//         coordInvertite[0] = coord[1];
+//         coordInvertite[1] = coord[0];
+//         listaInvertita.push(coordInvertite);
+//     });
+//     return listaInvertita;
+// }
 
 async function leggiDBMarkerSM() {
     try {
@@ -227,28 +227,41 @@ async function leggiDBMarkerCapp() {
 leggiDBMarkerSM();
 leggiDBMarkerCapp();
 
-const testPoligono = L.geoJSON(geoJSON_tester);
-testPoligono.bindPopup('<b>CIAO!</b>');
+// const testPoligono = L.geoJSON(geoJSON_tester);
+// testPoligono.bindPopup('<b>CIAO!</b>');
 
-const spegniGeoJSON = document.getElementById('spegniGeoJSON');
-let visibilitàGeoJSON = false;
-spegniGeoJSON.addEventListener("click", () => {
-    if (visibilitàGeoJSON) {
-        mappaGIS.removeLayer(testPoligono);
-    }
-    else {
-        mappaGIS.addLayer(testPoligono);
-    }
-    visibilitàGeoJSON = !visibilitàGeoJSON;
-});
+// const spegniGeoJSON = document.getElementById('spegniGeoJSON');
+// let visibilitàGeoJSON = false;
+// spegniGeoJSON.addEventListener("click", () => {
+//     if (visibilitàGeoJSON) {
+//         mappaGIS.removeLayer(testPoligono);
+//     }
+//     else {
+//         mappaGIS.addLayer(testPoligono);
+//     }
+//     visibilitàGeoJSON = !visibilitàGeoJSON;
+// });
+
+const tabellePopolateGIS = [
+    {tabella: "accesso_civico_toponimo_stradale", alias: "Accesso civico - Toponimo stradale", geometria: "geom_pun", colonneUtili: ["tp_str_nom", "acc_pc_ty", "civico_num"]},
+    {tabella: "area_di_circolazione_veicolare", alias: "Area di circolazione veicolare", geometria: "geom_pol", colonneUtili: ["ac_vei_zon"]},
+    {tabella: "area_verde", alias: "Area verde", geometria: "geom_pol", colonneUtili: ["ar_vrd_pa", "ar_vrd_ty"]},
+    {tabella: "bosco", alias: "Bosco", geometria: "geom_pol", colonneUtili: ["bosco_gov", "bosco_ty"]},
+    {tabella: "coltura_agricola", alias: "Coltura agricola", geometria: "geom_pol", colonneUtili: ["cl_agr_ty"]},
+    {tabella: "corso_d_acqua", alias: "Corso d\'acqua", geometria: "geom_pol", colonneUtili: ["cda_nom", "cda_ty"]},
+    {tabella: "curve_di_livello", alias: "Curve di livello", geometria: "geom_lin", colonneUtili: ["cv_liv_dt", "cv_liv_ty"]},
+    {tabella: "edificio", alias: "Edificio", geometria: "geom_pol", colonneUtili: ["edifc_stat", "edifc_ty", "edifc_uso"]},
+    {tabella: "edificio_minore", alias: "Edificio minore", geometria: "geom_pol", colonneUtili: ["edi_min_st", "edi_min_ty"]},
+    {tabella: "elemento_di_copertura", alias: "Elemento di copertura", geometria: "geom_pol", colonneUtili: ["ele_cp_ty"]},
+    {tabella: "località_significativa", alias: "Località significativa", geometria: "geom_pun", colonneUtili: ["loc_sg_top", "loc_sg_ty", "loc_sg_sgn"]},
+    {tabella: "nodo_rete_elettrica", alias: "Nodo rete elettrica", geometria: "geom_pun", colonneUtili: ["nd_ele_ty"]},
+    {tabella: "specchio_d_acqua", alias: "Specchio d\'acqua", geometria: "geom_pol", colonneUtili: ["sp_acq_nom", "sp_acq_ty"]},
+    {tabella: "strade_sentieri_e_altri_percorsi_interni", alias: "Strade, sentieri e altri percorsi interni", geometria: "geom_pol", colonneUtili: ["ar_vms_ty", "ar_vms_fon"]},
+    {tabella: "tratto_rete_elettrica", alias: "Tratto rete elettrica", geometria: "geom_lin", colonneUtili: ["tr_ele_ty"]},
+    {tabella: "unità_volumetrica", alias: "Unità volumetrica", geometria: "geom_pol", colonneUtili: ["un_vol_av"]},
+]
 
 proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
-// {"type":"Polygon","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:EPSG::32632"}},"coordinates":[[[445914,5076749],[445901,5076737],[445895,5076730],[445893,5076726],[445888,5076714],[445881,5076704],[445872,5076692],[445865,5076686],[445859,5076683],[445853,5076681],[445836,5076680],[445826,5076678],[445815,5076675],[445779,5076654],[445775,5076649],[445768,5076640],[445747,5076606],[445743.391207582,5076614.11978294],[445747.348,5076618.45],[445759.635,5076632.51],[445773.632,5076650.1557],[445778.087,5076655.772],[445783.62,5076662.0541],[445784.498,5076663.051],[445785.239,5076663.736],[445786.442,5076664.343],[445817.932,5076679.428],[445844.503,5076688.675],[445849.295,5076689.92],[445855.432,5076691.814],[445857.0993,5076692.4834],[445861.716,5076694.337],[445863.176,5076695.763],[445863.586,5076697.875],[445863.221,5076699.514],[445861.996,5076701.646],[445858.567,5076704.572],[445858.5253,5076704.5893],[445855.217,5076705.958],[445852.145,5076706.476],[445848.684,5076706.709],[445844.059,5076706.091],[445818.853,5076697.927],[445797.343,5076693.464],[445783.62,5076691.1208],[445777.1364,5076690.0137],[445759.938,5076687.077],[445754.531,5076685.505],[445738.1377,5076681.8089],[445712.374,5076676],[445703.023,5076674.475],[445698.796,5076674.91],[445696.41,5076676.574],[445696.334,5076678.21],[445696.347811924,5076679.33912477],[445723,5076690],[445759,5076712],[445761.24980965,5076714.571211029],[445771.906,5076721.8753],[445773.258,5076722.802],[445783.62,5076730.9723],[445797.54,5076741.948],[445802.112,5076746.223],[445805.73,5076751.086],[445807.223,5076755.109],[445807.649,5076758.663],[445807.423,5076764.126],[445806.325,5076766.319],[445805.818331104,5076766.83922974],[445817,5076772],[445846,5076774],[445877,5076774],[445906,5076760],[445914,5076749]],[[445887.30148884,5076729.005770294],[445893.720941118,5076735.506547229],[445889.391171256,5076739.847201657],[445882.968658181,5076733.10833126],[445887.30148884,5076729.005770294]]]}
-// const geojsonPROVAEPSG = {"type":"Polygon","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:EPSG::32632"}},"coordinates":[[[445914,5076749],[445901,5076737],[445895,5076730],[445893,5076726],[445888,5076714],[445881,5076704],[445872,5076692],[445865,5076686],[445859,5076683],[445853,5076681],[445836,5076680],[445826,5076678],[445815,5076675],[445779,5076654],[445775,5076649],[445768,5076640],[445747,5076606],[445743.391207582,5076614.11978294],[445747.348,5076618.45],[445759.635,5076632.51],[445773.632,5076650.1557],[445778.087,5076655.772],[445783.62,5076662.0541],[445784.498,5076663.051],[445785.239,5076663.736],[445786.442,5076664.343],[445817.932,5076679.428],[445844.503,5076688.675],[445849.295,5076689.92],[445855.432,5076691.814],[445857.0993,5076692.4834],[445861.716,5076694.337],[445863.176,5076695.763],[445863.586,5076697.875],[445863.221,5076699.514],[445861.996,5076701.646],[445858.567,5076704.572],[445858.5253,5076704.5893],[445855.217,5076705.958],[445852.145,5076706.476],[445848.684,5076706.709],[445844.059,5076706.091],[445818.853,5076697.927],[445797.343,5076693.464],[445783.62,5076691.1208],[445777.1364,5076690.0137],[445759.938,5076687.077],[445754.531,5076685.505],[445738.1377,5076681.8089],[445712.374,5076676],[445703.023,5076674.475],[445698.796,5076674.91],[445696.41,5076676.574],[445696.334,5076678.21],[445696.347811924,5076679.33912477],[445723,5076690],[445759,5076712],[445761.24980965,5076714.571211029],[445771.906,5076721.8753],[445773.258,5076722.802],[445783.62,5076730.9723],[445797.54,5076741.948],[445802.112,5076746.223],[445805.73,5076751.086],[445807.223,5076755.109],[445807.649,5076758.663],[445807.423,5076764.126],[445806.325,5076766.319],[445805.818331104,5076766.83922974],[445817,5076772],[445846,5076774],[445877,5076774],[445906,5076760],[445914,5076749]],[[445887.30148884,5076729.005770294],[445893.720941118,5076735.506547229],[445889.391171256,5076739.847201657],[445882.968658181,5076733.10833126],[445887.30148884,5076729.005770294]]]};
-// const boh = new L.Proj.GeoJSON(geojsonPROVAEPSG).addTo(mappaGIS);
-// L.Proj.GeoJSON(geojsonPROVAEPSG).addTo(mappaGIS);
-// const oggettoZERO = {"type":"Polygon","crs":{"type":"name","properties":{"name":"EPSG:32632"}},"coordinates":[[[445914,5076749],[445901,5076737],[445895,5076730],[445893,5076726],[445888,5076714],[445881,5076704],[445872,5076692],[445865,5076686],[445859,5076683],[445853,5076681],[445836,5076680],[445826,5076678],[445815,5076675],[445779,5076654],[445775,5076649],[445768,5076640],[445747,5076606],[445743.391207582,5076614.11978294],[445747.348,5076618.45],[445759.635,5076632.51],[445773.632,5076650.1557],[445778.087,5076655.772],[445783.62,5076662.0541],[445784.498,5076663.051],[445785.239,5076663.736],[445786.442,5076664.343],[445817.932,5076679.428],[445844.503,5076688.675],[445849.295,5076689.92],[445855.432,5076691.814],[445857.0993,5076692.4834],[445861.716,5076694.337],[445863.176,5076695.763],[445863.586,5076697.875],[445863.221,5076699.514],[445861.996,5076701.646],[445858.567,5076704.572],[445858.5253,5076704.5893],[445855.217,5076705.958],[445852.145,5076706.476],[445848.684,5076706.709],[445844.059,5076706.091],[445818.853,5076697.927],[445797.343,5076693.464],[445783.62,5076691.1208],[445777.1364,5076690.0137],[445759.938,5076687.077],[445754.531,5076685.505],[445738.1377,5076681.8089],[445712.374,5076676],[445703.023,5076674.475],[445698.796,5076674.91],[445696.41,5076676.574],[445696.334,5076678.21],[445696.347811924,5076679.33912477],[445723,5076690],[445759,5076712],[445761.24980965,5076714.571211029],[445771.906,5076721.8753],[445773.258,5076722.802],[445783.62,5076730.9723],[445797.54,5076741.948],[445802.112,5076746.223],[445805.73,5076751.086],[445807.223,5076755.109],[445807.649,5076758.663],[445807.423,5076764.126],[445806.325,5076766.319],[445805.818331104,5076766.83922974],[445817,5076772],[445846,5076774],[445877,5076774],[445906,5076760],[445914,5076749]],[[445887.30148884,5076729.005770294],[445893.720941118,5076735.506547229],[445889.391171256,5076739.847201657],[445882.968658181,5076733.10833126],[445887.30148884,5076729.005770294]]]}
-// const geojsonZERO = new L.Proj.GeoJSON(oggettoZERO).addTo(mappaGIS);
 
 async function getGeoJSON() {
     let oggetto_geoJSON_DB = await fetch("/Main10ance_DB/GIS_prova", {method: "GET", headers: {"content-type": "application/json"} });
@@ -276,4 +289,23 @@ function stileGeoJSON(polGeoJSON) {
     }
 }
 
-getGeoJSON();
+// getGeoJSON();
+
+async function getGIS(tabella, alias, geometria, colonneUtili) {
+    let oggettiGIS = await fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "alias": alias, "geometria": geometria, "colonneUtili": colonneUtili} });
+    let resp_oggettiGIS = await oggettiGIS.json();
+    return resp_oggettiGIS;
+    // console.log(resp_oggettiGIS);
+}
+
+tabellePopolateGIS.forEach(async tbl => {
+    // console.log(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili.join(", "));
+    const tabellaGIS = await getGIS(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili.join(", "));
+    // console.log(tabellaGIS);
+    tabellaGIS.forEach(geo => {
+        const geoRaw = JSON.parse(geo.geom);
+        const geoGeoJSON = L.Proj.geoJson(geoRaw).addTo(mappaGIS);
+        geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
+    });
+    // console.log(`SELECT ST_AsGeoJSON(${tbl.geometria}) AS "geom", ${tbl.colonneUtili.join(", ")} FROM main10ance_sacrimonti.${tbl.tabella} AS "${tbl.alias}";`);
+});

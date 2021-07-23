@@ -5,17 +5,21 @@ appGIS.use(express.json());
 appGIS.use(express.static("public"));
 
 const client = new Client({
-    connectionString: process.env.MAIN10ANCE_DB_URL,
-    ssl: { rejectUnauthorized: false }
+    // connectionString: process.env.MAIN10ANCE_DB_URL,
+    // ssl: { rejectUnauthorized: false }
+    connectionString: "postgresql://postgres:rilievo@localhost:5432/Main10ance_v4",
 });
 
 // per testare la richiesta:
 // fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "oid": 1066778289} }).then(a => a.json()).then(console.log)
+// fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "alias": "Bosco", "geometria": "geom_pol", "colonneUtili": ["bosco_gov", "bosco_ty"]} }).then(a => a.json()).then(console.log)
 appGIS.get('/Main10ance_DB/GIS', async (req, res) => {
     const reqJson = req.headers;
-    const identificativo = await leggiGIS(reqJson.tabella, reqJson.oid);
+    // const identificativo = await leggiGIS(reqJson.tabella, reqJson.oid);
+    const rispostaGIS = await leggiGIS(reqJson.tabella, reqJson.alias, reqJson.geometria, reqJson.colonneutili); //N.B.: scrivo "colonneutili" tutto minuscolo perché arriva così dagli headers della richiesta
     res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(identificativo[0]));
+    // res.send(JSON.stringify(identificativo[0]));
+    res.send(JSON.stringify(rispostaGIS));
 });
 
 start();
@@ -34,16 +38,28 @@ async function connect() {
     }
 };
 
+// VECCHIA
+// async function leggiGIS(nomeTabella, oidElemento) {
+//     try {
+//         const results = await client.query(`SELECT ST_AsGeoJSON FROM main10ance_sacrimonti."${nomeTabella}" WHERE "oid" = ($1);`, [oidElemento]);
+//         return results.rows;
+//     }
+//     catch(e) {
+//         return [];
+//     }
+// };
 
-async function leggiGIS(nomeTabella, oidElemento) {
+async function leggiGIS(tabella, alias, geometria, colonneUtili) {
     try {
-        const results = await client.query(`SELECT ST_AsGeoJSON FROM main10ance_sacrimonti."${nomeTabella}" WHERE "oid" = ($1);`, [oidElemento]);
-        return results.rows;
+        // console.log(colonneUtili);
+        const result = await client.query(`SELECT ST_AsGeoJSON(${geometria}) AS "geom", CONCAT_WS(', ', ${colonneUtili}) AS "info" FROM main10ance_sacrimonti.${tabella} AS "${alias}";`);
+        // const result = await client.query(`SELECT ST_AsGeoJSON(geom_pol) AS "geom", ar_vms_ty,ar_vms_fon FROM main10ance_sacrimonti.strade_sentieri_e_altri_percorsi_interni AS "Strade, sentieri e altri percorsi interni";`);
+        return result.rows;
     }
     catch(e) {
-        return [];
+        return [`errore: ${e}`];
     }
-};
+}
 
 async function prova() {
     try {
@@ -56,7 +72,7 @@ async function prova() {
     catch(e) {
         return [];
     }
-}
+};
 
 async function leggiListaTabelle() {
     try {
@@ -84,6 +100,6 @@ appGIS.get('/Main10ance_DB/tabelle', async (req, res) => {
     const risposta = await leggiListaTabelle();
     res.setHeader('content-type', 'application/json');
     res.send(risposta);
-})
+});
 
 module.exports = appGIS
