@@ -36,18 +36,19 @@ bottoneRefresh.addEventListener("click", () => {
     mappaGIS.setView(posOrigine, 8)
 });
 
-// classe per bottoni di navigazione SM
+// classi per bottoni di navigazione SM e Marker SM e CAPP
 class BottoneNavigazioneSM {
     constructor(nome, sigla, posizione) {
         this.nome = nome,
         this.sigla = sigla,
         this.posizione = posizione
 
-        const bottoneNav = document.createElement('button');
+        // const bottoneNav = document.createElement('button');
+        const bottoneNav = document.createElement('li');
         bottoneNav.setAttribute('id', `scegli${sigla}`);
         bottoneNav.innerHTML = `Sacro Monte di ${nome}`;
 
-        const contenitoreBottoniNav = document.getElementById('contenitore-selettori');
+        const contenitoreBottoniNav = document.getElementById('contenitore-selettori-2');
         contenitoreBottoniNav.appendChild(bottoneNav);
 
         bottoneNav.addEventListener('click', () => {
@@ -162,18 +163,6 @@ function getModel(urn) {
 //                 45.81838434481882
 //                 ],
 //                 [
-//                 8.255758881568909,
-//                 45.81814880931642
-//                 ],
-//                 [
-//                 8.256434798240662,
-//                 45.818758208649754
-//                 ],
-//                 [
-//                 8.256000280380249,
-//                 45.819247966470186
-//                 ],
-//                 [
 //                 8.254728913307188,
 //                 45.81896009407471
 //                 ]
@@ -182,17 +171,6 @@ function getModel(urn) {
 //         }
 //         }
 //     ]
-// }
-
-// function invertiLista(listaCoordinate) {
-//     listaInvertita = [];
-//     listaCoordinate.forEach((coord) => {
-//         coordInvertite = [];
-//         coordInvertite[0] = coord[1];
-//         coordInvertite[1] = coord[0];
-//         listaInvertita.push(coordInvertite);
-//     });
-//     return listaInvertita;
 // }
 
 async function leggiDBMarkerSM() {
@@ -244,21 +222,19 @@ leggiDBMarkerCapp();
 
 const tabellePopolateGIS = [
     // {tabella: "accesso_civico_toponimo_stradale", alias: "Accesso civico - Toponimo stradale", geometria: "geom_pun", colonneUtili: ["tp_str_nom", "acc_pc_ty", "civico_num"]},
-    // {tabella: "area_di_circolazione_veicolare", alias: "Area di circolazione veicolare", geometria: "geom_pol", colonneUtili: ["ac_vei_zon"]},
+    {tabella: "area_di_circolazione_veicolare", alias: "Area di circolazione veicolare", geometria: "geom_pol", colonneUtili: ["ac_vei_zon"]},
     // {tabella: "area_verde", alias: "Area verde", geometria: "geom_pol", colonneUtili: ["ar_vrd_pa", "ar_vrd_ty"]},
     // {tabella: "bosco", alias: "Bosco", geometria: "geom_pol", colonneUtili: ["bosco_gov", "bosco_ty"]},
     // {tabella: "coltura_agricola", alias: "Coltura agricola", geometria: "geom_pol", colonneUtili: ["cl_agr_ty"]},
     // {tabella: "corso_d_acqua", alias: "Corso d\'acqua", geometria: "geom_pol", colonneUtili: ["cda_nom", "cda_ty"]},
     // {tabella: "curve_di_livello", alias: "Curve di livello", geometria: "geom_lin", colonneUtili: ["cv_liv_dt", "cv_liv_ty"]},
-    {tabella: "edificio", alias: "Edificio", geometria: "geom_pol", colonneUtili: ["edifc_stat", "edifc_ty", "edifc_uso", "oid"]},
+    // {tabella: "edificio", alias: "Edificio", geometria: "geom_pol", colonneUtili: ["edifc_stat", "edifc_ty", "edifc_uso", "oid"]},
     // {tabella: "edificio_minore", alias: "Edificio minore", geometria: "geom_pol", colonneUtili: ["edi_min_st", "edi_min_ty"]},
-    // {tabella: "elemento_di_copertura", alias: "Elemento di copertura", geometria: "geom_pol", colonneUtili: ["ele_cp_ty", "oid"]}, // DA SVUOTARE, DIVENTA BIM
     // {tabella: "località_significativa", alias: "Località significativa", geometria: "geom_pun", colonneUtili: ["loc_sg_top", "loc_sg_ty", "loc_sg_sgn"]},
     // {tabella: "nodo_rete_elettrica", alias: "Nodo rete elettrica", geometria: "geom_pun", colonneUtili: ["nd_ele_ty"]},
     // {tabella: "specchio_d_acqua", alias: "Specchio d\'acqua", geometria: "geom_pol", colonneUtili: ["sp_acq_nom", "sp_acq_ty"]},
     // {tabella: "strade_sentieri_e_altri_percorsi_interni", alias: "Strade, sentieri e altri percorsi interni", geometria: "geom_pol", colonneUtili: ["ar_vms_ty", "ar_vms_fon"]},
     // {tabella: "tratto_rete_elettrica", alias: "Tratto rete elettrica", geometria: "geom_lin", colonneUtili: ["tr_ele_ty"]},
-    // {tabella: "unità_volumetrica", alias: "Unità volumetrica", geometria: "geom_pol", colonneUtili: ["un_vol_av", "oid"]},
 ]
 
 proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
@@ -295,17 +271,22 @@ async function getGIS(tabella, alias, geometria, colonneUtili) {
     let oggettiGIS = await fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "alias": alias, "geometria": geometria, "colonneUtili": colonneUtili} });
     let resp_oggettiGIS = await oggettiGIS.json();
     return resp_oggettiGIS;
-    // console.log(resp_oggettiGIS);
 }
 
+function creaLivelli(tabPopGIS) {
+    tabPopGIS.forEach(tb => {
+        console.log(tb.alias);
+        eval(`const ${tb.tabella} = L.layerGroup();`);
+    });
+}
+
+creaLivelli(tabellePopolateGIS);
+
 tabellePopolateGIS.forEach(async tbl => {
-    // console.log(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili.join(", "));
     const tabellaGIS = await getGIS(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili.join(", "));
-    // console.log(tabellaGIS);
     tabellaGIS.forEach(geo => {
         const geoRaw = JSON.parse(geo.geom);
         const geoGeoJSON = L.Proj.geoJson(geoRaw).addTo(mappaGIS);
         geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
     });
-    // console.log(`SELECT ST_AsGeoJSON(${tbl.geometria}) AS "geom", ${tbl.colonneUtili.join(", ")} FROM main10ance_sacrimonti.${tbl.tabella} AS "${tbl.alias}";`);
 });

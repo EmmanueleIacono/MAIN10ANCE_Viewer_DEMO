@@ -71,20 +71,21 @@
             <!-- GIS - PANEL HEADING -->
             <div id="contenitore-selettori">
               <span id="refreshGIS" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
+              <button class="dropdown-toggle" data-toggle="dropdown">Sacro Monte
+                <span class="glyphicon glyphicon-menu-down"></span>
+              </button>
+              <ul class="dropdown-menu" id="contenitore-selettori-2"></ul>
             </div>
-            <button type="button" id="spegniGeoJSON">VISIBILITA' GEOJSON-TESTER</button>
+            <!-- <button type="button" id="spegniGeoJSON">VISIBILITA' GEOJSON-TESTER</button> -->
           </div>
           <!-- GIS -->
           <div id="appGIS">
             <div id="mappa"></div>
+            <div id="legendaLayer">QUI LAYERS</div>
           </div>
         </div>
         <div id="tabDatabase" data-tab-content>
           <div id="filtroDB">
-            <!-- <div id="colDBCapp" class="colonnaDB"><h4>Cappella</h4>
-              <label for="selectCappella">Seleziona una cappella</label>
-              <select name="selectCappella" id="selectCappella"></select>
-            </div> -->
             <div id="colDBLOD34" class="colonnaDB">
               <form>
                 <input type="radio" name="radioLOD" id="radioLOD3">
@@ -101,7 +102,6 @@
               </form>
             </div>
             <div id="colDBLOD5" class="colonnaDB">
-              <!-- <h5>Attività</h5> -->
               <label for="selectLOD5">Attività</label>
               <select name="selectLOD5" id="selectLOD5" disabled></select>
             </div>
@@ -139,8 +139,6 @@
         </div>
       </div>
       <!-- FINE SEZIONE DB -->
-      <!-- <div id="tabDatabase" data-tab-content>QUI DATABASE</div>
-      <div id="tabDashboard" data-tab-content>QUI DASHBOARD</div> -->
     </div>
   </div>
 

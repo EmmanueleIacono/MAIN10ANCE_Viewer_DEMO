@@ -190,6 +190,14 @@ input[id^="form-"] {
 #mappa {
   /* height: 180px; */
   height: inherit;
+  /* position: fixed; */
+  position: static;
+  /* z-index: 1; */
+}
+
+#legendaLayer {
+  position: static;
+  z-index: 1000;
 }
 
 /* STILI PER TABS */
