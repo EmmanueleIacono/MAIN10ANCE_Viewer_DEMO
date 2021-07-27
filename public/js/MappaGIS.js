@@ -46,6 +46,7 @@ class BottoneNavigazioneSM {
         // const bottoneNav = document.createElement('button');
         const bottoneNav = document.createElement('li');
         bottoneNav.setAttribute('id', `scegli${sigla}`);
+        bottoneNav.setAttribute('class', 'selettoreSM-dropdown');
         bottoneNav.innerHTML = `Sacro Monte di ${nome}`;
 
         const contenitoreBottoniNav = document.getElementById('contenitore-selettori-2');

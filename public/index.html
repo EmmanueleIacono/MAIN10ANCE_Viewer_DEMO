@@ -54,37 +54,105 @@
             </div>
           </div>
         </li>
-        <li data-tab-target="#forgeViewer" class="tab" id="apriTabBIM">BIM VIEWER</li>
+        <!-- <li data-tab-target="#forgeViewer" class="tab" id="apriTabBIM">BIM VIEWER</li>
         <li data-tab-target="#tabMappa" class="tab" id="apriTabGIS">GIS VIEWER</li>
         <li data-tab-target="#tabDatabase" class="tab" id="apriTabDatabase">DATABASE</li>
-        <li data-tab-target="#tabDashboard" class="tab" id="apriTabDashboard">DASHBOARD</li>
+        <li data-tab-target="#tabDashboard" class="tab" id="apriTabDashboard">DASHBOARD</li> -->
+        <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
+        <li data-tab-target="#tab2" class="tab" id="apriTabGIS">GIS VIEWER</li>
+        <li data-tab-target="#tab3" class="tab" id="apriTabDatabase">DATABASE</li>
+        <li data-tab-target="#tab4" class="tab" id="apriTabDashboard">DASHBOARD</li>
       </ul>
     </div>
   </nav>
   <!-- End of navbar -->
   <div class="container-fluid fill">
-    <div class="row fill">
-      <div class="col-sm-9 fill tab-content">
-        <div id="forgeViewer" data-tab-content></div>
-        <div class="panel panel-default" id="tabMappa" data-tab-content>
+    <div class="row fill tab-content">
+      <div class="fill" id="tab1" data-tab-content>
+        <div class="col-sm-9 fill">
+          <div id="forgeViewer"></div>
+        </div>
+        <!-- SEZIONE DB -->
+        <div class="col-sm-3 fill" id="pannello-db">
+          <div class="panel panel-default fill" id="pannello-db-child">
+            <div class="panel-heading" id="pannello-db-header" data-toggle="tooltip">
+              <b>PARAMETRI</b>
+            </div>
+            <div class="pannelloDB">
+              <!-- BOTTONE DI REFRESH -->
+              <button id="refreshParams" class="glyphicon glyphicon-home dbBtn" title="Home" style="cursor: pointer" height="30"></button>
+  
+              <!-- BOTTONE DI QUERY -->
+              <button id="queryDB" class="glyphicon glyphicon-list-alt dbBtn" title="Interroga" style="cursor: pointer" height="30"></button>
+  
+              <!-- BOTTONE DI MODIFICA -->
+              <button id="modificaDB" class="glyphicon glyphicon-floppy-disk dbBtn" title="Modifica" style="cursor: pointer" height="30"></button>
+  
+              <!-- BOTTONE DI ANNULLA -->
+              <button id="annullaDB" class="glyphicon glyphicon-erase dbBtn" title="Annulla" style="cursor: pointer" height="30"></button>
+  
+              <!-- FORM -->
+              <form id="formDB" spellcheck="false"></form>
+            </div>
+          </div>
+        </div>
+        <!-- FINE SEZIONE DB -->
+      </div>
+      <div class="fill" id="tab2" data-tab-content>
+        <div class="panel panel-default col-sm-9 fill" id="tabMappa">
           <div class="panel-heading" id="pannello-modal-header" data-toggle="tooltip">
             <!-- GIS - PANEL HEADING -->
-            <div id="contenitore-selettori">
+            <!-- <div id="contenitore-selettori">
               <span id="refreshGIS" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
               <button class="dropdown-toggle" data-toggle="dropdown">Sacro Monte
                 <span class="glyphicon glyphicon-menu-down"></span>
               </button>
               <ul class="dropdown-menu" id="contenitore-selettori-2"></ul>
-            </div>
+            </div> -->
             <!-- <button type="button" id="spegniGeoJSON">VISIBILITA' GEOJSON-TESTER</button> -->
           </div>
           <!-- GIS -->
           <div id="appGIS">
             <div id="mappa"></div>
-            <div id="legendaLayer">QUI LAYERS</div>
+            <!-- <div id="legendaLayer">QUI LAYERS</div> -->
           </div>
         </div>
-        <div id="tabDatabase" data-tab-content>
+        <!-- PANNELLO LATERALE -->
+        <div class="col-sm-3 fill" id="pannello-lat-gis">
+          <div class="panel panel-default fill" id="pannello-lat-gis-child">
+            <div class="panel-heading" id="pannello-lat-gis-header" data-toggle="tooltip">
+              <b>FILTRI</b>
+            </div>
+            <div class="pannelloLatGIS">
+              <div id="contenitore-selettori">
+                <span id="refreshGIS" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
+                <button class="dropdown-toggle" data-toggle="dropdown">Sacro Monte
+                  <span class="glyphicon glyphicon-menu-down"></span>
+                </button>
+                <ul class="dropdown-menu" id="contenitore-selettori-2"></ul>
+              </div>
+              <div id="legendaLayer">QUI LAYERS</div>
+              <!-- BOTTONE DI REFRESH -->
+              <!-- <button id="refreshParams" class="glyphicon glyphicon-home dbBtn" title="Home" style="cursor: pointer" height="30"></button> -->
+  
+              <!-- BOTTONE DI QUERY -->
+              <!-- <button id="queryDB" class="glyphicon glyphicon-list-alt dbBtn" title="Interroga" style="cursor: pointer" height="30"></button> -->
+  
+              <!-- BOTTONE DI MODIFICA -->
+              <!-- <button id="modificaDB" class="glyphicon glyphicon-floppy-disk dbBtn" title="Modifica" style="cursor: pointer" height="30"></button> -->
+  
+              <!-- BOTTONE DI ANNULLA -->
+              <!-- <button id="annullaDB" class="glyphicon glyphicon-erase dbBtn" title="Annulla" style="cursor: pointer" height="30"></button> -->
+  
+              <!-- FORM -->
+              <form id="formDB" spellcheck="false"></form>
+            </div>
+          </div>
+        </div>
+        <!-- FINE PANNELLO LATERALE -->
+      </div>
+      <div class="fill" id="tab3" data-tab-content>
+        <div id="tabDatabase">
           <div id="filtroDB">
             <div id="colDBLOD34" class="colonnaDB">
               <form>
@@ -108,37 +176,10 @@
           </div>
           <div id="risultatiDB"></div>
         </div>
-        <div id="tabDashboard" data-tab-content>QUI DASHBOARD</div>
       </div>
-      <!-- SEZIONE DB -->
-      <div class="col-sm-3 fill" id="pannello-db">
-        <div class="panel panel-default fill" id="pannello-db-child">
-          <div class="panel-heading" id="pannello-db-header" data-toggle="tooltip">
-            <b>PARAMETRI</b>
-          </div>
-          <div class="pannelloDB">
-            <!-- BOTTONE DI REFRESH -->
-            <!-- <button id="refreshParams" class="glyphicon glyphicon-refresh dbBtn" title="Home" style="cursor: pointer" height="30"></button> -->
-            <button id="refreshParams" class="glyphicon glyphicon-home dbBtn" title="Home" style="cursor: pointer" height="30"></button>
-
-            <!-- BOTTONE DI QUERY -->
-            <!-- <button type="button" class="dbBtn" id="queryDB" title="Interroga">INTERROGA</button> -->
-            <button id="queryDB" class="glyphicon glyphicon-list-alt dbBtn" title="Interroga" style="cursor: pointer" height="30"></button>
-
-            <!-- BOTTONE DI MODIFICA -->
-            <!-- <button type="button" class="dbBtn" id="modificaDB" title="Modifica">MODIFICA</button> -->
-            <button id="modificaDB" class="glyphicon glyphicon-floppy-disk dbBtn" title="Modifica" style="cursor: pointer" height="30"></button>
-
-            <!-- BOTTONE DI ANNULLA -->
-            <!-- <button type="button" class="dbBtn" id="annullaDB" title="Annulla">ANNULLA</button> -->
-            <button id="annullaDB" class="glyphicon glyphicon-erase dbBtn" title="Annulla" style="cursor: pointer" height="30"></button>
-
-            <!-- FORM -->
-            <form id="formDB" spellcheck="false"></form>
-          </div>
-        </div>
+      <div class="fill" id="tab4" data-tab-content>
+        <div id="tabDashboard">QUI DASHBOARD</div>
       </div>
-      <!-- FINE SEZIONE DB -->
     </div>
   </div>
 

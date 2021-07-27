@@ -72,20 +72,29 @@ body {
 }
 
 /* DB */
-#pannello-db {
+#pannello-db, #pannello-lat-gis {
   padding-left: 15px;
   padding-right: 0px;
   /* border: none; */
   /* overflow: auto; */
 }
 
-#pannello-db-child {
+#pannello-db-child, #pannello-lat-gis-child {
   overflow: auto;
 }
 
-#pannello-db-header {
+#pannello-db-header, #pannello-lat-gis-header {
   color: var(--verdeMain10ance);
   background-color: var(--blackOlive);
+}
+
+.selettoreSM-dropdown {
+  cursor: pointer;
+  position: initial;
+}
+
+.dropdown-menu {
+  position: relative;
 }
 
 /* BUTTONS */
