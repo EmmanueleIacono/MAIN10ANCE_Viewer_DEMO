@@ -165,40 +165,40 @@ input[id^="form-"] {
   overflow: auto;
 }
 
-.modal-dialog {
+/* .modal-dialog {
   max-width: 900px;
   width: 100%;
   max-height: 850px;
   height: 100%;
   display: flex;
   justify-content: center;
-}
+} */
 
 .modal-content, .modal-header, .modal-body, .modal-footer, .panel, .panel-heading, #pannello-modal-header {
   background-color: var(--grigio);
 }
 
-.modal-title {
+/* .modal-title {
   font-weight: 700;
-}
+} */
 
 /* .modal-body {
   background-color: var(--grigio);
 } */
 
-.modal-footer {
+/* .modal-footer {
   align-self: flex-end;
-}
+} */
 
-#modal-content-GIS {
+/* #modal-content-GIS {
   height: 100%;
   width: 100%;
-}
+} */
 
-#modal-content-cappelle {
+/* #modal-content-cappelle {
   height: 50%;
   width: 70%;
-}
+} */
 
 /* MAPPA */
 #mappa {
