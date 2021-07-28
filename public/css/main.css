@@ -102,6 +102,11 @@ body {
   position: relative;
 } */
 
+#contenitore-selettori-2 {
+  position: relative;
+  /* z-index: 100; */
+}
+
 /* BUTTONS */
 
 .dbBtn {
