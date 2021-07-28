@@ -90,12 +90,17 @@ body {
 
 .selettoreSM-dropdown {
   cursor: pointer;
-  position: initial;
-}
-
-.dropdown-menu {
+  /* position: initial; */
   position: relative;
 }
+
+.selettoreSM-dropdown:hover {
+  background-color: #ccc;
+}
+
+/* .dropdown-menu {
+  position: relative;
+} */
 
 /* BUTTONS */
 
