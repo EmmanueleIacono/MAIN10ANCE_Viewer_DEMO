@@ -5,9 +5,9 @@ appGIS_BIM.use(express.json());
 appGIS_BIM.use(express.static("public"));
 
 const client = new Client({
-    // connectionString: process.env.MAIN10ANCE_DB_URL,
-    // ssl: { rejectUnauthorized: false }
-    connectionString: "postgresql://postgres:rilievo@localhost:5432/main10ance_v4",
+    connectionString: process.env.MAIN10ANCE_DB_URL,
+    ssl: { rejectUnauthorized: false }
+    // connectionString: "postgresql://postgres:rilievo@localhost:5432/main10ance_v4",
 });
 
 // per testare la richiesta:
