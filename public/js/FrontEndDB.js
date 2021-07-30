@@ -22,34 +22,35 @@ bottoneQuery.addEventListener("click", ottieniDatiDB); // per qualche motivo nel
 const bottoneMod = document.getElementById("modificaDB");
 bottoneMod.addEventListener("click", () => {
     if (formDB.hasChildNodes()) {
-        const moduli = $('[id^="form-"]');
-        let idElemento = parseInt($('[id^="idElemento-"]').text().replace(/ELEMENTO: /g,''));
-        let catElemento = $('[id^="categoriaElemento-"]').text().replace(/CATEGORIA: /g,'');
+        alert('Modifica temporaneamente disabilitata.');
+        // const moduli = $('[id^="form-"]');
+        // let idElemento = parseInt($('[id^="idElemento-"]').text().replace(/ELEMENTO: /g,''));
+        // let catElemento = $('[id^="categoriaElemento-"]').text().replace(/CATEGORIA: /g,'');
     
-        try {
-            [...moduli].forEach((mod) => {
-                let idPulito = (mod.id).match(/\-(.*)\-/).pop();
-                jsonRequest = {};
-                jsonRequest.id = idElemento;
-                jsonRequest.categoria = catElemento;
-                jsonRequest.parametro = idPulito;
-                if (($(`#${mod.id}`).val()) !== "") {
-                    jsonRequest.valore = $(`#${mod.id}`).val();
-                }
-                else {
-                    jsonRequest.valore = null;
-                }
-                scriviParametroElemento(jsonRequest);
-            });
-            alert('Operazione di modifica avvenuta con successo');
-        }
-        catch(e) {
-            console.log("Errore nella modifica dei parametri");
-            console.log(e);
-        }
-        finally {
-            ottieniDatiDB();
-        }
+        // try {
+        //     [...moduli].forEach((mod) => {
+        //         let idPulito = (mod.id).match(/\-(.*)\-/).pop();
+        //         jsonRequest = {};
+        //         jsonRequest.id = idElemento;
+        //         jsonRequest.categoria = catElemento;
+        //         jsonRequest.parametro = idPulito;
+        //         if (($(`#${mod.id}`).val()) !== "") {
+        //             jsonRequest.valore = $(`#${mod.id}`).val();
+        //         }
+        //         else {
+        //             jsonRequest.valore = null;
+        //         }
+        //         scriviParametroElemento(jsonRequest);
+        //     });
+        //     alert('Operazione di modifica avvenuta con successo');
+        // }
+        // catch(e) {
+        //     console.log("Errore nella modifica dei parametri");
+        //     console.log(e);
+        // }
+        // finally {
+        //     ottieniDatiDB();
+        // }
     }
     else {
         alert('Nessun elemento interrogato');
@@ -75,24 +76,45 @@ async function ottieniDatiDB() {
     else {
         const selezione = viewer.getSelection();
         const isolato = viewer.getIsolatedNodes();
+        // if ((selezione.length === 1) || (isolato.length === 1)) {
+        //     selezione.forEach(async (s) => {
+        //         viewer.getProperties(s, async (props) => {
+        //             let nome = props.name;
+        //             let idSemplice = (nome).match(/\[(.*)\]/).pop();
+        //             let parent = viewer.model.getData().instanceTree.getNodeParentId(s);
+        //             viewer.getProperties(parent, (propsParent) => {
+        //                 propsParent.properties.forEach((pP) => {
+        //                     if (pP.displayName === "_RC") {
+        //                         jsonRequest = {};
+        //                         jsonRequest.nome = nome;
+        //                         jsonRequest.id = idSemplice;
+        //                         jsonRequest.categoria = pP.displayValue;
+        //                         leggiDBElemento(jsonRequest);
+        //                     }
+        //                     });
+        //             }, (e) => {
+        //                 console.log(e)});
+        //         }, (e) => {
+        //                 console.log(`ATTENZIONE: ${e}`)
+        //             });
+        //     });
+        // }
         if ((selezione.length === 1) || (isolato.length === 1)) {
             selezione.forEach(async (s) => {
                 viewer.getProperties(s, async (props) => {
                     let nome = props.name;
-                    let idSemplice = (nome).match(/\[(.*)\]/).pop();
-                    let parent = viewer.model.getData().instanceTree.getNodeParentId(s);
-                    viewer.getProperties(parent, (propsParent) => {
-                        propsParent.properties.forEach((pP) => {
-                            if (pP.displayName === "_RC") {
-                                jsonRequest = {};
-                                jsonRequest.nome = nome;
-                                jsonRequest.id = idSemplice;
-                                jsonRequest.categoria = pP.displayValue;
-                                leggiDBElemento(jsonRequest);
-                            }
-                            });
-                    }, (e) => {
-                        console.log(e)});
+                    props.properties.forEach(p => {
+                        if (p.displayName === "id_main10ance") {
+                            let idMain10ance = p.displayValue;
+                            let arrayInfo = idMain10ance.split('|');
+                            let entità = arrayInfo[2];
+                            jsonRequest = {};
+                            jsonRequest.nome = nome;
+                            jsonRequest.id = idMain10ance;
+                            jsonRequest.categoria = entità;
+                            leggiDBElemento(jsonRequest);
+                        }
+                    });
                 }, (e) => {
                         console.log(`ATTENZIONE: ${e}`)
                     });
@@ -115,7 +137,8 @@ async function leggiDBElemento(jsonReq) {
         cancellaFormDB(formDB);
 
         // const risultato = await fetch(`${urlCorrente}/Main10ance_DB/all`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
-        const risultato = await fetch(`/Main10ance_DB/all`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
+        // const risultato = await fetch(`/Main10ance_DB/all`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
+        const risultato = await fetch(`/Main10ance_DB/BIMViewer`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
         const nomeElem = jsonReq.nome;
         const categoriaElem = jsonReq.categoria;
         const idElem = jsonReq.id;
@@ -127,7 +150,7 @@ async function leggiDBElemento(jsonReq) {
         titoloCategoria.setAttribute("id", `categoriaElemento-${categoriaElem}`);
         titoloNome.innerHTML = `<b>${nomeElem}</b>`;
         titoloID.innerHTML = `<b>ELEMENTO: ${idElem}</b>`;
-        titoloCategoria.innerHTML = `<b>CATEGORIA: ${categoriaElem}</b>`;
+        titoloCategoria.innerHTML = `<b>ENTITÀ: ${categoriaElem}</b>`;
         formDB.appendChild(titoloNome);
         formDB.appendChild(titoloCategoria);
         formDB.appendChild(titoloID);

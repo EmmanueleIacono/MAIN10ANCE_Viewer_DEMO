@@ -1,8 +1,8 @@
 const contenitoreDB = document.getElementById('tabDatabase');
 
 const listaLOD5 = ['controllo_stato_di_conservazione_livello_di_urgenza', 'danno_alterazione_degrado', 'frase_di_rischio', 'glossario', 'manutenzione_correttiva_o_a_guasto', 'manutenzione_regolare', 'restauri'];
-const listaLOD4 = ['statua', 'arredo', 'pavimento_decorativo', 'quadro', 'dipinto_murale'];
-const listaLOD3 = ['muro', 'tetto', 'pavimento', 'pilastro', 'finestra', 'porta', 'scala', 'modello_generico'];
+const listaLOD4 = ['arredo', 'dipinto_murale', 'pavimento_decorativo', 'quadro',  'statua'];
+const listaLOD3 = ['apparato_decorativo', 'catena', 'finestra', 'grata', 'muro', 'pavimento', 'pilastro', 'porta', 'scala', 'tetto', 'trave', 'volta'];
 
 const listaComplessiSMV = ['1', '2-3-4', '5-6-7-8-9', '10', '11', '12', '13', '14', '15', '16-24', '17', '18', '19', '20-21-22-23', '25-26', '27-29-30-31-32-33-34-35', '28', '36', '37-38-39', '40-41-42-43-44', '45'];
 

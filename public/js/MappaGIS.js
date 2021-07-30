@@ -29,6 +29,7 @@ setInterval(() => {
 // gruppi layer per marker sacri monti e marker cappelle
 let gruppoMarkerCappelle = L.layerGroup();
 let gruppoMarkerSacriMonti = L.layerGroup();
+let LivelloGIS = L.layerGroup();
 
 // reset vista totale default mappa
 const bottoneRefresh = document.getElementById('refreshGIS');
@@ -221,21 +222,33 @@ leggiDBMarkerCapp();
 //     visibilitàGeoJSON = !visibilitàGeoJSON;
 // });
 
+const spegniGIS = document.getElementById('spegniGIS');
+let visibilitàGIS = false;
+spegniGIS.addEventListener("click", () => {
+    if (visibilitàGIS) {
+        mappaGIS.removeLayer(LivelloGIS);
+    }
+    else {
+        mappaGIS.addLayer(LivelloGIS);
+    }
+    visibilitàGIS = !visibilitàGIS;
+});
+
 const tabellePopolateGIS = [
-    // {tabella: "accesso_civico_toponimo_stradale", alias: "Accesso civico - Toponimo stradale", geometria: "geom_pun", colonneUtili: ["tp_str_nom", "acc_pc_ty", "civico_num"]},
+    {tabella: "accesso_civico_toponimo_stradale", alias: "Accesso civico - Toponimo stradale", geometria: "geom_pun", colonneUtili: ["tp_str_nom", "acc_pc_ty", "civico_num"]},
     {tabella: "area_di_circolazione_veicolare", alias: "Area di circolazione veicolare", geometria: "geom_pol", colonneUtili: ["ac_vei_zon"]},
-    // {tabella: "area_verde", alias: "Area verde", geometria: "geom_pol", colonneUtili: ["ar_vrd_pa", "ar_vrd_ty"]},
-    // {tabella: "bosco", alias: "Bosco", geometria: "geom_pol", colonneUtili: ["bosco_gov", "bosco_ty"]},
-    // {tabella: "coltura_agricola", alias: "Coltura agricola", geometria: "geom_pol", colonneUtili: ["cl_agr_ty"]},
-    // {tabella: "corso_d_acqua", alias: "Corso d\'acqua", geometria: "geom_pol", colonneUtili: ["cda_nom", "cda_ty"]},
-    // {tabella: "curve_di_livello", alias: "Curve di livello", geometria: "geom_lin", colonneUtili: ["cv_liv_dt", "cv_liv_ty"]},
-    // {tabella: "edificio", alias: "Edificio", geometria: "geom_pol", colonneUtili: ["edifc_stat", "edifc_ty", "edifc_uso", "oid"]},
-    // {tabella: "edificio_minore", alias: "Edificio minore", geometria: "geom_pol", colonneUtili: ["edi_min_st", "edi_min_ty"]},
-    // {tabella: "località_significativa", alias: "Località significativa", geometria: "geom_pun", colonneUtili: ["loc_sg_top", "loc_sg_ty", "loc_sg_sgn"]},
-    // {tabella: "nodo_rete_elettrica", alias: "Nodo rete elettrica", geometria: "geom_pun", colonneUtili: ["nd_ele_ty"]},
-    // {tabella: "specchio_d_acqua", alias: "Specchio d\'acqua", geometria: "geom_pol", colonneUtili: ["sp_acq_nom", "sp_acq_ty"]},
-    // {tabella: "strade_sentieri_e_altri_percorsi_interni", alias: "Strade, sentieri e altri percorsi interni", geometria: "geom_pol", colonneUtili: ["ar_vms_ty", "ar_vms_fon"]},
-    // {tabella: "tratto_rete_elettrica", alias: "Tratto rete elettrica", geometria: "geom_lin", colonneUtili: ["tr_ele_ty"]},
+    {tabella: "area_verde", alias: "Area verde", geometria: "geom_pol", colonneUtili: ["ar_vrd_pa", "ar_vrd_ty"]},
+    {tabella: "bosco", alias: "Bosco", geometria: "geom_pol", colonneUtili: ["bosco_gov", "bosco_ty"]},
+    {tabella: "coltura_agricola", alias: "Coltura agricola", geometria: "geom_pol", colonneUtili: ["cl_agr_ty"]},
+    {tabella: "corso_d_acqua", alias: "Corso d\'acqua", geometria: "geom_pol", colonneUtili: ["cda_nom", "cda_ty"]},
+    {tabella: "curve_di_livello", alias: "Curve di livello", geometria: "geom_lin", colonneUtili: ["cv_liv_dt", "cv_liv_ty"]},
+    {tabella: "edificio", alias: "Edificio", geometria: "geom_pol", colonneUtili: ["edifc_stat", "edifc_ty", "edifc_uso", "oid"]},
+    {tabella: "edificio_minore", alias: "Edificio minore", geometria: "geom_pol", colonneUtili: ["edi_min_st", "edi_min_ty"]},
+    {tabella: "località_significativa", alias: "Località significativa", geometria: "geom_pun", colonneUtili: ["loc_sg_top", "loc_sg_ty", "loc_sg_sgn"]},
+    {tabella: "nodo_rete_elettrica", alias: "Nodo rete elettrica", geometria: "geom_pun", colonneUtili: ["nd_ele_ty"]},
+    {tabella: "specchio_d_acqua", alias: "Specchio d\'acqua", geometria: "geom_pol", colonneUtili: ["sp_acq_nom", "sp_acq_ty"]},
+    {tabella: "strade_sentieri_e_altri_percorsi_interni", alias: "Strade, sentieri e altri percorsi interni", geometria: "geom_pol", colonneUtili: ["ar_vms_ty", "ar_vms_fon"]},
+    {tabella: "tratto_rete_elettrica", alias: "Tratto rete elettrica", geometria: "geom_lin", colonneUtili: ["tr_ele_ty"]},
 ]
 
 proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
@@ -274,20 +287,20 @@ async function getGIS(tabella, alias, geometria, colonneUtili) {
     return resp_oggettiGIS;
 }
 
-function creaLivelli(tabPopGIS) {
-    tabPopGIS.forEach(tb => {
-        console.log(tb.alias);
-        eval(`const ${tb.tabella} = L.layerGroup();`);
-    });
-}
+// function creaLivelli(tabPopGIS) {
+//     tabPopGIS.forEach(tb => {
+//         // console.log(tb.alias);
+//         // eval(`const ${tb.tabella} = L.layerGroup();`);
+//     });
+// }
 
-creaLivelli(tabellePopolateGIS);
+// creaLivelli(tabellePopolateGIS);
 
 tabellePopolateGIS.forEach(async tbl => {
     const tabellaGIS = await getGIS(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili.join(", "));
     tabellaGIS.forEach(geo => {
         const geoRaw = JSON.parse(geo.geom);
-        const geoGeoJSON = L.Proj.geoJson(geoRaw).addTo(mappaGIS);
+        const geoGeoJSON = L.Proj.geoJson(geoRaw).addTo(LivelloGIS);
         geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
     });
 });
