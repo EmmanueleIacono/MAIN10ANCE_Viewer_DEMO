@@ -35,7 +35,7 @@ $(document).ready(function () {
       },
       "plugins": ["types",/* "state",*/ "sort", /*"contextmenu"*/],
     }).on('loaded.jstree', function () {
-      $('#appBuckets').jstree('open_all');
+      // $('#appBuckets').jstree('open_all');
     }).bind("activate_node.jstree", function (evt, data) { // "activate_node.jstree" è l'evento tipo "click", che invoca una callback
       console.log(data); // voglio capire che cos'è DATA
       if (data != null && data.node != null && data.node.type == 'object') {

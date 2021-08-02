@@ -40,17 +40,17 @@
         <li>
           <div id="dropdown-container">
             <!-- <button type="button" class="navBtn" id="scegliModello" data-toggle="modal" data-target="#scegliModelloModal">SELEZIONA CAPPELLA</button> -->
-            <button type="button" class="navBtn dropdown-toggle" id="scegliModello" data-toggle="dropdown">
+            <!-- <button type="button" class="navBtn dropdown-toggle" id="scegliModello" data-toggle="dropdown">
               SELEZIONA CAPPELLA <span class="glyphicon glyphicon-triangle-bottom"></span>
-            </button>
+            </button> -->
             <div class="panel panel-default dropdown-menu">
               <!-- <div class="panel-heading" id="pannello-modal-header" data-toggle="tooltip">
                 Buckets &amp; Objects
                 <span id="refreshBuckets" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
               </div> -->
-              <div id="appBuckets">
+              <!-- <div id="appBuckets">
                 tree here
-              </div>
+              </div> -->
             </div>
           </div>
         </li>
@@ -58,8 +58,8 @@
         <li data-tab-target="#tabMappa" class="tab" id="apriTabGIS">GIS VIEWER</li>
         <li data-tab-target="#tabDatabase" class="tab" id="apriTabDatabase">DATABASE</li>
         <li data-tab-target="#tabDashboard" class="tab" id="apriTabDashboard">DASHBOARD</li> -->
-        <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
         <li data-tab-target="#tab2" class="tab" id="apriTabGIS">GIS VIEWER</li>
+        <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
         <li data-tab-target="#tab3" class="tab" id="apriTabDatabase">DATABASE</li>
         <li data-tab-target="#tab4" class="tab" id="apriTabDashboard">DASHBOARD</li>
       </ul>
@@ -78,15 +78,18 @@
             <div class="panel-heading" id="pannello-db-header" data-toggle="tooltip">
               <b>PARAMETRI</b>
             </div>
+            <div id="appBuckets">
+              tree here
+            </div>
             <div class="pannelloDB">
               <!-- BOTTONE DI REFRESH -->
               <button id="refreshParams" class="glyphicon glyphicon-home dbBtn" title="Home" style="cursor: pointer" height="30"></button>
   
               <!-- BOTTONE DI QUERY -->
-              <button id="queryDB" class="glyphicon glyphicon-list-alt dbBtn" title="Interroga" style="cursor: pointer" height="30"></button>
+              <button id="queryDB" class="glyphicon glyphicon-list-alt dbBtn" title="Interroga e modifica" style="cursor: pointer" height="30"></button>
   
               <!-- BOTTONE DI MODIFICA -->
-              <button id="modificaDB" class="glyphicon glyphicon-floppy-disk dbBtn" title="Modifica" style="cursor: pointer" height="30"></button>
+              <button id="modificaDB" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
   
               <!-- BOTTONE DI ANNULLA -->
               <button id="annullaDB" class="glyphicon glyphicon-erase dbBtn" title="Annulla" style="cursor: pointer" height="30"></button>
@@ -160,6 +163,11 @@
           <div id="filtroDB">
             <div id="colDBLOD34" class="colonnaDB">
               <form>
+                <label for="radioSM">Sacro Monte</label>
+                <select name="selectSM" id="selectSM" disabled>
+                  <option value="Varallo">Varallo</option>
+                </select>
+                <br>
                 <input type="radio" name="radioLOD" id="radioLOD3">
                 <label for="radioLOD3">Opere immobili</label>
                 <select name="selectLOD3" id="selectLOD3" disabled></select>
