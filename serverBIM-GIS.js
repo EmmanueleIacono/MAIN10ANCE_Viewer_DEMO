@@ -95,16 +95,6 @@ async function leggiBIMViewer(nomeCategoria, idElemento) {
 }
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/GIS_prova", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appGIS_BIM.get('/Main10ance_DB/GIS_prova', async (req, res) => {
-    // const reqJson = req.headers;
-    const risultato = await prova();
-    res.setHeader('content-type', 'application/json');
-    res.send(risultato);
-    // console.log(risultato);
-});
-
-// per testare la richiesta:
 // fetch("/Main10ance_DB/tabelle", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appGIS_BIM.get('/Main10ance_DB/tabelle', async (req, res) => {
     const risposta = await leggiListaTabelle();

@@ -29,7 +29,7 @@ setInterval(() => {
 // gruppi layer per marker sacri monti e marker cappelle
 let gruppoMarkerCappelle = L.layerGroup();
 let gruppoMarkerSacriMonti = L.layerGroup();
-let LivelloGIS = L.layerGroup();
+const LivelloGIS = L.layerGroup();
 
 // reset vista totale default mappa
 const bottoneRefresh = document.getElementById('refreshGIS');
@@ -37,7 +37,7 @@ bottoneRefresh.addEventListener("click", () => {
     mappaGIS.setView(posOrigine, 8)
 });
 
-// classi per bottoni di navigazione SM e Marker SM e CAPP
+// classi per bottoni di navigazione e altro
 class BottoneNavigazioneSM {
     constructor(nome, sigla, posizione) {
         this.nome = nome,
@@ -134,7 +134,63 @@ class MarkerCappella {
     }
 }
 
-// questa funzione è molto carina ma va riarrangiata per ottenere l'URN da un'altra richiesta, non va bene hardcoded dentro oggetti... oppure sì?
+class LayerGIS {
+    constructor(tabella, alias, geometria, colonne) {
+        this.tabella = tabella;
+        this.alias = alias;
+        this.geometria = geometria;
+        this.colonne = colonne;
+    }
+    
+    async inizializza(tabella, alias, geometria, colonne) {
+        const gis = await getGIS(tabella, alias, geometria, colonne.join(", "));
+
+        let livelloTabella = L.layerGroup();
+
+        const contenitoreSpegniLiv = document.createElement('div');
+        const spegniLivello = document.createElement('button');
+        spegniLivello.setAttribute('id', `spegni-${tabella}`);
+        const quadratino = document.createElement('div');
+        quadratino.setAttribute('id', `colore-${tabella}`);
+        quadratino.style.width = '10px';
+        quadratino.style.height = '10px';
+        // spegniLivello.appendChild(quadratino);
+        contenitoreSpegniLiv.appendChild(quadratino);
+        spegniLivello.textContent = `${alias}`;
+        // spegniLivello.innerHTML = `${alias}`;
+        contenitoreSpegniLiv.appendChild(spegniLivello);
+        const contenitoreLivelli = document.getElementById('contenitore-livelli');
+        // contenitoreLivelli.appendChild(spegniLivello);
+        contenitoreLivelli.appendChild(contenitoreSpegniLiv);
+        let visibilitàLivello = false;
+        spegniLivello.addEventListener("click", () => {
+            if (visibilitàLivello) {
+                mappaGIS.removeLayer(livelloTabella);
+            }
+            else {
+                mappaGIS.addLayer(livelloTabella);
+            }
+            visibilitàLivello = !visibilitàLivello;
+        });
+
+        let coloreRandom = `#${(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6)}`;
+        // spegniLivello.style.backgroundColor = coloreRandom;
+        quadratino.style.backgroundColor = coloreRandom;
+        function stileGeoJSON(polGeoJSON) {
+            return {
+                color: coloreRandom,
+            }
+        }
+
+        gis.forEach(geo => {
+            const geoRaw = JSON.parse(geo.geom);
+            const geoGeoJSON = L.Proj.geoJson(geoRaw, {style: stileGeoJSON}).addTo(livelloTabella);
+            geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
+        });
+    }
+}
+
+// questa funzione è molto carina ma si potrebbe riarrangiare per ottenere l'URN da un'altra richiesta anziché da DB...
 function getModel(urn) {
     if ((urn !== null) && (urn !== '')) {
         document.getElementById('apriTabBIM').click();
@@ -144,36 +200,6 @@ function getModel(urn) {
         alert('Nessun modello presente per questo elemento');
     }
 }
-
-// fare in modo che i geojson siano presi dal database main10ance
-// const geoJSON_tester = {
-//     "type": "FeatureCollection",
-//     "features": [
-//         {
-//         "type": "Feature",
-//         "properties": {},
-//         "geometry": {
-//             "type": "Polygon",
-//             "coordinates": [
-//             [
-//                 [
-//                 8.254728913307188,
-//                 45.81896009407471
-//                 ],
-//                 [
-//                 8.254761099815369,
-//                 45.81838434481882
-//                 ],
-//                 [
-//                 8.254728913307188,
-//                 45.81896009407471
-//                 ]
-//             ]
-//             ]
-//         }
-//         }
-//     ]
-// }
 
 async function leggiDBMarkerSM() {
     try {
@@ -207,32 +233,17 @@ async function leggiDBMarkerCapp() {
 leggiDBMarkerSM();
 leggiDBMarkerCapp();
 
-// const testPoligono = L.geoJSON(geoJSON_tester);
-// testPoligono.bindPopup('<b>CIAO!</b>');
-
-// const spegniGeoJSON = document.getElementById('spegniGeoJSON');
-// let visibilitàGeoJSON = false;
-// spegniGeoJSON.addEventListener("click", () => {
-//     if (visibilitàGeoJSON) {
-//         mappaGIS.removeLayer(testPoligono);
+// const spegniGIS = document.getElementById('spegniGIS');
+// let visibilitàGIS = false;
+// spegniGIS.addEventListener("click", () => {
+//     if (visibilitàGIS) {
+//         mappaGIS.removeLayer(LivelloGIS);
 //     }
 //     else {
-//         mappaGIS.addLayer(testPoligono);
+//         mappaGIS.addLayer(LivelloGIS);
 //     }
-//     visibilitàGeoJSON = !visibilitàGeoJSON;
+//     visibilitàGIS = !visibilitàGIS;
 // });
-
-const spegniGIS = document.getElementById('spegniGIS');
-let visibilitàGIS = false;
-spegniGIS.addEventListener("click", () => {
-    if (visibilitàGIS) {
-        mappaGIS.removeLayer(LivelloGIS);
-    }
-    else {
-        mappaGIS.addLayer(LivelloGIS);
-    }
-    visibilitàGIS = !visibilitàGIS;
-});
 
 const tabellePopolateGIS = [
     {tabella: "accesso_civico_toponimo_stradale", alias: "Accesso civico - Toponimo stradale", geometria: "geom_pun", colonneUtili: ["tp_str_nom", "acc_pc_ty", "civico_num"]},
@@ -242,7 +253,7 @@ const tabellePopolateGIS = [
     {tabella: "coltura_agricola", alias: "Coltura agricola", geometria: "geom_pol", colonneUtili: ["cl_agr_ty"]},
     {tabella: "corso_d_acqua", alias: "Corso d\'acqua", geometria: "geom_pol", colonneUtili: ["cda_nom", "cda_ty"]},
     {tabella: "curve_di_livello", alias: "Curve di livello", geometria: "geom_lin", colonneUtili: ["cv_liv_dt", "cv_liv_ty"]},
-    {tabella: "edificio", alias: "Edificio", geometria: "geom_pol", colonneUtili: ["edifc_stat", "edifc_ty", "edifc_uso", "oid"]},
+    {tabella: "edificio", alias: "Edificio", geometria: "geom_pol", colonneUtili: ["edifc_stat", "edifc_ty", "edifc_uso"]},
     {tabella: "edificio_minore", alias: "Edificio minore", geometria: "geom_pol", colonneUtili: ["edi_min_st", "edi_min_ty"]},
     {tabella: "località_significativa", alias: "Località significativa", geometria: "geom_pun", colonneUtili: ["loc_sg_top", "loc_sg_ty", "loc_sg_sgn"]},
     {tabella: "nodo_rete_elettrica", alias: "Nodo rete elettrica", geometria: "geom_pun", colonneUtili: ["nd_ele_ty"]},
@@ -253,54 +264,22 @@ const tabellePopolateGIS = [
 
 proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
 
-async function getGeoJSON() {
-    let oggetto_geoJSON_DB = await fetch("/Main10ance_DB/GIS_prova", {method: "GET", headers: {"content-type": "application/json"} });
-    let resp_oggettoGeoJSON = await oggetto_geoJSON_DB.json();
-    resp_oggettoGeoJSON.forEach(gj => {
-        // console.log(gj);
-        const gjJSON = JSON.parse(gj.st_asgeojson);
-        // console.log(gjJSON);
-        // const gjGEO = new L.Proj.GeoJSON(gjJSON).addTo(mappaGIS);
-        const gjGEO = L.Proj.geoJson(gjJSON, {style: stileGeoJSON}).addTo(mappaGIS);
-        // const gjGEO = L.Proj.geoJson(gjJSON).addTo(mappaGIS);
-        // gjGEO.bindPopup(`<b>${gj.loc_sg_top}</b>`);
-        gjGEO.bindPopup(`<b>${gj.bosco_ty}</b>`);
-        // gjGEO.openPopup();
-    });
-}
-
-function stileGeoJSON(polGeoJSON) {
-    return {
-        color: '#6164c9',
-        // weight: 3,
-        // opacity: 1,
-        // stroke: false,
-        // fillOpacity: 1,
-    }
-}
-
-// getGeoJSON();
-
 async function getGIS(tabella, alias, geometria, colonneUtili) {
     let oggettiGIS = await fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "alias": alias, "geometria": geometria, "colonneUtili": colonneUtili} });
     let resp_oggettiGIS = await oggettiGIS.json();
     return resp_oggettiGIS;
 }
 
-// function creaLivelli(tabPopGIS) {
-//     tabPopGIS.forEach(tb => {
-//         // console.log(tb.alias);
-//         // eval(`const ${tb.tabella} = L.layerGroup();`);
-//     });
-// }
+async function leggiDBGIS(tabGIS) {
+    try {
+        tabGIS.forEach(async tbl => {
+            await new LayerGIS(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili).inizializza(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili);
+        });
+    }
+    catch(e) {
+        console.log('Errore nella lettura dei dati GIS');
+        console.log(e);
+    }
+}
 
-// creaLivelli(tabellePopolateGIS);
-
-tabellePopolateGIS.forEach(async tbl => {
-    const tabellaGIS = await getGIS(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili.join(", "));
-    tabellaGIS.forEach(geo => {
-        const geoRaw = JSON.parse(geo.geom);
-        const geoGeoJSON = L.Proj.geoJson(geoRaw).addTo(LivelloGIS);
-        geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
-    });
-});
+leggiDBGIS(tabellePopolateGIS);
