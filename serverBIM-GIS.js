@@ -7,11 +7,9 @@ appGIS_BIM.use(express.static("public"));
 const client = new Client({
     connectionString: process.env.MAIN10ANCE_DB_URL,
     ssl: { rejectUnauthorized: false }
-    // connectionString: "postgresql://postgres:rilievo@localhost:5432/main10ance_v4",
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "oid": 1066778289} }).then(a => a.json()).then(console.log)
 // fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "alias": "Bosco", "geometria": "geom_pol", "colonneUtili": ["bosco_gov", "bosco_ty"]} }).then(a => a.json()).then(console.log)
 appGIS_BIM.get('/Main10ance_DB/GIS', async (req, res) => {
     const reqJson = req.headers;
@@ -51,28 +49,13 @@ async function connect() {
 
 async function leggiGIS(tabella, alias, geometria, colonneUtili) {
     try {
-        // console.log(colonneUtili);
         const result = await client.query(`SELECT ST_AsGeoJSON(${geometria}) AS "geom", CONCAT_WS(', ', ${colonneUtili}) AS "info" FROM main10ance_sacrimonti.${tabella} AS "${alias}";`);
-        // const result = await client.query(`SELECT ST_AsGeoJSON(geom_pol) AS "geom", ar_vms_ty,ar_vms_fon FROM main10ance_sacrimonti.strade_sentieri_e_altri_percorsi_interni AS "Strade, sentieri e altri percorsi interni";`);
         return result.rows;
     }
     catch(e) {
         return [`errore: ${e}`];
     }
 }
-
-async function prova() {
-    try {
-    // const result = await client.query('SELECT ST_AsGeoJSON("geom_pol", 9, 4) FROM main10ance_sacrimonti."bosco" WHERE "oid" = 1066795976;');
-    // const result = await client.query('SELECT ST_AsGeoJSON("geom_pun"), "loc_sg_top" FROM main10ance_sacrimonti."località_significativa";');
-    const result = await client.query('SELECT ST_AsGeoJSON("geom_pol"), "bosco_ty" FROM main10ance_sacrimonti."bosco";');
-    // return result.rows[0].st_asgeojson;
-    return result.rows;
-    }
-    catch(e) {
-        return [];
-    }
-};
 
 async function leggiListaTabelle() {
     try {

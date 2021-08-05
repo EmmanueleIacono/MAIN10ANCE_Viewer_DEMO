@@ -171,7 +171,7 @@ input[id^="form-"] {
 #appGIS {
   /* height: 600px; */
   /* height: calc(80vh - 10px); */
-  height: 70vh;
+  height: 80vh;
 }
 
 #scegliGISModal {

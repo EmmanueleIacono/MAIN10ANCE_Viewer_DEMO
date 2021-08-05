@@ -148,23 +148,32 @@ class LayerGIS {
         let livelloTabella = L.layerGroup();
 
         const contenitoreSpegniLiv = document.createElement('div');
-        const spegniLivello = document.createElement('button');
-        spegniLivello.setAttribute('id', `spegni-${tabella}`);
-        const quadratino = document.createElement('div');
-        quadratino.setAttribute('id', `colore-${tabella}`);
-        quadratino.style.width = '10px';
-        quadratino.style.height = '10px';
-        // spegniLivello.appendChild(quadratino);
-        contenitoreSpegniLiv.appendChild(quadratino);
-        spegniLivello.textContent = `${alias}`;
+        // const spegniLivello = document.createElement('button');
+        const spegniLivelloCheck = document.createElement('input');
+        // spegniLivello.setAttribute('id', `spegni-${tabella}`);
+        spegniLivelloCheck.setAttribute('id', `spegni-${tabella}`);
+        spegniLivelloCheck.setAttribute('type', 'checkbox');
+        // const quadratino = document.createElement('div');
+        const labelCheck = document.createElement('label');
+        // quadratino.setAttribute('id', `colore-${tabella}`);
+        labelCheck.setAttribute('for', `spegni-${tabella}`);
+        // quadratino.style.width = '10px';
+        // quadratino.style.height = '10px';
+        // contenitoreSpegniLiv.appendChild(quadratino);
+        // spegniLivello.textContent = `${alias}`;
+        labelCheck.textContent = `${alias}`;
         // spegniLivello.innerHTML = `${alias}`;
-        contenitoreSpegniLiv.appendChild(spegniLivello);
+        // contenitoreSpegniLiv.appendChild(spegniLivello);
+        contenitoreSpegniLiv.appendChild(spegniLivelloCheck);
+        contenitoreSpegniLiv.appendChild(labelCheck);
         const contenitoreLivelli = document.getElementById('contenitore-livelli');
         // contenitoreLivelli.appendChild(spegniLivello);
         contenitoreLivelli.appendChild(contenitoreSpegniLiv);
         let visibilitàLivello = false;
-        spegniLivello.addEventListener("click", () => {
-            if (visibilitàLivello) {
+        // spegniLivello.addEventListener("click", () => {
+        spegniLivelloCheck.addEventListener("click", () => {
+            // if (visibilitàLivello) {
+            if (!spegniLivelloCheck.checked) {
                 mappaGIS.removeLayer(livelloTabella);
             }
             else {
@@ -175,17 +184,39 @@ class LayerGIS {
 
         let coloreRandom = `#${(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6)}`;
         // spegniLivello.style.backgroundColor = coloreRandom;
-        quadratino.style.backgroundColor = coloreRandom;
-        function stileGeoJSON(polGeoJSON) {
+
+        let geojsonMarkerOptions = {
+            radius: 8,
+            color: coloreRandom,
+            fillColor: coloreRandom,
+            fillOpacity: 0.8,
+        };
+
+        // quadratino.style.backgroundColor = coloreRandom;
+        // spegniLivelloCheck.style.color = coloreRandom;
+        // contenitoreSpegniLiv.style.backgroundColor = coloreRandom;
+
+        function stileGeoJSON(feature) {
             return {
                 color: coloreRandom,
             }
         }
 
+        function stileGeoPointToLayer(feature, latlng) {
+            return L.circleMarker(latlng, geojsonMarkerOptions);
+        }
+
         gis.forEach(geo => {
             const geoRaw = JSON.parse(geo.geom);
+            if (geoRaw.type === "Point") {
+                // console.log(geoRaw);
+                const geoGeoJSON = L.Proj.geoJson(geoRaw, {pointToLayer: stileGeoPointToLayer}).addTo(livelloTabella);
+                geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
+            }
+            else {
             const geoGeoJSON = L.Proj.geoJson(geoRaw, {style: stileGeoJSON}).addTo(livelloTabella);
             geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
+            }
         });
     }
 }
