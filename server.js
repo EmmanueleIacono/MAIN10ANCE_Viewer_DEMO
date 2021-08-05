@@ -49,10 +49,10 @@ async function start() {
 async function connect() {
     try {
         await client.connect();
-        console.log('Connessione al database Main10ance riuscita');
+        console.log('Connessione al database BIM riuscita');
     }
     catch(e) {
-        console.error(`Connessione al database Main10ance fallita: ${e}`);
+        console.error(`Connessione al database BIM fallita: ${e}`);
     }
 };
 

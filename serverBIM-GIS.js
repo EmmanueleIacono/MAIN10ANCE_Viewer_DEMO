@@ -29,10 +29,10 @@ async function start() {
 async function connect() {
     try {
         await client.connect();
-        console.log('Connessione al database GIS riuscita');
+        console.log('Connessione al database Main10ance riuscita');
     }
     catch(e) {
-        console.error(`Connessione al database GIS fallita: ${e}`);
+        console.error(`Connessione al database Main10ance fallita: ${e}`);
     }
 };
 
