@@ -14,7 +14,7 @@ $(document).ready(function () {
           "dataType": "json",
           'multiple': false,
           "data": function (node) {
-            console.log(node); //voglio capire che cosa sono questi NODE
+            // console.log(node); //voglio capire che cosa sono questi NODE
             return { "id": node.id };
           }
         }
