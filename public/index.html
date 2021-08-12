@@ -103,17 +103,7 @@
       </div>
       <div class="fill" id="tab2" data-tab-content>
         <div class="panel panel-default col-sm-9 fill" id="tabMappa">
-          <div class="panel-heading" id="pannello-modal-header" data-toggle="tooltip">
-            <!-- GIS - PANEL HEADING -->
-            <!-- <div id="contenitore-selettori">
-              <span id="refreshGIS" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
-              <button class="dropdown-toggle" data-toggle="dropdown">Sacro Monte
-                <span class="glyphicon glyphicon-menu-down"></span>
-              </button>
-              <ul class="dropdown-menu" id="contenitore-selettori-2"></ul>
-            </div> -->
-            <!-- <button type="button" id="spegniGeoJSON">VISIBILITA' GEOJSON-TESTER</button> -->
-          </div>
+          <div class="panel-heading" id="pannello-modal-header" data-toggle="tooltip"></div>
           <!-- GIS -->
           <div id="appGIS">
             <div id="mappa"></div>
@@ -132,27 +122,8 @@
               </div>
               <div id="contenitore-selettori">
                 <span id="refreshGIS" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
-                <!-- <br> -->
-                <!-- <button class="dropdown-toggle" data-toggle="dropdown">Sacro Monte
-                  <span class="glyphicon glyphicon-menu-down"></span>
-                </button>
-                <ul class="dropdown-menu menu-sm" id="contenitore-selettori-2"></ul> -->
                 <div class="menu-sm" id="contenitore-selettori-2"></div>
               </div>
-              <!-- <br> -->
-              <!-- <div id="legendaLayer">QUI LAYERS</div> -->
-              <!-- BOTTONE DI REFRESH -->
-              <!-- <button id="refreshParams" class="glyphicon glyphicon-home dbBtn" title="Home" style="cursor: pointer" height="30"></button> -->
-  
-              <!-- BOTTONE DI QUERY -->
-              <!-- <button id="queryDB" class="glyphicon glyphicon-list-alt dbBtn" title="Interroga" style="cursor: pointer" height="30"></button> -->
-  
-              <!-- BOTTONE DI MODIFICA -->
-              <!-- <button id="modificaDB" class="glyphicon glyphicon-floppy-disk dbBtn" title="Modifica" style="cursor: pointer" height="30"></button> -->
-  
-              <!-- BOTTONE DI ANNULLA -->
-              <!-- <button id="annullaDB" class="glyphicon glyphicon-erase dbBtn" title="Annulla" style="cursor: pointer" height="30"></button> -->
-  
               <!-- FORM -->
               <form id="formDBGIS" spellcheck="false"></form>
             </div>
@@ -171,14 +142,10 @@
                 <input type="radio" name="radioLOD" id="radioLOD3">
                 <label for="radioLOD3">Opere immobili</label>
                 <select name="selectLOD3" id="selectLOD3" disabled></select>
-                <!-- <label for="selectEdificio">Seleziona un edificio</label>
-                <select name="selectEdificio" id="selectEdificio" disabled></select> -->
                 <br>
                 <input type="radio" name="radioLOD" id="radioLOD4">
                 <label for="radioLOD4">Opere mobili e superfici decorate</label>
                 <select name="selectLOD4" id="selectLOD4" disabled></select>
-                <!-- <label for="selectCappella">Seleziona una cappella</label>
-                <select name="selectCappella" id="selectCappella" disabled></select> -->
                 <br>
                 <label for="selectCappella">Seleziona una cappella</label>
                 <select name="selectCappella" id="selectCappella" disabled></select>
@@ -188,10 +155,6 @@
               </form>
               <button id="applicaQuery">APPLICA</button>
             </div>
-            <!-- <div id="colDBLOD5" class="colonnaDB">
-              <label for="selectLOD5">Attività</label>
-              <select name="selectLOD5" id="selectLOD5" disabled></select>
-            </div> -->
           </div>
           <div id="risultatiDB"></div>
         </div>
@@ -233,17 +196,15 @@
       // abilito select lod 3
       document.getElementById('selectLOD3').disabled = false;
       document.getElementById('selectLOD4').disabled = true;
-      // document.getElementById('selectEdificio').disabled = false;
       document.getElementById('selectCappella').disabled = false;
-      document.getElementById('selectLOD5').disabled = false;
+      // document.getElementById('selectLOD5').disabled = false;
     }
     else if(document.getElementById('radioLOD4').checked) {
       // abilito select lod 4
       document.getElementById('selectLOD4').disabled = false;
       document.getElementById('selectLOD3').disabled = true;
       document.getElementById('selectCappella').disabled = false;
-      // document.getElementById('selectEdificio').disabled = true;
-      document.getElementById('selectLOD5').disabled = false;
+      // document.getElementById('selectLOD5').disabled = false;
     }
   }, 100);
 </script>

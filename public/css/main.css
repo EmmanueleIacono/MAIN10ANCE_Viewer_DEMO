@@ -262,3 +262,29 @@ input[id^="form-"] {
   margin-top: 10px;
   margin-bottom: 10px;
 } */
+
+#tabDatabase {
+  padding: 10px;
+}
+
+/* TABELLA DB */
+
+table {
+  /* font-family: arial, sans-serif; */
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  background-color: #b6b4b4;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}

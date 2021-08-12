@@ -9,6 +9,8 @@ const client = new Client({
     ssl: { rejectUnauthorized: false }
 });
 
+//////////          RICHIESTE          //////////
+
 // per testare la richiesta:
 // fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "alias": "Bosco", "geometria": "geom_pol", "colonneUtili": ["bosco_gov", "bosco_ty"]} }).then(a => a.json()).then(console.log)
 appGIS_BIM.get('/Main10ance_DB/GIS', async (req, res) => {
@@ -19,6 +21,41 @@ appGIS_BIM.get('/Main10ance_DB/GIS', async (req, res) => {
     // res.send(JSON.stringify(identificativo[0]));
     res.send(JSON.stringify(rispostaGIS));
 });
+
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabelle", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabelle', async (req, res) => {
+    const risposta = await leggiListaTabelle();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+appGIS_BIM.get('/Main10ance_DB/BIMViewer', async (req, res) => {
+    const reqJson = req.headers;
+    const risposta = await leggiBIMViewer(reqJson.categoria, reqJson.id);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(risposta[0]));
+});
+
+// per testare la richiesta:
+// fetch("/Main10ance_DB/colonne", {method: "GET", headers: {"content-type": "application/json", tab: "catena"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/colonne', async (req, res) => {
+    const reqJson = req.headers;
+    const risposta = await leggiColonneTabella(reqJson.tab);
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB", {method: "GET", headers: {"content-type": "application/json", tab: "catena"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB', async (req, res) => {
+    const reqJson = req.headers;
+    const risposta = await leggiTabellaDB(reqJson.tab);
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+//////////          AVVIO SERVER          //////////
 
 start();
 
@@ -36,16 +73,7 @@ async function connect() {
     }
 };
 
-// VECCHIA
-// async function leggiGIS(nomeTabella, oidElemento) {
-//     try {
-//         const results = await client.query(`SELECT ST_AsGeoJSON FROM main10ance_sacrimonti."${nomeTabella}" WHERE "oid" = ($1);`, [oidElemento]);
-//         return results.rows;
-//     }
-//     catch(e) {
-//         return [];
-//     }
-// };
+//////////          QUERY          //////////
 
 async function leggiGIS(tabella, alias, geometria, colonneUtili) {
     try {
@@ -55,7 +83,7 @@ async function leggiGIS(tabella, alias, geometria, colonneUtili) {
     catch(e) {
         return [`errore: ${e}`];
     }
-}
+};
 
 async function leggiListaTabelle() {
     try {
@@ -75,21 +103,26 @@ async function leggiBIMViewer(nomeCategoria, idElemento) {
     catch(e) {
         return [];
     }
-}
+};
 
-// per testare la richiesta:
-// fetch("/Main10ance_DB/tabelle", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appGIS_BIM.get('/Main10ance_DB/tabelle', async (req, res) => {
-    const risposta = await leggiListaTabelle();
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+async function leggiColonneTabella(nomeTab) {
+    try {
+        const result = await client.query(`SELECT * FROM information_schema.columns WHERE table_schema = 'main10ance_sacrimonti' AND table_name = ($1);`, [nomeTab]);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+};
 
-appGIS_BIM.get('/Main10ance_DB/BIMViewer', async (req, res) => {
-    const reqJson = req.headers;
-    const risposta = await leggiBIMViewer(reqJson.categoria, reqJson.id);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(risposta[0]));
-});
+async function leggiTabellaDB(nomeTab) {
+    try {
+        const result = await client.query(`SELECT * FROM main10ance_sacrimonti."${nomeTab}" ORDER BY "id_main10ance"`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+};
 
 module.exports = appGIS_BIM
