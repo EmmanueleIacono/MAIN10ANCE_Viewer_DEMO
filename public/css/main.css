@@ -227,6 +227,11 @@ input[id^="form-"] {
   z-index: 1000;
 }
 
+#contenitore-livelli-summary {
+  display: revert;
+  cursor: pointer;
+}
+
 /* STILI PER TABS */
 [data-tab-content] {
   display: none;

@@ -166,7 +166,7 @@ class LayerGIS {
         // contenitoreSpegniLiv.appendChild(spegniLivello);
         contenitoreSpegniLiv.appendChild(spegniLivelloCheck);
         contenitoreSpegniLiv.appendChild(labelCheck);
-        const contenitoreLivelli = document.getElementById('contenitore-livelli');
+        const contenitoreLivelli = document.getElementById('contenitore-livelli-details');
         // contenitoreLivelli.appendChild(spegniLivello);
         contenitoreLivelli.appendChild(contenitoreSpegniLiv);
         let visibilitàLivello = false;
