@@ -142,6 +142,9 @@
                 <label for="radioSM">Sacro Monte</label>
                 <select name="selectSM" id="selectSM"></select>
                 <br>
+                <label for="selectCappella">Cappella</label>
+                <select name="selectCappella" id="selectCappella"></select>
+                <br>
                 <input type="radio" name="radioLOD" id="radioLOD3">
                 <label for="radioLOD3">Opere immobili</label>
                 <select name="selectLOD3" id="selectLOD3" disabled></select>
@@ -150,9 +153,7 @@
                 <label for="radioLOD4">Opere mobili e superfici decorate</label>
                 <select name="selectLOD4" id="selectLOD4" disabled></select>
                 <br>
-                <label for="selectCappella">Seleziona una cappella</label>
-                <select name="selectCappella" id="selectCappella" disabled></select>
-                <br>
+                <input type="checkbox" name="checkLOD" id="checkLOD5">
                 <label for="selectLOD5">Attività</label>
                 <select name="selectLOD5" id="selectLOD5" disabled></select>
               </form>
@@ -195,19 +196,25 @@
 <!-- SCRIPT PER GESTIONE RADIO LOD DB -->
 <script>
   setInterval(() => {
-    if(document.getElementById('radioLOD3').checked) {
+    if (document.getElementById('radioLOD3').checked) {
       // abilito select lod 3
       document.getElementById('selectLOD3').disabled = false;
       document.getElementById('selectLOD4').disabled = true;
-      document.getElementById('selectCappella').disabled = false;
+      // document.getElementById('selectCappella').disabled = false;
       // document.getElementById('selectLOD5').disabled = false;
     }
-    else if(document.getElementById('radioLOD4').checked) {
+    if (document.getElementById('radioLOD4').checked) {
       // abilito select lod 4
       document.getElementById('selectLOD4').disabled = false;
       document.getElementById('selectLOD3').disabled = true;
-      document.getElementById('selectCappella').disabled = false;
+      // document.getElementById('selectCappella').disabled = false;
       // document.getElementById('selectLOD5').disabled = false;
+    }
+    if (document.getElementById('checkLOD5').checked) {
+      document.getElementById('selectLOD5').disabled = false;
+    }
+    if (!(document.getElementById('checkLOD5').checked)) {
+      document.getElementById('selectLOD5').disabled = true;
     }
   }, 100);
 </script>

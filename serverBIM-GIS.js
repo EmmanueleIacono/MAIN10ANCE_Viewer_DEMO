@@ -55,6 +55,15 @@ appGIS_BIM.get('/Main10ance_DB/tabellaDB', async (req, res) => {
     res.send(risposta);
 });
 
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB/glossario", {method: "GET", headers: {"content-type": "application/json", tab: "glossario"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB/glossario', async (req, res) => {
+    const reqJson = req.headers;
+    const risposta = await leggiTabellaGlossario(reqJson.tab);
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
 //////////          AVVIO SERVER          //////////
 
 start();
@@ -118,6 +127,16 @@ async function leggiColonneTabella(nomeTab) {
 async function leggiTabellaDB(nomeTab) {
     try {
         const result = await client.query(`SELECT * FROM main10ance_sacrimonti."${nomeTab}" ORDER BY "id_main10ance"`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+};
+
+async function leggiTabellaGlossario(nomeTab) {
+    try {
+        const result = await client.query(`SELECT * FROM main10ance_sacrimonti."${nomeTab}" ORDER BY "id_gloss"`);
         return result.rows;
     }
     catch(e) {

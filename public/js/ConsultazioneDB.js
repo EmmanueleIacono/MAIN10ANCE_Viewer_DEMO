@@ -4,6 +4,7 @@ const selectSM = document.getElementById('selectSM');
 const selezioneCapp = document.getElementById('selectCappella');
 const selezioneLOD3 = document.getElementById('selectLOD3');
 const selezioneLOD4 = document.getElementById('selectLOD4');
+const selezioneLOD5 = document.getElementById('selectLOD5');
 
 const listaLOD5 = ['controllo_stato_di_conservazione_livello_di_urgenza', 'danno_alterazione_degrado', 'frase_di_rischio', 'glossario', 'manutenzione_correttiva_o_a_guasto', 'manutenzione_regolare', 'restauri'];
 const listaLOD4 = ['arredo', 'dipinto_murale', 'pavimento_decorativo', 'quadro',  'statua'];
@@ -17,12 +18,22 @@ const applicaQuery = document.getElementById('applicaQuery');
 applicaQuery.addEventListener('click', async () => {
     contenitoreRisultatiDB.innerHTML = '';
     const tipoOpera = ottieniOpera();
+    const tipoAttività = ottieniAttività();
     if (tipoOpera) {
         // console.log(tipoOpera);
-        const tabellaRisultati = document.createElement('table');
-        contenitoreRisultatiDB.appendChild(tabellaRisultati);
-        const listaColonne = await costruisciIntestazione(tabellaRisultati, tipoOpera);
-        costruisciTabella(tabellaRisultati, listaColonne, tipoOpera);
+        // console.log(tipoAttività);
+        if (tipoAttività) {
+            const tabellaRisultati = document.createElement('table');
+            contenitoreRisultatiDB.appendChild(tabellaRisultati);
+            const listaColonne = await costruisciIntestazione(tabellaRisultati, tipoAttività);
+            costruisciTabella(tabellaRisultati, listaColonne, tipoAttività);
+        }
+        else {
+            const tabellaRisultati = document.createElement('table');
+            contenitoreRisultatiDB.appendChild(tabellaRisultati);
+            const listaColonne = await costruisciIntestazione(tabellaRisultati, tipoOpera);
+            costruisciTabella(tabellaRisultati, listaColonne, tipoOpera);
+        }
     }
     else {
         alert('Informazioni insufficienti per procedere');
@@ -42,6 +53,17 @@ function ottieniOpera() {
         qualeOpera = null;
     }
     return qualeOpera;
+}
+
+function ottieniAttività() {
+    let qualeAttività;
+    if(document.getElementById('checkLOD5').checked) {
+        qualeAttività = selezioneLOD5.value;
+      }
+    else {
+        qualeAttività = null;
+    }
+    return qualeAttività;
 }
 
 function setNumCappelle() {
@@ -65,9 +87,20 @@ async function costruisciTabella(tabella, colonne, opera) {
     datiDB.forEach(dato => {
         const qualeSM = (selectSM.value).split('-')[0];
         const qualeCapp = selezioneCapp.value;
-        const id_SM = (dato.id_main10ance).split('|')[0];
-        const id_ListaCapp = (dato.id_main10ance).split('|')[1].split('-');
-        if ((qualeSM === id_SM) && (id_ListaCapp.includes(qualeCapp))) {
+        if (dato.id_main10ance) {
+            const id_SM = (dato.id_main10ance).split('|')[0];
+            const id_ListaCapp = (dato.id_main10ance).split('|')[1].split('-');
+            if ((qualeSM === id_SM) && (id_ListaCapp.includes(qualeCapp))) {
+                const riga = document.createElement('tr');
+                tBody.appendChild(riga);
+                colonne.forEach(col => {
+                    const record = document.createElement('td');
+                    record.innerHTML = dato[col];
+                    riga.appendChild(record);
+                });
+            }
+        }
+        else {
             const riga = document.createElement('tr');
             tBody.appendChild(riga);
             colonne.forEach(col => {
@@ -83,6 +116,7 @@ async function costruisciIntestazione(tabella, opera) {
     jsonTabella = {};
     jsonTabella.tab = opera;
     const cols = await prendiColonne(jsonTabella);
+    // console.log(cols);
     const tHead = document.createElement('thead');
     tabella.appendChild(tHead);
     const trHead = document.createElement('tr');
@@ -105,20 +139,23 @@ async function prendiTabelle() {
         tabelle.forEach(t => {
             if (listaLOD5.includes(t.table_name)) {
                 const opzioneLOD5 = document.createElement('option');
+                const stringaPulita = (t.table_name).replace(/_/g, ' ');
                 opzioneLOD5.setAttribute('value', t.table_name);
-                opzioneLOD5.innerHTML = `${t.table_name}`;
+                opzioneLOD5.innerHTML = `${stringaPulita}`;
                 document.getElementById('selectLOD5').appendChild(opzioneLOD5);
             }
             else if (listaLOD4.includes(t.table_name)) {
                 const opzioneLOD4 = document.createElement('option');
+                const stringaPulita = (t.table_name).replace(/_/g, ' ');
                 opzioneLOD4.setAttribute('value', t.table_name);
-                opzioneLOD4.innerHTML = `${t.table_name}`;
+                opzioneLOD4.innerHTML = `${stringaPulita}`;
                 document.getElementById('selectLOD4').appendChild(opzioneLOD4);
             }
             else if (listaLOD3.includes(t.table_name)) {
                 const opzioneLOD3 = document.createElement('option');
+                const stringaPulita = (t.table_name).replace(/_/g, ' ');
                 opzioneLOD3.setAttribute('value', t.table_name);
-                opzioneLOD3.innerHTML = `${t.table_name}`;
+                opzioneLOD3.innerHTML = `${stringaPulita}`;
                 document.getElementById('selectLOD3').appendChild(opzioneLOD3);
             }
             else {
@@ -165,7 +202,13 @@ async function prendiColonne(jsonReq) {
 }
 
 async function prendiDatiTabella(jsonReq) {
-    const risultato = await fetch('/Main10ance_DB/tabellaDB', {method: "GET", headers: {"content-type": "application/json", "tab": jsonReq.tab}});
+    let risultato;
+    if (jsonReq.tab === 'glossario') {
+        risultato = await fetch('/Main10ance_DB/tabellaDB/glossario', {method: "GET", headers: {"content-type": "application/json", "tab": jsonReq.tab}});
+    }
+    else {
+        risultato = await fetch('/Main10ance_DB/tabellaDB', {method: "GET", headers: {"content-type": "application/json", "tab": jsonReq.tab}});
+    }
     const risTradotto = await risultato.json();
     return risTradotto;
 }
