@@ -23,11 +23,15 @@
   <script src="js/ForgeTree.js"></script>
   <script src="js/ForgeViewer.js"></script>
   <!-- PER QUESTI SOTTO SERVE DEFER PER CARICARLI DOPO L'HTML -->
-  <script src="js/FrontEndDB.js" defer></script>
+  <script src="js/BIM-DB.js" defer></script>
   <script src="js/MappaGIS.js" defer></script>
   <script src="js/ConsultazioneDB.js" defer></script>
 </head>
 <body>
+  <!-- CARICAMENTO -->
+  <!-- <div id="loading">
+    <img id="loading-image" src="./img/ajax-loader-2.gif" alt="Loading..." />
+  </div> -->
   <!-- Fixed navbar by Bootstrap: https://getbootstrap.com/examples/navbar-fixed-top/ -->
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
@@ -78,24 +82,29 @@
             <div class="panel-heading" id="pannello-db-header" data-toggle="tooltip">
               <b>PARAMETRI</b>
             </div>
-            <div id="appBuckets">
-              tree here
-            </div>
-            <div class="pannelloDB">
-              <!-- BOTTONE DI REFRESH -->
-              <button id="refreshParams" class="glyphicon glyphicon-home dbBtn" title="Home" style="cursor: pointer" height="30"></button>
-  
-              <!-- BOTTONE DI QUERY -->
-              <button id="queryDB" class="glyphicon glyphicon-list-alt dbBtn" title="Interroga e modifica" style="cursor: pointer" height="30"></button>
-  
-              <!-- BOTTONE DI MODIFICA -->
-              <button id="modificaDB" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
-  
-              <!-- BOTTONE DI ANNULLA -->
-              <button id="annullaDB" class="glyphicon glyphicon-erase dbBtn" title="Annulla" style="cursor: pointer" height="30"></button>
-  
-              <!-- FORM -->
-              <form id="formDB" spellcheck="false"></form>
+            <div class="panel-body">
+              <details>
+                <summary class="sommario-main10ance"><b>SELEZIONE MODELLI</b></summary>
+                <div id="appBuckets">
+                  tree here
+                </div>
+              </details>
+              <div class="pannelloDB">
+                <!-- BOTTONE DI REFRESH -->
+                <button id="refreshParams" class="glyphicon glyphicon-home dbBtn" title="Home" style="cursor: pointer" height="30"></button>
+    
+                <!-- BOTTONE DI QUERY -->
+                <button id="queryDB" class="glyphicon glyphicon-list-alt dbBtn" title="Interroga e modifica" style="cursor: pointer" height="30"></button>
+    
+                <!-- BOTTONE DI MODIFICA -->
+                <button id="modificaDB" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
+    
+                <!-- BOTTONE DI ANNULLA -->
+                <button id="annullaDB" class="glyphicon glyphicon-erase dbBtn" title="Annulla" style="cursor: pointer" height="30"></button>
+    
+                <!-- FORM -->
+                <form id="formDB" spellcheck="false"></form>
+              </div>
             </div>
           </div>
         </div>
@@ -117,15 +126,20 @@
               <b>FILTRI</b>
             </div>
             <div class="panel-body pannelloLatGIS">
+              <details>
+                <summary class="sommario-main10ance"><b>NAVIGAZIONE</b></summary>
+                <div id="contenitore-selettori">
+                  <span id="refreshGIS" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
+                  <br>
+                  <div class="menu-sm" id="contenitore-selettori-2"></div>
+                </div>
+              </details>
+              <br>
               <div id="contenitore-livelli-div">
                 <details id="contenitore-livelli-details">
-                  <summary id="contenitore-livelli-summary"><b>FILTRI GIS</b></summary>
+                  <summary id="contenitore-livelli-summary" class="sommario-main10ance"><b>LIVELLI GIS</b></summary>
                 </details>
               <!-- <button type="button" id="spegniGIS">MOSTRA/NASCONDI GIS</button> -->
-              </div>
-              <div id="contenitore-selettori">
-                <span id="refreshGIS" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
-                <div class="menu-sm" id="contenitore-selettori-2"></div>
               </div>
               <!-- FORM -->
               <form id="formDBGIS" spellcheck="false"></form>
@@ -158,6 +172,10 @@
                 <select name="selectLOD5" id="selectLOD5" disabled></select>
               </form>
               <button id="applicaQuery">APPLICA</button>
+              <button id="modificaDati" disabled>MODIFICA</button>
+              <button id="salvaDati" disabled>SALVA</button>
+              <!-- <br> -->
+              <button id="creaDati">AGGIUNGI</button>
             </div>
           </div>
           <div id="risultatiDB"></div>
@@ -168,6 +186,13 @@
       </div>
     </div>
   </div>
+
+  <!-- SCRIPT PER GESTIONE CARICAMENTO -->
+  <!-- <script>
+    $(window).on('load', () => {
+      $('#loading').hide();
+    })
+  </script> -->
 
   <!-- SCRIPT PER GESTIONE TABS -->
 <script>

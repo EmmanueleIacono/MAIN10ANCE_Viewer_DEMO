@@ -2,7 +2,7 @@ import('./ForgeViewer.js');
 
 // const urlCorrente = window.location.href.toString().slice(0, -1);
 
-let formDB = document.getElementById('formDB');
+const formDB = document.getElementById('formDB');
 
 // QUI SOTTO CI SONO I VARI CONTROLLI CHE REGOLANO LE RICHIESTE AL SERVER
 
@@ -154,6 +154,12 @@ async function leggiDBElemento(jsonReq) {
         formDB.appendChild(titoloNome);
         formDB.appendChild(titoloCategoria);
         formDB.appendChild(titoloID);
+        const detailsBIMLOD3 = document.createElement('details');
+        const summaryBIMLOD3 = document.createElement('summary');
+        summaryBIMLOD3.setAttribute('class', 'sommario-main10ance');
+        summaryBIMLOD3.innerHTML = '<b>LOD 3</b>';
+        detailsBIMLOD3.appendChild(summaryBIMLOD3);
+        formDB.appendChild(detailsBIMLOD3);
         const parametri = await risultato.json();
         const listaParametri = Object.entries(parametri);
         listaParametri.forEach((p) => {
@@ -162,19 +168,32 @@ async function leggiDBElemento(jsonReq) {
             const idLabelFormDB = document.createElement("label");
             idLabelFormDB.setAttribute("id", `${nomeP}-${idElem}`);
             idLabelFormDB.innerHTML = `${nomeP}: `;
-            const parametroInputFormDB = document.createElement("input");
-            parametroInputFormDB.setAttribute("id", `form-${nomeP}-${idElem}`);
-            parametroInputFormDB.setAttribute("placeholder", `${valoreP}`);
+            // const parametroInputFormDB = document.createElement("input");
+            // parametroInputFormDB.setAttribute("id", `form-${nomeP}-${idElem}`);
+            // parametroInputFormDB.setAttribute("placeholder", `${valoreP}`);
+            // if (valoreP !== null) {
+            //     parametroInputFormDB.setAttribute("value", `${valoreP}`);
+            // }
+            // else {
+            //     parametroInputFormDB.setAttribute("value", "");
+            // }
+            const parametroFormDBLOD3 = document.createElement("div");
+            parametroFormDBLOD3.setAttribute("id", `div-form-${nomeP}-${idElem}`);
             if (valoreP !== null) {
-                parametroInputFormDB.setAttribute("value", `${valoreP}`);
+                parametroFormDBLOD3.innerHTML = `${valoreP}`;
             }
             else {
-                parametroInputFormDB.setAttribute("value", "");
+                parametroFormDBLOD3.innerHTML = `<i>Nessun valore</i>`;
             }
             const br = document.createElement("br");
-            formDB.appendChild(idLabelFormDB);
-            formDB.appendChild(parametroInputFormDB);
-            formDB.appendChild(br);
+            // formDB.appendChild(idLabelFormDB);
+            // formDB.appendChild(parametroInputFormDB);
+            // formDB.appendChild(br);
+            detailsBIMLOD3.appendChild(idLabelFormDB);
+            // detailsBIMLOD3.appendChild(parametroInputFormDB);
+            detailsBIMLOD3.appendChild(parametroFormDBLOD3);
+            detailsBIMLOD3.appendChild(br);
+            detailsBIMLOD3.open = true;
         });
     }
     catch(e) {

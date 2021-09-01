@@ -19,9 +19,7 @@ applicaQuery.addEventListener('click', async () => {
     contenitoreRisultatiDB.innerHTML = '';
     const tipoOpera = ottieniOpera();
     const tipoAttività = ottieniAttività();
-    if (tipoOpera) {
-        // console.log(tipoOpera);
-        // console.log(tipoAttività);
+    if ((tipoOpera) || (tipoAttività === 'glossario')) {
         if (tipoAttività) {
             const tabellaRisultati = document.createElement('table');
             contenitoreRisultatiDB.appendChild(tabellaRisultati);
@@ -39,6 +37,33 @@ applicaQuery.addEventListener('click', async () => {
         alert('Informazioni insufficienti per procedere');
         return;
     }
+});
+
+const modificaDati = document.getElementById('modificaDati');
+modificaDati.addEventListener('click', () => {
+    const bodyTabellaDB = document.getElementById('bodyTabellaDB');
+    if ((bodyTabellaDB.innerHTML === '') || (bodyTabellaDB.innerHTML === null)) {
+        alert('Nessun dato modificabile');
+    }
+    else {
+        alert('sto modificando');
+    }
+});
+
+setInterval(() => {
+    if ((contenitoreRisultatiDB.innerHTML === '') || (contenitoreRisultatiDB.innerHTML === null)) {
+        modificaDati.disabled = true;
+    }
+    else {
+        modificaDati.disabled = false;
+    }
+}, 100);
+
+const salvaDati = document.getElementById('salvaDati');
+
+const creaDati = document.getElementById('creaDati');
+creaDati.addEventListener('click', () => {
+    alert('Operazione temporaneamente disabilitata');
 });
 
 function ottieniOpera() {
@@ -83,14 +108,17 @@ async function costruisciTabella(tabella, colonne, opera) {
     jsonTabella.tab = opera;
     const datiDB = await prendiDatiTabella(jsonTabella);
     const tBody = document.createElement('tbody');
+    tBody.setAttribute('id', 'bodyTabellaDB');
     tabella.appendChild(tBody);
     datiDB.forEach(dato => {
         const qualeSM = (selectSM.value).split('-')[0];
         const qualeCapp = selezioneCapp.value;
+        const qualeOpera = ottieniOpera();
         if (dato.id_main10ance) {
             const id_SM = (dato.id_main10ance).split('|')[0];
             const id_ListaCapp = (dato.id_main10ance).split('|')[1].split('-');
-            if ((qualeSM === id_SM) && (id_ListaCapp.includes(qualeCapp))) {
+            const id_opera = (dato.id_main10ance).split('|')[2];
+            if ((qualeSM === id_SM) && (id_ListaCapp.includes(qualeCapp)) && (qualeOpera === id_opera)) {
                 const riga = document.createElement('tr');
                 tBody.appendChild(riga);
                 colonne.forEach(col => {
@@ -204,7 +232,7 @@ async function prendiColonne(jsonReq) {
 async function prendiDatiTabella(jsonReq) {
     let risultato;
     if (jsonReq.tab === 'glossario') {
-        risultato = await fetch('/Main10ance_DB/tabellaDB/glossario', {method: "GET", headers: {"content-type": "application/json", "tab": jsonReq.tab}});
+        risultato = await fetch('/Main10ance_DB/tabellaDB/glossario', {method: "GET", headers: {"content-type": "application/json"}});
     }
     else {
         risultato = await fetch('/Main10ance_DB/tabellaDB', {method: "GET", headers: {"content-type": "application/json", "tab": jsonReq.tab}});
