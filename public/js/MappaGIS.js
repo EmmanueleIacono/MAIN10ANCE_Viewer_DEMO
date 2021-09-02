@@ -37,6 +37,22 @@ bottoneRefresh.addEventListener("click", () => {
     mappaGIS.setView(posOrigine, 8)
 });
 
+// prima interrogazione livelli GIS
+const livelliGISdetails = document.getElementById('contenitore-livelli-details');
+const livelliGISdiv = document.getElementById('contenitore-livelli-div-interno');
+const livelliGISloading = document.getElementById('contenitore-livelli-loading');
+livelliGISdetails.addEventListener('click', async () => {
+    if (livelliGISdiv.innerHTML === '') {
+        console.log('inizio');
+        const tabelleGIS = await getTabelleGIS();
+        leggiDBGIS(tabelleGIS).then(() => {
+            livelliGISloading.style.display = 'none';
+            livelliGISdiv.style.display = 'block';
+            console.log('fine');
+        });
+    }
+});
+
 // classi per bottoni di navigazione e altro
 class BottoneNavigazioneSM {
     constructor(nome, sigla, posizione) {
@@ -45,7 +61,6 @@ class BottoneNavigazioneSM {
         this.posizione = posizione
 
         const bottoneNav = document.createElement('button');
-        // const bottoneNav = document.createElement('li');
         bottoneNav.setAttribute('id', `scegli${sigla}`);
         bottoneNav.setAttribute('class', 'selettoreSM-dropdown');
         bottoneNav.innerHTML = `Sacro Monte di ${nome}`;
@@ -148,31 +163,18 @@ class LayerGIS {
         let livelloTabella = L.layerGroup();
 
         const contenitoreSpegniLiv = document.createElement('div');
-        // const spegniLivello = document.createElement('button');
         const spegniLivelloCheck = document.createElement('input');
-        // spegniLivello.setAttribute('id', `spegni-${tabella}`);
         spegniLivelloCheck.setAttribute('id', `spegni-${tabella}`);
         spegniLivelloCheck.setAttribute('type', 'checkbox');
-        // const quadratino = document.createElement('div');
         const labelCheck = document.createElement('label');
-        // quadratino.setAttribute('id', `colore-${tabella}`);
         labelCheck.setAttribute('for', `spegni-${tabella}`);
-        // quadratino.style.width = '10px';
-        // quadratino.style.height = '10px';
-        // contenitoreSpegniLiv.appendChild(quadratino);
-        // spegniLivello.textContent = `${alias}`;
         labelCheck.textContent = `${alias}`;
-        // spegniLivello.innerHTML = `${alias}`;
-        // contenitoreSpegniLiv.appendChild(spegniLivello);
         contenitoreSpegniLiv.appendChild(spegniLivelloCheck);
         contenitoreSpegniLiv.appendChild(labelCheck);
-        const contenitoreLivelli = document.getElementById('contenitore-livelli-details');
-        // contenitoreLivelli.appendChild(spegniLivello);
+        const contenitoreLivelli = document.getElementById('contenitore-livelli-div-interno');
         contenitoreLivelli.appendChild(contenitoreSpegniLiv);
         let visibilitàLivello = false;
-        // spegniLivello.addEventListener("click", () => {
         spegniLivelloCheck.addEventListener("click", () => {
-            // if (visibilitàLivello) {
             if (!spegniLivelloCheck.checked) {
                 mappaGIS.removeLayer(livelloTabella);
             }
@@ -183,7 +185,6 @@ class LayerGIS {
         });
 
         let coloreRandom = `#${(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6)}`;
-        // spegniLivello.style.backgroundColor = coloreRandom;
 
         let geojsonMarkerOptions = {
             radius: 8,
@@ -191,10 +192,6 @@ class LayerGIS {
             fillColor: coloreRandom,
             fillOpacity: 0.8,
         };
-
-        // quadratino.style.backgroundColor = coloreRandom;
-        // spegniLivelloCheck.style.color = coloreRandom;
-        // contenitoreSpegniLiv.style.backgroundColor = coloreRandom;
 
         function stileGeoJSON(feature) {
             return {
@@ -209,7 +206,6 @@ class LayerGIS {
         gis.forEach(geo => {
             const geoRaw = JSON.parse(geo.geom);
             if (geoRaw.type === "Point") {
-                // console.log(geoRaw);
                 const geoGeoJSON = L.Proj.geoJson(geoRaw, {pointToLayer: stileGeoPointToLayer}).addTo(livelloTabella);
                 geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
             }
@@ -264,35 +260,6 @@ async function leggiDBMarkerCapp() {
 leggiDBMarkerSM();
 leggiDBMarkerCapp();
 
-// const spegniGIS = document.getElementById('spegniGIS');
-// let visibilitàGIS = false;
-// spegniGIS.addEventListener("click", () => {
-//     if (visibilitàGIS) {
-//         mappaGIS.removeLayer(LivelloGIS);
-//     }
-//     else {
-//         mappaGIS.addLayer(LivelloGIS);
-//     }
-//     visibilitàGIS = !visibilitàGIS;
-// });
-
-const tabellePopolateGIS = [
-    {tabella: "accesso_civico_toponimo_stradale", alias: "Accesso civico - Toponimo stradale", geometria: "geom_pun", colonneUtili: ["tp_str_nom", "acc_pc_ty", "civico_num"]},
-    {tabella: "area_di_circolazione_veicolare", alias: "Area di circolazione veicolare", geometria: "geom_pol", colonneUtili: ["ac_vei_zon"]},
-    {tabella: "area_verde", alias: "Area verde", geometria: "geom_pol", colonneUtili: ["ar_vrd_pa", "ar_vrd_ty"]},
-    {tabella: "bosco", alias: "Bosco", geometria: "geom_pol", colonneUtili: ["bosco_gov", "bosco_ty"]},
-    {tabella: "coltura_agricola", alias: "Coltura agricola", geometria: "geom_pol", colonneUtili: ["cl_agr_ty"]},
-    {tabella: "corso_d_acqua", alias: "Corso d\'acqua", geometria: "geom_pol", colonneUtili: ["cda_nom", "cda_ty"]},
-    {tabella: "curve_di_livello", alias: "Curve di livello", geometria: "geom_lin", colonneUtili: ["cv_liv_dt", "cv_liv_ty"]},
-    {tabella: "edificio", alias: "Edificio", geometria: "geom_pol", colonneUtili: ["edifc_stat", "edifc_ty", "edifc_uso"]},
-    {tabella: "edificio_minore", alias: "Edificio minore", geometria: "geom_pol", colonneUtili: ["edi_min_st", "edi_min_ty"]},
-    {tabella: "località_significativa", alias: "Località significativa", geometria: "geom_pun", colonneUtili: ["loc_sg_top", "loc_sg_ty", "loc_sg_sgn"]},
-    {tabella: "nodo_rete_elettrica", alias: "Nodo rete elettrica", geometria: "geom_pun", colonneUtili: ["nd_ele_ty"]},
-    {tabella: "specchio_d_acqua", alias: "Specchio d\'acqua", geometria: "geom_pol", colonneUtili: ["sp_acq_nom", "sp_acq_ty"]},
-    {tabella: "strade_sentieri_e_altri_percorsi_interni", alias: "Strade, sentieri e altri percorsi interni", geometria: "geom_pol", colonneUtili: ["ar_vms_ty", "ar_vms_fon"]},
-    {tabella: "tratto_rete_elettrica", alias: "Tratto rete elettrica", geometria: "geom_lin", colonneUtili: ["tr_ele_ty"]},
-]
-
 proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
 
 async function getGIS(tabella, alias, geometria, colonneUtili) {
@@ -313,4 +280,8 @@ async function leggiDBGIS(tabGIS) {
     }
 }
 
-leggiDBGIS(tabellePopolateGIS);
+async function getTabelleGIS() {
+    let tabelleGIS = await fetch("/DB_Servizio/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} });
+    let resp_tabelleGIS = await tabelleGIS.json();
+    return resp_tabelleGIS;
+}

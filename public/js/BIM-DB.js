@@ -136,8 +136,6 @@ async function leggiDBElemento(jsonReq) {
     try {
         cancellaFormDB(formDB);
 
-        // const risultato = await fetch(`${urlCorrente}/Main10ance_DB/all`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
-        // const risultato = await fetch(`/Main10ance_DB/all`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
         const risultato = await fetch(`/Main10ance_DB/BIMViewer`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
         const nomeElem = jsonReq.nome;
         const categoriaElem = jsonReq.categoria;
@@ -162,39 +160,8 @@ async function leggiDBElemento(jsonReq) {
         formDB.appendChild(detailsBIMLOD3);
         const parametri = await risultato.json();
         const listaParametri = Object.entries(parametri);
-        listaParametri.forEach((p) => {
-            const nomeP = p[0];
-            const valoreP = p[1];
-            const idLabelFormDB = document.createElement("label");
-            idLabelFormDB.setAttribute("id", `${nomeP}-${idElem}`);
-            idLabelFormDB.innerHTML = `${nomeP}: `;
-            // const parametroInputFormDB = document.createElement("input");
-            // parametroInputFormDB.setAttribute("id", `form-${nomeP}-${idElem}`);
-            // parametroInputFormDB.setAttribute("placeholder", `${valoreP}`);
-            // if (valoreP !== null) {
-            //     parametroInputFormDB.setAttribute("value", `${valoreP}`);
-            // }
-            // else {
-            //     parametroInputFormDB.setAttribute("value", "");
-            // }
-            const parametroFormDBLOD3 = document.createElement("div");
-            parametroFormDBLOD3.setAttribute("id", `div-form-${nomeP}-${idElem}`);
-            if (valoreP !== null) {
-                parametroFormDBLOD3.innerHTML = `${valoreP}`;
-            }
-            else {
-                parametroFormDBLOD3.innerHTML = `<i>Nessun valore</i>`;
-            }
-            const br = document.createElement("br");
-            // formDB.appendChild(idLabelFormDB);
-            // formDB.appendChild(parametroInputFormDB);
-            // formDB.appendChild(br);
-            detailsBIMLOD3.appendChild(idLabelFormDB);
-            // detailsBIMLOD3.appendChild(parametroInputFormDB);
-            detailsBIMLOD3.appendChild(parametroFormDBLOD3);
-            detailsBIMLOD3.appendChild(br);
-            detailsBIMLOD3.open = true;
-        });
+        creaRisultatiTesto(listaParametri, idElem, detailsBIMLOD3);
+        detailsBIMLOD3.open = true;
     }
     catch(e) {
         console.log('Errore nella lettura dei valori');
@@ -217,4 +184,49 @@ function cancellaFormDB(form) {
     while (form.firstChild) {
         form.removeChild(form.firstChild);
     }
+}
+
+function creaRisultatiTesto(listaRisultati, idElem, detailsBIMLOD) {
+    listaRisultati.forEach(r => {
+        const nomeP = r[0];
+        const valoreP = r[1];
+        const idLabelFormDB = document.createElement("label");
+        idLabelFormDB.setAttribute("id", `${nomeP}-${idElem}`);
+        idLabelFormDB.innerHTML = `${nomeP}: `;
+        const parametroFormDBLOD3 = document.createElement("div");
+        parametroFormDBLOD3.setAttribute("id", `div-form-${nomeP}-${idElem}`);
+        if (valoreP !== null) {
+            parametroFormDBLOD3.innerHTML = `${valoreP}`;
+        }
+        else {
+            parametroFormDBLOD3.innerHTML = `<i>Nessun valore</i>`;
+        }
+        const br = document.createElement("br");
+        detailsBIMLOD.appendChild(idLabelFormDB);
+        detailsBIMLOD.appendChild(parametroFormDBLOD3);
+        detailsBIMLOD.appendChild(br);
+    });
+}
+
+function creaRisultatiInput(listaRisultati, idElem, detailsBIMLOD) {
+    listaRisultati.forEach(r => {
+        const nomeP = r[0];
+        const valoreP = r[1];
+        const idLabelFormDB = document.createElement("label");
+        idLabelFormDB.setAttribute("id", `${nomeP}-${idElem}`);
+        idLabelFormDB.innerHTML = `${nomeP}: `;
+        const parametroInputFormDB = document.createElement("input");
+        parametroInputFormDB.setAttribute("id", `form-${nomeP}-${idElem}`);
+        parametroInputFormDB.setAttribute("placeholder", `${valoreP}`);
+        if (valoreP !== null) {
+            parametroInputFormDB.setAttribute("value", `${valoreP}`);
+        }
+        else {
+            parametroInputFormDB.setAttribute("value", "");
+        }
+        const br = document.createElement("br");
+        detailsBIMLOD.appendChild(idLabelFormDB);
+        detailsBIMLOD.appendChild(parametroInputFormDB);
+        detailsBIMLOD.appendChild(br);
+    });
 }
