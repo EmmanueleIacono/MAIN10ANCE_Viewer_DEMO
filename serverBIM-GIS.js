@@ -34,7 +34,8 @@ appGIS_BIM.get('/Main10ance_DB/BIMViewer', async (req, res) => {
     const reqJson = req.headers;
     const risposta = await leggiBIMViewer(reqJson.categoria, reqJson.id);
     res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(risposta[0]));
+    // res.send(JSON.stringify(risposta[0]));
+    res.send(JSON.stringify(risposta));
 });
 
 // per testare la richiesta:

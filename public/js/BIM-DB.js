@@ -1,6 +1,4 @@
-import('./ForgeViewer.js');
-
-// const urlCorrente = window.location.href.toString().slice(0, -1);
+// import('./ForgeViewer.js');
 
 const formDB = document.getElementById('formDB');
 
@@ -16,7 +14,7 @@ bottoneRefrViewer.addEventListener("click", () => {
 
 // INTERROGA MODELLO
 const bottoneQuery = document.getElementById("queryDB");
-bottoneQuery.addEventListener("click", ottieniDatiDB); // per qualche motivo nell'addEventListener devo passare solo il nome della funzione, senza chiamarla aggiungendo ()...
+bottoneQuery.addEventListener("click", ottieniDatiDB);
 
 // MODIFICA DATABASE
 const bottoneMod = document.getElementById("modificaDB");
@@ -65,8 +63,6 @@ bottoneCanc.addEventListener("click", () => {
     viewer.isolate();
 });
 
-
-
 //FUNZIONI
 
 async function ottieniDatiDB() {
@@ -76,29 +72,6 @@ async function ottieniDatiDB() {
     else {
         const selezione = viewer.getSelection();
         const isolato = viewer.getIsolatedNodes();
-        // if ((selezione.length === 1) || (isolato.length === 1)) {
-        //     selezione.forEach(async (s) => {
-        //         viewer.getProperties(s, async (props) => {
-        //             let nome = props.name;
-        //             let idSemplice = (nome).match(/\[(.*)\]/).pop();
-        //             let parent = viewer.model.getData().instanceTree.getNodeParentId(s);
-        //             viewer.getProperties(parent, (propsParent) => {
-        //                 propsParent.properties.forEach((pP) => {
-        //                     if (pP.displayName === "_RC") {
-        //                         jsonRequest = {};
-        //                         jsonRequest.nome = nome;
-        //                         jsonRequest.id = idSemplice;
-        //                         jsonRequest.categoria = pP.displayValue;
-        //                         leggiDBElemento(jsonRequest);
-        //                     }
-        //                     });
-        //             }, (e) => {
-        //                 console.log(e)});
-        //         }, (e) => {
-        //                 console.log(`ATTENZIONE: ${e}`)
-        //             });
-        //     });
-        // }
         if ((selezione.length === 1) || (isolato.length === 1)) {
             selezione.forEach(async (s) => {
                 viewer.getProperties(s, async (props) => {
@@ -136,7 +109,8 @@ async function leggiDBElemento(jsonReq) {
     try {
         cancellaFormDB(formDB);
 
-        const risultato = await fetch(`/Main10ance_DB/BIMViewer`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id, "nome": jsonReq.nome}});
+        // const risultato = await fetch(`/Main10ance_DB/BIMViewer`, {method: "GET", headers: {"content-type": "application/json", "categoria": jsonReq.categoria, "id": jsonReq.id} });
+        
         const nomeElem = jsonReq.nome;
         const categoriaElem = jsonReq.categoria;
         const idElem = jsonReq.id;
@@ -152,16 +126,35 @@ async function leggiDBElemento(jsonReq) {
         formDB.appendChild(titoloNome);
         formDB.appendChild(titoloCategoria);
         formDB.appendChild(titoloID);
-        const detailsBIMLOD3 = document.createElement('details');
-        const summaryBIMLOD3 = document.createElement('summary');
-        summaryBIMLOD3.setAttribute('class', 'sommario-main10ance');
-        summaryBIMLOD3.innerHTML = '<b>LOD 3</b>';
-        detailsBIMLOD3.appendChild(summaryBIMLOD3);
+        const [detailsBIMLOD3, divDetailsBIMLOD3] = creaBloccoDetails('LOD 3');
         formDB.appendChild(detailsBIMLOD3);
-        const parametri = await risultato.json();
-        const listaParametri = Object.entries(parametri);
-        creaRisultatiTesto(listaParametri, idElem, detailsBIMLOD3);
+
+        // const parametri = await risultato.json();
+        const parametri = await cercaDatiDB(jsonReq.categoria, jsonReq.id);
+
+        parametri.forEach(p => {
+            const listaParametri = Object.entries(p);
+            creaRisultatiTesto(listaParametri, idElem, divDetailsBIMLOD3);
+        });
         detailsBIMLOD3.open = true;
+        const [detailsBIMLOD4, divDetailsBIMLOD4] = creaBloccoDetails('LOD 4');
+        formDB.appendChild(document.createElement('br'));
+        formDB.appendChild(detailsBIMLOD4);
+        const listaLOD4 = await leggiLOD(4);
+        listaLOD4.forEach(ogg => {
+            const detailsOpera = creaBloccoDetails(ogg.alias, ogg.tabella)[0];
+            divDetailsBIMLOD4.appendChild(document.createElement('br'));
+            divDetailsBIMLOD4.appendChild(detailsOpera);
+        });
+        const [detailsBIMLOD5, divDetailsBIMLOD5] = creaBloccoDetails('LOD 5');
+        formDB.appendChild(document.createElement('br'));
+        formDB.appendChild(detailsBIMLOD5);
+        const listaLOD5 = await leggiLOD(5);
+        listaLOD5.forEach(ogg => {
+            const detailsOpera = creaBloccoDetails(ogg.alias, ogg.tabella)[0];
+            divDetailsBIMLOD5.appendChild(document.createElement('br'));
+            divDetailsBIMLOD5.appendChild(detailsOpera);
+        });
     }
     catch(e) {
         console.log('Errore nella lettura dei valori');
@@ -171,7 +164,6 @@ async function leggiDBElemento(jsonReq) {
 
 async function scriviParametroElemento(jsonReq) {
     try {
-        // const risultato = await fetch(`${urlCorrente}/Main10ance_DB/all`, {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
         const risultato = await fetch(`/Main10ance_DB/all`, {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
     }
     catch(e) {
@@ -230,3 +222,64 @@ function creaRisultatiInput(listaRisultati, idElem, detailsBIMLOD) {
         detailsBIMLOD.appendChild(br);
     });
 }
+
+async function leggiLOD(lod) {
+    try {
+        const risultato = await fetch('/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod} });
+        const livelliLOD = await risultato.json();
+        return livelliLOD;
+    }
+    catch(e) {
+        console.log('Errore nella lettura dei LOD');
+        console.log(e);
+    }
+}
+
+function creaBloccoDetails(intestazione, id) {
+    id = id || intestazione;
+    const detailsBIM = document.createElement('details');
+    const summaryBIM = document.createElement('summary');
+    const divBIM = document.createElement('div');
+    summaryBIM.setAttribute('class', 'sommario-main10ance');
+    summaryBIM.setAttribute('id', `summary-${id.replace(/ /g, '_')}`);
+    summaryBIM.innerHTML = `<b>${intestazione}</b>`;
+    divBIM.setAttribute('id', `detailsdiv-${id.replace(/ /g, '_')}`);
+    detailsBIM.appendChild(summaryBIM);
+    detailsBIM.appendChild(divBIM);
+
+    summaryBIM.addEventListener('click', async () => {
+        if (!divBIM.innerHTML) {
+            const elementoTarget = $('[id^="idElemento-"]')[0];
+            const id = elementoTarget.id.replace('idElemento-', '');
+            const tabella = divBIM.id.replace('detailsdiv-','');
+            const datiDB = await cercaDatiDB(tabella, id);
+            if (datiDB) {
+                datiDB.forEach(d => {
+                    const listaDati = Object.entries(d);
+                    // console.log(listaDati);
+                    creaRisultatiInput(listaDati, id, divBIM);
+                });
+                // detailsBIM.open = true;
+            }
+        }
+    });
+
+    return [detailsBIM, divBIM];
+}
+
+async function cercaDatiDB(tabella, idMain10ance) {
+    try {
+        const risultato = await fetch(`/Main10ance_DB/BIMViewer`, {method: "GET", headers: {"content-type": "application/json", "categoria": tabella, "id": idMain10ance} });
+        const datiDB = await risultato.json();
+        console.log(datiDB);
+        return datiDB;
+    }
+    catch(e) {
+        console.log('Errore nella lettura dei valori');
+        console.log(e);
+    }
+}
+
+// PROVVISORIO -------------------------------------------
+document.getElementById('apriTabBIM').click();
+launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtZ2hpZmZhL1NNR19QVkMucnZ0');
