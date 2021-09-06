@@ -123,6 +123,16 @@ body {
   position: relative;
 }
 
+/* .scheda-con-man {}
+
+#scheda-controllo {
+  background-color: var(--verdeMain10ance);
+}
+
+#scheda-manutenzione {
+  background-color: var(--bluInterreg);
+} */
+
 /* .selettoreSM-dropdown:hover {
   background-color: #ccc;
 } */
@@ -152,7 +162,7 @@ body {
   margin-right: 5px;
 }
 
-#modificaDB, #queryDB, #annullaDB, #scegliModello, #scegliGIS, #refreshParams {
+#modificaDB, #queryDB, #annullaDB, #scegliModello, #scegliGIS, #refreshParams, #aggiungiDB {
   cursor: pointer;
   /* outline: none; */
   border: none;
@@ -164,7 +174,7 @@ body {
   margin-bottom: 1rem;
 }
 
-#refreshParams, #modificaDB, #queryDB, #annullaDB {
+#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB {
   padding: .9rem 1rem;
   font-size: large;
   font-weight: initial;
@@ -277,6 +287,7 @@ div[id^="div-form-"] {
   color: var(--ghostWhite);
   background-color: var(--verdeMain10ance);
   font-weight: bold;
+  border: none;
 }
 
 .tab.active {

@@ -133,27 +133,30 @@ async function leggiDBElemento(jsonReq) {
         const parametri = await cercaDatiDB(jsonReq.categoria, jsonReq.id);
 
         parametri.forEach(p => {
+            // console.log(parametri.indexOf(p));
             const listaParametri = Object.entries(p);
             creaRisultatiTesto(listaParametri, idElem, divDetailsBIMLOD3);
         });
         detailsBIMLOD3.open = true;
-        const [detailsBIMLOD4, divDetailsBIMLOD4] = creaBloccoDetails('LOD 4');
-        formDB.appendChild(document.createElement('br'));
-        formDB.appendChild(detailsBIMLOD4);
-        const listaLOD4 = await leggiLOD(4);
-        listaLOD4.forEach(ogg => {
-            const detailsOpera = creaBloccoDetails(ogg.alias, ogg.tabella)[0];
-            divDetailsBIMLOD4.appendChild(document.createElement('br'));
-            divDetailsBIMLOD4.appendChild(detailsOpera);
-        });
+        // const [detailsBIMLOD4, divDetailsBIMLOD4] = creaBloccoDetails('LOD 4');
+        // formDB.appendChild(document.createElement('br'));
+        // formDB.appendChild(detailsBIMLOD4);
+        // const listaLOD4 = await leggiLOD(4);
+        // listaLOD4.forEach(ogg => {
+        //     const detailsOpera = creaBloccoDetails(ogg.alias, ogg.tabella)[0];
+        //     divDetailsBIMLOD4.appendChild(document.createElement('br'));
+        //     divDetailsBIMLOD4.appendChild(detailsOpera);
+        // });
         const [detailsBIMLOD5, divDetailsBIMLOD5] = creaBloccoDetails('LOD 5');
         formDB.appendChild(document.createElement('br'));
         formDB.appendChild(detailsBIMLOD5);
         const listaLOD5 = await leggiLOD(5);
         listaLOD5.forEach(ogg => {
-            const detailsOpera = creaBloccoDetails(ogg.alias, ogg.tabella)[0];
-            divDetailsBIMLOD5.appendChild(document.createElement('br'));
-            divDetailsBIMLOD5.appendChild(detailsOpera);
+            if (ogg.tabella !== 'glossario') {
+                const detailsOpera = creaBloccoDetails(ogg.alias, ogg.tabella)[0];
+                divDetailsBIMLOD5.appendChild(document.createElement('br'));
+                divDetailsBIMLOD5.appendChild(detailsOpera);
+            }
         });
     }
     catch(e) {
@@ -185,17 +188,17 @@ function creaRisultatiTesto(listaRisultati, idElem, detailsBIMLOD) {
         const idLabelFormDB = document.createElement("label");
         idLabelFormDB.setAttribute("id", `${nomeP}-${idElem}`);
         idLabelFormDB.innerHTML = `${nomeP}: `;
-        const parametroFormDBLOD3 = document.createElement("div");
-        parametroFormDBLOD3.setAttribute("id", `div-form-${nomeP}-${idElem}`);
+        const parametroFormDB = document.createElement("div");
+        parametroFormDB.setAttribute("id", `div-form-${nomeP}-${idElem}`);
         if (valoreP !== null) {
-            parametroFormDBLOD3.innerHTML = `${valoreP}`;
+            parametroFormDB.innerHTML = `${valoreP}`;
         }
         else {
-            parametroFormDBLOD3.innerHTML = `<i>Nessun valore</i>`;
+            parametroFormDB.innerHTML = `<i>Nessun valore</i>`;
         }
         const br = document.createElement("br");
         detailsBIMLOD.appendChild(idLabelFormDB);
-        detailsBIMLOD.appendChild(parametroFormDBLOD3);
+        detailsBIMLOD.appendChild(parametroFormDB);
         detailsBIMLOD.appendChild(br);
     });
 }
@@ -255,9 +258,12 @@ function creaBloccoDetails(intestazione, id) {
             const datiDB = await cercaDatiDB(tabella, id);
             if (datiDB) {
                 datiDB.forEach(d => {
+                    const progressivo = datiDB.indexOf(d);
+                    // console.log(progressivo);
+                    const idComposto = `${id}-[${progressivo}]`;
                     const listaDati = Object.entries(d);
                     // console.log(listaDati);
-                    creaRisultatiInput(listaDati, id, divBIM);
+                    creaRisultatiInput(listaDati, idComposto, divBIM);
                 });
                 // detailsBIM.open = true;
             }
@@ -271,7 +277,7 @@ async function cercaDatiDB(tabella, idMain10ance) {
     try {
         const risultato = await fetch(`/Main10ance_DB/BIMViewer`, {method: "GET", headers: {"content-type": "application/json", "categoria": tabella, "id": idMain10ance} });
         const datiDB = await risultato.json();
-        console.log(datiDB);
+        // console.log(datiDB);
         return datiDB;
     }
     catch(e) {
@@ -281,5 +287,5 @@ async function cercaDatiDB(tabella, idMain10ance) {
 }
 
 // PROVVISORIO -------------------------------------------
-document.getElementById('apriTabBIM').click();
-launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtZ2hpZmZhL1NNR19QVkMucnZ0');
+// document.getElementById('apriTabBIM').click();
+// launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtZ2hpZmZhL1NNR19QVkMucnZ0');

@@ -24,6 +24,7 @@
   <script src="js/ForgeViewer.js"></script>
   <!-- PER QUESTI SOTTO SERVE DEFER PER CARICARLI DOPO L'HTML -->
   <script src="js/BIM-DB.js" defer></script>
+  <script src="js/BIM-modulo.js" defer></script>
   <script src="js/MappaGIS.js" defer></script>
   <script src="js/ConsultazioneDB.js" defer></script>
 </head>
@@ -73,11 +74,11 @@
   <div class="container-fluid fill">
     <div class="row fill tab-content">
       <div class="fill" id="tab1" data-tab-content>
-        <div class="col-sm-9 fill">
+        <div class="col-sm-8 fill">
           <div id="forgeViewer"></div>
         </div>
         <!-- SEZIONE DB -->
-        <div class="col-sm-3 fill" id="pannello-db">
+        <div class="col-sm-4 fill" id="pannello-db">
           <div class="panel panel-default fill" id="pannello-db-child">
             <div class="panel-heading" id="pannello-db-header" data-toggle="tooltip">
               <b>PARAMETRI</b>
@@ -95,6 +96,9 @@
     
                 <!-- BOTTONE DI QUERY -->
                 <button id="queryDB" class="glyphicon glyphicon-list-alt dbBtn" title="Interroga e modifica" style="cursor: pointer" height="30"></button>
+
+                <!-- BOTTONE DI AGGIUNTA -->
+                <button id="aggiungiDB" class="glyphicon glyphicon-plus dbBtn" title="Aggiungi" style="cursor: pointer" height="30"></button>
     
                 <!-- BOTTONE DI MODIFICA -->
                 <button id="modificaDB" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
@@ -105,6 +109,12 @@
                 <!-- FORM -->
                 <form id="formDB" spellcheck="false"></form>
               </div>
+            <!-- <div id="contenitore-controllo-manutenzione">
+              <button data-tab-target="#scheda-controllo" class="tab" id="apriTabControllo">SCHEDA CONTROLLO</button>
+              <button data-tab-target="#scheda-manutenzione" class="tab" id="apriTabManutenzione">SCHEDA MANUTENZIONE</button>
+              <div data-tab-content id="scheda-controllo" class="scheda-con-man">SCHEDA CONTROLLO</div>
+              <div data-tab-content id="scheda-manutenzione" class="scheda-con-man">SCHEDA MANUTENZIONE</div> -->
+            </div>
             </div>
           </div>
         </div>
@@ -221,6 +231,30 @@
           target.classList.add('active');
       });
   });
+</script>
+<!-- SCRIPT GESTIONE TAB SCHEDE MANUTENZIONE -->
+<script>
+  // const tabs2 = document.querySelectorAll('[data-tab-target-2]');
+  // const tabContents2 = document.querySelectorAll('[data-tab-content-2]');
+
+  // tabs.forEach((tab) => {
+  //     tab.addEventListener("click", () => {
+  //         // per prima cosa prendo il target su cui ho cliccato
+  //         const target = document.querySelector(tab.dataset.tabTarget);
+  //         // poi faccio sparire tutti i tab
+  //         tabContents.forEach((tabContent) => {
+  //             tabContent.classList.remove('active');
+  //         });
+  //         // questo è per rimuovere il background color di tutti
+  //         tabs.forEach((tab) => {
+  //             tab.classList.remove('active');
+  //         });
+  //         // qui aggiungo il background color al tab selezionato
+  //         tab.classList.add('active');
+  //         // infine rendo visibile solo quello su cui ho cliccato
+  //         target.classList.add('active');
+  //     });
+  // });
 </script>
 <!-- SCRIPT PER GESTIONE RADIO LOD DB -->
 <script>
