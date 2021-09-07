@@ -15,10 +15,8 @@ const client = new Client({
 // fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "alias": "Bosco", "geometria": "geom_pol", "colonneUtili": ["bosco_gov", "bosco_ty"]} }).then(a => a.json()).then(console.log)
 appGIS_BIM.get('/Main10ance_DB/GIS', async (req, res) => {
     const reqJson = req.headers;
-    // const identificativo = await leggiGIS(reqJson.tabella, reqJson.oid);
     const rispostaGIS = await leggiGIS(reqJson.tabella, reqJson.alias, reqJson.geometria, reqJson.colonneutili); //N.B.: scrivo "colonneutili" tutto minuscolo perché arriva così dagli headers della richiesta
     res.setHeader('content-type', 'application/json');
-    // res.send(JSON.stringify(identificativo[0]));
     res.send(JSON.stringify(rispostaGIS));
 });
 
@@ -60,6 +58,15 @@ appGIS_BIM.get('/Main10ance_DB/tabellaDB', async (req, res) => {
 // fetch("/Main10ance_DB/tabellaDB/glossario", {method: "GET", headers: {"content-type": "application/json", tab: "glossario"} }).then(a => a.json()).then(console.log)
 appGIS_BIM.get('/Main10ance_DB/tabellaDB/glossario', async (req, res) => {
     const risposta = await leggiTabellaGlossario();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB/enum", {method: "GET", headers: {"content-type": "application/json", nomeenum: "cl_ogg_fr"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB/enum', async (req, res) => {
+    const reqJson = req.headers;
+    const risposta = await leggiEnum(reqJson.nomeenum);
     res.setHeader('content-type', 'application/json');
     res.send(risposta);
 });
@@ -137,6 +144,16 @@ async function leggiTabellaDB(nomeTab) {
 async function leggiTabellaGlossario() {
     try {
         const result = await client.query(`SELECT * FROM main10ance_sacrimonti."glossario" ORDER BY regexp_replace("id_gloss", '\\D', '', 'g')`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+};
+
+async function leggiEnum(nomeEnum) {
+    try {
+        const result = await client.query(`SELECT unnest(enum_range(null::main10ance_sacrimonti.${nomeEnum}));`);
         return result.rows;
     }
     catch(e) {

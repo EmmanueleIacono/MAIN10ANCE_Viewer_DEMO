@@ -10,6 +10,8 @@
   --blackOlive: #36382e;
   --ghostWhite: #f8f8ff;
   --lightGray: #d3d4d9;
+  --verdeMain10anceTrasparenza: #a8c95660;
+  --bluInterregTrasparenza: #1a4f9c60;
 }
 
 /* * {
@@ -123,15 +125,19 @@ body {
   position: relative;
 }
 
-/* .scheda-con-man {}
+.scheda-con-man, #apriTabControllo, #apriTabManutenzione, #chiudiSchede {
+  display: none;
+}
 
 #scheda-controllo {
-  background-color: var(--verdeMain10ance);
+  background-color: var(--verdeMain10anceTrasparenza);
+  font-size: 13px;
 }
 
 #scheda-manutenzione {
-  background-color: var(--bluInterreg);
-} */
+  background-color: var(--bluInterregTrasparenza);
+  font-size: 13px;
+}
 
 /* .selettoreSM-dropdown:hover {
   background-color: #ccc;
@@ -162,7 +168,7 @@ body {
   margin-right: 5px;
 }
 
-#modificaDB, #queryDB, #annullaDB, #scegliModello, #scegliGIS, #refreshParams, #aggiungiDB {
+#modificaDB, #queryDB, #annullaDB, #scegliModello, #scegliGIS, #refreshParams, #aggiungiDB, #chiudiSchede {
   cursor: pointer;
   /* outline: none; */
   border: none;
@@ -174,15 +180,15 @@ body {
   margin-bottom: 1rem;
 }
 
-#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB {
+#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB, #chiudiSchede {
   padding: .9rem 1rem;
   font-size: large;
   font-weight: initial;
 }
 
-#input-id, #input-comment, #input-id-svuota {
+/* #input-id, #input-comment, #input-id-svuota {
   font-size: 20px;
-}
+} */
 
 .pannelloDB {
   padding: 10px;
@@ -192,6 +198,13 @@ body {
 input[id^="form-"] {
   float: right;
   line-height: 80%
+}
+
+input[id^="scheda-controllo-"], select[id^="scheda-controllo-"], textarea[id^="scheda-controllo-"] {
+  float: right;
+  line-height: 100%;
+  padding: 1px;
+  border: 0;
 }
 
 div[id^="div-form-"] {
