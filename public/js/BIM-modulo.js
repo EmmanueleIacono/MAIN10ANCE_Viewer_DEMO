@@ -35,7 +35,9 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
         const listaDati = preparaDati();
         const listaFiltrata = filtraOggetti(listaDati);
         console.log(listaFiltrata);
-        preparaDatiNascosti(true);
+        const [listaDatiNascosti, listaIdMain10ance] = preparaDatiNascosti(true);
+        console.log(listaDatiNascosti);
+        console.log(listaIdMain10ance);
         // const risultato = await compilaScheda(listaDati);
         // if (risultato) {
         //     alert('Operazione andata a buon fine');
@@ -360,15 +362,32 @@ async function compilaScheda(jsonReq) {
 
 function preparaDatiNascosti(controllo) {
     const listaIdMain10anceGrezza = trovaElementi('modulo-aggiungi-');
+    let listaJSON = [];
     let listaIdMain10ance = [];
     listaIdMain10anceGrezza.forEach(idgr => {
         const idCompleto = idgr.id;
         const idMain10ance = idCompleto.replace('modulo-aggiungi-', '');
         listaIdMain10ance.push(idMain10ance);
     });
-    console.log(listaIdMain10ance);
+    const idUnivoco = dataInteger();
+    const dataIns = dataCorta();
+    // console.log(listaIdMain10ance);
     if (controllo) {
-        return;
+        const contr = 'controllo_stato_di_conservazione_livello_di_urgenza';
+        const dad = 'danno_alterazione_degrado';
+        const frase = 'frase_di_rischio';
+        const id_contr = {tabella: contr, colonna: 'id_contr', valore: idUnivoco};
+        const id_dad = {tabella: dad, colonna: 'id_dad', valore: idUnivoco};
+        const fr_risc = {tabella: frase, colonna: 'fr_risc', valore: idUnivoco};
+        const data_ins_c = {tabella: contr, colonna: 'data_ins', valore: dataIns};
+        const data_ins_d = {tabella: dad, colonna: 'data_ins', valore: dataIns};
+        const data_ins_f = {tabella: frase, colonna: 'data_ins', valore: dataIns};
+        listaJSON.push(id_contr);
+        listaJSON.push(id_dad);
+        listaJSON.push(fr_risc);
+        listaJSON.push(data_ins_c);
+        listaJSON.push(data_ins_d);
+        listaJSON.push(data_ins_f);
     }
     else {
         return;
@@ -376,7 +395,7 @@ function preparaDatiNascosti(controllo) {
     // id_contr = id_dad = fr_risc
     // id_main10ance (uguale per tutti)
     // data_ins -> automatica
-    return;
+    return [listaJSON, listaIdMain10ance];
 }
 
 function filtraOggetti(listaOggetti) {
@@ -403,4 +422,70 @@ function filtraOggetti(listaOggetti) {
         }
     });
     return listaFiltrata;
+}
+
+function dataInteger() {
+    const dataFull = new Date();
+    const anno = dataFull.getFullYear();
+    const meseGrezzo = dataFull.getMonth();
+    let mese;
+    if ((meseGrezzo+1) < 10) {
+        mese = `0${meseGrezzo+1}`;
+    }
+    else {
+        mese = meseGrezzo+1;
+    }
+    const giornoGrezzo = dataFull.getDate();
+    let giorno;
+    if ((giornoGrezzo) < 10) {
+        giorno = `0${giornoGrezzo}`;
+    }
+    else {
+        giorno = giornoGrezzo;
+    }
+    const oraGrezzo = dataFull.getHours();
+    let ora;
+    if ((oraGrezzo) < 10) {
+        ora = `0${oraGrezzo}`;
+    }
+    else {
+        ora = oraGrezzo;
+    }
+    const minutiGrezzo = dataFull.getMinutes();
+    let minuti;
+    if ((minutiGrezzo) < 10) {
+        minuti = `0${minutiGrezzo}`;
+    }
+    else {
+        minuti = minutiGrezzo;
+    }
+    const secondiGrezzo = dataFull.getSeconds();
+    let secondi;
+    if ((secondiGrezzo) < 10) {
+        secondi = `0${secondiGrezzo}`;
+    }
+    else {
+        secondi = secondiGrezzo;
+    }
+    const millisecondiGrezzo = dataFull.getMilliseconds();
+    let millisecondi;
+    if ((millisecondiGrezzo) < 10) {
+        millisecondi = `00${millisecondiGrezzo}`;
+    }
+    else if (((millisecondiGrezzo) >= 10) && ((millisecondiGrezzo) < 100)) {
+        millisecondi = `0${millisecondiGrezzo}`;
+    }
+    else {
+        millisecondi = millisecondiGrezzo;
+    }
+    const dataStringa = `${anno}${mese}${giorno}${ora}${minuti}${secondi}${millisecondi}`;
+    const dataInteger = parseInt(dataStringa);
+    return dataInteger;
+}
+
+function dataCorta() {
+    const dataFull = new Date();
+    const dataStringa = dataFull.toISOString();
+    const dataCorta = dataStringa.split('T')[0];
+    return dataCorta;
 }
