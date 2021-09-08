@@ -287,10 +287,10 @@ async function cercaDatiDB(tabella, idMain10ance) {
 }
 
 // PROVVISORIO -------------------------------------------
-// document.getElementById('apriTabBIM').click();
-// launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtZ2hpZmZhL1NNR19QVkMucnZ0');
-// setTimeout(() => {
-//     viewer.select(2915);
-//     bottoneAggiungi.click();
-//     apriTabControllo.click();
-// }, 3000);
+document.getElementById('apriTabBIM').click();
+launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtZ2hpZmZhL1NNR19QVkMucnZ0');
+setTimeout(() => {
+    viewer.select(2915);
+    bottoneAggiungi.click();
+    apriTabControllo.click();
+}, 3000);

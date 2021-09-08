@@ -1,5 +1,6 @@
 const { Client } = require('pg');
 const express = require('express');
+const { json } = require('express');
 const appGIS_BIM = express.Router();
 appGIS_BIM.use(express.json());
 appGIS_BIM.use(express.static("public"));
@@ -69,6 +70,22 @@ appGIS_BIM.get('/Main10ance_DB/tabellaDB/enum', async (req, res) => {
     const risposta = await leggiEnum(reqJson.nomeenum);
     res.setHeader('content-type', 'application/json');
     res.send(risposta);
+});
+
+appGIS_BIM.post('/Main10ance_DB/schede/nuova', async (req, res) => {
+    let result = {};
+    try {
+        const reqJson = req.body;
+        await transazioneScheda(reqJson);
+        result.success = true;
+    }
+    catch(e) {
+        result.success = false;
+    }
+    finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
 });
 
 //////////          AVVIO SERVER          //////////
@@ -158,6 +175,22 @@ async function leggiEnum(nomeEnum) {
     }
     catch(e) {
         return [];
+    }
+};
+
+async function transazioneScheda(listaJSON) {
+    try {
+        await client.query("BEGIN");
+        listaJSON.forEach(async jsn => {
+            await client.query(`INSERT INTO main10ance_sacrimonti.${jsn.tabella} ("${jsn.colonna}") VALUES (($1));`, [jsn.valore]);
+        });
+        await client.query("COMMIT");
+        return true;
+    }
+    catch (ex) {
+        console.log(`Errore: ${ex}`);
+        await client.query("ROLLBACK");
+        return false;
     }
 };
 

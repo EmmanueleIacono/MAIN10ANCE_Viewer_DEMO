@@ -125,7 +125,7 @@ body {
   position: relative;
 }
 
-.scheda-con-man, #apriTabControllo, #apriTabManutenzione, #chiudiSchede {
+.scheda-con-man, #apriTabControllo, #apriTabManutenzione, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaManutenzione {
   display: none;
 }
 
@@ -168,7 +168,7 @@ body {
   margin-right: 5px;
 }
 
-#modificaDB, #queryDB, #annullaDB, #scegliModello, #scegliGIS, #refreshParams, #aggiungiDB, #chiudiSchede {
+#modificaDB, #queryDB, #annullaDB, #scegliModello, #scegliGIS, #refreshParams, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo {
   cursor: pointer;
   /* outline: none; */
   border: none;
@@ -180,7 +180,19 @@ body {
   margin-bottom: 1rem;
 }
 
-#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB, #chiudiSchede {
+#salvaSchedaManutenzione {
+  cursor: pointer;
+  /* outline: none; */
+  border: none;
+  font-size: inherit;
+  font-weight: bold;
+  background: var(--bluInterreg);
+  color: var(--ghostWhite);
+  padding: .75rem 1.75rem;
+  margin-bottom: 1rem;
+}
+
+#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaManutenzione {
   padding: .9rem 1rem;
   font-size: large;
   font-weight: initial;

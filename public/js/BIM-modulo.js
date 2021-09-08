@@ -1,6 +1,8 @@
 const bottoneAggiungi = document.getElementById('aggiungiDB');
 const apriTabControllo = document.getElementById('apriTabControllo');
 const apriTabManutenzione = document.getElementById('apriTabManutenzione');
+const bottoneSalvaSchedaControllo = document.getElementById('salvaSchedaControllo');
+const bottoneSalvaSchedaManutenzione = document.getElementById('salvaSchedaManutenzione');
 const bottoneChiudiSchede = document.getElementById('chiudiSchede');
 const schedaControllo = document.getElementById('scheda-controllo');
 const schedaManutenzione = document.getElementById('scheda-manutenzione');
@@ -14,6 +16,8 @@ apriTabControllo.addEventListener('click', () => {
     apriTabManutenzione.classList.remove('active');
     schedaControllo.style.display = 'block';
     apriTabControllo.classList.add('active');
+    bottoneSalvaSchedaManutenzione.style.display = 'none';
+    bottoneSalvaSchedaControllo.style.display = 'inline';
     preparaCampiControllo();
 });
 
@@ -22,6 +26,24 @@ apriTabManutenzione.addEventListener('click', () => {
     apriTabControllo.classList.remove('active');
     schedaManutenzione.style.display = 'block';
     apriTabManutenzione.classList.add('active');
+    bottoneSalvaSchedaControllo.style.display = 'none';
+    bottoneSalvaSchedaManutenzione.style.display = 'inline';
+});
+
+bottoneSalvaSchedaControllo.addEventListener('click', async () => {
+    if (verificaVincoliControllo()) {
+        const listaDati = preparaDati();
+        const listaFiltrata = filtraOggetti(listaDati);
+        console.log(listaFiltrata);
+        preparaDatiNascosti(true);
+        // const risultato = await compilaScheda(listaDati);
+        // if (risultato) {
+        //     alert('Operazione andata a buon fine');
+        // }
+    }
+    else {
+        alert('ATTENZIONE: I campi UTENTE, DATA, e NOME FENOMENO sono obbligatori.');
+    }
 });
 
 bottoneChiudiSchede.addEventListener('click', () => {
@@ -29,6 +51,7 @@ bottoneChiudiSchede.addEventListener('click', () => {
     apriTabManutenzione.style.display = 'none';
     schedaControllo.style.display = 'none';
     schedaManutenzione.style.display = 'none';
+    bottoneSalvaSchedaControllo.style.display = 'none';
     bottoneChiudiSchede.style.display = 'none';
 });
 
@@ -85,13 +108,14 @@ function preparaModulo(nome, id) {
     const hId = document.createElement('h5');
     hId.setAttribute('id', `modulo-aggiungi-${id}`);
     hId.innerHTML = `<b>IDENTIFICATIVO ELEMENTO: ${id}</b>`;
-    formDB.appendChild(hNome);
+    // formDB.appendChild(hNome);
     formDB.appendChild(hId);
 }
 
 function mostraBottoniSchede() {
     apriTabControllo.style.display = 'inline';
     apriTabManutenzione.style.display = 'inline';
+    // bottoneSalvaSchedaControllo.style.display = 'inline';
     bottoneChiudiSchede.style.display = 'inline';
     apriTabControllo.classList.remove('active');
     apriTabManutenzione.classList.remove('active');
@@ -122,7 +146,7 @@ async function preparaCampiControllo() {
     const contLabelControllo = document.createElement('label');
     contLabelControllo.innerHTML = '<b>TIPO DI CONTROLLO</b>';
     const contInputControllo = document.createElement('input');
-    contInputControllo.setAttribute('id', 'scheda-controllo-[]-{controllo}');
+    contInputControllo.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza|frase_di_rischio]-{controllo}');
     // STRUMENTAZIONE
     const contLabelStrumentazione = document.createElement('label');
     contLabelStrumentazione.innerHTML = '<b>STRUMENTAZIONE</b>';
@@ -138,7 +162,7 @@ async function preparaCampiControllo() {
     const contLabelTipoFenomeno = document.createElement('label');
     contLabelTipoFenomeno.innerHTML = '<b>TIPO DI FENOMENO</b>';
     const contSelectTipoFenomeno = document.createElement('select');
-    contSelectTipoFenomeno.setAttribute('id', 'scheda-controllo-[danno-alterazione-degrado]-{dad_ty}');
+    contSelectTipoFenomeno.setAttribute('id', 'scheda-controllo-[danno_alterazione_degrado]-{dad_ty}');
     creaListaOpzioni(listaEnumFenomeno, contSelectTipoFenomeno, 'unnest');
     // NOME FENOMENO
     const contLabelNomeFenomeno = document.createElement('label');
@@ -155,7 +179,7 @@ async function preparaCampiControllo() {
     const contLabelEstensione = document.createElement('label');
     contLabelEstensione.innerHTML = '<b>ESTENSIONE</b>';
     const contSelectEstensione = document.createElement('select');
-    contSelectEstensione.setAttribute('id', 'scheda-controllo-[danno-alterazione-degrado]-{est_sup}');
+    contSelectEstensione.setAttribute('id', 'scheda-controllo-[danno_alterazione_degrado]-{est_sup}');
     creaListaOpzioni(listaEnumEstensione, contSelectEstensione, 'unnest');
     // FRASE DI RISCHIO
     const contLabelFrase = document.createElement('label');
@@ -171,6 +195,8 @@ async function preparaCampiControllo() {
     const contLabelFrequenza = document.createElement('label');
     contLabelFrequenza.innerHTML = '<b>FREQUENZA (MESI)</b>';
     const contInputFrequenza = document.createElement('input');
+    contInputFrequenza.setAttribute('type', 'number');
+    contInputFrequenza.setAttribute('step', 1);
     contInputFrequenza.setAttribute('id', 'scheda-controllo-[frase_di_rischio]-{frequenza}');
     // MANUTENZIONE STRAORDINARIA
     const contLabelManStr = document.createElement('label');
@@ -187,7 +213,7 @@ async function preparaCampiControllo() {
     const contLabelCommenti = document.createElement('label');
     contLabelCommenti.innerHTML = '<b>COMMENTI</b>';
     const contInputCommenti = document.createElement('textarea');
-    contInputCommenti.setAttribute('id', 'scheda-controllo-[]-{commenti}');
+    contInputCommenti.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza|danno_alterazione_degrado]-{commenti}');
 
     schedaControllo.appendChild(contLabelUtente);
     schedaControllo.appendChild(contInputUtente);
@@ -273,4 +299,108 @@ async function leggiGloss() {
         console.log('Errore nella lettura del glossario');
         console.log(e);
     }
+}
+
+function trovaElementi(stringa) {
+    const oggInput = $(`[id^="${stringa}"]`);
+    delete oggInput['length'];
+    delete oggInput['prevObject'];
+    const listaInput = Object.values(oggInput);
+    return listaInput;
+}
+
+function preparaDati() {
+    const listaInput = trovaElementi('scheda-controllo-');
+    let listaJSON = [];
+    listaInput.forEach(inp => {
+        const idCompleto = inp.id;
+        let valoreInput;
+        if ((inp.value === '') || (inp.value === 'null')) {
+            valoreInput = null;
+        }
+        else {
+            valoreInput = inp.value;
+        }
+        const idPulitoTabelle = idCompleto.match(/\[(.*)\]/).pop();
+        const listaTabelle = idPulitoTabelle.split('|');
+        const idColonna = idCompleto.match(/\{(.*)\}/).pop();
+        listaTabelle.forEach(tab => {
+            const jsonRequest = {};
+            jsonRequest.tabella = tab;
+            jsonRequest.colonna = idColonna;
+            jsonRequest.valore = valoreInput;
+            listaJSON.push(jsonRequest);
+        });
+    });
+    return listaJSON;
+}
+
+function verificaVincoliControllo() {
+    const utente = $('[id*="{esecutori}"]')[0];
+    const data = $('[id*="{data_con}"]')[0];
+    const gloss = $('[id*="{rid_gloss}"]')[0];
+    if ((!utente.value) || (utente.value === 'null') || (!data.value) || (data.value === 'null') || (!gloss.value) || (gloss.value === 'null')) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+async function compilaScheda(jsonReq) {
+    try {
+        await fetch(`/Main10ance_DB/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) }).then(() => {return true;});
+    }
+    catch(e) {
+        alert('ERRORE: Operazione annullata');
+        console.log(e);
+        return false;
+    }
+}
+
+function preparaDatiNascosti(controllo) {
+    const listaIdMain10anceGrezza = trovaElementi('modulo-aggiungi-');
+    let listaIdMain10ance = [];
+    listaIdMain10anceGrezza.forEach(idgr => {
+        const idCompleto = idgr.id;
+        const idMain10ance = idCompleto.replace('modulo-aggiungi-', '');
+        listaIdMain10ance.push(idMain10ance);
+    });
+    console.log(listaIdMain10ance);
+    if (controllo) {
+        return;
+    }
+    else {
+        return;
+    }
+    // id_contr = id_dad = fr_risc
+    // id_main10ance (uguale per tutti)
+    // data_ins -> automatica
+    return;
+}
+
+function filtraOggetti(listaOggetti) {
+    let listaFiltrata = [];
+    let listaDiControllo = [];
+    listaOggetti.forEach(ogg => {
+        if (listaDiControllo.includes(ogg.tabella)) {
+            listaFiltrata.forEach(obj => {
+                if (obj.tabella === ogg.tabella) {
+                    obj.colonne.push(ogg.colonna);
+                    obj.valori.push(ogg.valore);
+                }
+            });
+        }
+        else {
+            let nuovoOggetto = {};
+            nuovoOggetto.tabella = ogg.tabella;
+            nuovoOggetto.colonne = [];
+            nuovoOggetto.valori = [];
+            nuovoOggetto.colonne.push(ogg.colonna);
+            nuovoOggetto.valori.push(ogg.valore);
+            listaDiControllo.push(ogg.tabella);
+            listaFiltrata.push(nuovoOggetto);
+        }
+    });
+    return listaFiltrata;
 }
