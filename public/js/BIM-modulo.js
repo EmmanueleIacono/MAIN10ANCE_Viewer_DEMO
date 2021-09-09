@@ -33,15 +33,18 @@ apriTabManutenzione.addEventListener('click', () => {
 bottoneSalvaSchedaControllo.addEventListener('click', async () => {
     if (verificaVincoliControllo()) {
         const listaDati = preparaDati();
-        const listaFiltrata = filtraOggetti(listaDati);
-        console.log(listaFiltrata);
         const [listaDatiNascosti, listaIdMain10ance] = preparaDatiNascosti(true);
-        console.log(listaDatiNascosti);
-        console.log(listaIdMain10ance);
-        // const risultato = await compilaScheda(listaDati);
-        // if (risultato) {
-        //     alert('Operazione andata a buon fine');
-        // }
+        const listaDatiCompleta = [...listaDati, ...listaDatiNascosti];
+        const listaFiltrata = filtraOggetti(listaDatiCompleta);
+        const listaTotaleFiltrata = filtraListeDatiId(listaFiltrata, listaIdMain10ance);
+        const listaRinominata = rinominaID(listaTotaleFiltrata, true);
+        const resp = await compilaScheda(listaRinominata);
+        if (resp) {
+            alert('Operazione andata a buon fine');
+        }
+        else {
+            alert('Operazione non riuscita');
+        }
     }
     else {
         alert('ATTENZIONE: I campi UTENTE, DATA, e NOME FENOMENO sono obbligatori.');
@@ -109,7 +112,7 @@ function preparaModulo(nome, id) {
     hNome.innerHTML = `<b>NOME ELEMENTO: ${nome}</b>`;
     const hId = document.createElement('h5');
     hId.setAttribute('id', `modulo-aggiungi-${id}`);
-    hId.innerHTML = `<b>IDENTIFICATIVO ELEMENTO: ${id}</b>`;
+    hId.innerHTML = `<b>ID ELEMENTO: ${id}</b>`;
     // formDB.appendChild(hNome);
     formDB.appendChild(hId);
 }
@@ -316,9 +319,16 @@ function preparaDati() {
     let listaJSON = [];
     listaInput.forEach(inp => {
         const idCompleto = inp.id;
+        // const valoreInput = inp.value;
         let valoreInput;
+        // if ((inp.value === '') || (inp.value === 'null')) {
+        //     valoreInput = null;
+        // }
+        // else {
+        //     valoreInput = inp.value;
+        // }
         if ((inp.value === '') || (inp.value === 'null')) {
-            valoreInput = null;
+            return;
         }
         else {
             valoreInput = inp.value;
@@ -351,12 +361,10 @@ function verificaVincoliControllo() {
 
 async function compilaScheda(jsonReq) {
     try {
-        await fetch(`/Main10ance_DB/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) }).then(() => {return true;});
+        await fetch(`/Main10ance_DB/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) }).then(res => {res.json();}).then(dati => {console.log(dati);});
     }
     catch(e) {
-        alert('ERRORE: Operazione annullata');
         console.log(e);
-        return false;
     }
 }
 
@@ -371,14 +379,13 @@ function preparaDatiNascosti(controllo) {
     });
     const idUnivoco = dataInteger();
     const dataIns = dataCorta();
-    // console.log(listaIdMain10ance);
     if (controllo) {
         const contr = 'controllo_stato_di_conservazione_livello_di_urgenza';
         const dad = 'danno_alterazione_degrado';
         const frase = 'frase_di_rischio';
-        const id_contr = {tabella: contr, colonna: 'id_contr', valore: idUnivoco};
-        const id_dad = {tabella: dad, colonna: 'id_dad', valore: idUnivoco};
-        const fr_risc = {tabella: frase, colonna: 'fr_risc', valore: idUnivoco};
+        const id_contr = {tabella: contr, colonna: 'id_id', valore: idUnivoco};
+        const id_dad = {tabella: dad, colonna: 'id_id', valore: idUnivoco};
+        const fr_risc = {tabella: frase, colonna: 'id_id', valore: idUnivoco};
         const data_ins_c = {tabella: contr, colonna: 'data_ins', valore: dataIns};
         const data_ins_d = {tabella: dad, colonna: 'data_ins', valore: dataIns};
         const data_ins_f = {tabella: frase, colonna: 'data_ins', valore: dataIns};
@@ -392,9 +399,6 @@ function preparaDatiNascosti(controllo) {
     else {
         return;
     }
-    // id_contr = id_dad = fr_risc
-    // id_main10ance (uguale per tutti)
-    // data_ins -> automatica
     return [listaJSON, listaIdMain10ance];
 }
 
@@ -426,7 +430,9 @@ function filtraOggetti(listaOggetti) {
 
 function dataInteger() {
     const dataFull = new Date();
-    const anno = dataFull.getFullYear();
+    const annoGrezzo = dataFull.getFullYear();
+    const annoLista = [...`${annoGrezzo}`];
+    const anno = `${annoLista[2]}${annoLista[3]}`;
     const meseGrezzo = dataFull.getMonth();
     let mese;
     if ((meseGrezzo+1) < 10) {
@@ -488,4 +494,43 @@ function dataCorta() {
     const dataStringa = dataFull.toISOString();
     const dataCorta = dataStringa.split('T')[0];
     return dataCorta;
+}
+
+function filtraListeDatiId(listaDati, listaId) {
+    let listaTotaleFiltrata = [];
+    listaId.forEach(id => {
+        listaDati.forEach(d => {
+            const indice = listaId.indexOf(id);
+            let dCopia = JSON.parse(JSON.stringify(d));
+            dCopia.colonne.push('id_main10ance');
+            dCopia.valori.push(id);
+            const indiceID = dCopia.colonne.indexOf('id_id');
+            dCopia.valori[indiceID] += indice;
+            listaTotaleFiltrata.push(dCopia);
+        });
+    });
+    return listaTotaleFiltrata;
+}
+
+function rinominaID(listaOgg, controllo) {
+    if (controllo) {
+        listaOgg.forEach(ogg => {
+            if (ogg.tabella === 'controllo_stato_di_conservazione_livello_di_urgenza') {
+                const ind = ogg.colonne.indexOf('id_id');
+                ogg.colonne[ind] = 'id_contr';
+            }
+            else if (ogg.tabella === 'danno_alterazione_degrado') {
+                const ind = ogg.colonne.indexOf('id_id');
+                ogg.colonne[ind] = 'id_dad';
+            }
+            else if (ogg.tabella === 'frase_di_rischio') {
+                const ind = ogg.colonne.indexOf('id_id');
+                ogg.colonne[ind] = 'id_fr_risc';
+            }
+        });
+    }
+    else {
+        return;
+    }
+    return listaOgg;
 }

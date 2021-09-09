@@ -180,16 +180,27 @@ async function leggiEnum(nomeEnum) {
 
 async function transazioneScheda(listaJSON) {
     try {
-        await client.query("BEGIN");
+        await client.query("BEGIN;");
         listaJSON.forEach(async jsn => {
-            await client.query(`INSERT INTO main10ance_sacrimonti.${jsn.tabella} ("${jsn.colonna}") VALUES (($1));`, [jsn.valore]);
+            const stringaColonne = jsn.colonne.join(', ');
+            const lenColonne = (jsn.colonne).length;
+            let listaValues = [];
+            for (let n=1; n<=lenColonne; n++) {
+                let str = `$${n}`;
+                listaValues.push(str);
+            }
+            const stringaValues = listaValues.join(', ');
+            // const stringaValori = "'"+jsn.valori.join("', '")+"'";
+            await client.query(`INSERT INTO main10ance_sacrimonti.${jsn.tabella} (${stringaColonne}) VALUES (${stringaValues});`, [...jsn.valori]);
         });
-        await client.query("COMMIT");
+        await client.query("COMMIT;");
+        console.log('COMMIT');
         return true;
     }
     catch (ex) {
         console.log(`Errore: ${ex}`);
-        await client.query("ROLLBACK");
+        await client.query("ROLLBACK;");
+        console.log('ROLLBACK');
         return false;
     }
 };
