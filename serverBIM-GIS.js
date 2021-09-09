@@ -1,6 +1,5 @@
 const { Client } = require('pg');
 const express = require('express');
-const { json } = require('express');
 const appGIS_BIM = express.Router();
 appGIS_BIM.use(express.json());
 appGIS_BIM.use(express.static("public"));
@@ -76,7 +75,8 @@ appGIS_BIM.post('/Main10ance_DB/schede/nuova', async (req, res) => {
     let result = {};
     try {
         const reqJson = req.body;
-        await transazioneScheda(reqJson);
+        const listaStringheValues = gestisciStringheSchede(reqJson);
+        await transazioneScheda(listaStringheValues);
         result.success = true;
     }
     catch(e) {
@@ -178,31 +178,76 @@ async function leggiEnum(nomeEnum) {
     }
 };
 
-async function transazioneScheda(listaJSON) {
+// async function transazioneScheda(listaJSON) {
+//     try {
+//         await client.query("BEGIN;");
+//         listaJSON.forEach(async jsn => {
+//             const stringaColonne = jsn.colonne.join(', ');
+//             const lenColonne = (jsn.colonne).length;
+//             let listaValues = [];
+//             for (let n=1; n<=lenColonne; n++) {
+//                 let str = `$${n}`;
+//                 listaValues.push(str);
+//             }
+//             const stringaValues = listaValues.join(', ');
+//             // const stringaValori = "'"+jsn.valori.join("', '")+"'";
+//             await client.query(`INSERT INTO main10ance_sacrimonti.${jsn.tabella} (${stringaColonne}) VALUES (${stringaValues});`, [...jsn.valori]);
+//         });
+//         await client.query("COMMIT;");
+//         console.log('COMMIT');
+//         return true;
+//     }
+//     catch (ex) {
+//         console.log(`Errore: ${ex}`);
+//         await client.query("ROLLBACK;");
+//         console.log('ROLLBACK');
+//         return false;
+//     }
+// };
+async function transazioneScheda(listaStrVals) {
     try {
         await client.query("BEGIN;");
-        listaJSON.forEach(async jsn => {
-            const stringaColonne = jsn.colonne.join(', ');
-            const lenColonne = (jsn.colonne).length;
-            let listaValues = [];
-            for (let n=1; n<=lenColonne; n++) {
-                let str = `$${n}`;
-                listaValues.push(str);
+        try {
+            for (const sv of listaStrVals) {
+                await client.query(sv[0], sv[1]);
             }
-            const stringaValues = listaValues.join(', ');
-            // const stringaValori = "'"+jsn.valori.join("', '")+"'";
-            await client.query(`INSERT INTO main10ance_sacrimonti.${jsn.tabella} (${stringaColonne}) VALUES (${stringaValues});`, [...jsn.valori]);
-        });
+        }
+        catch(e) {
+            console.log('Errore interno: ' + e);
+            throw e;
+        }
+
         await client.query("COMMIT;");
-        console.log('COMMIT');
         return true;
     }
     catch (ex) {
         console.log(`Errore: ${ex}`);
         await client.query("ROLLBACK;");
-        console.log('ROLLBACK');
         return false;
     }
 };
+
+//////////          ALTRE FUNZIONI          //////////
+
+function gestisciStringheSchede(listaOggetti) {
+    let listaStringheEValori = [];
+    listaOggetti.forEach(async jsn => {
+        let listaInterna = [];
+        const listaValori = jsn.valori;
+        const stringaColonne = jsn.colonne.join(', ');
+        const lenColonne = (jsn.colonne).length;
+        let listaValues = [];
+        for (let n=1; n<=lenColonne; n++) {
+            let str = `$${n}`;
+            listaValues.push(str);
+        }
+        const stringaValues = listaValues.join(', ');
+        const stringa = `INSERT INTO main10ance_sacrimonti.${jsn.tabella} (${stringaColonne}) VALUES (${stringaValues});`;
+        listaInterna.push(stringa);
+        listaInterna.push(listaValori);
+        listaStringheEValori.push(listaInterna);
+    });
+    return listaStringheEValori;
+}
 
 module.exports = appGIS_BIM
