@@ -63,6 +63,14 @@ appGIS_BIM.get('/Main10ance_DB/tabellaDB/glossario', async (req, res) => {
 });
 
 // per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB/glossario/degradi", {method: "GET", headers: {"content-type": "application/json", tab: "glossario"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB/glossario/degradi', async (req, res) => {
+    const risposta = await leggiTabellaGlossarioDegradi();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+// per testare la richiesta:
 // fetch("/Main10ance_DB/tabellaDB/enum", {method: "GET", headers: {"content-type": "application/json", nomeenum: "cl_ogg_fr"} }).then(a => a.json()).then(console.log)
 appGIS_BIM.get('/Main10ance_DB/tabellaDB/enum', async (req, res) => {
     const reqJson = req.headers;
@@ -85,6 +93,7 @@ appGIS_BIM.post('/Main10ance_DB/schede/nuova', async (req, res) => {
     finally {
         res.setHeader('content-type', 'application/json');
         res.send(JSON.stringify(result));
+        // res.send(result);
     }
 });
 
@@ -150,7 +159,7 @@ async function leggiColonneTabella(nomeTab) {
 
 async function leggiTabellaDB(nomeTab) {
     try {
-        const result = await client.query(`SELECT * FROM main10ance_sacrimonti."${nomeTab}" ORDER BY "id_main10ance"`);
+        const result = await client.query(`SELECT * FROM main10ance_sacrimonti."${nomeTab}" ORDER BY "id_main10ance";`);
         return result.rows;
     }
     catch(e) {
@@ -160,10 +169,21 @@ async function leggiTabellaDB(nomeTab) {
 
 async function leggiTabellaGlossario() {
     try {
-        const result = await client.query(`SELECT * FROM main10ance_sacrimonti."glossario" ORDER BY regexp_replace("id_gloss", '\\D', '', 'g')`);
+        const result = await client.query(`SELECT * FROM main10ance_sacrimonti."glossario" ORDER BY regexp_replace("id_gloss", '\\D', '', 'g');`);
         return result.rows;
     }
     catch(e) {
+        return [];
+    }
+};
+
+async function leggiTabellaGlossarioDegradi() {
+    try {
+        const result = await client.query(`SELECT * FROM main10ance_sacrimonti."glossario" WHERE ("gloss_ty"='danno' OR "gloss_ty"='alterazione' OR "gloss_ty"='degrado' OR "gloss_ty"='nessuno') ORDER BY regexp_replace("id_gloss", '\\D', '', 'g');`);
+        return result.rows;
+    }
+    catch(e) {
+        console.log(e);
         return [];
     }
 };
@@ -178,32 +198,6 @@ async function leggiEnum(nomeEnum) {
     }
 };
 
-// async function transazioneScheda(listaJSON) {
-//     try {
-//         await client.query("BEGIN;");
-//         listaJSON.forEach(async jsn => {
-//             const stringaColonne = jsn.colonne.join(', ');
-//             const lenColonne = (jsn.colonne).length;
-//             let listaValues = [];
-//             for (let n=1; n<=lenColonne; n++) {
-//                 let str = `$${n}`;
-//                 listaValues.push(str);
-//             }
-//             const stringaValues = listaValues.join(', ');
-//             // const stringaValori = "'"+jsn.valori.join("', '")+"'";
-//             await client.query(`INSERT INTO main10ance_sacrimonti.${jsn.tabella} (${stringaColonne}) VALUES (${stringaValues});`, [...jsn.valori]);
-//         });
-//         await client.query("COMMIT;");
-//         console.log('COMMIT');
-//         return true;
-//     }
-//     catch (ex) {
-//         console.log(`Errore: ${ex}`);
-//         await client.query("ROLLBACK;");
-//         console.log('ROLLBACK');
-//         return false;
-//     }
-// };
 async function transazioneScheda(listaStrVals) {
     try {
         await client.query("BEGIN;");

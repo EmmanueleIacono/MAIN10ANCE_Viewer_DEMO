@@ -132,11 +132,13 @@ body {
 #scheda-controllo {
   background-color: var(--verdeMain10anceTrasparenza);
   font-size: 13px;
+  padding: 30px 14px;
 }
 
 #scheda-manutenzione {
   background-color: var(--bluInterregTrasparenza);
   font-size: 13px;
+  padding: 30px 14px;
 }
 
 /* .selettoreSM-dropdown:hover {
@@ -305,7 +307,7 @@ div[id^="div-form-"] {
   display: block;
 }
 
-.tab {
+.tab, #apriPDF {
   cursor: pointer;
   padding: 10px;
   margin: 10px;

@@ -1,4 +1,5 @@
 const bottoneAggiungi = document.getElementById('aggiungiDB');
+const contenitoreSchede = document.getElementById('contenitore-controllo-manutenzione');
 const apriTabControllo = document.getElementById('apriTabControllo');
 const apriTabManutenzione = document.getElementById('apriTabManutenzione');
 const bottoneSalvaSchedaControllo = document.getElementById('salvaSchedaControllo');
@@ -6,6 +7,7 @@ const bottoneSalvaSchedaManutenzione = document.getElementById('salvaSchedaManut
 const bottoneChiudiSchede = document.getElementById('chiudiSchede');
 const schedaControllo = document.getElementById('scheda-controllo');
 const schedaManutenzione = document.getElementById('scheda-manutenzione');
+// const bottonePDF = document.getElementById('apriPDF');
 
 bottoneAggiungi.addEventListener('click', () => {
     inizializzaModulo();
@@ -18,6 +20,9 @@ apriTabControllo.addEventListener('click', () => {
     apriTabControllo.classList.add('active');
     bottoneSalvaSchedaManutenzione.style.display = 'none';
     bottoneSalvaSchedaControllo.style.display = 'inline';
+    if (document.getElementById('apriPDF')) {
+        document.getElementById('apriPDF').remove();
+    }
     preparaCampiControllo();
 });
 
@@ -28,6 +33,9 @@ apriTabManutenzione.addEventListener('click', () => {
     apriTabManutenzione.classList.add('active');
     bottoneSalvaSchedaControllo.style.display = 'none';
     bottoneSalvaSchedaManutenzione.style.display = 'inline';
+    if (document.getElementById('apriPDF')) {
+        document.getElementById('apriPDF').remove();
+    }
 });
 
 bottoneSalvaSchedaControllo.addEventListener('click', async () => {
@@ -39,8 +47,12 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
         const listaTotaleFiltrata = filtraListeDatiId(listaFiltrata, listaIdMain10ance);
         const listaRinominata = rinominaID(listaTotaleFiltrata, true);
         const resp = await compilaScheda(listaRinominata);
-        if (resp) {
+        if (resp.success) {
             alert('Operazione andata a buon fine');
+            const bottonePDF = document.createElement('button');
+            bottonePDF.setAttribute('id', 'apriPDF');
+            bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
+            contenitoreSchede.appendChild(bottonePDF);
         }
         else {
             alert('Operazione non riuscita');
@@ -58,6 +70,9 @@ bottoneChiudiSchede.addEventListener('click', () => {
     schedaManutenzione.style.display = 'none';
     bottoneSalvaSchedaControllo.style.display = 'none';
     bottoneChiudiSchede.style.display = 'none';
+    if (document.getElementById('apriPDF')) {
+        document.getElementById('apriPDF').remove();
+    }
 });
 
 /////   FUNZIONI    /////
@@ -131,9 +146,14 @@ async function preparaCampiControllo() {
 
     const listaEnumConservazione = await leggiEnum('st_cons');
     const listaEnumGlossario = await leggiGloss();
+    const listaEnumMateriale = await leggiEnum('mat_ty');
     const listaEnumFenomeno = await leggiEnum('dad_ty');
     const listaEnumEstensione = await leggiEnum('est_sup');
     const listaEnumUrgenza = await leggiEnum('liv_urg');
+
+    //TITOLO
+    const contTitolo = document.createElement('h4');
+    contTitolo.innerHTML = '<b>SCHEDA CONTROLLO</b>';
 
     // UTENTE
     const contLabelUtente = document.createElement('label');
@@ -157,24 +177,40 @@ async function preparaCampiControllo() {
     contLabelStrumentazione.innerHTML = '<b>STRUMENTAZIONE</b>';
     const contInputStrumentazione = document.createElement('input');
     contInputStrumentazione.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{strumentaz}');
+    // MATERIALE
+    const contLabelMateriale = document.createElement('label');
+    contLabelMateriale.innerHTML = '<b>MATERIALE</b>';
+    const contSelectMateriale = document.createElement('select');
+    contSelectMateriale.setAttribute('id', 'scheda-controllo-[danno_alterazione_degrado]-{materiale}');
+    creaListaOpzioni(listaEnumMateriale, contSelectMateriale, 'unnest', true);
+    contSelectMateriale.addEventListener('change', () => {
+        filtraOpzioniGlossario(contSelectMateriale.value, contSelectNomeFenomeno, listaEnumGlossario, 'materiale');
+    });
     // STATO DI CONSERVAZIONE
     const contLabelStatoCons = document.createElement('label');
     contLabelStatoCons.innerHTML = '<b>STATO DI CONSERVAZIONE</b>';
     const contSelectStatoCons = document.createElement('select');
     contSelectStatoCons.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{st_cons}');
-    creaListaOpzioni(listaEnumConservazione, contSelectStatoCons, 'unnest');
+    creaListaOpzioni(listaEnumConservazione, contSelectStatoCons, 'unnest', true);
     // TIPO DI FENOMENO
     const contLabelTipoFenomeno = document.createElement('label');
     contLabelTipoFenomeno.innerHTML = '<b>TIPO DI FENOMENO</b>';
     const contSelectTipoFenomeno = document.createElement('select');
     contSelectTipoFenomeno.setAttribute('id', 'scheda-controllo-[danno_alterazione_degrado]-{dad_ty}');
-    creaListaOpzioni(listaEnumFenomeno, contSelectTipoFenomeno, 'unnest');
+    creaListaOpzioni(listaEnumFenomeno, contSelectTipoFenomeno, 'unnest', true);
+    contSelectTipoFenomeno.addEventListener('change', () => {
+        filtraOpzioniGlossario(contSelectTipoFenomeno.value, contSelectNomeFenomeno, listaEnumGlossario, 'gloss_ty');
+    });
     // NOME FENOMENO
     const contLabelNomeFenomeno = document.createElement('label');
     contLabelNomeFenomeno.innerHTML = '<b>NOME FENOMENO</b>';
     const contSelectNomeFenomeno = document.createElement('select');
     contSelectNomeFenomeno.setAttribute('id', 'scheda-controllo-[danno_alterazione_degrado]-{rid_gloss}');
-    creaListaOpzioni(listaEnumGlossario, contSelectNomeFenomeno, 'id_gloss');
+    creaListaOpzioni(listaEnumGlossario, contSelectNomeFenomeno, 'id_gloss', true);
+    contSelectNomeFenomeno.addEventListener('change', () => {
+        filtraOpzioniFenomeno(contSelectNomeFenomeno.value, contSelectTipoFenomeno, listaEnumGlossario);
+        filtraOpzioniMateriale(contSelectNomeFenomeno.value, contSelectMateriale, listaEnumGlossario);
+    });
     // CAUSA
     const contLabelCausa = document.createElement('label');
     contLabelCausa.innerHTML = '<b>CAUSA</b>';
@@ -185,7 +221,7 @@ async function preparaCampiControllo() {
     contLabelEstensione.innerHTML = '<b>ESTENSIONE</b>';
     const contSelectEstensione = document.createElement('select');
     contSelectEstensione.setAttribute('id', 'scheda-controllo-[danno_alterazione_degrado]-{est_sup}');
-    creaListaOpzioni(listaEnumEstensione, contSelectEstensione, 'unnest');
+    creaListaOpzioni(listaEnumEstensione, contSelectEstensione, 'unnest', true);
     // FRASE DI RISCHIO
     const contLabelFrase = document.createElement('label');
     contLabelFrase.innerHTML = '<b>FRASE DI RISCHIO</b>';
@@ -213,13 +249,15 @@ async function preparaCampiControllo() {
     contLabelUrgenza.innerHTML = '<b>LIVELLO DI URGENZA</b>';
     const contSelectUrgenza = document.createElement('select');
     contSelectUrgenza.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{liv_urg}');
-    creaListaOpzioni(listaEnumUrgenza, contSelectUrgenza, 'unnest');
+    creaListaOpzioni(listaEnumUrgenza, contSelectUrgenza, 'unnest', true);
     // COMMENTI
     const contLabelCommenti = document.createElement('label');
     contLabelCommenti.innerHTML = '<b>COMMENTI</b>';
     const contInputCommenti = document.createElement('textarea');
     contInputCommenti.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza|danno_alterazione_degrado]-{commenti}');
 
+    schedaControllo.appendChild(contTitolo);
+    schedaControllo.appendChild(document.createElement('br'));
     schedaControllo.appendChild(contLabelUtente);
     schedaControllo.appendChild(contInputUtente);
     schedaControllo.appendChild(document.createElement('br'));
@@ -231,6 +269,9 @@ async function preparaCampiControllo() {
     schedaControllo.appendChild(document.createElement('br'));
     schedaControllo.appendChild(contLabelStrumentazione);
     schedaControllo.appendChild(contInputStrumentazione);
+    schedaControllo.appendChild(document.createElement('br'));
+    schedaControllo.appendChild(contLabelMateriale);
+    schedaControllo.appendChild(contSelectMateriale);
     schedaControllo.appendChild(document.createElement('br'));
     schedaControllo.appendChild(contLabelStatoCons);
     schedaControllo.appendChild(contSelectStatoCons);
@@ -279,13 +320,13 @@ async function leggiEnum(nomeEnum) {
     }
 }
 
-function creaListaOpzioni(listaOpzioni, targetSelect, parametro) {
-    // const selectOpzioni = document.createElement('select');
-    // selectOpzioni.setAttribute('id', `${idSelect}`);
-    const opzioneVuota = document.createElement('option');
-    opzioneVuota.setAttribute('value', null);
-    opzioneVuota.innerHTML = '';
-    targetSelect.appendChild(opzioneVuota);
+function creaListaOpzioni(listaOpzioni, targetSelect, parametro, opzVuota) {
+    if (opzVuota) {
+        const opzioneVuota = document.createElement('option');
+        opzioneVuota.setAttribute('value', null);
+        opzioneVuota.innerHTML = '';
+        targetSelect.appendChild(opzioneVuota);
+    }
     listaOpzioni.forEach(op => {
         const opzioneSel = document.createElement('option');
         opzioneSel.setAttribute('value', `${op[parametro]}`);
@@ -296,7 +337,7 @@ function creaListaOpzioni(listaOpzioni, targetSelect, parametro) {
 
 async function leggiGloss() {
     try {
-        const risultato = await fetch('/Main10ance_DB/tabellaDB/glossario', {method: "GET", headers: {"content-type": "application/json"} });
+        const risultato = await fetch('/Main10ance_DB/tabellaDB/glossario/degradi', {method: "GET", headers: {"content-type": "application/json"} });
         const listaGloss = await risultato.json();
         return listaGloss;
     }
@@ -361,7 +402,9 @@ function verificaVincoliControllo() {
 
 async function compilaScheda(jsonReq) {
     try {
-        await fetch(`/Main10ance_DB/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) }).then(res => {res.json();}).then(dati => {console.log(dati);});
+        const resp = await fetch(`/Main10ance_DB/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        const respData = await resp.json();
+        return respData;
     }
     catch(e) {
         console.log(e);
@@ -533,4 +576,59 @@ function rinominaID(listaOgg, controllo) {
         return;
     }
     return listaOgg;
+}
+
+function filtraOpzioniGlossario(valore, selectNomeFenomeno, enumGlossario, colonnaTarget) {
+    if ((valore) && (valore !== 'null')) {
+        let nuovaListaEnum = [];
+        enumGlossario.forEach(en => {
+            if (en[colonnaTarget] === valore) {
+                nuovaListaEnum.push(en);
+            }
+        });
+        selectNomeFenomeno.innerHTML = '';
+        creaListaOpzioni(nuovaListaEnum, selectNomeFenomeno, 'id_gloss', false);
+    }
+    else {
+        selectNomeFenomeno.innerHTML = '';
+        creaListaOpzioni(enumGlossario, selectNomeFenomeno, 'id_gloss', true);
+    }
+}
+
+function filtraOpzioniFenomeno(valore, selectTipoFenomeno, enumGlossario) {
+    let valoreDaCercare;
+    enumGlossario.every(gls => {
+        if (gls['id_gloss'] === valore) {
+            valoreDaCercare = gls['gloss_ty'];
+            return false;
+        }
+        else {
+            return true;
+        }
+    });
+    if ((valoreDaCercare) && (valoreDaCercare !== 'nessuno')) {
+        selectTipoFenomeno.value = valoreDaCercare;
+    }
+    else {
+        selectTipoFenomeno.value = null;
+    }
+}
+
+function filtraOpzioniMateriale(valore, selectMateriale, enumGlossario) {
+    let valoreDaCercare;
+    enumGlossario.every(gls => {
+        if (gls['id_gloss'] === valore) {
+            valoreDaCercare = gls['materiale'];
+            return false;
+        }
+        else {
+            return true;
+        }
+    });
+    if ((valoreDaCercare) && (valoreDaCercare !== 'nessuno')) {
+        selectMateriale.value = valoreDaCercare;
+    }
+    else {
+        selectMateriale.value = null;
+    }
 }
