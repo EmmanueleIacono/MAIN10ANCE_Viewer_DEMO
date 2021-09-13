@@ -51,7 +51,9 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
             const bottonePDF = document.createElement('button');
             bottonePDF.setAttribute('id', 'apriPDF');
             bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
-            bottonePDF.addEventListener('click', creaPDF);
+            bottonePDF.addEventListener('click', () => {
+                creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
+            });
             contenitoreSchede.appendChild(bottonePDF);
         }
         else {
@@ -633,7 +635,74 @@ function filtraOpzioniMateriale(valore, selectMateriale, enumGlossario) {
     }
 }
 
-function creaPDF() {
-    alert('creo un pdf');
-    return;
+async function creaPDF(listaIdMain10ance, listaDatiNascosti, contr_manut) {
+    const stringaID = listaIdMain10ance.join('-');
+    let idUnivoco;
+    listaDatiNascosti.every(ls => {
+        if (ls['colonna'] === 'id_id') {
+            idUnivoco = ls['valore'];
+            return false;
+        }
+        else {
+            return true;
+        }
+    });
+    let pdf = new jsPDF({
+        orientation: 'l',
+        unit: 'mm',
+        format: 'a4'
+    });
+    const nomeFile = `${contr_manut}_${stringaID}_${idUnivoco}.pdf`;
+    pdf.setProperties({
+        title: nomeFile
+    });
+    pdf.setFontSize(14);
+
+    // html2canvas(($('#scheda-controllo')[0]).focus(), {
+    //     onrendered: canvas => {
+    //         let img = canvas.toDataURL("image/png");
+    //         pdf.addImage(img, 'JPEG', 20, 20);
+
+    //         const fileCreato = pdf.output('bloburl', {filename: nomeFile});
+    //         window.open(fileCreato, '_blank');
+    //     }
+    // });
+
+    const canvasScheda = await html2canvas($('#scheda-controllo')[0]);
+    const immagineScheda = await canvasScheda.toDataURL("image/png");
+    const canvasForge = document.getElementsByTagName('canvas')[0];
+    const canvasViewer = await html2canvas(canvasForge);
+    const immagineViewer = await canvasViewer.toDataURL("image/png");
+
+    pdf.text(5, 10, `ID ELEMENTO: ${stringaID}`);
+    pdf.text(5, 20, `ID RECORD: ${idUnivoco}`);
+    pdf.addImage(immagineViewer, 'PNG', 5, 30, 148, 135);
+    pdf.addImage(immagineScheda, 'PNG', 148, 30);
+
+    const fileCreato = pdf.output('bloburl', {filename: nomeFile});
+    window.open(fileCreato, '_blank');
+
+    // pdf.text(20, 20, 'PROVA PROVA');
+    // pdf.addPage();
+    // pdf.text(30, 30, 'PROVA PROVA PAG 2');
+
+    // let specialElementHandlers = {}
+
+    // pdf.fromHTML($('#scheda-controllo').get(0), {
+    //     elementHandlers: specialElementHandlers
+    // });
+
+    // pdf.fromHTML($('#scheda-controllo').get(0), 20, 20);
+
+    // pdf.save(nomeFile);
+    // const fileCreato = pdf.output('bloburl', {filename: nomeFile}); // QUESTO
+    // const stringaEmbed = `<embed type="application/pdf" src="${fileCreato}" width="1000" height="1000">`;
+    // window.open(fileCreato, '_blank'); // QUESTO
+
+    // let stringaFile = pdf.output('datauristring');
+    // let iframeFile = "<iframe width='100%' height='100%' src='" + stringaFile + "'></iframe>"
+    // let wOp = window.open();
+    // wOp.document.open();
+    // wOp.document.write(stringaEmbed);
+    // wOp.document.close();
 }

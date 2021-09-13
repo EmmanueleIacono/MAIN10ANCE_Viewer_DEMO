@@ -96,7 +96,7 @@ class MarkerSacroMonte {
         contenitorePopup.innerHTML = `<b>Sacro Monte di ${nome}</b><br>`;
         const selettoreSM = document.createElement('button');
         selettoreSM.setAttribute('id', `selettore_${sigla}`);
-        selettoreSM.innerHTML = 'APRI';
+        selettoreSM.innerHTML = 'MODELLO';
         contenitorePopup.appendChild(selettoreSM);
         selettoreSM.addEventListener('click', () => {
             getModel(urn);
@@ -134,7 +134,7 @@ class MarkerCappella {
         contenitorePopup.innerHTML = `<b>${nome}</b><br>${descrizione}<br>`;
         const selettoreCapp = document.createElement('button');
         selettoreCapp.setAttribute('id', `selettore_${sigla}`);
-        selettoreCapp.innerHTML = 'APRI';
+        selettoreCapp.innerHTML = 'MODELLO';
         contenitorePopup.appendChild(selettoreCapp);
         selettoreCapp.addEventListener('click', () => {
             getModel(urn);

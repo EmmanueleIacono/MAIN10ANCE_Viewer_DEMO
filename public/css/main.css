@@ -170,7 +170,7 @@ body {
   margin-right: 5px;
 }
 
-#modificaDB, #queryDB, #annullaDB, #scegliModello, #scegliGIS, #refreshParams, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo {
+#modificaDB, #queryDB, #annullaDB, #scegliModello, #scegliGIS, #refreshParams, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo, #cercaID {
   cursor: pointer;
   /* outline: none; */
   border: none;
@@ -194,7 +194,7 @@ body {
   margin-bottom: 1rem;
 }
 
-#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaManutenzione {
+#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaManutenzione, #cercaID {
   padding: .9rem 1rem;
   font-size: large;
   font-weight: initial;
@@ -224,6 +224,10 @@ input[id^="scheda-controllo-"], select[id^="scheda-controllo-"], textarea[id^="s
 div[id^="div-form-"] {
   float: right;
   line-height: 80%
+}
+
+#labelCerca {
+  padding-right: 10px;
 }
 
 #formDB {

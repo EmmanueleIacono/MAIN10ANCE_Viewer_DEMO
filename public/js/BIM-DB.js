@@ -1,5 +1,6 @@
 // import('./ForgeViewer.js');
 
+const contenitoreRicerca = document.getElementById('contenitore-campo-ricerca');
 const formDB = document.getElementById('formDB');
 
 // QUI SOTTO CI SONO I VARI CONTROLLI CHE REGOLANO LE RICHIESTE AL SERVER
@@ -12,12 +13,36 @@ bottoneRefrViewer.addEventListener("click", () => {
     viewer.fitToView();
 });
 
+// BOTTONE RICERCA
+const bottoneRicerca = document.getElementById('cercaID');
+bottoneRicerca.addEventListener('click', () => {
+    if (!contenitoreRicerca.innerHTML) {
+        const labelCerca = document.createElement('label');
+        labelCerca.setAttribute('id', 'labelCerca');
+        labelCerca.innerHTML = '<b>id_main10ance   </b>';
+        const inputCerca = document.createElement('input');
+        contenitoreRicerca.appendChild(labelCerca);
+        contenitoreRicerca.appendChild(inputCerca);
+        inputCerca.addEventListener('keyup', () => {
+            viewer.search(inputCerca.value, el => {
+                viewer.select(el);
+            }, () => {
+                alert('Errore nella ricerca');
+            }, ['id_main10ance']);
+        });
+    }
+    else {
+        contenitoreRicerca.innerHTML = '';
+    }
+});
+
 // INTERROGA MODELLO
 const bottoneQuery = document.getElementById("queryDB");
 bottoneQuery.addEventListener("click", ottieniDatiDB);
 
 // MODIFICA DATABASE
 const bottoneMod = document.getElementById("modificaDB");
+bottoneMod.style.display = 'none'; // PROVVISORIO AL POSTO DI ELIMINARE O COMMENTARE BOTTONE, PER FACILITA'
 bottoneMod.addEventListener("click", () => {
     if (formDB.hasChildNodes()) {
         alert('Modifica temporaneamente disabilitata.');
