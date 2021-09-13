@@ -93,7 +93,6 @@ appGIS_BIM.post('/Main10ance_DB/schede/nuova', async (req, res) => {
     finally {
         res.setHeader('content-type', 'application/json');
         res.send(JSON.stringify(result));
-        // res.send(result);
     }
 });
 

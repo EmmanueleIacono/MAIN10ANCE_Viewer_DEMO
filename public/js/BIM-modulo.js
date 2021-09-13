@@ -7,7 +7,6 @@ const bottoneSalvaSchedaManutenzione = document.getElementById('salvaSchedaManut
 const bottoneChiudiSchede = document.getElementById('chiudiSchede');
 const schedaControllo = document.getElementById('scheda-controllo');
 const schedaManutenzione = document.getElementById('scheda-manutenzione');
-// const bottonePDF = document.getElementById('apriPDF');
 
 bottoneAggiungi.addEventListener('click', () => {
     inizializzaModulo();
@@ -52,6 +51,7 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
             const bottonePDF = document.createElement('button');
             bottonePDF.setAttribute('id', 'apriPDF');
             bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
+            bottonePDF.addEventListener('click', creaPDF);
             contenitoreSchede.appendChild(bottonePDF);
         }
         else {
@@ -631,4 +631,9 @@ function filtraOpzioniMateriale(valore, selectMateriale, enumGlossario) {
     else {
         selectMateriale.value = null;
     }
+}
+
+function creaPDF() {
+    alert('creo un pdf');
+    return;
 }
