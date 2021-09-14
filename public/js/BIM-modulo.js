@@ -1,23 +1,23 @@
 const bottoneAggiungi = document.getElementById('aggiungiDB');
-const contenitoreSchede = document.getElementById('contenitore-controllo-manutenzione');
+const contenitoreSchede = document.getElementById('contenitore-controllo-intervento');
 const apriTabControllo = document.getElementById('apriTabControllo');
-const apriTabManutenzione = document.getElementById('apriTabManutenzione');
+const apriTabIntervento = document.getElementById('apriTabIntervento');
 const bottoneSalvaSchedaControllo = document.getElementById('salvaSchedaControllo');
-const bottoneSalvaSchedaManutenzione = document.getElementById('salvaSchedaManutenzione');
+const bottoneSalvaSchedaIntervento = document.getElementById('salvaSchedaIntervento');
 const bottoneChiudiSchede = document.getElementById('chiudiSchede');
 const schedaControllo = document.getElementById('scheda-controllo');
-const schedaManutenzione = document.getElementById('scheda-manutenzione');
+const schedaIntervento = document.getElementById('scheda-intervento');
 
 bottoneAggiungi.addEventListener('click', () => {
     inizializzaModulo();
 });
 
 apriTabControllo.addEventListener('click', () => {
-    schedaManutenzione.style.display = 'none';
-    apriTabManutenzione.classList.remove('active');
+    schedaIntervento.style.display = 'none';
+    apriTabIntervento.classList.remove('active');
     schedaControllo.style.display = 'block';
     apriTabControllo.classList.add('active');
-    bottoneSalvaSchedaManutenzione.style.display = 'none';
+    bottoneSalvaSchedaIntervento.style.display = 'none';
     bottoneSalvaSchedaControllo.style.display = 'inline';
     if (document.getElementById('apriPDF')) {
         document.getElementById('apriPDF').remove();
@@ -25,52 +25,75 @@ apriTabControllo.addEventListener('click', () => {
     preparaCampiControllo();
 });
 
-apriTabManutenzione.addEventListener('click', () => {
+apriTabIntervento.addEventListener('click', () => {
     schedaControllo.style.display = 'none';
     apriTabControllo.classList.remove('active');
-    schedaManutenzione.style.display = 'block';
-    apriTabManutenzione.classList.add('active');
+    schedaIntervento.style.display = 'block';
+    apriTabIntervento.classList.add('active');
     bottoneSalvaSchedaControllo.style.display = 'none';
-    bottoneSalvaSchedaManutenzione.style.display = 'inline';
+    bottoneSalvaSchedaIntervento.style.display = 'inline';
     if (document.getElementById('apriPDF')) {
         document.getElementById('apriPDF').remove();
     }
+    preparaSceltaIntervento();
 });
 
 bottoneSalvaSchedaControllo.addEventListener('click', async () => {
-    if (verificaVincoliControllo()) {
-        const listaDati = preparaDati();
-        const [listaDatiNascosti, listaIdMain10ance] = preparaDatiNascosti(true);
-        const listaDatiCompleta = [...listaDati, ...listaDatiNascosti];
-        const listaFiltrata = filtraOggetti(listaDatiCompleta);
-        const listaTotaleFiltrata = filtraListeDatiId(listaFiltrata, listaIdMain10ance);
-        const listaRinominata = rinominaID(listaTotaleFiltrata, true);
-        const resp = await compilaScheda(listaRinominata);
-        if (resp.success) {
-            alert('Operazione andata a buon fine');
-            const bottonePDF = document.createElement('button');
-            bottonePDF.setAttribute('id', 'apriPDF');
-            bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
-            bottonePDF.addEventListener('click', () => {
-                creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
-            });
-            contenitoreSchede.appendChild(bottonePDF);
+    if (verificaPresenzaIDm10a()) {
+        if (verificaVincoliControllo()) {
+            const listaDati = preparaDati();
+            const [listaDatiNascosti, listaIdMain10ance] = preparaDatiNascosti(true);
+            const listaDatiCompleta = [...listaDati, ...listaDatiNascosti];
+            const listaFiltrata = filtraOggetti(listaDatiCompleta);
+            const listaTotaleFiltrata = filtraListeDatiId(listaFiltrata, listaIdMain10ance);
+            const listaRinominata = rinominaID(listaTotaleFiltrata, true);
+            const resp = await compilaScheda(listaRinominata);
+            if (resp.success) {
+                alert('Operazione andata a buon fine');
+                const bottonePDF = document.createElement('button');
+                bottonePDF.setAttribute('id', 'apriPDF');
+                bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
+                bottonePDF.addEventListener('click', () => {
+                    creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
+                });
+                contenitoreSchede.appendChild(bottonePDF);
+            }
+            else {
+                alert('Operazione non riuscita');
+            }
         }
         else {
-            alert('Operazione non riuscita');
+            alert('ATTENZIONE: I campi OPERATORE, DATA, e NOME FENOMENO sono obbligatori.');
         }
     }
     else {
-        alert('ATTENZIONE: I campi UTENTE, DATA, e NOME FENOMENO sono obbligatori.');
+        alert('Nessun ID associato alla scheda. Selezionare un elemento e riprovare.');
+        bottoneChiudiSchede.click();
+    }
+});
+
+bottoneSalvaSchedaIntervento.addEventListener('click', () => {
+    if (verificaPresenzaIDm10a()) {
+        if (verificaVincoliManutenzione()) {
+            console.log('vincoli a posto');
+        }
+        else {
+            alert('ATTENZIONE: I campi OPERATORE, DATA, e SCHEDA CONTROLLO sono obbligatori.');
+        }
+    }
+    else {
+        alert('Nessun ID associato alla scheda. Selezionare un elemento e riprovare.');
+        bottoneChiudiSchede.click();
     }
 });
 
 bottoneChiudiSchede.addEventListener('click', () => {
     apriTabControllo.style.display = 'none';
-    apriTabManutenzione.style.display = 'none';
+    apriTabIntervento.style.display = 'none';
     schedaControllo.style.display = 'none';
-    schedaManutenzione.style.display = 'none';
+    schedaIntervento.style.display = 'none';
     bottoneSalvaSchedaControllo.style.display = 'none';
+    bottoneSalvaSchedaIntervento.style.display = 'none';
     bottoneChiudiSchede.style.display = 'none';
     if (document.getElementById('apriPDF')) {
         document.getElementById('apriPDF').remove();
@@ -136,18 +159,18 @@ function preparaModulo(nome, id) {
 
 function mostraBottoniSchede() {
     apriTabControllo.style.display = 'inline';
-    apriTabManutenzione.style.display = 'inline';
+    apriTabIntervento.style.display = 'inline';
     // bottoneSalvaSchedaControllo.style.display = 'inline';
     bottoneChiudiSchede.style.display = 'inline';
     apriTabControllo.classList.remove('active');
-    apriTabManutenzione.classList.remove('active');
+    apriTabIntervento.classList.remove('active');
 }
 
 async function preparaCampiControllo() {
     schedaControllo.innerHTML = '';
 
     const listaEnumConservazione = await leggiEnum('st_cons');
-    const listaEnumGlossario = await leggiGloss();
+    const listaEnumGlossario = await leggiGlossDegradi();
     const listaEnumMateriale = await leggiEnum('mat_ty');
     const listaEnumFenomeno = await leggiEnum('dad_ty');
     const listaEnumEstensione = await leggiEnum('est_sup');
@@ -157,12 +180,12 @@ async function preparaCampiControllo() {
     const contTitolo = document.createElement('h4');
     contTitolo.innerHTML = '<b>SCHEDA CONTROLLO</b>';
 
-    // UTENTE
-    const contLabelUtente = document.createElement('label');
-    contLabelUtente.innerHTML = '<b>UTENTE</b>';
-    const contInputUtente = document.createElement('input');
-    contInputUtente.setAttribute('placeholder', 'es. Mario Rossi');
-    contInputUtente.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{esecutori}');
+    // OPERATORE
+    const contLabelOperatore = document.createElement('label');
+    contLabelOperatore.innerHTML = '<b>OPERATORE</b>';
+    const contInputOperatore = document.createElement('input');
+    contInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
+    contInputOperatore.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{esecutori}');
     // DATA
     const contLabelData = document.createElement('label');
     contLabelData.innerHTML = '<b>DATA</b>';
@@ -260,8 +283,8 @@ async function preparaCampiControllo() {
 
     schedaControllo.appendChild(contTitolo);
     schedaControllo.appendChild(document.createElement('br'));
-    schedaControllo.appendChild(contLabelUtente);
-    schedaControllo.appendChild(contInputUtente);
+    schedaControllo.appendChild(contLabelOperatore);
+    schedaControllo.appendChild(contInputOperatore);
     schedaControllo.appendChild(document.createElement('br'));
     schedaControllo.appendChild(contLabelData);
     schedaControllo.appendChild(contInputData);
@@ -310,6 +333,143 @@ async function preparaCampiControllo() {
     schedaControllo.appendChild(document.createElement('br'));
 }
 
+function preparaSceltaIntervento() {
+    schedaIntervento.innerHTML = '';
+
+    const divSceltaIntervento = document.createElement('div');
+    divSceltaIntervento.setAttribute('id', 'contenitore-scelta-intervento');
+    const divSchedaIntervento = document.createElement('div');
+    divSchedaIntervento.setAttribute('id', 'contenitore-scheda-intervento');
+    const labelIntervento = document.createElement('label');
+    labelIntervento.innerHTML = '<b>TIPO DI INTERVENTO: </b>';
+    const selectIntervento = document.createElement('select');
+    selectIntervento.setAttribute('id', 'scelta-intervento');
+    const listaOpzioniIntervento = [{intervento: 'Manutenzione Ordinaria'}, {intervento: 'Manutenzione Straordinaria'}, {intervento: 'Restauro'}];
+    creaListaOpzioni(listaOpzioniIntervento, selectIntervento, 'intervento', true);
+
+    selectIntervento.addEventListener('change', () => {
+        preparaCampiIntervento(selectIntervento);
+    });
+    
+    divSceltaIntervento.appendChild(labelIntervento);
+    divSceltaIntervento.appendChild(selectIntervento);
+
+    schedaIntervento.appendChild(divSceltaIntervento);
+    schedaIntervento.appendChild(divSchedaIntervento);
+}
+
+function preparaCampiIntervento(select) {
+    const contenitoreSchedeIntervento = document.getElementById('contenitore-scheda-intervento');
+
+    const interventoTarget = select.value;
+    if (interventoTarget === 'Manutenzione Ordinaria') {
+        preparaCampiManOrd(contenitoreSchedeIntervento);
+    }
+    else if (interventoTarget === 'Manutenzione Straordinaria') {
+        contenitoreSchedeIntervento.innerHTML = interventoTarget;
+    }
+    else if (interventoTarget === 'Restauro') {
+        contenitoreSchedeIntervento.innerHTML = interventoTarget;
+    }
+    else {
+        contenitoreSchedeIntervento.innerHTML = '';
+    }
+}
+
+async function preparaCampiManOrd(divScheda) {
+    divScheda.innerHTML = '';
+
+    const listaSchedeControllo = await leggiSchedeControllo();
+    console.log(listaSchedeControllo);
+
+    //TITOLO
+    const intTitolo = document.createElement('h4');
+    intTitolo.innerHTML = '<b>SCHEDA MANUTENZIONE REGOLARE</b>';
+
+    // OPERATORE
+    const intLabelOperatore = document.createElement('label');
+    intLabelOperatore.innerHTML = '<b>OPERATORE</b>';
+    const intInputOperatore = document.createElement('input');
+    intInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
+    intInputOperatore.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{esecutori}');
+    // DATA INTERVENTO
+    const intLabelData = document.createElement('label');
+    intLabelData.innerHTML = '<b>DATA INTERVENTO</b>';
+    const intInputData = document.createElement('input');
+    intInputData.setAttribute('type', 'date');
+    intInputData.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{data_ese}');
+    // SCHEDA CONTROLLO
+    const intLabelSchedaControllo = document.createElement('label');
+    intLabelSchedaControllo.innerHTML = '<b>SCHEDA CONTROLLO</b>';
+    const intSelectSchedaControllo = document.createElement('select');
+    intSelectSchedaControllo.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{id_contr}');
+    creaListaOpzioni(listaSchedeControllo, intSelectSchedaControllo, 'scheda', true);
+    // FREQUENZA EFFETTIVA
+    const intLabelFrequenza = document.createElement('label');
+    intLabelFrequenza.innerHTML = '<b>FREQUENZA EFFETTIVA (MESI)</b>';
+    const intInputFrequenza = document.createElement('input');
+    intInputFrequenza.setAttribute('type', 'number');
+    intInputFrequenza.setAttribute('step', 1);
+    intInputFrequenza.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{fq_eff}');
+    // AZIONE
+    const intLabelAzione = document.createElement('label');
+    intLabelAzione.innerHTML = '<b>AZIONE</b>';
+    const intInputAzione = document.createElement('input');
+    intInputAzione.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{azione}');
+    // STRUMENTAZIONE
+    const intLabelStrumentazione = document.createElement('label');
+    intLabelStrumentazione.innerHTML = '<b>STRUMENTAZIONE</b>';
+    const intInputStrumentazione = document.createElement('input');
+    intInputStrumentazione.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{strumentaz}');
+    // MATERIALI UTILIZZATI
+    const intLabelMateriale = document.createElement('label');
+    intLabelMateriale.innerHTML = '<b>MATERIALI UTILIZZATI</b>';
+    const intInputMateriale = document.createElement('input');
+    intInputMateriale.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{materiale}');
+    // COSTO
+    const intLabelCosto = document.createElement('label');
+    intLabelCosto.innerHTML = '<b>COSTO (€)</b>';
+    const intInputCosto = document.createElement('input');
+    intInputCosto.setAttribute('type', 'number');
+    intInputCosto.setAttribute('step', 0.01);
+    intInputCosto.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{costo}');
+    // COMMENTI
+    const intLabelCommenti = document.createElement('label');
+    intLabelCommenti.innerHTML = '<b>COMMENTI</b>';
+    const intInputCommenti = document.createElement('textarea');
+    intInputCommenti.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{commenti}');
+
+    divScheda.appendChild(intTitolo);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelOperatore);
+    divScheda.appendChild(intInputOperatore);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelData);
+    divScheda.appendChild(intInputData);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelSchedaControllo);
+    divScheda.appendChild(intSelectSchedaControllo);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelFrequenza);
+    divScheda.appendChild(intInputFrequenza);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelAzione);
+    divScheda.appendChild(intInputAzione);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelStrumentazione);
+    divScheda.appendChild(intInputStrumentazione);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelMateriale);
+    divScheda.appendChild(intInputMateriale);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelCosto);
+    divScheda.appendChild(intInputCosto);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelCommenti);
+    divScheda.appendChild(intInputCommenti);
+    divScheda.appendChild(document.createElement('br'));
+}
+
 async function leggiEnum(nomeEnum) {
     try {
         const risultato = await fetch('/Main10ance_DB/tabellaDB/enum', {method: "GET", headers: {"content-type": "application/json", "nomeEnum": nomeEnum} });
@@ -337,7 +497,7 @@ function creaListaOpzioni(listaOpzioni, targetSelect, parametro, opzVuota) {
     });
 }
 
-async function leggiGloss() {
+async function leggiGlossDegradi() {
     try {
         const risultato = await fetch('/Main10ance_DB/tabellaDB/glossario/degradi', {method: "GET", headers: {"content-type": "application/json"} });
         const listaGloss = await risultato.json();
@@ -345,6 +505,37 @@ async function leggiGloss() {
     }
     catch(e) {
         console.log('Errore nella lettura del glossario');
+        console.log(e);
+    }
+}
+
+async function leggiSchedeControllo() {
+    try {
+        const risultato = await fetch('/Main10ance_DB/tabellaDB/schede-controllo', {method: "GET", headers: {"content-type": "application/json"} });
+        const listaContr = await risultato.json();
+        const listaIdMain10anceGrezza = trovaElementi('modulo-aggiungi-');
+        let listaIdMain10ance = [];
+        listaIdMain10anceGrezza.forEach(idgr => {
+            const idCompleto = idgr.id;
+            const idMain10ance = idCompleto.replace('modulo-aggiungi-', '');
+            listaIdMain10ance.push(idMain10ance);
+        });
+        let listaFiltrata = [];
+        listaContr.forEach(contr => {
+            if (listaIdMain10ance.includes(contr['id_main10ance'])) {
+                listaFiltrata.push(contr);
+            }
+        });
+        let listaFinale = [];
+        listaFiltrata.forEach(filtr => {
+            let ogg = {};
+            ogg.scheda = `${filtr['id_contr']}`;
+            listaFinale.push(ogg);
+        });
+        return listaFinale;
+    }
+    catch(e) {
+        console.log('Errore nella lettura delle schede di controllo');
         console.log(e);
     }
 }
@@ -362,14 +553,7 @@ function preparaDati() {
     let listaJSON = [];
     listaInput.forEach(inp => {
         const idCompleto = inp.id;
-        // const valoreInput = inp.value;
         let valoreInput;
-        // if ((inp.value === '') || (inp.value === 'null')) {
-        //     valoreInput = null;
-        // }
-        // else {
-        //     valoreInput = inp.value;
-        // }
         if ((inp.value === '') || (inp.value === 'null')) {
             return;
         }
@@ -391,14 +575,46 @@ function preparaDati() {
 }
 
 function verificaVincoliControllo() {
-    const utente = $('[id*="{esecutori}"]')[0];
+    const operatore = $('[id*="{esecutori}"]')[0];
     const data = $('[id*="{data_con}"]')[0];
     const gloss = $('[id*="{rid_gloss}"]')[0];
-    if ((!utente.value) || (utente.value === 'null') || (!data.value) || (data.value === 'null') || (!gloss.value) || (gloss.value === 'null')) {
+    if ((!operatore.value) || (operatore.value === 'null') || (!data.value) || (data.value === 'null') || (!gloss.value) || (gloss.value === 'null')) {
         return false;
     }
     else {
         return true;
+    }
+}
+
+function verificaVincoliManutenzione() {
+    const operatore = $('[id*="{esecutori}"]')[0];
+    const data = $('[id*="{data_ese}"]')[0];
+    const contr = $('[id*="{id_contr}"]')[0];
+    if ((!operatore.value) || (operatore.value === 'null') || (!data.value) || (data.value === 'null') || (!contr.value) || (contr.value === 'null')) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+function verificaVincoliRestauro() {
+    const operatore = $('[id*="{operatore}"]')[0];
+    if ((!operatore.value) || (operatore.value === 'null')) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+
+function verificaPresenzaIDm10a() {
+    if ($(`[id^="modulo-aggiungi-"]`)[0]) {
+        return true;
+    }
+    else {
+        return false;
     }
 }
 
@@ -430,13 +646,13 @@ function preparaDatiNascosti(controllo) {
         const frase = 'frase_di_rischio';
         const id_contr = {tabella: contr, colonna: 'id_id', valore: idUnivoco};
         const id_dad = {tabella: dad, colonna: 'id_id', valore: idUnivoco};
-        const fr_risc = {tabella: frase, colonna: 'id_id', valore: idUnivoco};
+        const id_fr_risc = {tabella: frase, colonna: 'id_id', valore: idUnivoco};
         const data_ins_c = {tabella: contr, colonna: 'data_ins', valore: dataIns};
         const data_ins_d = {tabella: dad, colonna: 'data_ins', valore: dataIns};
         const data_ins_f = {tabella: frase, colonna: 'data_ins', valore: dataIns};
         listaJSON.push(id_contr);
         listaJSON.push(id_dad);
-        listaJSON.push(fr_risc);
+        listaJSON.push(id_fr_risc);
         listaJSON.push(data_ins_c);
         listaJSON.push(data_ins_d);
         listaJSON.push(data_ins_f);
@@ -657,16 +873,6 @@ async function creaPDF(listaIdMain10ance, listaDatiNascosti, contr_manut) {
         title: nomeFile
     });
     pdf.setFontSize(14);
-
-    // html2canvas(($('#scheda-controllo')[0]).focus(), {
-    //     onrendered: canvas => {
-    //         let img = canvas.toDataURL("image/png");
-    //         pdf.addImage(img, 'JPEG', 20, 20);
-
-    //         const fileCreato = pdf.output('bloburl', {filename: nomeFile});
-    //         window.open(fileCreato, '_blank');
-    //     }
-    // });
 
     const canvasScheda = await html2canvas($('#scheda-controllo')[0]);
     const immagineScheda = await canvasScheda.toDataURL("image/png");

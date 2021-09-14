@@ -125,7 +125,7 @@ body {
   position: relative;
 }
 
-.scheda-con-man, #apriTabControllo, #apriTabManutenzione, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaManutenzione {
+.scheda-con-int, #apriTabControllo, #apriTabIntervento, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento {
   display: none;
 }
 
@@ -135,7 +135,7 @@ body {
   padding: 30px 14px;
 }
 
-#scheda-manutenzione {
+#scheda-intervento {
   background-color: var(--bluInterregTrasparenza);
   font-size: 13px;
   padding: 30px 14px;
@@ -182,7 +182,7 @@ body {
   margin-bottom: 1rem;
 }
 
-#salvaSchedaManutenzione {
+#salvaSchedaIntervento {
   cursor: pointer;
   /* outline: none; */
   border: none;
@@ -194,7 +194,7 @@ body {
   margin-bottom: 1rem;
 }
 
-#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaManutenzione, #cercaID {
+#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento, #cercaID {
   padding: .9rem 1rem;
   font-size: large;
   font-weight: initial;
@@ -214,7 +214,7 @@ input[id^="form-"] {
   line-height: 80%
 }
 
-input[id^="scheda-controllo-"], select[id^="scheda-controllo-"], textarea[id^="scheda-controllo-"] {
+input[id^="scheda-controllo-"], select[id^="scheda-controllo-"], textarea[id^="scheda-controllo-"], #scelta-intervento, input[id^="scheda-intervento-"], select[id^="scheda-intervento-"], textarea[id^="scheda-intervento-"] {
   float: right;
   line-height: 100%;
   padding: 1px;

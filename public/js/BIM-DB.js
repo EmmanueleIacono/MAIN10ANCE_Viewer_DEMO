@@ -288,7 +288,7 @@ function creaBloccoDetails(intestazione, id) {
                     const idComposto = `${id}-[${progressivo}]`;
                     const listaDati = Object.entries(d);
                     // console.log(listaDati);
-                    creaRisultatiInput(listaDati, idComposto, divBIM);
+                    creaRisultatiTesto(listaDati, idComposto, divBIM);
                 });
                 // detailsBIM.open = true;
             }
@@ -317,5 +317,5 @@ async function cercaDatiDB(tabella, idMain10ance) {
 // setTimeout(() => {
 //     viewer.select(2915);
 //     bottoneAggiungi.click();
-//     apriTabControllo.click();
+//     apriTabIntervento.click();
 // }, 3000);

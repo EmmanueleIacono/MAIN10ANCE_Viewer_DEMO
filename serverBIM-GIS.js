@@ -96,6 +96,14 @@ appGIS_BIM.post('/Main10ance_DB/schede/nuova', async (req, res) => {
     }
 });
 
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB/schede-controllo", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB/schede-controllo', async (req, res) => {
+    const risposta = await leggiSchedeControllo();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
 //////////          AVVIO SERVER          //////////
 
 start();
@@ -217,6 +225,16 @@ async function transazioneScheda(listaStrVals) {
         console.log(`Errore: ${ex}`);
         await client.query("ROLLBACK;");
         return false;
+    }
+};
+
+async function leggiSchedeControllo() {
+    try {
+        const result = await client.query(`SELECT "id_contr", "id_main10ance" FROM main10ance_sacrimonti."controllo_stato_di_conservazione_livello_di_urgenza";`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
     }
 };
 
