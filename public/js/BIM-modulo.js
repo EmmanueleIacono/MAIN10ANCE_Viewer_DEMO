@@ -47,6 +47,7 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
             const listaFiltrata = filtraOggetti(listaDatiCompleta);
             const listaTotaleFiltrata = filtraListeDatiId(listaFiltrata, listaIdMain10ance);
             const listaRinominata = rinominaID(listaTotaleFiltrata);
+            console.log('listaRinominata: ', listaRinominata);
             const resp = await compilaScheda(listaRinominata);
             if (resp.success) {
                 alert('Operazione andata a buon fine');
@@ -130,7 +131,6 @@ function inizializzaModulo() {
     else {
         const selezione = viewer.getSelection();
         const isolato = viewer.getIsolatedNodes();
-        // if ((selezione.length === 1) || (isolato.length === 1)) {
         if ((selezione.length !== 0) || (isolato.length !== 0)) {
             selezione.forEach(async (s) => {
                 viewer.getProperties(s, async (props) => {
@@ -153,12 +153,9 @@ function inizializzaModulo() {
                     });
             });
         }
-        else if ((selezione.length === 0) && (isolato.length === 0)) {
+        else {
             alert('Nessun elemento selezionato');
         }
-        // else {
-        //     alert('Selezionare un solo elemento per volta');
-        // }
         // viewer.clearSelection();
         viewer.isolate(selezione);
         viewer.fitToView(selezione);
@@ -166,9 +163,9 @@ function inizializzaModulo() {
 }
 
 function preparaModulo(nome, id) {
-    const hNome = document.createElement('h4');
-    hNome.setAttribute('id', `modulo-aggiungi-${nome}`);
-    hNome.innerHTML = `<b>NOME ELEMENTO: ${nome}</b>`;
+    // const hNome = document.createElement('h4');
+    // hNome.setAttribute('id', `modulo-aggiungi-${nome}`);
+    // hNome.innerHTML = `<b>NOME ELEMENTO: ${nome}</b>`;
     const hId = document.createElement('h5');
     hId.setAttribute('id', `modulo-aggiungi-${id}`);
     hId.innerHTML = `<b>ID ELEMENTO: ${id}</b>`;
@@ -273,7 +270,7 @@ async function preparaCampiControllo() {
     contInputFrase.setAttribute('id', 'scheda-controllo-[frase_di_rischio]-{fr_risc}');
     // MANUTENZIONE ORDINARIA
     const contLabelManOrd = document.createElement('label');
-    contLabelManOrd.innerHTML = '<b>MANUTENZIONE ORDINARIA</b>';
+    contLabelManOrd.innerHTML = '<b>MANUTENZIONE REGOLARE</b>';
     const contInputManOrd = document.createElement('input');
     contInputManOrd.setAttribute('id', 'scheda-controllo-[frase_di_rischio]-{mn_reg}');
     // FREQUENZA
@@ -285,7 +282,7 @@ async function preparaCampiControllo() {
     contInputFrequenza.setAttribute('id', 'scheda-controllo-[frase_di_rischio]-{frequenza}');
     // MANUTENZIONE STRAORDINARIA
     const contLabelManStr = document.createElement('label');
-    contLabelManStr.innerHTML = '<b>MANUTENZIONE STRAORDINARIA</b>';
+    contLabelManStr.innerHTML = '<b>MANUTENZIONE CORRETTIVA</b>';
     const contInputManStr = document.createElement('input');
     contInputManStr.setAttribute('id', 'scheda-controllo-[frase_di_rischio]-{mn_nec}');
     // LIVELLO DI URGENZA
@@ -363,7 +360,7 @@ function preparaSceltaIntervento() {
     labelIntervento.innerHTML = '<b>TIPO DI INTERVENTO: </b>';
     const selectIntervento = document.createElement('select');
     selectIntervento.setAttribute('id', 'scelta-intervento');
-    const listaOpzioniIntervento = [{intervento: 'Manutenzione Ordinaria'}, {intervento: 'Manutenzione Straordinaria'}, {intervento: 'Restauro'}];
+    const listaOpzioniIntervento = [{intervento: 'Manutenzione Regolare'}, {intervento: 'Manutenzione Correttiva'}, {intervento: 'Restauro'}];
     creaListaOpzioni(listaOpzioniIntervento, selectIntervento, 'intervento', 'intervento', true);
 
     selectIntervento.addEventListener('change', () => {
@@ -381,10 +378,10 @@ function preparaCampiIntervento(select) {
     const contenitoreSchedeIntervento = document.getElementById('contenitore-scheda-intervento');
 
     const interventoTarget = select.value;
-    if (interventoTarget === 'Manutenzione Ordinaria') {
+    if (interventoTarget === 'Manutenzione Regolare') {
         preparaCampiManOrd(contenitoreSchedeIntervento);
     }
-    else if (interventoTarget === 'Manutenzione Straordinaria') {
+    else if (interventoTarget === 'Manutenzione Correttiva') {
         preparaCampiManStr(contenitoreSchedeIntervento);
     }
     else if (interventoTarget === 'Restauro') {
@@ -422,6 +419,34 @@ async function preparaCampiManOrd(divScheda) {
     const intSelectSchedaControllo = document.createElement('select');
     intSelectSchedaControllo.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{id_contr}');
     creaListaOpzioni(listaSchedeControllo, intSelectSchedaControllo, 'valore', 'scheda', true);
+    intSelectSchedaControllo.addEventListener('change', () => {
+        if ((intSelectSchedaControllo.value === null) || (intSelectSchedaControllo.value === 'null')) {
+            viewer.clearSelection();
+            cancellaFormDB(formDB);
+        }
+        else {
+            listaSchedeControllo.forEach(sc => {
+                if (intSelectSchedaControllo.value === sc.valore) {
+                    const nuovaListaId = sc.id_main10ance;
+                    let listaElementi = [];
+                    nuovaListaId.forEach(id => {
+                        viewer.search(id, el => {
+                            // viewer.select(el);
+                            listaElementi.push(el[0]);
+                            viewer.select(listaElementi);
+                            viewer.fitToView();
+                            // console.log(listaElementi);
+                            // bottoneAggiungi.click();
+                            // return listaElementi;
+                        }, () => {
+                            alert('Errore nella ricerca');
+                        }, ['id_main10ance']);
+                    });
+                }
+            });
+            // bottoneAggiungi.click();
+        }
+    });
     // FREQUENZA EFFETTIVA
     const intLabelFrequenza = document.createElement('label');
     intLabelFrequenza.innerHTML = '<b>FREQUENZA EFFETTIVA (MESI)</b>';
@@ -495,7 +520,7 @@ async function preparaCampiManStr(divScheda) {
 
     // TITOLO
     const intTitolo = document.createElement('h4');
-    intTitolo.innerHTML = '<b>SCHEDA MANUTENZIONE STRAORDINARIA</b>';
+    intTitolo.innerHTML = '<b>SCHEDA MANUTENZIONE CORRETTIVA</b>';
 
     // OPERATORE
     const intLabelOperatore = document.createElement('label');
@@ -593,18 +618,21 @@ async function leggiSchedeControllo() {
     try {
         const risultato = await fetch('/Main10ance_DB/tabellaDB/schede-controllo', {method: "GET", headers: {"content-type": "application/json"} });
         const listaContr = await risultato.json();
-        const listaIdMain10anceGrezza = trovaElementi('modulo-aggiungi-');
-        let listaIdMain10ance = [];
-        listaIdMain10anceGrezza.forEach(idgr => {
-            const idCompleto = idgr.id;
-            const idMain10ance = idCompleto.replace('modulo-aggiungi-', '');
-            listaIdMain10ance.push(idMain10ance);
-        });
+        const listaIdMain10ance = trovaIdMain10ance();
         let listaFiltrata = [];
-        listaContr.forEach(contr => {
-            if (listaIdMain10ance.includes(contr['id_main10ance'])) {
-                listaFiltrata.push(contr);
-            }
+        // listaContr.forEach(contr => {
+        //     if (listaIdMain10ance.includes(contr['id_main10ance'])) {
+        //         listaFiltrata.push(contr);
+        //     }
+        // });
+        listaIdMain10ance.forEach(id => {
+            listaContr.forEach(contr => {
+                if (contr['id_main10ance'].includes(id)) {
+                    if (!(listaFiltrata.includes(contr))) {
+                        listaFiltrata.push(contr);
+                    }
+                }
+            });
         });
         let listaFinale = [];
         // listaFiltrata.forEach(filtr => {
@@ -616,6 +644,7 @@ async function leggiSchedeControllo() {
             let ogg = {};
             ogg.scheda = `${filtr['data_con']} - ${filtr['rid_gloss']}`;
             ogg.valore = `${filtr['id_dad']}`;
+            ogg.id_main10ance = filtr['id_main10ance'];
             listaFinale.push(ogg);
         });
         return listaFinale;
@@ -632,6 +661,17 @@ function trovaElementi(stringa) {
     delete oggInput['prevObject'];
     const listaInput = Object.values(oggInput);
     return listaInput;
+}
+
+function trovaIdMain10ance() {
+    const listaIdMain10anceGrezza = trovaElementi('modulo-aggiungi-');
+    let listaIdMain10ance = [];
+    listaIdMain10anceGrezza.forEach(idgr => {
+        const idCompleto = idgr.id;
+        const idMain10ance = idCompleto.replace('modulo-aggiungi-', '');
+        listaIdMain10ance.push(idMain10ance);
+    });
+    return listaIdMain10ance;
 }
 
 function preparaDati(idparziale) {
@@ -716,14 +756,8 @@ async function compilaScheda(jsonReq) {
 }
 
 function preparaDatiNascosti(scheda) {
-    const listaIdMain10anceGrezza = trovaElementi('modulo-aggiungi-');
     let listaJSON = [];
-    let listaIdMain10ance = [];
-    listaIdMain10anceGrezza.forEach(idgr => {
-        const idCompleto = idgr.id;
-        const idMain10ance = idCompleto.replace('modulo-aggiungi-', '');
-        listaIdMain10ance.push(idMain10ance);
-    });
+    const listaIdMain10ance = trovaIdMain10ance();
     const idUnivoco = dataInteger();
     const dataIns = dataCorta();
     if (scheda === 'controllo') {
@@ -851,16 +885,21 @@ function dataCorta() {
 
 function filtraListeDatiId(listaDati, listaId) {
     let listaTotaleFiltrata = [];
-    listaId.forEach(id => {
-        listaDati.forEach(d => {
-            const indice = listaId.indexOf(id);
-            let dCopia = JSON.parse(JSON.stringify(d));
-            dCopia.colonne.push('id_main10ance');
-            dCopia.valori.push(id);
-            const indiceID = dCopia.colonne.indexOf('id_id');
-            dCopia.valori[indiceID] += indice;
-            listaTotaleFiltrata.push(dCopia);
-        });
+    // listaId.forEach(id => {
+    //     listaDati.forEach(d => {
+    //         const indice = listaId.indexOf(id);
+    //         let dCopia = JSON.parse(JSON.stringify(d));
+    //         dCopia.colonne.push('id_main10ance');
+    //         dCopia.valori.push(id);
+    //         const indiceID = dCopia.colonne.indexOf('id_id');
+    //         dCopia.valori[indiceID] += indice;
+    //         listaTotaleFiltrata.push(dCopia);
+    //     });
+    // });
+    listaDati.forEach(d => {
+        d.colonne.push('id_main10ance');
+        d.valori.push(listaId);
+        listaTotaleFiltrata.push(d);
     });
     return listaTotaleFiltrata;
 }

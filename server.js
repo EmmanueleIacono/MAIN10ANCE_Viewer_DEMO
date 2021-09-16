@@ -44,7 +44,7 @@ start();
 
 async function start() {
     await connect();
-};
+}
 
 async function connect() {
     try {
@@ -54,7 +54,7 @@ async function connect() {
     catch(e) {
         console.error(`Connessione al database BIM fallita: ${e}`);
     }
-};
+}
 
 async function leggiDBAll(nomeCategoria, idElemento) {
     try {
@@ -64,7 +64,7 @@ async function leggiDBAll(nomeCategoria, idElemento) {
     catch(e) {
         return [];
     }
-};
+}
 
 async function scriviDBAll(nomeCategoria, nomeParametro, testoParametro, idElemento) {
     try {
@@ -74,6 +74,6 @@ async function scriviDBAll(nomeCategoria, nomeParametro, testoParametro, idEleme
     catch(e) {
         return false;
     }
-};
+}
 
 module.exports = appPG

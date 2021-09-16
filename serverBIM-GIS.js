@@ -110,7 +110,7 @@ start();
 
 async function start() {
     await connect();
-};
+}
 
 async function connect() {
     try {
@@ -120,7 +120,7 @@ async function connect() {
     catch(e) {
         console.error(`Connessione al database Main10ance fallita: ${e}`);
     }
-};
+}
 
 //////////          QUERY          //////////
 
@@ -132,7 +132,7 @@ async function leggiGIS(tabella, alias, geometria, colonneUtili) {
     catch(e) {
         return [`errore: ${e}`];
     }
-};
+}
 
 async function leggiListaTabelle() {
     try {
@@ -142,7 +142,7 @@ async function leggiListaTabelle() {
     catch(e) {
         return [];
     }
-};
+}
 
 async function leggiBIMViewer(nomeCategoria, idElemento) {
     try {
@@ -152,7 +152,7 @@ async function leggiBIMViewer(nomeCategoria, idElemento) {
     catch(e) {
         return [];
     }
-};
+}
 
 async function leggiColonneTabella(nomeTab) {
     try {
@@ -162,7 +162,7 @@ async function leggiColonneTabella(nomeTab) {
     catch(e) {
         return [];
     }
-};
+}
 
 async function leggiTabellaDB(nomeTab) {
     try {
@@ -172,7 +172,7 @@ async function leggiTabellaDB(nomeTab) {
     catch(e) {
         return [];
     }
-};
+}
 
 async function leggiTabellaGlossario() {
     try {
@@ -182,7 +182,7 @@ async function leggiTabellaGlossario() {
     catch(e) {
         return [];
     }
-};
+}
 
 async function leggiTabellaGlossarioDegradi() {
     try {
@@ -193,7 +193,7 @@ async function leggiTabellaGlossarioDegradi() {
         console.log(e);
         return [];
     }
-};
+}
 
 async function leggiEnum(nomeEnum) {
     try {
@@ -203,7 +203,7 @@ async function leggiEnum(nomeEnum) {
     catch(e) {
         return [];
     }
-};
+}
 
 async function transazioneScheda(listaStrVals) {
     try {
@@ -226,7 +226,7 @@ async function transazioneScheda(listaStrVals) {
         await client.query("ROLLBACK;");
         return false;
     }
-};
+}
 
 async function leggiSchedeControllo() {
     try {
@@ -237,7 +237,7 @@ async function leggiSchedeControllo() {
     catch(e) {
         return [];
     }
-};
+}
 
 //////////          ALTRE FUNZIONI          //////////
 
