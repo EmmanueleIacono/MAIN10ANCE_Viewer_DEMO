@@ -223,7 +223,7 @@ input[id^="scheda-controllo-"], select[id^="scheda-controllo-"], textarea[id^="s
 
 div[id^="div-form-"] {
   float: right;
-  line-height: 80%
+  /* line-height: 80% */
 }
 
 #labelCerca {

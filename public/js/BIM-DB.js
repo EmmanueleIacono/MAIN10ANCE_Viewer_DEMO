@@ -17,11 +17,12 @@ bottoneRefrViewer.addEventListener("click", () => {
 const bottoneRicerca = document.getElementById('cercaID');
 bottoneRicerca.addEventListener('click', () => {
     if (!contenitoreRicerca.innerHTML) {
-        const labelCerca = document.createElement('label');
-        labelCerca.setAttribute('id', 'labelCerca');
-        labelCerca.innerHTML = '<b>id_main10ance   </b>';
+        // const labelCerca = document.createElement('label');
+        // labelCerca.setAttribute('id', 'labelCerca');
+        // labelCerca.innerHTML = '<b>id_main10ance</b>';
         const inputCerca = document.createElement('input');
-        contenitoreRicerca.appendChild(labelCerca);
+        inputCerca.setAttribute('placeholder', 'id_main10ance');
+        // contenitoreRicerca.appendChild(labelCerca);
         contenitoreRicerca.appendChild(inputCerca);
         inputCerca.addEventListener('keyup', () => {
             viewer.search(inputCerca.value, el => {

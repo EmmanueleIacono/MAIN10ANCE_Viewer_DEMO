@@ -230,7 +230,8 @@ async function transazioneScheda(listaStrVals) {
 
 async function leggiSchedeControllo() {
     try {
-        const result = await client.query(`SELECT "id_contr", "id_main10ance" FROM main10ance_sacrimonti."controllo_stato_di_conservazione_livello_di_urgenza";`);
+        // const result = await client.query(`SELECT "id_contr", "id_main10ance" FROM main10ance_sacrimonti."controllo_stato_di_conservazione_livello_di_urgenza";`);
+        const result = await client.query(`SELECT main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza.data_con, main10ance_sacrimonti.danno_alterazione_degrado.id_dad, main10ance_sacrimonti.danno_alterazione_degrado.id_main10ance, main10ance_sacrimonti.danno_alterazione_degrado.rid_gloss FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza JOIN main10ance_sacrimonti.danno_alterazione_degrado ON main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza.id_contr = main10ance_sacrimonti.danno_alterazione_degrado.id_dad ORDER BY data_con;`);
         return result.rows;
     }
     catch(e) {
