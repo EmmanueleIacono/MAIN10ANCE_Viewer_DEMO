@@ -47,7 +47,6 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
             const listaFiltrata = filtraOggetti(listaDatiCompleta);
             const listaTotaleFiltrata = filtraListeDatiId(listaFiltrata, listaIdMain10ance);
             const listaRinominata = rinominaID(listaTotaleFiltrata);
-            console.log('listaRinominata: ', listaRinominata);
             const resp = await compilaScheda(listaRinominata);
             if (resp.success) {
                 alert('Operazione andata a buon fine');
@@ -74,14 +73,16 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
 });
 
 bottoneSalvaSchedaIntervento.addEventListener('click', async () => {
+    const scelta = document.getElementById('scelta-intervento').value;
     if (verificaPresenzaIDm10a()) {
-        if (verificaVincoliManutenzione()) {
+        if (verificaVincoliManutenzioneRestauro(scelta)) {
             const listaDati = preparaDati('scheda-intervento-');
-            const [listaDatiNascosti, listaIdMain10ance] = preparaDatiNascosti('manutenzione');
+            const [listaDatiNascosti, listaIdMain10ance] = preparaDatiNascosti(scelta);
             const listaDatiCompleta = [...listaDati, ...listaDatiNascosti];
             const listaFiltrata = filtraOggetti(listaDatiCompleta);
             const listaTotaleFiltrata = filtraListeDatiId(listaFiltrata, listaIdMain10ance);
             const listaRinominata = rinominaID(listaTotaleFiltrata);
+            console.log(listaRinominata);
             const resp = await compilaScheda(listaRinominata);
             if (resp.success) {
                 alert('Operazione andata a buon fine');
@@ -98,7 +99,12 @@ bottoneSalvaSchedaIntervento.addEventListener('click', async () => {
             }
         }
         else {
-            alert('ATTENZIONE: I campi OPERATORE, DATA, e SCHEDA CONTROLLO sono obbligatori.');
+            if ((scelta === 'Manutenzione Regolare') || (scelta === 'Manutenzione Correttiva')) {
+                alert('ATTENZIONE: I campi OPERATORE, DATA, e SCHEDA CONTROLLO sono obbligatori.');
+            }
+            else if (scelta === 'Restauro') {
+                alert('ATTENZIONE: I campi OPERATORE e NOME FENOMENO sono obbligatori.');
+            }
         }
     }
     else {
@@ -425,26 +431,23 @@ async function preparaCampiManOrd(divScheda) {
             cancellaFormDB(formDB);
         }
         else {
+            cancellaFormDB(formDB);
             listaSchedeControllo.forEach(sc => {
                 if (intSelectSchedaControllo.value === sc.valore) {
                     const nuovaListaId = sc.id_main10ance;
                     let listaElementi = [];
                     nuovaListaId.forEach(id => {
+                        preparaModulo(undefined, id);
                         viewer.search(id, el => {
-                            // viewer.select(el);
                             listaElementi.push(el[0]);
                             viewer.select(listaElementi);
-                            viewer.fitToView();
-                            // console.log(listaElementi);
-                            // bottoneAggiungi.click();
-                            // return listaElementi;
+                            // viewer.fitToView();
                         }, () => {
                             alert('Errore nella ricerca');
                         }, ['id_main10ance']);
                     });
                 }
             });
-            // bottoneAggiungi.click();
         }
     });
     // FREQUENZA EFFETTIVA
@@ -540,6 +543,68 @@ async function preparaCampiManStr(divScheda) {
     const intSelectSchedaControllo = document.createElement('select');
     intSelectSchedaControllo.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{id_contr}');
     creaListaOpzioni(listaSchedeControllo, intSelectSchedaControllo, 'valore', 'scheda', true);
+    intSelectSchedaControllo.addEventListener('change', () => {
+        if ((intSelectSchedaControllo.value === null) || (intSelectSchedaControllo.value === 'null')) {
+            viewer.clearSelection();
+            cancellaFormDB(formDB);
+        }
+        else {
+            cancellaFormDB(formDB);
+            listaSchedeControllo.forEach(sc => {
+                if (intSelectSchedaControllo.value === sc.valore) {
+                    const nuovaListaId = sc.id_main10ance;
+                    let listaElementi = [];
+                    nuovaListaId.forEach(id => {
+                        preparaModulo(undefined, id);
+                        viewer.search(id, el => {
+                            listaElementi.push(el[0]);
+                            viewer.select(listaElementi);
+                            // viewer.fitToView();
+                        }, () => {
+                            alert('Errore nella ricerca');
+                        }, ['id_main10ance']);
+                    });
+                }
+            });
+        }
+    });
+    // PROGETTISTI
+    const intLabelProgettisti = document.createElement('label');
+    intLabelProgettisti.innerHTML = '<b>PROGETTISTA/I</b>';
+    const intInputProgettisti = document.createElement('input');
+    intInputProgettisti.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{progettist}');
+    // AZIONE
+    const intLabelAzione = document.createElement('label');
+    intLabelAzione.innerHTML = '<b>AZIONE</b>';
+    const intInputAzione = document.createElement('input');
+    intInputAzione.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{azione}');
+    // STRUMENTAZIONE
+    const intLabelStrumentazione = document.createElement('label');
+    intLabelStrumentazione.innerHTML = '<b>STRUMENTAZIONE</b>';
+    const intInputStrumentazione = document.createElement('input');
+    intInputStrumentazione.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{strumentazione}');
+    // MATERIALI UTILIZZATI
+    const intLabelMateriale = document.createElement('label');
+    intLabelMateriale.innerHTML = '<b>MATERIALI UTILIZZATI</b>';
+    const intInputMateriale = document.createElement('input');
+    intInputMateriale.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{materiale}');
+    // COSTO
+    const intLabelCosto = document.createElement('label');
+    intLabelCosto.innerHTML = '<b>COSTO (€)</b>';
+    const intInputCosto = document.createElement('input');
+    intInputCosto.setAttribute('type', 'number');
+    intInputCosto.setAttribute('step', 0.01);
+    intInputCosto.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{costo}');
+    // CAUSA
+    const intLabelCausa = document.createElement('label');
+    intLabelCausa.innerHTML = '<b>CAUSA</b>';
+    const intInputCausa = document.createElement('input');
+    intInputCausa.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{causa}');
+    // COMMENTI
+    const intLabelCommenti = document.createElement('label');
+    intLabelCommenti.innerHTML = '<b>COMMENTI</b>';
+    const intInputCommenti = document.createElement('textarea');
+    intInputCommenti.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{commenti}');
 
     divScheda.appendChild(intTitolo);
     divScheda.appendChild(document.createElement('br'));
@@ -552,10 +617,33 @@ async function preparaCampiManStr(divScheda) {
     divScheda.appendChild(intLabelSchedaControllo);
     divScheda.appendChild(intSelectSchedaControllo);
     divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelProgettisti);
+    divScheda.appendChild(intInputProgettisti);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelAzione);
+    divScheda.appendChild(intInputAzione);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelStrumentazione);
+    divScheda.appendChild(intInputStrumentazione);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelMateriale);
+    divScheda.appendChild(intInputMateriale);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelCosto);
+    divScheda.appendChild(intInputCosto);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelCausa);
+    divScheda.appendChild(intInputCausa);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelCommenti);
+    divScheda.appendChild(intInputCommenti);
+    divScheda.appendChild(document.createElement('br'));
 }
 
 async function preparaCampiRestauri(divScheda) {
     divScheda.innerHTML = '';
+
+    const listaEnumGlossario = await leggiGlossDegradi();
 
     // TITOLO
     const intTitolo = document.createElement('h4');
@@ -567,11 +655,78 @@ async function preparaCampiRestauri(divScheda) {
     const intInputOperatore = document.createElement('input');
     intInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
     intInputOperatore.setAttribute('id', 'scheda-intervento-[restauri]-{operatore}');
+    // ANNO INIZIO
+    const intLabelAnnoI = document.createElement('label');
+    intLabelAnnoI.innerHTML = '<b>ANNO INIZIO</b>';
+    const intInputAnnoI = document.createElement('input');
+    intInputAnnoI.setAttribute('type', 'number');
+    intInputAnnoI.setAttribute('min', 1800);
+    intInputAnnoI.setAttribute('max', 2099);
+    intInputAnnoI.setAttribute('step', 1);
+    intInputAnnoI.setAttribute('id', 'scheda-intervento-[restauri]-{anno_iniz}');
+    // ANNO FINE
+    const intLabelAnnoF = document.createElement('label');
+    intLabelAnnoF.innerHTML = '<b>ANNO FINE</b>';
+    const intInputAnnoF = document.createElement('input');
+    intInputAnnoF.setAttribute('type', 'number');
+    intInputAnnoF.setAttribute('min', 1800);
+    intInputAnnoF.setAttribute('max', 2099);
+    intInputAnnoF.setAttribute('step', 1);
+    intInputAnnoF.setAttribute('id', 'scheda-intervento-[restauri]-{anno_fine}');
+    // PROGETTISTI
+    const intLabelProgettisti = document.createElement('label');
+    intLabelProgettisti.innerHTML = '<b>PROGETTISTA/I</b>';
+    const intInputProgettisti = document.createElement('input');
+    intInputProgettisti.setAttribute('id', 'scheda-intervento-[restauri]-{progettist}');
+    // NOME FENOMENO
+    const intLabelNomeFenomeno = document.createElement('label');
+    intLabelNomeFenomeno.innerHTML = '<b>NOME FENOMENO</b>';
+    const intSelectNomeFenomeno = document.createElement('select');
+    intSelectNomeFenomeno.setAttribute('id', 'scheda-intervento-[restauri]-{rid_gloss}');
+    creaListaOpzioni(listaEnumGlossario, intSelectNomeFenomeno, 'id_gloss', 'id_gloss', true);
+    // DESCRIZIONE
+    const intLabelDescrizione = document.createElement('label');
+    intLabelDescrizione.innerHTML = '<b>DESCRIZIONE INTERVENTO</b>';
+    const intInputDescrizione = document.createElement('input');
+    intInputDescrizione.setAttribute('id', 'scheda-intervento-[restauri]-{descriz}');
+    // COSTO
+    const intLabelCosto = document.createElement('label');
+    intLabelCosto.innerHTML = '<b>COSTO (€)</b>';
+    const intInputCosto = document.createElement('input');
+    intInputCosto.setAttribute('type', 'number');
+    intInputCosto.setAttribute('step', 0.01);
+    intInputCosto.setAttribute('id', 'scheda-intervento-[restauri]-{costo}');
+    // COMMENTI
+    const intLabelCommenti = document.createElement('label');
+    intLabelCommenti.innerHTML = '<b>COMMENTI</b>';
+    const intInputCommenti = document.createElement('textarea');
+    intInputCommenti.setAttribute('id', 'scheda-intervento-[restauri]-{commenti}');
 
     divScheda.appendChild(intTitolo);
     divScheda.appendChild(document.createElement('br'));
     divScheda.appendChild(intLabelOperatore);
     divScheda.appendChild(intInputOperatore);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelAnnoI);
+    divScheda.appendChild(intInputAnnoI);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelAnnoF);
+    divScheda.appendChild(intInputAnnoF);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelProgettisti);
+    divScheda.appendChild(intInputProgettisti);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelNomeFenomeno);
+    divScheda.appendChild(intSelectNomeFenomeno);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelDescrizione);
+    divScheda.appendChild(intInputDescrizione);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelCosto);
+    divScheda.appendChild(intInputCosto);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelCommenti);
+    divScheda.appendChild(intInputCommenti);
     divScheda.appendChild(document.createElement('br'));
 }
 
@@ -712,27 +867,32 @@ function verificaVincoliControllo() {
     }
 }
 
-function verificaVincoliManutenzione() {
-    const operatore = $('[id*="{esecutori}"]')[0];
-    const data = $('[id*="{data_ese}"]')[0];
-    const contr = $('[id*="{id_contr}"]')[0];
-    if ((!operatore.value) || (operatore.value === 'null') || (!data.value) || (data.value === 'null') || (!contr.value) || (contr.value === 'null')) {
-        return false;
+function verificaVincoliManutenzioneRestauro(scheda) {
+    console.log(scheda);
+    if ((scheda === 'Manutenzione Regolare') || (scheda === 'Manutenzione Correttiva')) {
+        const operatore = $('[id*="{esecutori}"]')[0];
+        const data = $('[id*="{data_ese}"]')[0];
+        const contr = $('[id*="{id_contr}"]')[0];
+        if ((!operatore.value) || (operatore.value === 'null') || (!data.value) || (data.value === 'null') || (!contr.value) || (contr.value === 'null')) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
-    else {
-        return true;
+    else if (scheda === 'Restauro') {
+        const operatore = $('[id*="{operatore}"]')[0];
+        const rid_gloss = $('[id*="{rid_gloss}"]')[0];
+        if ((!operatore.value) || (operatore.value === 'null') || (!rid_gloss.value) || (rid_gloss.value === 'null')) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }
 
-function verificaVincoliRestauro() {
-    const operatore = $('[id*="{operatore}"]')[0];
-    if ((!operatore.value) || (operatore.value === 'null')) {
-        return false;
-    }
-    else {
-        return true;
-    }
-}
+function verificaVincoliRestauro() {}
 
 
 function verificaPresenzaIDm10a() {
@@ -777,14 +937,21 @@ function preparaDatiNascosti(scheda) {
         listaJSON.push(data_ins_d);
         listaJSON.push(data_ins_f);
     }
-    else if (scheda === 'manutenzione') {
-        const tab = trovaTabellaManutenzione();
+    else if ((scheda === 'Manutenzione Regolare') || (scheda === 'Manutenzione Correttiva')) {
+        const tab = trovaTabellaIntervento();
         const id_tab = {tabella: tab, colonna: 'id_id', valore: idUnivoco};
         const data_ins_tab = {tabella: tab, colonna: 'data_ins', valore: dataIns};
         const rid_gloss = {tabella: tab, colonna: 'rid_gloss', valore: trovaRidGloss()};
         listaJSON.push(id_tab);
         listaJSON.push(data_ins_tab);
         listaJSON.push(rid_gloss);
+    }
+    else if (scheda === 'Restauro') {
+        const tab = trovaTabellaIntervento();
+        const id_tab = {tabella: tab, colonna: 'id_id', valore: idUnivoco};
+        const data_ins_tab = {tabella: tab, colonna: 'data_ins', valore: dataIns};
+        listaJSON.push(id_tab);
+        listaJSON.push(data_ins_tab);
     }
     return [listaJSON, listaIdMain10ance];
 }
@@ -906,28 +1073,23 @@ function filtraListeDatiId(listaDati, listaId) {
 
 function rinominaID(listaOgg) {
     listaOgg.forEach(ogg => {
+        const ind = ogg.colonne.indexOf('id_id');
         if (ogg.tabella === 'controllo_stato_di_conservazione_livello_di_urgenza') {
-            const ind = ogg.colonne.indexOf('id_id');
             ogg.colonne[ind] = 'id_contr';
         }
         else if (ogg.tabella === 'danno_alterazione_degrado') {
-            const ind = ogg.colonne.indexOf('id_id');
             ogg.colonne[ind] = 'id_dad';
         }
         else if (ogg.tabella === 'frase_di_rischio') {
-            const ind = ogg.colonne.indexOf('id_id');
             ogg.colonne[ind] = 'id_fr_risc';
         }
         else if (ogg.tabella === 'manutenzione_regolare') {
-            const ind = ogg.colonne.indexOf('id_id');
             ogg.colonne[ind] = 'id_mn_reg';
         }
-        else if (ogg.tabella === 'manutenzione_corretiva_o_a_guasto') {
-            const ind = ogg.colonne.indexOf('id_id');
+        else if (ogg.tabella === 'manutenzione_correttiva_o_a_guasto') {
             ogg.colonne[ind] = 'id_mn_gu';
         }
         else if (ogg.tabella === 'restauri') {
-            const ind = ogg.colonne.indexOf('id_id');
             ogg.colonne[ind] = 'id_restaur';
         }
     });
@@ -1060,7 +1222,7 @@ function trovaRidGloss() {
     return ridGloss;
 }
 
-function trovaTabellaManutenzione() {
+function trovaTabellaIntervento() {
     const elemento = $('[id^="scheda-intervento-"]')[0];
     const idElemento = elemento.id;
     const tabellaElemento = idElemento.match(/\[(.*)\]/).pop();

@@ -18,13 +18,13 @@ applicaQuery.addEventListener('click', async () => {
             const tabellaRisultati = document.createElement('table');
             contenitoreRisultatiDB.appendChild(tabellaRisultati);
             const listaColonne = await costruisciIntestazione(tabellaRisultati, tipoAttività);
-            costruisciTabella(tabellaRisultati, listaColonne, tipoAttività);
+            costruisciTabella(tabellaRisultati, listaColonne, tipoAttività, true);
         }
         else {
             const tabellaRisultati = document.createElement('table');
             contenitoreRisultatiDB.appendChild(tabellaRisultati);
             const listaColonne = await costruisciIntestazione(tabellaRisultati, tipoOpera);
-            costruisciTabella(tabellaRisultati, listaColonne, tipoOpera);
+            costruisciTabella(tabellaRisultati, listaColonne, tipoOpera, false);
         }
     }
     else {
@@ -97,7 +97,7 @@ function setNumCappelle() {
     }
 }
 
-async function costruisciTabella(tabella, colonne, opera) {
+async function costruisciTabella(tabella, colonne, opera, LOD5_Bool) {
     jsonTabella = {};
     jsonTabella.tab = opera;
     const datiDB = await prendiDatiTabella(jsonTabella);
@@ -109,17 +109,38 @@ async function costruisciTabella(tabella, colonne, opera) {
         const qualeCapp = selezioneCapp.value;
         const qualeOpera = ottieniOpera();
         if (dato.id_main10ance) {
-            const id_SM = (dato.id_main10ance).split('|')[0];
-            const id_ListaCapp = (dato.id_main10ance).split('|')[1].split('-');
-            const id_opera = (dato.id_main10ance).split('|')[2];
-            if ((qualeSM === id_SM) && (id_ListaCapp.includes(qualeCapp)) && (qualeOpera === id_opera)) {
-                const riga = document.createElement('tr');
-                tBody.appendChild(riga);
-                colonne.forEach(col => {
-                    const record = document.createElement('td');
-                    record.innerHTML = dato[col];
-                    riga.appendChild(record);
+            if (LOD5_Bool) {
+                listaSM_DB = [];
+                listaCapp_DB = [];
+                listaOp_DB = [];
+                (dato.id_main10ance).forEach(id => {
+                    listaSM_DB.push(id.split('|')[0]);
+                    listaCapp_DB.push(...(id.split('|')[1].split('-')));
+                    listaOp_DB.push(id.split('|')[2]);
                 });
+                if ((listaSM_DB.includes(qualeSM)) && (listaCapp_DB.includes(qualeCapp)) && (listaOp_DB.includes(qualeOpera))) {
+                    const riga = document.createElement('tr');
+                    tBody.appendChild(riga);
+                    colonne.forEach(col => {
+                        const record = document.createElement('td');
+                        record.innerHTML = dato[col];
+                        riga.appendChild(record);
+                    });
+                }
+            }
+            else {
+                const id_SM = (dato.id_main10ance).split('|')[0];
+                const id_ListaCapp = (dato.id_main10ance).split('|')[1].split('-');
+                const id_opera = (dato.id_main10ance).split('|')[2];
+                if ((qualeSM === id_SM) && (id_ListaCapp.includes(qualeCapp)) && (qualeOpera === id_opera)) {
+                    const riga = document.createElement('tr');
+                    tBody.appendChild(riga);
+                    colonne.forEach(col => {
+                        const record = document.createElement('td');
+                        record.innerHTML = dato[col];
+                        riga.appendChild(record);
+                    });
+                }
             }
         }
         else {

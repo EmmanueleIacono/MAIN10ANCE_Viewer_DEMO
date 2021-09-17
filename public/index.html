@@ -69,7 +69,7 @@
         <li data-tab-target="#tab2" class="tab" id="apriTabGIS">GIS VIEWER</li>
         <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
         <li data-tab-target="#tab3" class="tab" id="apriTabDatabase">DATABASE</li>
-        <li data-tab-target="#tab4" class="tab" id="apriTabDashboard">DASHBOARD</li>
+        <!-- <li data-tab-target="#tab4" class="tab" id="apriTabDashboard">DASHBOARD</li> -->
       </ul>
     </div>
   </nav>
@@ -119,8 +119,8 @@
                 <form id="formDB" spellcheck="false"></form>
               </div>
             <div id="contenitore-controllo-intervento">
-              <button class="tab" id="apriTabControllo">SCHEDA CONTROLLO</button>
-              <button class="tab" id="apriTabIntervento">SCHEDA INTERVENTO</button>
+              <button class="scheda" id="apriTabControllo">SCHEDA CONTROLLO</button>
+              <button class="scheda" id="apriTabIntervento">SCHEDA INTERVENTO</button>
               <button id="salvaSchedaControllo" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
               <button id="salvaSchedaIntervento" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
               <button id="chiudiSchede" class="glyphicon glyphicon-remove dbBtn" title="Chiudi schede" style="cursor: pointer" height="30"></button>
@@ -175,7 +175,7 @@
         <!-- FINE PANNELLO LATERALE -->
       </div>
       <div class="fill" id="tab3" data-tab-content>
-        <div id="tabDatabase">
+        <div class="panel panel-default col-sm-7 fill" id="tabDatabase">
           <div id="filtroDB">
             <div id="colDBLOD34" class="colonnaDB">
               <form>
@@ -206,10 +206,18 @@
           </div>
           <div id="risultatiDB"></div>
         </div>
+        <div class="col-sm-5 fill" id="pannello-lat-db">
+          <div class="panel panel-default fill">
+            <div class="panel-heading" id="pannello-lat-gis-header" data-toggle="tooltip">
+              <b>DASHBOARD</b>
+            </div>
+            <div class="panel-body pannelloLatDB">dati</div>
+          </div>
+        </div>
       </div>
-      <div class="fill" id="tab4" data-tab-content>
+      <!-- <div class="fill" id="tab4" data-tab-content>
         <div id="tabDashboard">QUI DASHBOARD</div>
-      </div>
+      </div> -->
     </div>
   </div>
 

@@ -311,12 +311,3 @@ async function cercaDatiDB(tabella, idMain10ance) {
         console.log(e);
     }
 }
-
-// PROVVISORIO -------------------------------------------
-// document.getElementById('apriTabBIM').click();
-// launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtZ2hpZmZhL1NNR19QVkMucnZ0');
-// setTimeout(() => {
-//     viewer.select(2915);
-//     bottoneAggiungi.click();
-//     apriTabIntervento.click();
-// }, 3000);

@@ -84,8 +84,13 @@ appGIS_BIM.post('/Main10ance_DB/schede/nuova', async (req, res) => {
     try {
         const reqJson = req.body;
         const listaStringheValues = gestisciStringheSchede(reqJson);
-        await transazioneScheda(listaStringheValues);
-        result.success = true;
+        const succ = await transazioneScheda(listaStringheValues);
+        if (succ) {
+            result.success = true;
+        }
+        else {
+            result.success = false;
+        }
     }
     catch(e) {
         result.success = false;
@@ -214,7 +219,7 @@ async function transazioneScheda(listaStrVals) {
             }
         }
         catch(e) {
-            console.log('Errore interno: ' + e);
+            // console.log('Errore interno: ' + e);
             throw e;
         }
 
