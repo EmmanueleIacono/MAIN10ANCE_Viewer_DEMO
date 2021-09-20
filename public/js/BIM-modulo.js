@@ -372,7 +372,7 @@ function preparaSceltaIntervento() {
     selectIntervento.addEventListener('change', () => {
         preparaCampiIntervento(selectIntervento);
     });
-    
+
     divSceltaIntervento.appendChild(labelIntervento);
     divSceltaIntervento.appendChild(selectIntervento);
 
@@ -1228,3 +1228,36 @@ function trovaTabellaIntervento() {
     const tabellaElemento = idElemento.match(/\[(.*)\]/).pop();
     return tabellaElemento;
 }
+
+async function creaPDF2(contr_manut) {
+    viewer.fitToView();
+    const idScheda = contr_manut.toLowerCase();
+    const titoloScheda = contr_manut.replace('-', ' ');
+    const schedaFull = document.getElementById(idScheda);
+    const schedaChildren = schedaFull.getElementsByTagName('*');
+    let listaPulita = [];
+    schedaChildren.forEach(el => {
+        if ((el.tagName !== 'BR') && (el.tagName !== 'B') && (el.tagName !== 'OPTION') && (el.tagName !== 'DIV')) {
+            listaPulita.push(el);
+        }
+    });
+    let listaStringhe = [];
+    for (let n=0; n<listaPulita.length; n++) {
+        let tag = listaPulita[n].tagName;
+        if ((tag !== 'INPUT') && (tag !== 'SELECT') && (tag !== 'TEXTAREA')) {
+            let testo = listaPulita[n].innerText;
+            listaStringhe.push(testo);
+        }
+        else {
+            let valore = listaPulita[n].value;
+            listaStringhe.push(valore);
+        }
+    }
+    console.log(listaStringhe);
+}
+
+// creaPDF2('SCHEDA-CONTROLLO');
+// creaPDF2('SCHEDA-INTERVENTO');
+
+// document.getElementById('apriTabBIM').click();
+// launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtdmFyYWxsby9TTVZfQ0FQXzE2LTI0LnJ2dA');
