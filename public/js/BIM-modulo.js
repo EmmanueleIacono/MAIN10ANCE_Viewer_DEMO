@@ -1254,6 +1254,23 @@ async function creaPDF2(contr_manut) {
         }
     }
     console.log(listaStringhe);
+
+    let pdf = new jsPDF({
+        orientation: 'l',
+        unit: 'mm',
+        format: 'a3'
+    });
+    // const nomeFile = `${contr_manut}_${stringaID}_${idUnivoco}.pdf`;
+    // pdf.setProperties({
+    //     title: nomeFile
+    // });
+    pdf.setFontSize(14);
+
+    let titoloDoc = listaStringhe[0];
+
+    pdf.text(10, 10, titoloDoc);
+
+    pdf.table(x, y);
 }
 
 // creaPDF2('SCHEDA-CONTROLLO');
