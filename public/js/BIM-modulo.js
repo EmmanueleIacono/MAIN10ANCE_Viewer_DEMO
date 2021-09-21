@@ -1230,7 +1230,7 @@ function trovaTabellaIntervento() {
 }
 
 async function creaPDF2(contr_manut) {
-    viewer.fitToView();
+    // viewer.fitToView();
     const idScheda = contr_manut.toLowerCase();
     const titoloScheda = contr_manut.replace('-', ' ');
     const schedaFull = document.getElementById(idScheda);
@@ -1261,6 +1261,7 @@ async function creaPDF2(contr_manut) {
         format: 'a3'
     });
     // const nomeFile = `${contr_manut}_${stringaID}_${idUnivoco}.pdf`;
+    const nomeFile = `${contr_manut}.pdf`;
     // pdf.setProperties({
     //     title: nomeFile
     // });
@@ -1270,11 +1271,26 @@ async function creaPDF2(contr_manut) {
 
     pdf.text(10, 10, titoloDoc);
 
-    pdf.table(x, y);
+    const canvasForge = document.getElementsByTagName('canvas')[0];
+    const canvasViewer = await html2canvas(canvasForge);
+    const immagineViewer = await canvasViewer.toDataURL("image/png");
+    let xImg = 10;
+    let yImg = 30;
+    let lImg = (420/2)-(xImg*2);
+    let hImg = lImg;
+    pdf.addImage(immagineViewer, 'PNG', xImg, yImg, lImg, hImg);
+
+    // let xT = (420/2)+10;
+    // let yT = 30;
+    // let headersArray = null;
+    // pdf.table(xT, yT, dataArray, headersArray, {printHeaders: false, autoSize: false, margins, fontSize: 12});
+
+    const fileCreato = pdf.output('bloburl', {filename: nomeFile});
+    window.open(fileCreato, '_blank');
 }
 
-// creaPDF2('SCHEDA-CONTROLLO');
+// viewer.fitToView(null, null, true);setTimeout(() => {creaPDF2('SCHEDA-CONTROLLO')}, 500);
 // creaPDF2('SCHEDA-INTERVENTO');
 
-// document.getElementById('apriTabBIM').click();
-// launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtdmFyYWxsby9TTVZfQ0FQXzE2LTI0LnJ2dA');
+document.getElementById('apriTabBIM').click();
+launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtdmFyYWxsby9TTVZfQ0FQXzE2LTI0LnJ2dA');
