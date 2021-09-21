@@ -18,6 +18,10 @@
   <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+  <!-- FullCalendar -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.9.0/main.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.9.0/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.9.0/locales-all.min.js"></script>
   <!-- Autodesk Forge Viewer files -->
   <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css" type="text/css">
   <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js"></script>
@@ -30,6 +34,7 @@
   <script src="js/BIM-modulo.js" defer></script>
   <script src="js/MappaGIS.js" defer></script>
   <script src="js/ConsultazioneDB.js" defer></script>
+  <script src="js/calendario.js" defer></script>
 </head>
 <body>
   <!-- CARICAMENTO -->
@@ -211,7 +216,9 @@
             <div class="panel-heading" id="pannello-lat-gis-header" data-toggle="tooltip">
               <b>DASHBOARD</b>
             </div>
-            <div class="panel-body pannelloLatDB">dati</div>
+            <div class="panel-body pannelloLatDB">
+              <div id="calendar"></div>
+            </div>
           </div>
         </div>
       </div>

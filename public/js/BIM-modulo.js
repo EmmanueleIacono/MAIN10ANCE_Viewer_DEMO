@@ -54,7 +54,11 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
                 bottonePDF.setAttribute('id', 'apriPDF');
                 bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
                 bottonePDF.addEventListener('click', () => {
-                    creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
+                    // creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
+                    viewer.fitToView(null, null, true);
+                    setTimeout(() => {
+                        creaPDF2(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
+                    }, 500);
                 });
                 contenitoreSchede.appendChild(bottonePDF);
             }
@@ -90,7 +94,11 @@ bottoneSalvaSchedaIntervento.addEventListener('click', async () => {
                 bottonePDF.setAttribute('id', 'apriPDF');
                 bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
                 bottonePDF.addEventListener('click', () => {
-                    creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-INTERVENTO');
+                    // creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-INTERVENTO');
+                    viewer.fitToView(null, null, true);
+                    setTimeout(() => {
+                        creaPDF2(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-INTERVENTO');
+                    }, 500);
                 });
                 contenitoreSchede.appendChild(bottonePDF);
             }
@@ -1229,8 +1237,19 @@ function trovaTabellaIntervento() {
     return tabellaElemento;
 }
 
-async function creaPDF2(contr_manut) {
-    // viewer.fitToView();
+async function creaPDF2(listaIdMain10ance, listaDatiNascosti, contr_manut) {
+    const stringaID = listaIdMain10ance.join(', ');
+    let idUnivoco;
+    listaDatiNascosti.every(ls => {
+        if (ls['colonna'] === 'id_id') {
+            idUnivoco = ls['valore'];
+            return false;
+        }
+        else {
+            return true;
+        }
+    });
+
     const idScheda = contr_manut.toLowerCase();
     const titoloScheda = contr_manut.replace('-', ' ');
     const schedaFull = document.getElementById(idScheda);
@@ -1242,18 +1261,34 @@ async function creaPDF2(contr_manut) {
         }
     });
     let listaStringhe = [];
+    let listaCoppieValori = [];
     for (let n=0; n<listaPulita.length; n++) {
         let tag = listaPulita[n].tagName;
-        if ((tag !== 'INPUT') && (tag !== 'SELECT') && (tag !== 'TEXTAREA')) {
+        // if ((tag !== 'INPUT') && (tag !== 'SELECT') && (tag !== 'TEXTAREA')) {
+        if ((tag === 'LABEL') || (tag === 'H4')) {
             let testo = listaPulita[n].innerText;
             listaStringhe.push(testo);
+            if (tag === 'LABEL') {
+                let coppia = {pos: "sx", txt: testo};
+                listaCoppieValori.push(coppia);
+            }
+            else {
+                let coppia = {pos: "sx", txt: testo};
+                let coppia2 = {pos: "dx", txt: ""};
+                listaCoppieValori.push(coppia);
+                listaCoppieValori.push(coppia2);
+            }
         }
         else {
             let valore = listaPulita[n].value;
+            if ((!valore) || (valore === 'null')) {
+                valore = '';
+            }
             listaStringhe.push(valore);
+            let coppia = {pos: "dx", txt: valore};
+            listaCoppieValori.push(coppia);
         }
     }
-    console.log(listaStringhe);
 
     let pdf = new jsPDF({
         orientation: 'l',
@@ -1261,13 +1296,13 @@ async function creaPDF2(contr_manut) {
         format: 'a3'
     });
     // const nomeFile = `${contr_manut}_${stringaID}_${idUnivoco}.pdf`;
-    const nomeFile = `${contr_manut}.pdf`;
-    // pdf.setProperties({
-    //     title: nomeFile
-    // });
-    pdf.setFontSize(14);
+    const nomeFile = `${contr_manut}_${idUnivoco}.pdf`;
+    pdf.setProperties({
+        title: nomeFile
+    });
+    pdf.setFontSize(24);
 
-    let titoloDoc = listaStringhe[0];
+    let titoloDoc = titoloScheda;
 
     pdf.text(10, 10, titoloDoc);
 
@@ -1275,22 +1310,39 @@ async function creaPDF2(contr_manut) {
     const canvasViewer = await html2canvas(canvasForge);
     const immagineViewer = await canvasViewer.toDataURL("image/png");
     let xImg = 10;
-    let yImg = 30;
+    let yImg = 20;
     let lImg = (420/2)-(xImg*2);
     let hImg = lImg;
     pdf.addImage(immagineViewer, 'PNG', xImg, yImg, lImg, hImg);
 
-    // let xT = (420/2)+10;
-    // let yT = 30;
-    // let headersArray = null;
-    // pdf.table(xT, yT, dataArray, headersArray, {printHeaders: false, autoSize: false, margins, fontSize: 12});
+    let yRect = yImg;
+    let xRect = (420/2)+0;
+    let lRect = 200;
+    let hRect = hImg;
+    pdf.setFillColor('#9bb7e0');
+    pdf.rect(xRect, yRect, lRect, hRect, "F");
+
+    pdf.setFontSize(14);
+    let yTxt = 30;
+    listaCoppieValori.forEach(cpp => {
+        if (cpp.pos === 'sx') {
+            pdf.text(xRect+5, yTxt, cpp.txt);
+        }
+        else {
+            pdf.text(xRect+100, yTxt, cpp.txt);
+            yTxt += 10;
+        }
+    });
+
+    pdf.text(xImg, hImg+40, 'Elementi:');
+    pdf.text(xImg, hImg+50, stringaID, {maxWidth: 400});
 
     const fileCreato = pdf.output('bloburl', {filename: nomeFile});
     window.open(fileCreato, '_blank');
 }
 
-// viewer.fitToView(null, null, true);setTimeout(() => {creaPDF2('SCHEDA-CONTROLLO')}, 500);
-// creaPDF2('SCHEDA-INTERVENTO');
+// viewer.fitToView(null, null, true);setTimeout(() => {creaPDF2(trovaIdMain10ance(), [{colonna: 'id_id', valore: 'ID elemento'}], 'SCHEDA-CONTROLLO')}, 500);
+// viewer.fitToView(null, null, true);setTimeout(() => {creaPDF2(trovaIdMain10ance(), [{colonna: 'id_id', valore: 'ID elemento'}], 'SCHEDA-INTERVENTO')}, 500);
 
-document.getElementById('apriTabBIM').click();
-launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtdmFyYWxsby9TTVZfQ0FQXzE2LTI0LnJ2dA');
+// document.getElementById('apriTabBIM').click();
+// launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtdmFyYWxsby9TTVZfQ0FQXzE2LTI0LnJ2dA');
