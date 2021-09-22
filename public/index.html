@@ -195,8 +195,25 @@
             <div class="panel-heading" id="pannello-lat-schede-header" data-toggle="tooltip">
               <b>FILTRI</b>
             </div>
-            <div class="panel-body pannelloLatSchede">
-              qui filtri schede
+            <div class="panel-body pannelloLatSchede" id="pannello-lat-schede-body">
+              <input type="checkbox" name="check-generale" id="check-generale">
+              <label for="check-generale">ATTIVA FILTRI</label>
+              <br>
+              <button id="vedi-schede-tutto">VISUALIZZA TUTTO</button>
+              <button id="vedi-schede-nulla">SPEGNI TUTTO</button>
+              <br>
+              <input type="checkbox" name="check-controllo" id="check-controllo" class="filtro-schede" disabled>
+              <label for="check-controllo">Schede controllo</label>
+              <br>
+              <input type="checkbox" name="check-man-reg" id="check-man-reg" class="filtro-schede" disabled>
+              <label for="check-man-reg">Schede manutenzione regolare</label>
+              <br>
+              <input type="checkbox" name="check-man-corr" id="check-man-corr" class="filtro-schede" disabled>
+              <label for="check-man-corr">Schede manutenzione correttiva</label>
+              <br>
+              <input type="checkbox" name="check-restauro" id="check-restauro" class="filtro-schede" disabled>
+              <label for="check-restauro">Schede restauro</label>
+              <br>
             </div>
           </div>
         </div>

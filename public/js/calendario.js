@@ -12,17 +12,30 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
     },
     eventClick: (info) => {
         if (info.event.title.startsWith('Controllo')) {
-            alert(`Fenomeno: ${info.event.extendedProps.fenomeno} \nControllo: ${info.event.extendedProps.attività} \nElementi controllati: ${(info.event.extendedProps.elementi).join(', ')}`);
-            apriTabSchede.click();
-            filtraSchedeConID();
+            // alert(`Fenomeno: ${info.event.extendedProps.fenomeno} \nControllo: ${info.event.extendedProps.attività} \nElementi controllati: ${(info.event.extendedProps.elementi).join(', ')}`);
+            const aprireScheda = confirm(`Visualizzare scheda? \nFenomeno: ${info.event.extendedProps.fenomeno} \nControllo: ${info.event.extendedProps.attività} \nElementi controllati: ${(info.event.extendedProps.elementi).join(', ')}`);
+            if (aprireScheda) {
+                apriTabSchede.click();
+                checkGenerale.checked = false;
+                filtraSchedeDaID(info.event.id);
+            }
+            // apriTabSchede.click();
+            // filtraSchedeDaID(info.event.id);
         }
         else if (info.event.title.startsWith('Manutenzione')) {
-            alert(`Fenomeno: ${info.event.extendedProps.fenomeno} \nAttività: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
+            const aprireScheda = confirm(`Visualizzare scheda? \nFenomeno: ${info.event.extendedProps.fenomeno} \nAttività: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
+            if (aprireScheda) {
+                apriTabSchede.click();
+                if (checkGenerale.checked) {checkGenerale.click();}
+                filtraSchedeDaID(info.event.id);
+            }
+            // apriTabSchede.click();
+            // filtraSchedeDaID(info.event.id);
         }
         else {
             alert(info.event.title);
         }
-        console.log(info);
+        // console.log(info);
     },
 });
 

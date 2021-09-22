@@ -118,6 +118,30 @@ appGIS_BIM.get('/Main10ance_DB/tabellaDB/schede-controllo-2', async (req, res) =
 });
 
 // per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB/schede-manutenzione-regolare", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB/schede-manutenzione-regolare', async (req, res) => {
+    const risposta = await leggiSchedeManReg();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva', async (req, res) => {
+    const risposta = await leggiSchedeManCorr();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB/schede-restauro", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB/schede-restauro', async (req, res) => {
+    const risposta = await leggiSchedeRestauro();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+// per testare la richiesta:
 // fetch("/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appGIS_BIM.get('/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare', async (req, res) => {
     const risposta = await leggiEventiManutenzioneRegolare();
@@ -272,6 +296,36 @@ async function leggiSchedeControllo() {
 async function leggiSchedeControllo2() {
     try {
         const result = await client.query(`SELECT mc.esecutori AS "Operatore", mc.data_con AS "Data controllo", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", md.materiale AS "Materiale", mc.st_cons AS "Stato di conservazione", md.dad_ty AS "Tipo di fenomeno", md.rid_gloss AS "Nome fenomeno", md.causa_e AS "Causa", md.est_sup AS "Estensione", mf.fr_risc AS "Frase di rischio", mf.mn_reg AS "Manutenzione regolare prevista", mf.frequenza AS "Frequenza prevista (mesi)", mf.mn_nec AS "Manutenzione correttiva prevista", mc.liv_urg AS "Livello di urgenza", mc.commenti AS "Commenti", md.id_dad AS "Codice scheda controllo", md.id_main10ance AS "Elementi controllati", mc.data_ins AS "Data registrazione scheda" FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN main10ance_sacrimonti.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN main10ance_sacrimonti.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiSchedeManReg() {
+    try {
+        const result = await client.query(`SELECT * FROM main10ance_sacrimonti.manutenzione_regolare ORDER BY data_ese;`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiSchedeManCorr() {
+    try {
+        const result = await client.query(`SELECT * FROM main10ance_sacrimonti.manutenzione_correttiva_o_a_guasto ORDER BY data_ese;`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiSchedeRestauro() {
+    try {
+        const result = await client.query(`SELECT * FROM main10ance_sacrimonti.restauri ORDER BY anno_iniz;`);
         return result.rows;
     }
     catch(e) {
