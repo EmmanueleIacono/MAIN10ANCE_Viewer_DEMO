@@ -12,6 +12,8 @@
   --lightGray: #d3d4d9;
   --verdeMain10anceTrasparenza: #a8c95660;
   --bluInterregTrasparenza: #1a4f9c60;
+  --bluInterregTrasparenza2: #1a4e9c30;
+  --bluInterregTrasparenza3: #1a4e9c15;
 }
 
 /* * {
@@ -103,7 +105,7 @@ body {
 }
 
 /* DB */
-#pannello-db, #pannello-lat-gis, #pannello-lat-db {
+#pannello-db, #pannello-lat-gis, #pannello-lat-db, #pannello-lat-schede {
   padding-left: 15px;
   padding-right: 0px;
   /* border: none; */
@@ -114,7 +116,7 @@ body {
   overflow: auto;
 }
 
-#pannello-db-header, #pannello-lat-gis-header, #pannello-lat-db-header {
+#pannello-db-header, #pannello-lat-gis-header, #pannello-lat-db-header, #pannello-lat-schede-header {
   color: var(--verdeMain10ance);
   background-color: var(--blackOlive);
 }
@@ -375,7 +377,12 @@ td, th {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
+  /* max-width: 200px; */
+  /* word-wrap: break-word; */
+  word-break: break-all;
 }
+
+/* .tdbreak {} */
 
 th {
   background-color: #b6b4b4;
@@ -395,4 +402,24 @@ tr:nth-child(even) {
   padding: 10px;
   width: 100%;
   height: 80%;
+}
+
+/* TABELLE SCHEDE CONTROLLO-INTERVENTO */
+
+#contenitore-schede {
+  height: 90%;
+  overflow: auto;
+}
+
+.caption-schede {
+  color: var(--bluInterreg);
+}
+
+.td-schede {
+  border: none;
+  background-color: var(--bluInterregTrasparenza2);
+}
+
+.tr-schede:nth-child(even) {
+  background-color: var(--bluInterregTrasparenza3);
 }

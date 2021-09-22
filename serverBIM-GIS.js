@@ -109,6 +109,30 @@ appGIS_BIM.get('/Main10ance_DB/tabellaDB/schede-controllo', async (req, res) => 
     res.send(risposta);
 });
 
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB/schede-controllo-2", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB/schede-controllo-2', async (req, res) => {
+    const risposta = await leggiSchedeControllo2();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare', async (req, res) => {
+    const risposta = await leggiEventiManutenzioneRegolare();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+// per testare la richiesta:
+// fetch("/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appGIS_BIM.get('/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva', async (req, res) => {
+    const risposta = await leggiEventiManutenzioneCorrettiva();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
 //////////          AVVIO SERVER          //////////
 
 start();
@@ -236,7 +260,38 @@ async function transazioneScheda(listaStrVals) {
 async function leggiSchedeControllo() {
     try {
         // const result = await client.query(`SELECT "id_contr", "id_main10ance" FROM main10ance_sacrimonti."controllo_stato_di_conservazione_livello_di_urgenza";`);
-        const result = await client.query(`SELECT main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza.data_con, main10ance_sacrimonti.danno_alterazione_degrado.id_dad, main10ance_sacrimonti.danno_alterazione_degrado.id_main10ance, main10ance_sacrimonti.danno_alterazione_degrado.rid_gloss FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza JOIN main10ance_sacrimonti.danno_alterazione_degrado ON main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza.id_contr = main10ance_sacrimonti.danno_alterazione_degrado.id_dad ORDER BY data_con;`);
+        // const result = await client.query(`SELECT main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza.data_con, main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza.controllo, main10ance_sacrimonti.danno_alterazione_degrado.id_dad, main10ance_sacrimonti.danno_alterazione_degrado.id_main10ance, main10ance_sacrimonti.danno_alterazione_degrado.rid_gloss FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza JOIN main10ance_sacrimonti.danno_alterazione_degrado ON main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza.id_contr = main10ance_sacrimonti.danno_alterazione_degrado.id_dad ORDER BY data_con;`);
+        const result = await client.query(`SELECT mc.data_con, mc.controllo, md.id_dad, md.id_main10ance, md.rid_gloss FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN main10ance_sacrimonti.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad ORDER BY data_con;`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiSchedeControllo2() {
+    try {
+        const result = await client.query(`SELECT mc.esecutori AS "Operatore", mc.data_con AS "Data controllo", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", md.materiale AS "Materiale", mc.st_cons AS "Stato di conservazione", md.dad_ty AS "Tipo di fenomeno", md.rid_gloss AS "Nome fenomeno", md.causa_e AS "Causa", md.est_sup AS "Estensione", mf.fr_risc AS "Frase di rischio", mf.mn_reg AS "Manutenzione regolare prevista", mf.frequenza AS "Frequenza prevista (mesi)", mf.mn_nec AS "Manutenzione correttiva prevista", mc.liv_urg AS "Livello di urgenza", mc.commenti AS "Commenti", md.id_dad AS "Codice scheda controllo", md.id_main10ance AS "Elementi controllati", mc.data_ins AS "Data registrazione scheda" FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN main10ance_sacrimonti.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN main10ance_sacrimonti.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiEventiManutenzioneRegolare() {
+    try {
+        const result = await client.query(`SELECT "id_mn_reg", "id_contr", "id_main10ance", "rid_gloss", "data_ese", "azione" FROM main10ance_sacrimonti."manutenzione_regolare" ORDER BY "id_mn_reg";`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiEventiManutenzioneCorrettiva() {
+    try {
+        const result = await client.query(`SELECT "id_mn_gu", "id_contr", "id_main10ance", "rid_gloss", "data_ese", "azione" FROM main10ance_sacrimonti."manutenzione_correttiva_o_a_guasto" ORDER BY "id_mn_gu";`);
         return result.rows;
     }
     catch(e) {
