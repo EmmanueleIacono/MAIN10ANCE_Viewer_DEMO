@@ -16,7 +16,7 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
             const aprireScheda = confirm(`Visualizzare scheda? \nFenomeno: ${info.event.extendedProps.fenomeno} \nControllo: ${info.event.extendedProps.attività} \nElementi controllati: ${(info.event.extendedProps.elementi).join(', ')}`);
             if (aprireScheda) {
                 apriTabSchede.click();
-                checkGenerale.checked = false;
+                if (checkGenerale.checked) {checkGenerale.click();}
                 filtraSchedeDaID(info.event.id);
             }
             // apriTabSchede.click();
