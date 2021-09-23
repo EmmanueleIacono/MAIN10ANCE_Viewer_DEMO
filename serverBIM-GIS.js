@@ -285,7 +285,7 @@ async function leggiSchedeControllo() {
     try {
         // const result = await client.query(`SELECT "id_contr", "id_main10ance" FROM main10ance_sacrimonti."controllo_stato_di_conservazione_livello_di_urgenza";`);
         // const result = await client.query(`SELECT main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza.data_con, main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza.controllo, main10ance_sacrimonti.danno_alterazione_degrado.id_dad, main10ance_sacrimonti.danno_alterazione_degrado.id_main10ance, main10ance_sacrimonti.danno_alterazione_degrado.rid_gloss FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza JOIN main10ance_sacrimonti.danno_alterazione_degrado ON main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza.id_contr = main10ance_sacrimonti.danno_alterazione_degrado.id_dad ORDER BY data_con;`);
-        const result = await client.query(`SELECT mc.data_con, mc.controllo, md.id_dad, md.id_main10ance, md.rid_gloss FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN main10ance_sacrimonti.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad ORDER BY data_con;`);
+        const result = await client.query(`SELECT mc.data_con, mc.controllo, md.id_dad, md.id_main10ance, md.rid_gloss, mf.mn_reg, mf.frequenza, mf.mn_nec, mc.liv_urg FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN main10ance_sacrimonti.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN main10ance_sacrimonti.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
         return result.rows;
     }
     catch(e) {
@@ -305,7 +305,7 @@ async function leggiSchedeControllo2() {
 
 async function leggiSchedeManReg() {
     try {
-        const result = await client.query(`SELECT * FROM main10ance_sacrimonti.manutenzione_regolare ORDER BY data_ese;`);
+        const result = await client.query(`SELECT esecutori AS "Operatore", data_ese AS "Data intervento", id_contr AS "Scheda controllo", rid_gloss AS "Fenomeno interessato", fq_eff AS "Frequenza effettiva (mesi)", azione AS "Azione", strumentaz AS "Strumentazione", materiale AS "Materiali utilizzati", costo AS "Costo (€)", commenti AS "Commenti", id_mn_reg AS "Codice scheda manutenzione regolare", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM main10ance_sacrimonti.manutenzione_regolare ORDER BY data_ese;`);
         return result.rows;
     }
     catch(e) {
@@ -315,7 +315,7 @@ async function leggiSchedeManReg() {
 
 async function leggiSchedeManCorr() {
     try {
-        const result = await client.query(`SELECT * FROM main10ance_sacrimonti.manutenzione_correttiva_o_a_guasto ORDER BY data_ese;`);
+        const result = await client.query(`SELECT esecutori AS "Operatore", data_ese AS "Data intervento", id_contr AS "Scheda controllo", rid_gloss AS "Fenomeno interessato", progettist AS "Progettista/i", azione AS "Azione", strumentaz AS "Strumentazione", materiale AS "Materiali utilizzati", costo AS "Costo (€)", causa AS "Causa", commenti AS "Commenti", id_mn_gu AS "Codice scheda manutenzione correttiva", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM main10ance_sacrimonti.manutenzione_correttiva_o_a_guasto ORDER BY data_ese;`);
         return result.rows;
     }
     catch(e) {
@@ -325,7 +325,7 @@ async function leggiSchedeManCorr() {
 
 async function leggiSchedeRestauro() {
     try {
-        const result = await client.query(`SELECT * FROM main10ance_sacrimonti.restauri ORDER BY anno_iniz;`);
+        const result = await client.query(`SELECT operatore AS "Operatore", anno_iniz AS "Anno inizio", anno_fine AS "Anno fine", progettist AS "Progettista/i", rid_gloss AS "Fenomeno interessato", descriz AS "Descrizione intervento", costo AS "Costo (€)", commenti AS "Commenti", id_restaur AS "Codice scheda restauro", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM main10ance_sacrimonti.restauri ORDER BY anno_iniz;`);
         return result.rows;
     }
     catch(e) {

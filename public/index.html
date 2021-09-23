@@ -74,8 +74,8 @@
         <li data-tab-target="#tabDashboard" class="tab" id="apriTabDashboard">DASHBOARD</li> -->
         <li data-tab-target="#tab2" class="tab" id="apriTabGIS">GIS VIEWER</li>
         <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
-        <li data-tab-target="#tab4" class="tab" id="apriTabSchede">SCHEDE</li>
-        <li data-tab-target="#tab3" class="tab" id="apriTabDatabase">DATABASE</li>
+        <li data-tab-target="#tab4" class="tab" id="apriTabSchede">PLANNING</li>
+        <li data-tab-target="#tab3" class="tab" id="apriTabDatabase">DASHBOARD</li>
         <!-- <li data-tab-target="#tab4" class="tab" id="apriTabDashboard">DASHBOARD</li> -->
       </ul>
     </div>
@@ -182,38 +182,43 @@
         <!-- FINE PANNELLO LATERALE -->
       </div>
       <div class="fill" id="tab4" data-tab-content>
-        <div class="panel panel-default col-sm-9 fill" id="tabSchede">
+        <div class="panel panel-default col-sm-7 fill" id="tabSchede">
           <h4 id="tabella-titolo">
+            <span id="refreshSchede" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
             <b>SCHEDE</b>
           </h4>
           <div id="contenitore-schede">
             QUI SCHEDE
           </div>
         </div>
-        <div class="col-sm-3 fill" id="pannello-lat-schede">
+        <div class="col-sm-5 fill" id="pannello-lat-schede">
           <div class="panel panel-default fill">
             <div class="panel-heading" id="pannello-lat-schede-header" data-toggle="tooltip">
-              <b>FILTRI</b>
+              <b>CALENDAR</b>
             </div>
             <div class="panel-body pannelloLatSchede" id="pannello-lat-schede-body">
-              <input type="checkbox" name="check-generale" id="check-generale">
-              <label for="check-generale">ATTIVA FILTRI</label>
-              <br>
-              <button id="vedi-schede-tutto">VISUALIZZA TUTTO</button>
-              <button id="vedi-schede-nulla">SPEGNI TUTTO</button>
-              <br>
-              <input type="checkbox" name="check-controllo" id="check-controllo" class="filtro-schede" disabled>
-              <label for="check-controllo">Schede controllo</label>
-              <br>
-              <input type="checkbox" name="check-man-reg" id="check-man-reg" class="filtro-schede" disabled>
-              <label for="check-man-reg">Schede manutenzione regolare</label>
-              <br>
-              <input type="checkbox" name="check-man-corr" id="check-man-corr" class="filtro-schede" disabled>
-              <label for="check-man-corr">Schede manutenzione correttiva</label>
-              <br>
-              <input type="checkbox" name="check-restauro" id="check-restauro" class="filtro-schede" disabled>
-              <label for="check-restauro">Schede restauro</label>
-              <br>
+              <div id="calendar"></div>
+              <details id="details-filtri-schede" open>
+                <summary class="sommario-main10ance"><b>FILTRI</b></summary>
+                <input type="checkbox" name="check-generale" id="check-generale">
+                <label for="check-generale">ATTIVA FILTRI</label>
+                <br>
+                <button id="vedi-schede-tutto">VISUALIZZA TUTTO</button>
+                <button id="vedi-schede-nulla">SPEGNI TUTTO</button>
+                <br>
+                <input type="checkbox" name="check-controllo" id="check-controllo" class="filtro-schede" disabled>
+                <label for="check-controllo">Schede controllo</label>
+                <br>
+                <input type="checkbox" name="check-man-reg" id="check-man-reg" class="filtro-schede" disabled>
+                <label for="check-man-reg">Schede manutenzione regolare</label>
+                <br>
+                <input type="checkbox" name="check-man-corr" id="check-man-corr" class="filtro-schede" disabled>
+                <label for="check-man-corr">Schede manutenzione correttiva</label>
+                <br>
+                <input type="checkbox" name="check-restauro" id="check-restauro" class="filtro-schede" disabled>
+                <label for="check-restauro">Schede restauro</label>
+                <br>
+              </details>
             </div>
           </div>
         </div>
@@ -256,7 +261,7 @@
               <b>DASHBOARD</b>
             </div>
             <div class="panel-body pannelloLatDB">
-              <div id="calendar"></div>
+              <!-- <div id="calendar"></div> -->
             </div>
           </div>
         </div>

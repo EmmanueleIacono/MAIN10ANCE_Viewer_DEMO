@@ -41,29 +41,34 @@ apriTabIntervento.addEventListener('click', () => {
 bottoneSalvaSchedaControllo.addEventListener('click', async () => {
     if (verificaPresenzaIDm10a()) {
         if (verificaVincoliControllo()) {
-            const listaDati = preparaDati('scheda-controllo-');
-            const [listaDatiNascosti, listaIdMain10ance] = preparaDatiNascosti('controllo');
-            const listaDatiCompleta = [...listaDati, ...listaDatiNascosti];
-            const listaFiltrata = filtraOggetti(listaDatiCompleta);
-            const listaTotaleFiltrata = filtraListeDatiId(listaFiltrata, listaIdMain10ance);
-            const listaRinominata = rinominaID(listaTotaleFiltrata);
-            const resp = await compilaScheda(listaRinominata);
-            if (resp.success) {
-                alert('Operazione andata a buon fine');
-                const bottonePDF = document.createElement('button');
-                bottonePDF.setAttribute('id', 'apriPDF');
-                bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
-                bottonePDF.addEventListener('click', () => {
-                    // creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
-                    viewer.fitToView(null, null, true);
-                    setTimeout(() => {
-                        creaPDF2(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
-                    }, 500);
-                });
-                contenitoreSchede.appendChild(bottonePDF);
+            if (verificaVincoliRadioManut()) {
+                const listaDati = preparaDati('scheda-controllo-');
+                const [listaDatiNascosti, listaIdMain10ance] = preparaDatiNascosti('controllo');
+                const listaDatiCompleta = [...listaDati, ...listaDatiNascosti];
+                const listaFiltrata = filtraOggetti(listaDatiCompleta);
+                const listaTotaleFiltrata = filtraListeDatiId(listaFiltrata, listaIdMain10ance);
+                const listaRinominata = rinominaID(listaTotaleFiltrata);
+                const resp = await compilaScheda(listaRinominata);
+                if (resp.success) {
+                    alert('Operazione andata a buon fine');
+                    const bottonePDF = document.createElement('button');
+                    bottonePDF.setAttribute('id', 'apriPDF');
+                    bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
+                    bottonePDF.addEventListener('click', () => {
+                        // creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
+                        viewer.fitToView(null, null, true);
+                        setTimeout(() => {
+                            creaPDF2(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
+                        }, 500);
+                    });
+                    contenitoreSchede.appendChild(bottonePDF);
+                }
+                else {
+                    alert('Operazione non riuscita');
+                }
             }
             else {
-                alert('Operazione non riuscita');
+                alert('ATTENZIONE: Inserire i valori mancanti per i campi sulla manutenzione regolare o correttiva.');
             }
         }
         else {
@@ -266,6 +271,20 @@ async function preparaCampiControllo() {
         filtraOpzioniFenomeno(contSelectNomeFenomeno.value, contSelectTipoFenomeno, listaEnumGlossario);
         filtraOpzioniMateriale(contSelectNomeFenomeno.value, contSelectMateriale, listaEnumGlossario);
     });
+    contSelectNomeFenomeno.addEventListener('click', () => {
+        if ((!contSelectNomeFenomeno.value) || (contSelectNomeFenomeno.value === 'null') || (contSelectNomeFenomeno.value === '0 NESSUN FENOMENO')) {
+            contRadioManOrd.checked = false;
+            contRadioManStr.checked = false;
+            contInputManOrd.value = null;
+            contInputManOrd.disabled = true;
+            contInputFrequenza.value = null;
+            contInputFrequenza.disabled = true;
+            contInputManStr.value = null;
+            contInputManStr.disabled = true;
+            contSelectUrgenza.value = null;
+            contSelectUrgenza.disabled = true;
+        }
+    });
     // CAUSA
     const contLabelCausa = document.createElement('label');
     contLabelCausa.innerHTML = '<b>CAUSA</b>';
@@ -283,10 +302,26 @@ async function preparaCampiControllo() {
     const contInputFrase = document.createElement('input');
     contInputFrase.setAttribute('id', 'scheda-controllo-[frase_di_rischio]-{fr_risc}');
     // MANUTENZIONE ORDINARIA
+    const contRadioManOrd = document.createElement('input');
+    contRadioManOrd.setAttribute('type', 'radio');
+    contRadioManOrd.setAttribute('id', 'radio-man-ord');
+    contRadioManOrd.disabled = false;
+    contRadioManOrd.addEventListener('change', () => {
+        if (contRadioManOrd.checked) {
+            contRadioManStr.checked = false;
+            contInputManOrd.disabled = false;
+            contInputFrequenza.disabled = false;
+            contInputManStr.value = null;
+            contInputManStr.disabled = true;
+            contSelectUrgenza.value = null;
+            contSelectUrgenza.disabled = true;
+        }
+    });
     const contLabelManOrd = document.createElement('label');
     contLabelManOrd.innerHTML = '<b>MANUTENZIONE REGOLARE</b>';
     const contInputManOrd = document.createElement('input');
     contInputManOrd.setAttribute('id', 'scheda-controllo-[frase_di_rischio]-{mn_reg}');
+    contInputManOrd.disabled = true;
     // FREQUENZA
     const contLabelFrequenza = document.createElement('label');
     contLabelFrequenza.innerHTML = '<b>FREQUENZA (MESI)</b>';
@@ -294,17 +329,35 @@ async function preparaCampiControllo() {
     contInputFrequenza.setAttribute('type', 'number');
     contInputFrequenza.setAttribute('step', 1);
     contInputFrequenza.setAttribute('id', 'scheda-controllo-[frase_di_rischio]-{frequenza}');
+    contInputFrequenza.disabled = true;
     // MANUTENZIONE STRAORDINARIA
+    const contRadioManStr = document.createElement('input');
+    contRadioManStr.setAttribute('type', 'radio');
+    contRadioManStr.setAttribute('id', 'radio-man-str');
+    contRadioManStr.disabled = false;
+    contRadioManStr.addEventListener('change', () => {
+        if (contRadioManStr.checked) {
+            contRadioManOrd.checked = false;
+            contInputManStr.disabled = false;
+            contSelectUrgenza.disabled = false;
+            contInputManOrd.value = null;
+            contInputManOrd.disabled = true;
+            contInputFrequenza.value = null;
+            contInputFrequenza.disabled = true;
+        }
+    });
     const contLabelManStr = document.createElement('label');
     contLabelManStr.innerHTML = '<b>MANUTENZIONE CORRETTIVA</b>';
     const contInputManStr = document.createElement('input');
     contInputManStr.setAttribute('id', 'scheda-controllo-[frase_di_rischio]-{mn_nec}');
+    contInputManStr.disabled = true;
     // LIVELLO DI URGENZA
     const contLabelUrgenza = document.createElement('label');
     contLabelUrgenza.innerHTML = '<b>LIVELLO DI URGENZA</b>';
     const contSelectUrgenza = document.createElement('select');
     contSelectUrgenza.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{liv_urg}');
     creaListaOpzioni(listaEnumUrgenza, contSelectUrgenza, 'unnest', 'unnest', true);
+    contSelectUrgenza.disabled = true;
     // COMMENTI
     const contLabelCommenti = document.createElement('label');
     contLabelCommenti.innerHTML = '<b>COMMENTI</b>';
@@ -346,12 +399,14 @@ async function preparaCampiControllo() {
     schedaControllo.appendChild(contLabelFrase);
     schedaControllo.appendChild(contInputFrase);
     schedaControllo.appendChild(document.createElement('br'));
+    schedaControllo.appendChild(contRadioManOrd);
     schedaControllo.appendChild(contLabelManOrd);
     schedaControllo.appendChild(contInputManOrd);
     schedaControllo.appendChild(document.createElement('br'));
     schedaControllo.appendChild(contLabelFrequenza);
     schedaControllo.appendChild(contInputFrequenza);
     schedaControllo.appendChild(document.createElement('br'));
+    schedaControllo.appendChild(contRadioManStr);
     schedaControllo.appendChild(contLabelManStr);
     schedaControllo.appendChild(contInputManStr);
     schedaControllo.appendChild(document.createElement('br'));
@@ -876,7 +931,7 @@ function verificaVincoliControllo() {
 }
 
 function verificaVincoliManutenzioneRestauro(scheda) {
-    console.log(scheda);
+    // console.log(scheda);
     if ((scheda === 'Manutenzione Regolare') || (scheda === 'Manutenzione Correttiva')) {
         const operatore = $('[id*="{esecutori}"]')[0];
         const data = $('[id*="{data_ese}"]')[0];
@@ -900,7 +955,32 @@ function verificaVincoliManutenzioneRestauro(scheda) {
     }
 }
 
-function verificaVincoliRestauro() {}
+function verificaVincoliRadioManut() {
+    const fenomeno = $('[id*="{rid_gloss}"]')[0];
+    const radioOrd = $('[id*="radio-man-ord"]')[0];
+    const radioStr = $('[id*="radio-man-str"]')[0];
+    const mn_reg = $('[id*="{mn_reg}"]')[0];
+    const freq = $('[id*="{frequenza}"]')[0];
+    const mn_nec = $('[id*="{mn_nec}"]')[0];
+    const urg = $('[id*="{liv_urg}"]')[0];
+    if ((fenomeno.value) && (fenomeno.value !== 'null') && (fenomeno.value !== '0 NESSUN FENOMENO')) {
+        if ((!radioOrd.checked) && (!radioStr.checked)) {
+            return false;
+        }
+        else if ((radioOrd.checked) && ((!mn_reg.value) || (mn_reg.value === 'null') || (!freq.value) || (freq.value === 'null'))) {
+            return false;
+        }
+        else if ((radioStr.checked) && ((!mn_nec.value) || (mn_nec.value === 'null') || (!urg.value) || (urg.value === 'null'))) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    else {
+        return true;
+    }
+}
 
 
 function verificaPresenzaIDm10a() {
@@ -1256,7 +1336,7 @@ async function creaPDF2(listaIdMain10ance, listaDatiNascosti, contr_manut) {
     const schedaChildren = schedaFull.getElementsByTagName('*');
     let listaPulita = [];
     schedaChildren.forEach(el => {
-        if ((el.tagName !== 'BR') && (el.tagName !== 'B') && (el.tagName !== 'OPTION') && (el.tagName !== 'DIV')) {
+        if ((el.tagName !== 'BR') && (el.tagName !== 'B') && (el.tagName !== 'OPTION') && (el.tagName !== 'DIV') && (el.type !== 'radio')) {
             listaPulita.push(el);
         }
     });

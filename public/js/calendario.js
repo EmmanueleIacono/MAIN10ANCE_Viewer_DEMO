@@ -12,39 +12,31 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
     },
     eventClick: (info) => {
         if (info.event.title.startsWith('Controllo')) {
-            // alert(`Fenomeno: ${info.event.extendedProps.fenomeno} \nControllo: ${info.event.extendedProps.attività} \nElementi controllati: ${(info.event.extendedProps.elementi).join(', ')}`);
-            const aprireScheda = confirm(`Visualizzare scheda? \nFenomeno: ${info.event.extendedProps.fenomeno} \nControllo: ${info.event.extendedProps.attività} \nElementi controllati: ${(info.event.extendedProps.elementi).join(', ')}`);
+            const aprireScheda = confirm(`Visualizzare scheda? \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nControllo: ${info.event.extendedProps.attività} \nElementi controllati: ${(info.event.extendedProps.elementi).join(', ')}`);
             if (aprireScheda) {
-                apriTabSchede.click();
                 if (checkGenerale.checked) {checkGenerale.click();}
                 filtraSchedeDaID(info.event.id);
             }
-            // apriTabSchede.click();
-            // filtraSchedeDaID(info.event.id);
         }
         else if (info.event.title.startsWith('Manutenzione')) {
-            const aprireScheda = confirm(`Visualizzare scheda? \nFenomeno: ${info.event.extendedProps.fenomeno} \nAttività: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
+            const aprireScheda = confirm(`Visualizzare scheda? \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nAttività: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
             if (aprireScheda) {
-                apriTabSchede.click();
                 if (checkGenerale.checked) {checkGenerale.click();}
                 filtraSchedeDaID(info.event.id);
             }
-            // apriTabSchede.click();
-            // filtraSchedeDaID(info.event.id);
+        }
+        else if (info.event.title.startsWith('Programmata')) {
+            alert(`Intervento PROGRAMMATO: \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nIntervento: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
+            console.log(info);
         }
         else {
             alert(info.event.title);
         }
-        // console.log(info);
     },
 });
 
-apriTabDB.addEventListener('click', () => {
-    renderizzaCalendario();
-    creaEventiControllo();
-    creaEventiManReg();
-    creaEventiManCorr();
-});
+// apriTabDB.addEventListener('click', popolaCalendario);
+apriTabSchede.addEventListener('click', popolaCalendario);
 
 function renderizzaCalendario() {
     calendar.render();
@@ -54,38 +46,13 @@ function renderizzaCalendario() {
     });
 }
 
-const eventoTest = {
-    id: 'qwerty',
-    title: 'Modulo formativo Main10ance',
-    start: '2021-09-23',
-    defaultAllDay: true,
-};
-
-const eventoTest2 = {
-    id: 'qwertypoi',
-    title: 'Gianvito presenta',
-    start: '2021-10-05',
-    defaultAllDay: true,
-};
-
-const eventoTest3 = {
-    id: 'hgjghj',
-    title: 'Francesca presenta',
-    start: '2021-10-05',
-    defaultAllDay: true,
-};
-
-const eventoTest4 = {
-    id: 'bnmnbm',
-    title: 'Emmanuele presenta',
-    start: '2021-10-05',
-    defaultAllDay: true,
-};
-
-calendar.addEvent(eventoTest);
-calendar.addEvent(eventoTest2);
-calendar.addEvent(eventoTest3);
-calendar.addEvent(eventoTest4);
+async function popolaCalendario() {
+    renderizzaCalendario();
+    const eventiC = await creaEventiControllo();
+    const eventiMR = await creaEventiManReg();
+    const eventiMC = await creaEventiManCorr();
+    creaEventiProgrammati(eventiC, eventiMR, eventiMC);
+}
 
 async function creaEventiControllo() {
     const listaEventi = await prendiEventiControllo();
@@ -113,6 +80,7 @@ async function creaEventiControllo() {
         };
         calendar.addEvent(eventoControllo);
     });
+    return listaEventi;
 }
 
 async function creaEventiManReg() {
@@ -142,6 +110,7 @@ async function creaEventiManReg() {
         };
         calendar.addEvent(eventoManReg);
     });
+    return listaEventi;
 }
 
 async function creaEventiManCorr() {
@@ -171,6 +140,82 @@ async function creaEventiManCorr() {
         };
         calendar.addEvent(eventoManCorr);
     });
+    return listaEventi;
+}
+
+function creaEventiProgrammati(listaControlli, listaManReg, listaManCorr) {
+    const mesiUrgenze = {
+        "uc 0 - a lungo termine": '36',
+        "uc 1 - termine intermedio": '12',
+        "uc 2 - breve termine": '6',
+        "uc 3 - urgente e immediato": '1'
+    };
+    console.log(listaControlli);
+    console.log(listaManReg);
+    console.log(listaManCorr);
+    let listaIdContrManReg = [];
+    listaManReg.forEach(mr => {
+        listaIdContrManReg.push(mr.id_contr);
+    });
+    let listaIdContrManCorr = [];
+    listaManCorr.forEach(mc => {
+        listaIdContrManCorr.push(mc.id_contr);
+    });
+    listaControlli.forEach(con => {
+        const idC = con.id_dad;
+        const dataC = con.data_con;
+        if (con.mn_reg) {
+            const mesiFuturi = con.frequenza;
+            const quanteRipetizioni = 10;
+            if (!(listaIdContrManReg.includes(idC))) {
+                for (let n=1; n<=quanteRipetizioni; n++) {
+                    const eventoProgrammato = {
+                        id: `P${n}-${idC}`,
+                        title: `Programmata manutenzione regolare`,
+                        start: aggiungiMesi(dataC, (parseInt(mesiFuturi)*n)),
+                        defaultAllDay: true,
+                        extendedProps: {
+                            fenomeno: con.rid_gloss,
+                            elementi: con.id_main10ance,
+                            attività: con.mn_reg,
+                        },
+                        backgroundColor: '#c74646',
+                        borderColor: '#c74646',
+                        textColor: '#f8f8ff',
+                    };
+                    calendar.addEvent(eventoProgrammato);
+                }
+            }
+        }
+        else if (con.mn_nec) {
+            const mesiFuturi = mesiUrgenze[con.liv_urg];
+            if (!(listaIdContrManCorr.includes(idC))) {
+                const eventoProgrammato = {
+                    id: `P-${idC}`,
+                    title: `Programmata manutenzione correttiva`,
+                    start: aggiungiMesi(dataC, mesiFuturi),
+                    defaultAllDay: true,
+                    extendedProps: {
+                        fenomeno: con.rid_gloss,
+                        elementi: con.id_main10ance,
+                        attività: con.mn_nec,
+                    },
+                    backgroundColor: '#c74646',
+                    borderColor: '#c74646',
+                    textColor: '#f8f8ff',
+                };
+                calendar.addEvent(eventoProgrammato);
+            }
+        }
+    });
+}
+
+function aggiungiMesi(data, mesi) {
+    const dataDiPartenza = new Date(Date.parse(data));
+    const mesiDaAggiungere = parseInt(mesi);
+    const dataFuturaFull = new Date(dataDiPartenza.setMonth(dataDiPartenza.getMonth()+mesiDaAggiungere));
+    const dataFutura = dataFuturaFull.toISOString().split('T')[0];
+    return dataFutura;
 }
 
 async function prendiEventiControllo() {

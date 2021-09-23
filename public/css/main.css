@@ -11,6 +11,8 @@
   --ghostWhite: #f8f8ff;
   --lightGray: #d3d4d9;
   --verdeMain10anceTrasparenza: #a8c95660;
+  --verdeMain10anceTrasparenza2: #a8c95630;
+  --verdeMain10anceTrasparenza3: #a8c95615;
   --bluInterregTrasparenza: #1a4f9c60;
   --bluInterregTrasparenza2: #1a4e9c30;
   --bluInterregTrasparenza3: #1a4e9c15;
@@ -377,8 +379,12 @@ td, th {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
-  /* max-width: 200px; */
+  max-width: 200px;
   /* word-wrap: break-word; */
+  /* word-break: break-all; */
+}
+
+td {
   word-break: break-all;
 }
 
@@ -415,11 +421,34 @@ tr:nth-child(even) {
   color: var(--bluInterreg);
 }
 
-.td-schede {
-  border: none;
-  background-color: var(--bluInterregTrasparenza2);
+/* .caption-schede-c {
+  color: var(--verdeMain10ance);
 }
 
-.tr-schede:nth-child(even) {
+.caption-schede-mr-mc-r {
+  color: var(--bluInterreg);
+} */
+
+.td-schede-mr-mc-r {
+  border: none;
+  background-color: var(--bluInterregTrasparenza2);
+  max-width: 500px;
+}
+
+.tr-schede-mr-mc-r:nth-child(even) {
   background-color: var(--bluInterregTrasparenza3);
+}
+
+/* .tr-schede:nth-child(odd) {
+  background-color: var(--bluInterregTrasparenza3);
+} */
+
+.td-schede-c {
+  border: none;
+  background-color: var(--verdeMain10anceTrasparenza);
+  max-width: 500px;
+}
+
+.tr-schede-c:nth-child(even) {
+  background-color: var(--verdeMain10anceTrasparenza2);
 }

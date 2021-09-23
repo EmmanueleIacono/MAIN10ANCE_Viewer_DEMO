@@ -1,5 +1,6 @@
 const tabContenitoreSchede = document.getElementById('tabSchede');
 const divContenitoreSchede = document.getElementById('contenitore-schede');
+const aggiornaSchedeStart = document.getElementById('refreshSchede');
 const contenitoreFiltriSchede = document.getElementById('pannello-lat-schede-body');
 const checkGenerale = document.getElementById('check-generale');
 const visualizzaTutto = document.getElementById('vedi-schede-tutto');
@@ -13,14 +14,17 @@ divContenitoreSchede.innerHTML = '';
 
 // const tabellaSchede = creaStrutturaSchede();
 // azioniPreliminari();
+visualizzaSchedeStart();
 
-(function () {
+function visualizzaSchedeStart() {
     divContenitoreSchede.innerHTML = '';
     compilaTabelleControllo();
     compilaTabelleManReg();
     compilaTabelleManCorr();
     compilaTabelleRestauro();
-})();
+};
+
+aggiornaSchedeStart.addEventListener('click', visualizzaSchedeStart);
 
 checkGenerale.addEventListener('change', () => {
     const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
@@ -95,16 +99,17 @@ async function compilaTabelleControllo() {
         const [tabellaSchede, captionSchede] = creaStrutturaSchede();
         tabellaSchede.setAttribute('id', `${scheda["Codice scheda controllo"]}`);
         captionSchede.innerHTML = `<b>SCHEDA CONTROLLO N. ${scheda["Codice scheda controllo"]}</b>`;
+        captionSchede.classList.add('caption-schede-c');
         for (const [chiave, valore] of Object.entries(scheda)) {
             const trScheda = document.createElement('tr');
-            trScheda.className = 'schede tr-schede';
+            trScheda.className = 'schede tr-schede-c';
             const tdChiave = document.createElement('td');
             tdChiave.innerHTML = `<b>${chiave}</b>`;
             tdChiave.style.width = '400px';
-            tdChiave.className = 'schede td-schede';
+            tdChiave.className = 'schede td-schede-c';
             const tdValore = document.createElement('td');
             tdValore.innerHTML = `${valore}`;
-            tdValore.className = 'schede td-schede';
+            tdValore.className = 'schede td-schede-c';
             trScheda.appendChild(tdChiave);
             trScheda.appendChild(tdValore);
             tabellaSchede.appendChild(trScheda);
@@ -120,18 +125,19 @@ async function compilaTabelleManReg() {
     listaSchedeManRegComplete.forEach(scheda => {
         // console.log(scheda);
         const [tabellaSchede, captionSchede] = creaStrutturaSchede();
-        tabellaSchede.setAttribute('id', `${scheda["id_mn_reg"]}`);
-        captionSchede.innerHTML = `<b>SCHEDA MANUTENZIONE REGOLARE N. ${scheda["id_mn_reg"]}</b>`;
+        tabellaSchede.setAttribute('id', `${scheda["Codice scheda manutenzione regolare"]}`);
+        captionSchede.innerHTML = `<b>SCHEDA MANUTENZIONE REGOLARE N. ${scheda["Codice scheda manutenzione regolare"]}</b>`;
+        captionSchede.classList.add('caption-schede-mr-mc-r');
         for (const [chiave, valore] of Object.entries(scheda)) {
             const trScheda = document.createElement('tr');
-            trScheda.className = 'schede tr-schede';
+            trScheda.className = 'schede tr-schede-mr-mc-r';
             const tdChiave = document.createElement('td');
             tdChiave.innerHTML = `<b>${chiave}</b>`;
             tdChiave.style.width = '400px';
-            tdChiave.className = 'schede td-schede';
+            tdChiave.className = 'schede td-schede-mr-mc-r';
             const tdValore = document.createElement('td');
             tdValore.innerHTML = `${valore}`;
-            tdValore.className = 'schede td-schede';
+            tdValore.className = 'schede td-schede-mr-mc-r';
             trScheda.appendChild(tdChiave);
             trScheda.appendChild(tdValore);
             tabellaSchede.appendChild(trScheda);
@@ -147,18 +153,19 @@ async function compilaTabelleManCorr() {
     listaSchedeManCorrComplete.forEach(scheda => {
         // console.log(scheda);
         const [tabellaSchede, captionSchede] = creaStrutturaSchede();
-        tabellaSchede.setAttribute('id', `${scheda["id_mn_gu"]}`);
-        captionSchede.innerHTML = `<b>SCHEDA MANUTENZIONE CORRETTIVA N. ${scheda["id_mn_gu"]}</b>`;
+        tabellaSchede.setAttribute('id', `${scheda["Codice scheda manutenzione correttiva"]}`);
+        captionSchede.innerHTML = `<b>SCHEDA MANUTENZIONE CORRETTIVA N. ${scheda["Codice scheda manutenzione correttiva"]}</b>`;
+        captionSchede.classList.add('caption-schede-mr-mc-r');
         for (const [chiave, valore] of Object.entries(scheda)) {
             const trScheda = document.createElement('tr');
-            trScheda.className = 'schede tr-schede';
+            trScheda.className = 'schede tr-schede-mr-mc-r';
             const tdChiave = document.createElement('td');
             tdChiave.innerHTML = `<b>${chiave}</b>`;
             tdChiave.style.width = '400px';
-            tdChiave.className = 'schede td-schede';
+            tdChiave.className = 'schede td-schede-mr-mc-r';
             const tdValore = document.createElement('td');
             tdValore.innerHTML = `${valore}`;
-            tdValore.className = 'schede td-schede';
+            tdValore.className = 'schede td-schede-mr-mc-r';
             trScheda.appendChild(tdChiave);
             trScheda.appendChild(tdValore);
             tabellaSchede.appendChild(trScheda);
@@ -174,18 +181,19 @@ async function compilaTabelleRestauro() {
     listaSchedeRestauroComplete.forEach(scheda => {
         // console.log(scheda);
         const [tabellaSchede, captionSchede] = creaStrutturaSchede();
-        tabellaSchede.setAttribute('id', `${scheda["id_restaur"]}`);
-        captionSchede.innerHTML = `<b>SCHEDA RESTAURO N. ${scheda["id_restaur"]}</b>`;
+        tabellaSchede.setAttribute('id', `${scheda["Codice scheda restauro"]}`);
+        captionSchede.innerHTML = `<b>SCHEDA RESTAURO N. ${scheda["Codice scheda restauro"]}</b>`;
+        captionSchede.classList.add('caption-schede-mr-mc-r');
         for (const [chiave, valore] of Object.entries(scheda)) {
             const trScheda = document.createElement('tr');
-            trScheda.className = 'schede tr-schede';
+            trScheda.className = 'schede tr-schede-mr-mc-r';
             const tdChiave = document.createElement('td');
             tdChiave.innerHTML = `<b>${chiave}</b>`;
             tdChiave.style.width = '400px';
-            tdChiave.className = 'schede td-schede';
+            tdChiave.className = 'schede td-schede-mr-mc-r';
             const tdValore = document.createElement('td');
             tdValore.innerHTML = `${valore}`;
-            tdValore.className = 'schede td-schede';
+            tdValore.className = 'schede td-schede-mr-mc-r';
             trScheda.appendChild(tdChiave);
             trScheda.appendChild(tdValore);
             tabellaSchede.appendChild(trScheda);
