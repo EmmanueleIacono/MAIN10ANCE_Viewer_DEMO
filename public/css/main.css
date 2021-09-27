@@ -349,7 +349,6 @@ div[id^="div-form-"] {
 /* TABELLA DB */
 
 table {
-  /* font-family: arial, sans-serif; */
   border-collapse: collapse;
   width: 100%;
   padding: 10px;
@@ -361,22 +360,17 @@ td, th {
   text-align: left;
   padding: 8px;
   max-width: 200px;
-  /* word-wrap: break-word; */
-  /* word-break: break-all; */
 }
 
 td {
   word-break: break-all;
 }
 
-/* .tdbreak {} */
-
 th {
   background-color: #b6b4b4;
-}
+} 
 
 tr:nth-child(even) {
-  /* background-color: #dddddd; */
   background-color: #cacaca;
 }
 

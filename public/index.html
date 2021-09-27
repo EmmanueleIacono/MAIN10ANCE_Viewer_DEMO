@@ -146,7 +146,7 @@
       </div>
       <div class="fill" id="tab2" data-tab-content>
         <div class="panel panel-default col-sm-9 fill" id="tabMappa">
-          <div class="panel-heading" id="pannello-modal-header" data-toggle="tooltip"></div>
+          <!-- <div class="panel-heading" id="pannello-modal-header" data-toggle="tooltip"></div> -->
           <!-- GIS -->
           <div id="appGIS">
             <div id="mappa"></div>
@@ -271,6 +271,10 @@
                   <option value="volta">Volta</option>
                 </select>
                 <br>
+                <input type="checkbox" name="check-stato-conservazione" id="check-stato-conservazione" class="filtro-schede" disabled>
+                <label for="check-stato-conservazione">Stato di conservazione</label>
+                <select name="select-stato-conservazione" id="select-stato-conservazione" disabled></select>
+                <br>
                 <input type="checkbox" name="check-fenomeno" id="check-fenomeno" class="filtro-schede" disabled>
                 <label for="check-fenomeno">Fenomeno</label>
                 <select name="select-fenomeno" id="select-fenomeno" disabled></select>
@@ -286,7 +290,6 @@
                 <label for="input-data-a" style="font-weight: normal;">A</label>
                 <input type="date" name="input-data-a" id="input-data-a" disabled>
                 <br>
-                <!-- data (da a) -->
               </details>
             </div>
           </div>

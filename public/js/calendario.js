@@ -6,6 +6,11 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
     timeZone: 'local',
     locale: 'it',
     initialView: 'dayGridMonth',
+    headerToolbar: {
+        left: 'dayGridMonth,timeGridWeek',
+        center: 'title',
+        right: 'prevYear,prev,next,nextYear'
+    },
     eventMouseEnter: (info) => {
         info.el.style.cursor = 'pointer';
         info.el.title = info.event.title;

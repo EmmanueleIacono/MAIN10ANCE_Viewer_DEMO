@@ -9,6 +9,21 @@ const checkControllo = document.getElementById('check-controllo');
 const checkManReg = document.getElementById('check-man-reg');
 const checkManCorr = document.getElementById('check-man-corr');
 const checkRestauro = document.getElementById('check-restauro');
+const checkSacroMonte = document.getElementById('check-sacro-monte');
+const selectSacroMonte = document.getElementById('select-sacro-monte');
+const checkCappella = document.getElementById('check-cappella');
+const selectCappella = document.getElementById('select-cappella');
+const checkElemento = document.getElementById('check-elemento');
+const selectElemento = document.getElementById('select-elemento');
+const checkStatoCons = document.getElementById('check-stato-conservazione');
+const selectStatoCons = document.getElementById('select-stato-conservazione');
+const checkFenomeno = document.getElementById('check-fenomeno');
+const selectFenomeno = document.getElementById('select-fenomeno');
+const checkMateriale = document.getElementById('check-materiale');
+const selectMateriale = document.getElementById('select-materiale');
+const checkData = document.getElementById('check-data');
+const inputDataDa = document.getElementById('input-data-da');
+const inputDataA = document.getElementById('input-data-a');
 
 divContenitoreSchede.innerHTML = '';
 
@@ -28,6 +43,8 @@ aggiornaSchedeStart.addEventListener('click', visualizzaSchedeStart);
 
 checkGenerale.addEventListener('change', () => {
     const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
+    const listaSelect = contenitoreFiltriSchede.getElementsByTagName('select');
+    const listaInput = contenitoreFiltriSchede.getElementsByTagName('input');
     if (checkGenerale.checked) {
         listaCheckbox.forEach(cbx => {
             cbx.disabled = false;
@@ -37,12 +54,85 @@ checkGenerale.addEventListener('change', () => {
         listaCheckbox.forEach(cbx => {
             cbx.disabled = true;
         });
+        listaSelect.forEach(sl => {
+            sl.disabled = true;
+        });
+        listaInput.forEach(inp => {
+            if (inp.type === 'date') {
+                inp.disabled = true;
+            }
+        });
         filtraVediTutto();
     }
 });
 
 visualizzaTutto.addEventListener('click', filtraVediTutto);
 visualizzaNulla.addEventListener('click', filtraVediNulla);
+
+checkSacroMonte.addEventListener('change', () => {
+    if (checkSacroMonte.checked) {
+        selectSacroMonte.disabled = false;
+    }
+    else {
+        selectSacroMonte.disabled = true;
+    }
+});
+
+checkCappella.addEventListener('change', () => {
+    if (checkCappella.checked) {
+        selectCappella.disabled = false;
+    }
+    else {
+        selectCappella.disabled = true;
+    }
+});
+
+checkElemento.addEventListener('change', () => {
+    if (checkElemento.checked) {
+        selectElemento.disabled = false;
+    }
+    else {
+        selectElemento.disabled = true;
+    }
+});
+
+checkStatoCons.addEventListener('change', () => {
+    if (checkStatoCons.checked) {
+        selectStatoCons.disabled = false;
+    }
+    else {
+        selectStatoCons.disabled = true;
+    }
+});
+
+checkFenomeno.addEventListener('change', () => {
+    if (checkFenomeno.checked) {
+        selectFenomeno.disabled = false;
+    }
+    else {
+        selectFenomeno.disabled = true;
+    }
+});
+
+checkMateriale.addEventListener('change', () => {
+    if (checkMateriale.checked) {
+        selectMateriale.disabled = false;
+    }
+    else {
+        selectMateriale.disabled = true;
+    }
+});
+
+checkData.addEventListener('change', () => {
+    if (checkData.checked) {
+        inputDataDa.disabled = false;
+        inputDataA.disabled = false;
+    }
+    else {
+        inputDataDa.disabled = true;
+        inputDataA.disabled = true;
+    }
+});
 
 // setInterval(() => {
 //     // const insiemeTabelle = document.querySelectorAll('.tabella-schede');
@@ -245,8 +335,15 @@ function filtraSchedeDaID(idScheda) {
 
 function filtraVediTutto() {
     const insiemeTabelle = document.querySelectorAll('.tabella-schede');
+    const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
     insiemeTabelle.forEach(tab => {
         tab.style.display = 'table';
+    });
+    if (checkGenerale.checked) {
+        checkGenerale.click();
+    }
+    listaCheckbox.forEach(cbx => {
+        cbx.checked = false;
     });
 }
 
