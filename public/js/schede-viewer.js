@@ -25,6 +25,8 @@ const checkData = document.getElementById('check-data');
 const inputDataDa = document.getElementById('input-data-da');
 const inputDataA = document.getElementById('input-data-a');
 
+let listaSigleNumericheCappelle;
+
 divContenitoreSchede.innerHTML = '';
 
 // const tabellaSchede = creaStrutturaSchede();
@@ -38,6 +40,16 @@ function visualizzaSchedeStart() {
     compilaTabelleManCorr();
     compilaTabelleRestauro();
 };
+
+popolaSelectSacriMonti();
+popolaSelectElementi();
+popolaSelectFenomeno();
+popolaSelectStatoCons();
+popolaSelectMateriale();
+
+(async function popolaListaSigleNumCapp() {
+    listaSigleNumericheCappelle = await prendiSigleNumericheCappelle();
+})();
 
 aggiornaSchedeStart.addEventListener('click', visualizzaSchedeStart);
 
@@ -132,6 +144,18 @@ checkData.addEventListener('change', () => {
         inputDataDa.disabled = true;
         inputDataA.disabled = true;
     }
+});
+
+selectSacroMonte.addEventListener('change', () => {
+    selectCappella.innerHTML = '';
+    listaSigleNumericheCappelle.forEach(s => {
+        if (s.sacro_monte === selectSacroMonte.value) {
+            const opz = document.createElement('option');
+            opz.setAttribute('value', s.numero);
+            opz.innerHTML = s.nome;
+            selectCappella.appendChild(opz);
+        }
+    });
 });
 
 // setInterval(() => {
@@ -319,6 +343,24 @@ async function prendiUrn(jsonReq) {
     return risTradotto;
 }
 
+async function prendiSigleNumericheCappelle() {
+    const risultato = await fetch('/DB_Servizio/MarkerCapp', {method: "GET", headers: {"content-type": "application/json"}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+async function prendiSigleSacriMonti() {
+    const risultato = await fetch('/DB_Servizio/MarkerSM', {method: "GET", headers: {"content-type": "application/json"}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+async function prendiLOD3e4() {
+    const risultato = await fetch('/DB_Servizio/LOD/3e4', {method: "GET", headers: {"content-type": "application/json"}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
 function filtraSchedeDaID(idScheda) {
     // compilaTabelleControllo();
     const insiemeTabelle = document.querySelectorAll('.tabella-schede');
@@ -400,5 +442,55 @@ function cercaElementiDaScheda(strID) {
         }, () => {
             alert('Errore nella ricerca');
         }, ['id_main10ance']);
+    });
+}
+
+async function popolaSelectSacriMonti() {
+    const listaSigleSM = await prendiSigleSacriMonti();
+    listaSigleSM.forEach(sgl => {
+        const opz = document.createElement('option');
+        opz.setAttribute('value', sgl.sigla);
+        opz.innerHTML = sgl.nome;
+        selectSacroMonte.appendChild(opz);
+    });
+}
+
+async function popolaSelectElementi() {
+    const listaElementi = await prendiLOD3e4();
+    listaElementi.forEach(el => {
+        const opz = document.createElement('option');
+        opz.setAttribute('value', el.tabella);
+        opz.innerHTML = el.alias;
+        selectElemento.appendChild(opz);
+    });
+}
+
+async function popolaSelectFenomeno() {
+    const listaFenomeni = await leggiGlossDegradi();
+    listaFenomeni.forEach(f => {
+        const opz = document.createElement('option');
+        opz.setAttribute('value', f.id_gloss);
+        opz.innerHTML = f.id_gloss;
+        selectFenomeno.appendChild(opz);
+    });
+}
+
+async function popolaSelectStatoCons() {
+    const listaStatiCons = await leggiEnum('st_cons');
+    listaStatiCons.forEach(st => {
+        const opz = document.createElement('option');
+        opz.setAttribute('value', st.unnest);
+        opz.innerHTML = st.unnest;
+        selectStatoCons.appendChild(opz);
+    });
+}
+
+async function popolaSelectMateriale() {
+    const listaMateriali = await leggiEnum('mat_ty');
+    listaMateriali.forEach(m => {
+        const opz = document.createElement('option');
+        opz.setAttribute('value', m.unnest);
+        opz.innerHTML = m.unnest;
+        selectMateriale.appendChild(opz);
     });
 }

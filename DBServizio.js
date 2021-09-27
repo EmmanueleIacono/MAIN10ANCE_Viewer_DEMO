@@ -51,6 +51,14 @@ appServizio.get('/DB_Servizio/LOD/UrnCappelle', async (req, res) => {
     res.send(JSON.stringify(urn[0]));
 });
 
+// per testare la richiesta:
+// fetch("/DB_Servizio/LOD/3e4", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appServizio.get('/DB_Servizio/LOD/3e4', async (req, res) => {
+    const lod = await leggiTabelleLOD3e4();
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(lod));
+});
+
 start();
 
 async function start() {
@@ -79,7 +87,7 @@ async function leggiMarkerSM() {
 
 async function leggiMarkerCapp() {
     try {
-        const results = await client.query(`SELECT * FROM "dati_cappelle";`);
+        const results = await client.query(`SELECT * FROM "dati_cappelle" ORDER BY CAST("numero" AS INTEGER);`);
         return results.rows;
     }
     catch(e) {
@@ -110,6 +118,16 @@ async function leggiListaTabelleLOD(LOD) {
 async function recuperaUrnLOD3(sm, capp) {
     try {
         const results = await client.query(`SELECT "urn" FROM "dati_cappelle" WHERE "sacro_monte" = ($1) AND "numero" = ($2);`, [sm, capp]);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiTabelleLOD3e4() {
+    try {
+        const results = await client.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM "lod" WHERE "LOD" = 3 OR "LOD" = 4 ORDER BY "tabella";`);
         return results.rows;
     }
     catch(e) {

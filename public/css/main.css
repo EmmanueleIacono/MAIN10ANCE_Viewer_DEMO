@@ -280,7 +280,8 @@ div[id^="div-form-"] {
 #appGIS {
   /* height: 600px; */
   /* height: calc(80vh - 10px); */
-  height: 80vh;
+  /* height: 80vh; */
+  height: 100%;
 }
 
 #scegliGISModal {

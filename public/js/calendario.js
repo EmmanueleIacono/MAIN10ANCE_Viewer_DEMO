@@ -31,8 +31,11 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
             }
         }
         else if (info.event.title.startsWith('Programmata')) {
-            alert(`Intervento PROGRAMMATO: \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nIntervento: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
-            // console.log(info);
+            const aprireScheda = confirm(`Visualizzare scheda manutenzione collegata? \n \nIntervento PROGRAMMATO: \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nIntervento: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
+            if (aprireScheda) {
+                const idSchedaCollegata = info.event.id.split('-')[1];
+                filtraSchedeDaID(idSchedaCollegata);
+            }
         }
         else {
             alert(info.event.title);
