@@ -78,6 +78,11 @@
         <li data-tab-target="#tab3" class="tab" id="apriTabDatabase">DASHBOARD</li>
         <!-- <li data-tab-target="#tab4" class="tab" id="apriTabDashboard">DASHBOARD</li> -->
       </ul>
+      <div class="pull-right">
+        <ul class="nav navbar-nav">
+          <li class="tab">LOGOUT</li>
+        </ul>
+      </div>
     </div>
   </nav>
   <!-- End of navbar -->
@@ -192,7 +197,7 @@
           </div>
         </div>
         <div class="col-sm-5 fill" id="pannello-lat-schede">
-          <div class="panel panel-default fill">
+          <div class="panel panel-default fill" id="pannello-lat-schede-inner">
             <div class="panel-heading" id="pannello-lat-schede-header" data-toggle="tooltip">
               <b>CALENDAR</b>
             </div>
@@ -203,8 +208,8 @@
                 <input type="checkbox" name="check-generale" id="check-generale">
                 <label for="check-generale">ATTIVA FILTRI</label>
                 <br>
-                <button id="vedi-schede-tutto">VISUALIZZA TUTTO</button>
-                <button id="vedi-schede-nulla">SPEGNI TUTTO</button>
+                <button id="vedi-schede-tutto" class="vedi-schede">VISUALIZZA TUTTO</button>
+                <button id="vedi-schede-nulla" class="vedi-schede">SPEGNI TUTTO</button>
                 <br>
                 <input type="checkbox" name="check-controllo" id="check-controllo" class="filtro-schede" disabled>
                 <label for="check-controllo">Schede controllo</label>
@@ -218,6 +223,70 @@
                 <input type="checkbox" name="check-restauro" id="check-restauro" class="filtro-schede" disabled>
                 <label for="check-restauro">Schede restauro</label>
                 <br>
+                <input type="checkbox" name="check-sacro-monte" id="check-sacro-monte" class="filtro-schede" disabled>
+                <label for="check-sacro-monte">Sacro Monte</label>
+                <select name="select-sacro-monte" id="select-sacro-monte" disabled>
+                  <option value="Belmonte">Belmonte</option>
+                  <option value="Brissago">Brissago</option>
+                  <option value="Crea">Crea</option>
+                  <option value="Domodossola">Domodossola</option>
+                  <option value="Ghiffa">Ghiffa</option>
+                  <option value="Oropa">Oropa</option>
+                  <option value="Orselina">Orselina</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Ossuccio">Ossuccio</option>
+                  <option value="Varallo">Varallo</option>
+                  <option value="Varese">Varese</option>
+                </select>
+                <br>
+                <input type="checkbox" name="check-cappella" id="check-cappella" class="filtro-schede" disabled>
+                <label for="check-cappella">Cappella</label>
+                <select name="select-cappella" id="select-cappella" disabled>
+                  <option value="1">Cappella 1</option>
+                  <option value="2">Cappella 2</option>
+                  <option value="3">Cappella 3</option>
+                  <option value="4">Cappella 4</option>
+                  <option value="5">Cappella 5</option>
+                </select>
+                <br>
+                <input type="checkbox" name="check-elemento" id="check-elemento" class="filtro-schede" disabled>
+                <label for="check-elemento">Elemento</label>
+                <select name="select-elemento" id="select-elemento" disabled>
+                  <option value="apparato_decorativo">Apparato decorativo</option>
+                  <option value="arredo">Arredo</option>
+                  <option value="catena">Catena</option>
+                  <option value="dipinto_murale">Dipinto murale</option>
+                  <option value="finestra">Finestra</option>
+                  <option value="grata">Grata</option>
+                  <option value="muro">Muro</option>
+                  <option value="pavimento">Pavimento</option>
+                  <option value="pavimento_decorativo">Pavimento decorativo</option>
+                  <option value="pilastro">Pilastro</option>
+                  <option value="porta">Porta</option>
+                  <option value="quadro">Quadro</option>
+                  <option value="scala">Scala</option>
+                  <option value="statua">Statua</option>
+                  <option value="tetto">Tetto</option>
+                  <option value="trave">Trave</option>
+                  <option value="volta">Volta</option>
+                </select>
+                <br>
+                <input type="checkbox" name="check-fenomeno" id="check-fenomeno" class="filtro-schede" disabled>
+                <label for="check-fenomeno">Fenomeno</label>
+                <select name="select-fenomeno" id="select-fenomeno" disabled></select>
+                <br>
+                <input type="checkbox" name="check-materiale" id="check-materiale" class="filtro-schede" disabled>
+                <label for="check-materiale">Materiale</label>
+                <select name="select-materiale" id="select-materiale" disabled></select>
+                <br>
+                <input type="checkbox" name="check-data" id="check-data" class="filtro-schede" disabled>
+                <label for="check-data">Data</label>
+                <label for="input-data-da" style="font-weight: normal;">Da</label>
+                <input type="date" name="input-data-da" id="input-data-da" disabled>
+                <label for="input-data-a" style="font-weight: normal;">A</label>
+                <input type="date" name="input-data-a" id="input-data-a" disabled>
+                <br>
+                <!-- data (da a) -->
               </details>
             </div>
           </div>

@@ -72,7 +72,7 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
             }
         }
         else {
-            alert('ATTENZIONE: I campi OPERATORE, DATA, e NOME FENOMENO sono obbligatori.');
+            alert('ATTENZIONE: I campi OPERATORE, DATA, STATO DI CONSERVAZIONE e NOME FENOMENO sono obbligatori.');
         }
     }
     else {
@@ -148,8 +148,12 @@ function inizializzaModulo() {
         alert('Nessun modello selezionato');
     }
     else {
-        const selezione = viewer.getSelection();
-        const isolato = viewer.getIsolatedNodes();
+        let selezione = viewer.getSelection();
+        let isolato = viewer.getIsolatedNodes();
+        if (isolato.length !== 0) {
+            viewer.select(isolato);
+            selezione = viewer.getSelection();
+        }
         if ((selezione.length !== 0) || (isolato.length !== 0)) {
             selezione.forEach(async (s) => {
                 viewer.getProperties(s, async (props) => {
@@ -922,7 +926,8 @@ function verificaVincoliControllo() {
     const operatore = $('[id*="{esecutori}"]')[0];
     const data = $('[id*="{data_con}"]')[0];
     const gloss = $('[id*="{rid_gloss}"]')[0];
-    if ((!operatore.value) || (operatore.value === 'null') || (!data.value) || (data.value === 'null') || (!gloss.value) || (gloss.value === 'null')) {
+    const st_cons = $('[id*="{st_cons}"]')[0];
+    if ((!operatore.value) || (operatore.value === 'null') || (!data.value) || (data.value === 'null') || (!gloss.value) || (gloss.value === 'null') || (!st_cons.value) || (st_cons.value === 'null')) {
         return false;
     }
     else {

@@ -127,6 +127,18 @@ body {
   cursor: pointer;
   /* position: initial; */
   position: relative;
+  /* width: 200px; */
+  width: 100%;
+  height: 40px;
+  border: none;
+  margin: 2px;
+  background-color: var(--verdeMain10ance);
+  color: var(--grigioMoltoScuro);
+  font-weight: bold;
+}
+
+.selettoreSM-dropdown:hover {
+  background-color: var(--verdeMain10anceTrasparenza);
 }
 
 .scheda-con-int, #apriTabControllo, #apriTabIntervento, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento {
@@ -275,40 +287,9 @@ div[id^="div-form-"] {
   overflow: auto;
 }
 
-/* .modal-dialog {
-  max-width: 900px;
-  width: 100%;
-  max-height: 850px;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-} */
-
 .modal-content, .modal-header, .modal-body, .modal-footer, .panel, .panel-heading, #pannello-modal-header {
   background-color: var(--grigio);
 }
-
-/* .modal-title {
-  font-weight: 700;
-} */
-
-/* .modal-body {
-  background-color: var(--grigio);
-} */
-
-/* .modal-footer {
-  align-self: flex-end;
-} */
-
-/* #modal-content-GIS {
-  height: 100%;
-  width: 100%;
-} */
-
-/* #modal-content-cappelle {
-  height: 50%;
-  width: 70%;
-} */
 
 /* MAPPA */
 #mappa {
@@ -421,6 +402,12 @@ tr:nth-child(even) {
   color: var(--bluInterreg);
 }
 
+.caption-schede:hover {
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-thickness: 3px;
+}
+
 /* .caption-schede-c {
   color: var(--verdeMain10ance);
 }
@@ -451,4 +438,19 @@ tr:nth-child(even) {
 
 .tr-schede-c:nth-child(even) {
   background-color: var(--verdeMain10anceTrasparenza2);
+}
+
+.vedi-schede {
+  background-color: var(--verdeMain10ance);
+  color: var(--grigioMoltoScuro);
+  border: none;
+  font-weight: bold;
+}
+
+.vedi-schede:hover {
+  background-color: var(--verdeMain10anceTrasparenza);
+}
+
+#pannello-lat-schede-inner {
+  overflow: auto;
 }

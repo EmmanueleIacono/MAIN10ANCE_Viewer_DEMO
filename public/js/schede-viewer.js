@@ -81,6 +81,7 @@ function creaStrutturaSchede() {
     const captionSchede = document.createElement('caption');
     // captionSchede.setAttribute('id', 'caption-schede');
     captionSchede.className = 'schede caption-schede';
+    captionSchede.addEventListener('click', apriModelloDaScheda);
     // captionSchede.innerHTML = ``;
 
     tabellaSchede.appendChild(captionSchede);
@@ -91,8 +92,6 @@ function creaStrutturaSchede() {
 }
 
 async function compilaTabelleControllo() {
-    // divContenitoreSchede.innerHTML = '';
-
     const listaSchedeControlloComplete = await prendiSchedeControllo();
     listaSchedeControlloComplete.forEach(scheda => {
         // console.log(scheda);
@@ -110,6 +109,7 @@ async function compilaTabelleControllo() {
             const tdValore = document.createElement('td');
             tdValore.innerHTML = `${valore}`;
             tdValore.className = 'schede td-schede-c';
+            tdValore.setAttribute('id', `[${chiave.replaceAll(' ', '')}]{${scheda["Codice scheda controllo"]}}`);
             trScheda.appendChild(tdChiave);
             trScheda.appendChild(tdValore);
             tabellaSchede.appendChild(trScheda);
@@ -119,8 +119,6 @@ async function compilaTabelleControllo() {
 }
 
 async function compilaTabelleManReg() {
-    // divContenitoreSchede.innerHTML = '';
-
     const listaSchedeManRegComplete = await prendiSchedeManReg();
     listaSchedeManRegComplete.forEach(scheda => {
         // console.log(scheda);
@@ -138,6 +136,7 @@ async function compilaTabelleManReg() {
             const tdValore = document.createElement('td');
             tdValore.innerHTML = `${valore}`;
             tdValore.className = 'schede td-schede-mr-mc-r';
+            tdValore.setAttribute('id', `[${chiave.replaceAll(' ', '')}]{${scheda["Codice scheda manutenzione regolare"]}}`);
             trScheda.appendChild(tdChiave);
             trScheda.appendChild(tdValore);
             tabellaSchede.appendChild(trScheda);
@@ -147,8 +146,6 @@ async function compilaTabelleManReg() {
 }
 
 async function compilaTabelleManCorr() {
-    // divContenitoreSchede.innerHTML = '';
-
     const listaSchedeManCorrComplete = await prendiSchedeManCorr();
     listaSchedeManCorrComplete.forEach(scheda => {
         // console.log(scheda);
@@ -166,6 +163,7 @@ async function compilaTabelleManCorr() {
             const tdValore = document.createElement('td');
             tdValore.innerHTML = `${valore}`;
             tdValore.className = 'schede td-schede-mr-mc-r';
+            tdValore.setAttribute('id', `[${chiave.replaceAll(' ', '')}]{${scheda["Codice scheda manutenzione correttiva"]}}`);
             trScheda.appendChild(tdChiave);
             trScheda.appendChild(tdValore);
             tabellaSchede.appendChild(trScheda);
@@ -175,8 +173,6 @@ async function compilaTabelleManCorr() {
 }
 
 async function compilaTabelleRestauro() {
-    // divContenitoreSchede.innerHTML = '';
-
     const listaSchedeRestauroComplete = await prendiSchedeRestauro();
     listaSchedeRestauroComplete.forEach(scheda => {
         // console.log(scheda);
@@ -194,6 +190,7 @@ async function compilaTabelleRestauro() {
             const tdValore = document.createElement('td');
             tdValore.innerHTML = `${valore}`;
             tdValore.className = 'schede td-schede-mr-mc-r';
+            tdValore.setAttribute('id', `[${chiave.replaceAll(' ', '')}]{${scheda["Codice scheda restauro"]}}`);
             trScheda.appendChild(tdChiave);
             trScheda.appendChild(tdValore);
             tabellaSchede.appendChild(trScheda);
@@ -222,6 +219,12 @@ async function prendiSchedeManCorr() {
 
 async function prendiSchedeRestauro() {
     const risultato = await fetch('/Main10ance_DB/tabellaDB/schede-restauro', {method: "GET", headers: {"content-type": "application/json"}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+async function prendiUrn(jsonReq) {
+    const risultato = await fetch('/DB_Servizio/LOD/UrnCappelle', {method: "GET", headers: {"content-type": "application/json", "sm": jsonReq.sm, "capp": jsonReq.capp}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
@@ -264,5 +267,41 @@ function filtraSchedeConManRest(filtro) {
         // else {
         //     tab.style.display = 'none';
         // }
+    });
+}
+
+async function apriModelloDaScheda() {
+    const stringaCaption = this.innerText;
+    const stringaPulita = stringaCaption.split('.')[1].replaceAll(' ', '');
+    const tabellaCliccata = document.getElementById(stringaPulita);
+    const tdTarget = tabellaCliccata.querySelectorAll('[id^="[Elementi"]')[0];
+    const stringaIdMain10ance = tdTarget.innerText;
+    const sacroMonteDaCercare = stringaIdMain10ance.split('|')[0];
+    const cappellaDaCercare = stringaIdMain10ance.split('|')[1].split('-')[0];
+    let jsonPerUrn = {};
+    jsonPerUrn.sm = sacroMonteDaCercare;
+    jsonPerUrn.capp = cappellaDaCercare;
+    const urnRes = await prendiUrn(jsonPerUrn);
+    const urn = await urnRes.urn;
+    const conferma = confirm('Visualizzare gli elementi nel BIM Viewer?');
+    if (conferma) {
+        console.log(urn);
+        document.getElementById('apriTabBIM').click();
+        launchViewer(urn, () => {
+            cercaElementiDaScheda(stringaIdMain10ance);
+        });
+    }
+}
+
+function cercaElementiDaScheda(strID) {
+    const listaID = strID.split(',');
+    let listaElems = [];
+    listaID.forEach(id => {
+        viewer.search(id, el => {
+            listaElems.push(el[0]);
+            viewer.isolate(listaElems);
+        }, () => {
+            alert('Errore nella ricerca');
+        }, ['id_main10ance']);
     });
 }

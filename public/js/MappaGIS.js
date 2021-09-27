@@ -67,6 +67,7 @@ class BottoneNavigazioneSM {
 
         const contenitoreBottoniNav = document.getElementById('contenitore-selettori-2');
         contenitoreBottoniNav.appendChild(bottoneNav);
+        contenitoreBottoniNav.appendChild(document.createElement('br'));
 
         bottoneNav.addEventListener('click', () => {
             mappaGIS.setView(posizione, 17);
@@ -186,6 +187,9 @@ class LayerGIS {
 
         let coloreRandom = `#${(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6)}`;
 
+        spegniLivelloCheck.style.accentColor = coloreRandom;
+        spegniLivelloCheck.style.marginRight = '10px';
+
         let geojsonMarkerOptions = {
             radius: 8,
             color: coloreRandom,
@@ -221,7 +225,10 @@ class LayerGIS {
 function getModel(urn) {
     if ((urn !== null) && (urn !== '')) {
         document.getElementById('apriTabBIM').click();
-        launchViewer(urn);
+        if (urn !== urnModelloCorrente) {
+            launchViewer(urn);
+            urnModelloCorrente = urn;
+        }
     }
     else {
         alert('Nessun modello presente per questo elemento');

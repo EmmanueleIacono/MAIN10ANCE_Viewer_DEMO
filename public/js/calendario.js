@@ -27,7 +27,7 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
         }
         else if (info.event.title.startsWith('Programmata')) {
             alert(`Intervento PROGRAMMATO: \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nIntervento: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
-            console.log(info);
+            // console.log(info);
         }
         else {
             alert(info.event.title);
@@ -52,6 +52,8 @@ async function popolaCalendario() {
     const eventiMR = await creaEventiManReg();
     const eventiMC = await creaEventiManCorr();
     creaEventiProgrammati(eventiC, eventiMR, eventiMC);
+    ripulisciEventiProgrammatiMR();
+    ripulisciEventiProgrammatiMC();
 }
 
 async function creaEventiControllo() {
@@ -208,6 +210,25 @@ function creaEventiProgrammati(listaControlli, listaManReg, listaManCorr) {
             }
         }
     });
+}
+
+function ripulisciEventiProgrammatiMR() {
+    return;
+}
+
+function ripulisciEventiProgrammatiMC() {
+    return;
+}
+
+function confrontaDate(dataProgrammata, dataManutenzione) {
+    let msDataProg = Date.parse(dataProgrammata);
+    let msDataMan = Date.parse(dataManutenzione);
+    if (msDataProg<=msDataMan) {
+        return true; // MANUTENZIONE EFFETTUATA, TOGLIERE EVENTO PROGRAMMATO
+    }
+    else {
+        return false; // MANUTENZIONE NON EFFETTUATA, MANTENERE EVENTO PROGRAMMATO
+    }
 }
 
 function aggiungiMesi(data, mesi) {

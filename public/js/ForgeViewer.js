@@ -1,23 +1,32 @@
 var viewer;
 
-function launchViewer(urn) {
+function launchViewer(urn, opzioniPostLoading) {
+  const opzioniPost = opzioniPostLoading || undefined;
+
   var options = {
     env: 'AutodeskProduction',
-    getAccessToken: getForgeToken
+    getAccessToken: getForgeToken,
+    opz: opzioniPost
   };
 
   Autodesk.Viewing.Initializer(options, () => {
     viewer = new Autodesk.Viewing.GuiViewer3D(document.getElementById('forgeViewer'), { extensions: ['Autodesk.DocumentBrowser', 'Autodesk.VisualClusters'] });
     viewer.start();
     var documentId = 'urn:' + urn;
-    Autodesk.Viewing.Document.load(documentId, onDocumentLoadSuccess, onDocumentLoadFailure);
+    let opzFunc = options.opz;
+    Autodesk.Viewing.Document.load(documentId, (doc) => {
+      onDocumentLoadSuccess(doc, opzFunc);
+    }, onDocumentLoadFailure);
   });
 }
 
-function onDocumentLoadSuccess(doc) {
+function onDocumentLoadSuccess(doc, opz) {
   var viewables = doc.getRoot().getDefaultGeometry();
   viewer.loadDocumentNode(doc, viewables).then(i => {
     // documented loaded, any action?
+    if (opz) {
+      opz();
+    }
     viewer.fitToView();
   });
 }

@@ -1,3 +1,5 @@
+let urnModelloCorrente;
+
 $(document).ready(function () {
     prepareAppBucketTree();
     $('#refreshBuckets').click(function () {
@@ -37,18 +39,26 @@ $(document).ready(function () {
     }).on('loaded.jstree', function () {
       // $('#appBuckets').jstree('open_all');
     }).bind("activate_node.jstree", function (evt, data) { // "activate_node.jstree" è l'evento tipo "click", che invoca una callback
-      console.log(data); // voglio capire che cos'è DATA
+      // console.log(data); // voglio capire che cos'è DATA
       if (data != null && data.node != null && data.node.type == 'object') {
-        $("#forgeViewer").empty();
+        // $("#forgeViewer").empty();
         var urn = data.node.id;
-        try {
-          document.getElementById('apriTabBIM').click();
-          launchViewer(urn);
-        }
-        catch {
-          let messaggioDiErrore = 'Modello non disponibile.';
-          $('#forgeViewer').html(messaggioDiErrore);
+        if (urn !== urnModelloCorrente) {
+          $("#forgeViewer").empty();
+          try {
+            document.getElementById('apriTabBIM').click();
+            launchViewer(urn);
+            urnModelloCorrente = urn;
+          }
+          catch {
+            let messaggioDiErrore = 'Modello non disponibile.';
+            $('#forgeViewer').html(messaggioDiErrore);
+          }
         }
       }
     });
   }
+
+// function testDocLoading() {
+//   console.log('OK!');
+// }
