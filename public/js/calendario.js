@@ -31,7 +31,7 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
             }
         }
         else if (info.event.title.startsWith('Programmata')) {
-            const aprireScheda = confirm(`Visualizzare scheda manutenzione collegata? \n \nIntervento PROGRAMMATO: \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nIntervento: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
+            const aprireScheda = confirm(`Visualizzare scheda controllo collegata? \n \nIntervento PROGRAMMATO: \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nIntervento: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
             if (aprireScheda) {
                 const idSchedaCollegata = info.event.id.split('-')[1];
                 filtraSchedeDaID(idSchedaCollegata);
@@ -61,7 +61,7 @@ async function popolaCalendario() {
     const eventiMC = await creaEventiManCorr();
     creaEventiProgrammati(eventiC, eventiMR, eventiMC);
     ripulisciEventiProgrammatiMR();
-    ripulisciEventiProgrammatiMC();
+    // ripulisciEventiProgrammatiMC();
 }
 
 async function creaEventiControllo() {
@@ -160,9 +160,9 @@ function creaEventiProgrammati(listaControlli, listaManReg, listaManCorr) {
         "uc 2 - breve termine": '6',
         "uc 3 - urgente e immediato": '1'
     };
-    console.log(listaControlli);
-    console.log(listaManReg);
-    console.log(listaManCorr);
+    // console.log(listaControlli);
+    // console.log(listaManReg);
+    // console.log(listaManCorr);
     let listaIdContrManReg = [];
     listaManReg.forEach(mr => {
         listaIdContrManReg.push(mr.id_contr);
@@ -177,7 +177,7 @@ function creaEventiProgrammati(listaControlli, listaManReg, listaManCorr) {
         if (con.mn_reg) {
             const mesiFuturi = con.frequenza;
             const quanteRipetizioni = 10;
-            if (!(listaIdContrManReg.includes(idC))) {
+            // if (!(listaIdContrManReg.includes(idC))) {
                 for (let n=1; n<=quanteRipetizioni; n++) {
                     const eventoProgrammato = {
                         id: `P${n}-${idC}`,
@@ -195,7 +195,7 @@ function creaEventiProgrammati(listaControlli, listaManReg, listaManCorr) {
                     };
                     calendar.addEvent(eventoProgrammato);
                 }
-            }
+            // }
         }
         else if (con.mn_nec) {
             const mesiFuturi = mesiUrgenze[con.liv_urg];
@@ -221,7 +221,28 @@ function creaEventiProgrammati(listaControlli, listaManReg, listaManCorr) {
 }
 
 function ripulisciEventiProgrammatiMR() {
-    return;
+    const listaEventiCal = calendar.getEvents();
+    listaEventiCal.forEach(evt => {
+        if (evt.title === 'Programmata manutenzione regolare') {
+            const controlloRif = evt.id.split('-')[1];
+            const dataProgrammata = evt.start;
+            // console.log(e.id);
+            // console.log(controlloRif);
+            // console.log(e.start);
+            // console.log(e.extendedProps);
+            listaEventiCal.forEach(e => {
+                if ((e.extendedProps.controllo) && (e.extendedProps.controllo === controlloRif)) {
+                    const dataManutenzione = e.start;
+                    const manAvvenuta = confrontaDate(dataProgrammata, dataManutenzione);
+                    if (manAvvenuta) {
+                        // console.log('DA RIMUOVERE: '+evt.title+' '+dataProgrammata);
+                        evt.remove();
+                    }
+                }
+            });
+        }
+        // console.log(e.id+': '+e.title);
+    });
 }
 
 function ripulisciEventiProgrammatiMC() {

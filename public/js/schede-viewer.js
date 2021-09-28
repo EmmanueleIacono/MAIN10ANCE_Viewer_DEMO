@@ -444,7 +444,7 @@ async function apriModelloDaScheda() {
     const urn = await urnRes.urn;
     const conferma = confirm('Visualizzare gli elementi nel BIM Viewer?');
     if (conferma) {
-        console.log(urn);
+        // console.log(urn);
         document.getElementById('apriTabBIM').click();
         launchViewer(urn, () => {
             cercaElementiDaScheda(stringaIdMain10ance);

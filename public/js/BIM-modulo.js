@@ -19,6 +19,7 @@ apriTabControllo.addEventListener('click', () => {
     apriTabControllo.classList.add('active');
     bottoneSalvaSchedaIntervento.style.display = 'none';
     bottoneSalvaSchedaControllo.style.display = 'inline';
+    bottoneChiudiSchede.style.background = 'var(--verdeMain10ance)';
     if (document.getElementById('apriPDF')) {
         document.getElementById('apriPDF').remove();
     }
@@ -32,6 +33,7 @@ apriTabIntervento.addEventListener('click', () => {
     apriTabIntervento.classList.add('active');
     bottoneSalvaSchedaControllo.style.display = 'none';
     bottoneSalvaSchedaIntervento.style.display = 'inline';
+    bottoneChiudiSchede.style.background = 'var(--bluInterreg)';
     if (document.getElementById('apriPDF')) {
         document.getElementById('apriPDF').remove();
     }
@@ -91,7 +93,6 @@ bottoneSalvaSchedaIntervento.addEventListener('click', async () => {
             const listaFiltrata = filtraOggetti(listaDatiCompleta);
             const listaTotaleFiltrata = filtraListeDatiId(listaFiltrata, listaIdMain10ance);
             const listaRinominata = rinominaID(listaTotaleFiltrata);
-            console.log(listaRinominata);
             const resp = await compilaScheda(listaRinominata);
             if (resp.success) {
                 alert('Operazione andata a buon fine');
@@ -201,6 +202,7 @@ function mostraBottoniSchede() {
     apriTabIntervento.style.display = 'inline';
     // bottoneSalvaSchedaControllo.style.display = 'inline';
     bottoneChiudiSchede.style.display = 'inline';
+    // bottoneChiudiSchede.style.background = 'var(--blackOlive)';
     apriTabControllo.classList.remove('active');
     apriTabIntervento.classList.remove('active');
 }
@@ -362,6 +364,13 @@ async function preparaCampiControllo() {
     contSelectUrgenza.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{liv_urg}');
     creaListaOpzioni(listaEnumUrgenza, contSelectUrgenza, 'unnest', 'unnest', true);
     contSelectUrgenza.disabled = true;
+    // COSTO PREVISTO
+    const contLabelCosto = document.createElement('label');
+    contLabelCosto.innerHTML = '<b>COSTO PREVISTO (€)</b>';
+    const contInputCosto = document.createElement('input');
+    contInputCosto.setAttribute('type', 'number');
+    contInputCosto.setAttribute('step', 0.01);
+    contInputCosto.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{costo}');
     // COMMENTI
     const contLabelCommenti = document.createElement('label');
     contLabelCommenti.innerHTML = '<b>COMMENTI</b>';
@@ -416,6 +425,9 @@ async function preparaCampiControllo() {
     schedaControllo.appendChild(document.createElement('br'));
     schedaControllo.appendChild(contLabelUrgenza);
     schedaControllo.appendChild(contSelectUrgenza);
+    schedaControllo.appendChild(document.createElement('br'));
+    schedaControllo.appendChild(contLabelCosto);
+    schedaControllo.appendChild(contInputCosto);
     schedaControllo.appendChild(document.createElement('br'));
     schedaControllo.appendChild(contLabelCommenti);
     schedaControllo.appendChild(contInputCommenti);
@@ -1404,7 +1416,14 @@ async function creaPDF2(listaIdMain10ance, listaDatiNascosti, contr_manut) {
     let xRect = (420/2)+0;
     let lRect = 200;
     let hRect = hImg;
-    pdf.setFillColor('#9bb7e0');
+    let coloreFill;
+    if (contr_manut === 'SCHEDA-CONTROLLO') {
+        coloreFill = '#a5e09b';
+    }
+    else {
+        coloreFill = '#9bb7e0';
+    }
+    pdf.setFillColor(coloreFill);
     pdf.rect(xRect, yRect, lRect, hRect, "F");
 
     pdf.setFontSize(14);

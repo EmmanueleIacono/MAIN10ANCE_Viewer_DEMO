@@ -146,7 +146,7 @@ body {
 }
 
 #scheda-controllo {
-  background-color: var(--bluInterregTrasparenza);
+  background-color: var(--verdeMain10anceTrasparenza);
   font-size: 13px;
   padding: 30px 14px;
 }
@@ -198,13 +198,37 @@ body {
   margin-bottom: 1rem;
 }
 
-#chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento {
+#salvaSchedaIntervento {
   cursor: pointer;
   /* outline: none; */
   border: none;
   font-size: inherit;
   font-weight: bold;
   background: var(--bluInterreg);
+  color: var(--ghostWhite);
+  padding: .75rem 1.75rem;
+  margin-bottom: 1rem;
+}
+
+#salvaSchedaControllo {
+  cursor: pointer;
+  /* outline: none; */
+  border: none;
+  font-size: inherit;
+  font-weight: bold;
+  background: var(--verdeMain10ance);
+  color: var(--ghostWhite);
+  padding: .75rem 1.75rem;
+  margin-bottom: 1rem;
+}
+
+#chiudiSchede {
+  cursor: pointer;
+  /* outline: none; */
+  border: none;
+  font-size: inherit;
+  font-weight: bold;
+  background: var(--blackOlive);
   color: var(--ghostWhite);
   padding: .75rem 1.75rem;
   margin-bottom: 1rem;
@@ -221,7 +245,8 @@ body {
   padding: 10px;
   margin: 10px;
   color: var(--ghostWhite);
-  background-color: var(--bluInterreg);
+  /* background-color: var(--bluInterreg); */
+  background-color: var(--blackOlive);
   font-weight: bold;
   border: none;
 }
@@ -231,6 +256,42 @@ body {
 }
 
 .scheda:hover {
+  background-color: #aaa;
+}
+
+.scheda-controllo {
+  cursor: pointer;
+  padding: 10px;
+  margin: 10px;
+  color: var(--ghostWhite);
+  background-color: var(--verdeMain10ance);
+  font-weight: bold;
+  border: none;
+}
+
+.scheda-controllo.active {
+  background-color: var(--verdeMain10anceTrasparenza);
+}
+
+.scheda-controllo:hover {
+  background-color: #aaa;
+}
+
+.scheda-intervento {
+  cursor: pointer;
+  padding: 10px;
+  margin: 10px;
+  color: var(--ghostWhite);
+  background-color: var(--bluInterreg);
+  font-weight: bold;
+  border: none;
+}
+
+.scheda-intervento.active {
+  background-color: var(--bluInterregTrasparenza);
+}
+
+.scheda-intervento:hover {
   background-color: #aaa;
 }
 
