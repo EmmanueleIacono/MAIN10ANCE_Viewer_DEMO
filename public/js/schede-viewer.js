@@ -221,7 +221,12 @@ async function compilaTabelleControllo() {
             tdChiave.style.width = '400px';
             tdChiave.className = 'schede td-schede-c';
             const tdValore = document.createElement('td');
-            tdValore.innerHTML = `${valore}`;
+            if ((!valore) || (valore === 'null')) {
+                tdValore.innerHTML = `<i>Nessun valore</i>`;
+            }
+            else {
+                tdValore.innerHTML = `${valore}`;
+            }
             tdValore.className = 'schede td-schede-c';
             tdValore.setAttribute('id', `[${chiave.replaceAll(' ', '')}]{${scheda["Codice scheda controllo"]}}`);
             trScheda.appendChild(tdChiave);
@@ -248,7 +253,12 @@ async function compilaTabelleManReg() {
             tdChiave.style.width = '400px';
             tdChiave.className = 'schede td-schede-mr-mc-r';
             const tdValore = document.createElement('td');
-            tdValore.innerHTML = `${valore}`;
+            if ((!valore) || (valore === 'null')) {
+                tdValore.innerHTML = `<i>Nessun valore</i>`;
+            }
+            else {
+                tdValore.innerHTML = `${valore}`;
+            }
             tdValore.className = 'schede td-schede-mr-mc-r';
             tdValore.setAttribute('id', `[${chiave.replaceAll(' ', '')}]{${scheda["Codice scheda manutenzione regolare"]}}`);
             trScheda.appendChild(tdChiave);
@@ -275,7 +285,12 @@ async function compilaTabelleManCorr() {
             tdChiave.style.width = '400px';
             tdChiave.className = 'schede td-schede-mr-mc-r';
             const tdValore = document.createElement('td');
-            tdValore.innerHTML = `${valore}`;
+            if ((!valore) || (valore === 'null')) {
+                tdValore.innerHTML = `<i>Nessun valore</i>`;
+            }
+            else {
+                tdValore.innerHTML = `${valore}`;
+            }
             tdValore.className = 'schede td-schede-mr-mc-r';
             tdValore.setAttribute('id', `[${chiave.replaceAll(' ', '')}]{${scheda["Codice scheda manutenzione correttiva"]}}`);
             trScheda.appendChild(tdChiave);
@@ -302,7 +317,12 @@ async function compilaTabelleRestauro() {
             tdChiave.style.width = '400px';
             tdChiave.className = 'schede td-schede-mr-mc-r';
             const tdValore = document.createElement('td');
-            tdValore.innerHTML = `${valore}`;
+            if ((!valore) || (valore === 'null')) {
+                tdValore.innerHTML = `<i>Nessun valore</i>`;
+            }
+            else {
+                tdValore.innerHTML = `${valore}`;
+            }
             tdValore.className = 'schede td-schede-mr-mc-r';
             tdValore.setAttribute('id', `[${chiave.replaceAll(' ', '')}]{${scheda["Codice scheda restauro"]}}`);
             trScheda.appendChild(tdChiave);

@@ -271,10 +271,11 @@ div[id^="div-form-"] {
 /* MODALS */
 
 #appBuckets {
-  overflow: auto;
+  /* overflow: auto; */
   width: 100%;
   /* height: calc(100vh - 150px); */
-  height: 150px;
+  /* height: 150px; */
+  height: 100%;
 }
 
 #appGIS {
