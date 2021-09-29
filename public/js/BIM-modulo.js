@@ -202,7 +202,7 @@ function mostraBottoniSchede() {
     apriTabIntervento.style.display = 'inline';
     // bottoneSalvaSchedaControllo.style.display = 'inline';
     bottoneChiudiSchede.style.display = 'inline';
-    // bottoneChiudiSchede.style.background = 'var(--blackOlive)';
+    bottoneChiudiSchede.style.background = 'var(--blackOlive)';
     apriTabControllo.classList.remove('active');
     apriTabIntervento.classList.remove('active');
 }
@@ -225,7 +225,7 @@ async function preparaCampiControllo() {
     const contLabelOperatore = document.createElement('label');
     contLabelOperatore.innerHTML = '<b>OPERATORE</b>';
     const contInputOperatore = document.createElement('input');
-    contInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
+    // contInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
     contInputOperatore.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{esecutori}');
     // DATA
     const contLabelData = document.createElement('label');
@@ -490,7 +490,7 @@ async function preparaCampiManOrd(divScheda) {
     const intLabelOperatore = document.createElement('label');
     intLabelOperatore.innerHTML = '<b>OPERATORE</b>';
     const intInputOperatore = document.createElement('input');
-    intInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
+    // intInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
     intInputOperatore.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{esecutori}');
     // DATA INTERVENTO
     const intLabelData = document.createElement('label');
@@ -608,7 +608,7 @@ async function preparaCampiManStr(divScheda) {
     const intLabelOperatore = document.createElement('label');
     intLabelOperatore.innerHTML = '<b>OPERATORE</b>';
     const intInputOperatore = document.createElement('input');
-    intInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
+    // intInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
     intInputOperatore.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{esecutori}');
     // DATA INTERVENTO
     const intLabelData = document.createElement('label');
@@ -732,7 +732,7 @@ async function preparaCampiRestauri(divScheda) {
     const intLabelOperatore = document.createElement('label');
     intLabelOperatore.innerHTML = '<b>OPERATORE</b>';
     const intInputOperatore = document.createElement('input');
-    intInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
+    // intInputOperatore.setAttribute('placeholder', 'es. Mario Rossi');
     intInputOperatore.setAttribute('id', 'scheda-intervento-[restauri]-{operatore}');
     // ANNO INIZIO
     const intLabelAnnoI = document.createElement('label');
