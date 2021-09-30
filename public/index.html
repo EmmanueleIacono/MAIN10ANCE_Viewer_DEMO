@@ -208,51 +208,44 @@
                 <input type="checkbox" name="check-generale" id="check-generale">
                 <label for="check-generale">ATTIVA FILTRI</label>
                 <br>
-                <button id="vedi-schede-tutto" class="vedi-schede">VISUALIZZA TUTTO</button>
-                <button id="vedi-schede-nulla" class="vedi-schede">SPEGNI TUTTO</button>
+                <button id="vedi-schede-tutto" class="vedi-schede-disatt" disabled>SELEZIONA TUTTO</button>
+                <button id="vedi-schede-nulla" class="vedi-schede-disatt" disabled>DESELEZIONA TUTTO</button>
                 <br>
-                <input type="checkbox" name="check-controllo" id="check-controllo" class="filtro-schede" disabled>
-                <label for="check-controllo">Schede controllo</label>
-                <br>
-                <input type="checkbox" name="check-man-reg" id="check-man-reg" class="filtro-schede" disabled>
-                <label for="check-man-reg">Schede manutenzione regolare</label>
-                <br>
-                <input type="checkbox" name="check-man-corr" id="check-man-corr" class="filtro-schede" disabled>
-                <label for="check-man-corr">Schede manutenzione correttiva</label>
-                <br>
-                <input type="checkbox" name="check-restauro" id="check-restauro" class="filtro-schede" disabled>
-                <label for="check-restauro">Schede restauro</label>
+                <input type="checkbox" name="check-tipo-scheda" id="check-tipo-scheda" class="filtro-schede" disabled>
+                <label for="check-tipo-scheda">Scheda</label>
+                <select name="select-tipo-scheda" id="select-tipo-scheda">
+                  <option value="scheda controllo">Scheda controllo</option>
+                  <option value="scheda manutenzione regolare">Scheda manutenzione regolare</option>
+                  <option value="scheda manutenzione correttiva">Scheda manutenzione correttiva</option>
+                  <option value="scheda restauro">Scheda restauro</option>
+                </select>
                 <br>
                 <input type="checkbox" name="check-sacro-monte" id="check-sacro-monte" class="filtro-schede" disabled>
                 <label for="check-sacro-monte">Sacro Monte</label>
-                <select name="select-sacro-monte" id="select-sacro-monte" disabled></select>
+                <select name="select-sacro-monte" id="select-sacro-monte"></select>
                 <br>
                 <input type="checkbox" name="check-cappella" id="check-cappella" class="filtro-schede" disabled>
                 <label for="check-cappella">Cappella</label>
-                <select name="select-cappella" id="select-cappella" disabled></select>
+                <select name="select-cappella" id="select-cappella"></select>
                 <br>
                 <input type="checkbox" name="check-elemento" id="check-elemento" class="filtro-schede" disabled>
                 <label for="check-elemento">Elemento</label>
-                <select name="select-elemento" id="select-elemento" disabled></select>
+                <select name="select-elemento" id="select-elemento"></select>
                 <br>
                 <input type="checkbox" name="check-stato-conservazione" id="check-stato-conservazione" class="filtro-schede" disabled>
                 <label for="check-stato-conservazione">Stato di conservazione</label>
-                <select name="select-stato-conservazione" id="select-stato-conservazione" disabled></select>
+                <select name="select-stato-conservazione" id="select-stato-conservazione"></select>
                 <br>
                 <input type="checkbox" name="check-fenomeno" id="check-fenomeno" class="filtro-schede" disabled>
                 <label for="check-fenomeno">Fenomeno</label>
-                <select name="select-fenomeno" id="select-fenomeno" disabled></select>
-                <br>
-                <input type="checkbox" name="check-materiale" id="check-materiale" class="filtro-schede" disabled>
-                <label for="check-materiale">Materiale</label>
-                <select name="select-materiale" id="select-materiale" disabled></select>
+                <select name="select-fenomeno" id="select-fenomeno"></select>
                 <br>
                 <input type="checkbox" name="check-data" id="check-data" class="filtro-schede" disabled>
                 <label for="check-data">Data</label>
                 <label for="input-data-da" style="font-weight: normal;">Da</label>
-                <input type="date" name="input-data-da" id="input-data-da" disabled>
+                <input type="date" name="input-data-da" id="input-data-da">
                 <label for="input-data-a" style="font-weight: normal;">A</label>
-                <input type="date" name="input-data-a" id="input-data-a" disabled>
+                <input type="date" name="input-data-a" id="input-data-a">
                 <br>
               </details>
             </div>

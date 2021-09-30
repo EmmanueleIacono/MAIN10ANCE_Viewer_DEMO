@@ -2,13 +2,16 @@ const tabContenitoreSchede = document.getElementById('tabSchede');
 const divContenitoreSchede = document.getElementById('contenitore-schede');
 const aggiornaSchedeStart = document.getElementById('refreshSchede');
 const contenitoreFiltriSchede = document.getElementById('pannello-lat-schede-body');
+const listaCheckboxSchede = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
 const checkGenerale = document.getElementById('check-generale');
-const visualizzaTutto = document.getElementById('vedi-schede-tutto');
-const visualizzaNulla = document.getElementById('vedi-schede-nulla');
-const checkControllo = document.getElementById('check-controllo');
-const checkManReg = document.getElementById('check-man-reg');
-const checkManCorr = document.getElementById('check-man-corr');
-const checkRestauro = document.getElementById('check-restauro');
+const selezionaTutto = document.getElementById('vedi-schede-tutto');
+const selezionaNulla = document.getElementById('vedi-schede-nulla');
+const checkTipoScheda = document.getElementById('check-tipo-scheda');
+const selectTipoScheda = document.getElementById('select-tipo-scheda');
+// const checkControllo = document.getElementById('check-controllo');
+// const checkManReg = document.getElementById('check-man-reg');
+// const checkManCorr = document.getElementById('check-man-corr');
+// const checkRestauro = document.getElementById('check-restauro');
 const checkSacroMonte = document.getElementById('check-sacro-monte');
 const selectSacroMonte = document.getElementById('select-sacro-monte');
 const checkCappella = document.getElementById('check-cappella');
@@ -19,8 +22,8 @@ const checkStatoCons = document.getElementById('check-stato-conservazione');
 const selectStatoCons = document.getElementById('select-stato-conservazione');
 const checkFenomeno = document.getElementById('check-fenomeno');
 const selectFenomeno = document.getElementById('select-fenomeno');
-const checkMateriale = document.getElementById('check-materiale');
-const selectMateriale = document.getElementById('select-materiale');
+// const checkMateriale = document.getElementById('check-materiale');
+// const selectMateriale = document.getElementById('select-materiale');
 const checkData = document.getElementById('check-data');
 const inputDataDa = document.getElementById('input-data-da');
 const inputDataA = document.getElementById('input-data-a');
@@ -39,13 +42,17 @@ function visualizzaSchedeStart() {
     compilaTabelleManReg();
     compilaTabelleManCorr();
     compilaTabelleRestauro();
+
+    if (checkGenerale.checked) {
+        checkGenerale.click();
+    }
 };
 
 popolaSelectSacriMonti();
 popolaSelectElementi();
 popolaSelectFenomeno();
 popolaSelectStatoCons();
-popolaSelectMateriale();
+// popolaSelectMateriale();
 
 (async function popolaListaSigleNumCapp() {
     listaSigleNumericheCappelle = await prendiSigleNumericheCappelle();
@@ -54,95 +61,124 @@ popolaSelectMateriale();
 aggiornaSchedeStart.addEventListener('click', visualizzaSchedeStart);
 
 checkGenerale.addEventListener('change', () => {
-    const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
+    // const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
     const listaSelect = contenitoreFiltriSchede.getElementsByTagName('select');
     const listaInput = contenitoreFiltriSchede.getElementsByTagName('input');
     if (checkGenerale.checked) {
-        listaCheckbox.forEach(cbx => {
+        listaCheckboxSchede.forEach(cbx => {
             cbx.disabled = false;
         });
+        // listaSelect.forEach(sl => {
+        //     sl.disabled = false;
+        // });
+        // listaInput.forEach(inp => {
+        //     if (inp.type === 'date') {
+        //         inp.disabled = false;
+        //     }
+        // });
+        selezionaTutto.disabled = false;
+        selezionaTutto.classList.toggle('vedi-schede');
+        selezionaTutto.classList.toggle('vedi-schede-disatt');
+        selezionaNulla.disabled = false;
+        selezionaNulla.classList.toggle('vedi-schede');
+        selezionaNulla.classList.toggle('vedi-schede-disatt');
+
+        filtraViewSchede();
     }
     else {
-        listaCheckbox.forEach(cbx => {
+        listaCheckboxSchede.forEach(cbx => {
             cbx.disabled = true;
         });
-        listaSelect.forEach(sl => {
-            sl.disabled = true;
-        });
-        listaInput.forEach(inp => {
-            if (inp.type === 'date') {
-                inp.disabled = true;
-            }
-        });
+        // listaSelect.forEach(sl => {
+        //     sl.disabled = true;
+        // });
+        // listaInput.forEach(inp => {
+        //     if (inp.type === 'date') {
+        //         inp.disabled = true;
+        //     }
+        // });
+        selezionaTutto.disabled = true;
+        selezionaTutto.classList.toggle('vedi-schede');
+        selezionaTutto.classList.toggle('vedi-schede-disatt');
+        selezionaNulla.disabled = true;
+        selezionaNulla.classList.toggle('vedi-schede');
+        selezionaNulla.classList.toggle('vedi-schede-disatt');
         filtraVediTutto();
+        // spuntaTuttoNiente(false);
     }
 });
 
-visualizzaTutto.addEventListener('click', filtraVediTutto);
-visualizzaNulla.addEventListener('click', filtraVediNulla);
+selezionaTutto.addEventListener('click', () => {
+    // filtraVediTutto();
+    spuntaTuttoNiente(true);
+});
+selezionaNulla.addEventListener('click', () => {
+    // filtraVediNulla();
+    spuntaTuttoNiente(false);
+});
 
-checkSacroMonte.addEventListener('change', () => {
+checkTipoScheda.addEventListener('change', () => {
+    if ((!checkTipoScheda.checked) && (checkStatoCons.checked)) {
+        checkStatoCons.checked = false;
+    }
+    filtraViewSchede();
+});
+selectTipoScheda.addEventListener('change', () => {
+    if (checkTipoScheda.checked) {
+        filtraViewSchede();
+    }
+});
+
+checkSacroMonte.addEventListener('change', filtraViewSchede);
+selectSacroMonte.addEventListener('change', () => {
     if (checkSacroMonte.checked) {
-        selectSacroMonte.disabled = false;
-    }
-    else {
-        selectSacroMonte.disabled = true;
+        filtraViewSchede();
     }
 });
 
-checkCappella.addEventListener('change', () => {
+checkCappella.addEventListener('change', filtraViewSchede);
+selectCappella.addEventListener('change', () => {
     if (checkCappella.checked) {
-        selectCappella.disabled = false;
-    }
-    else {
-        selectCappella.disabled = true;
+        filtraViewSchede();
     }
 });
 
-checkElemento.addEventListener('change', () => {
+checkElemento.addEventListener('change', filtraViewSchede);
+selectElemento.addEventListener('change', () => {
     if (checkElemento.checked) {
-        selectElemento.disabled = false;
-    }
-    else {
-        selectElemento.disabled = true;
+        filtraViewSchede();
     }
 });
 
 checkStatoCons.addEventListener('change', () => {
+    selectTipoScheda.value = 'scheda controllo';
+    if (!checkTipoScheda.checked) {
+        checkTipoScheda.click();
+    }
+    filtraViewSchede();
+});
+selectStatoCons.addEventListener('change', () => {
     if (checkStatoCons.checked) {
-        selectStatoCons.disabled = false;
-    }
-    else {
-        selectStatoCons.disabled = true;
+        filtraViewSchede();
     }
 });
 
-checkFenomeno.addEventListener('change', () => {
+checkFenomeno.addEventListener('change', filtraViewSchede);
+selectFenomeno.addEventListener('change', () => {
     if (checkFenomeno.checked) {
-        selectFenomeno.disabled = false;
-    }
-    else {
-        selectFenomeno.disabled = true;
+        filtraViewSchede();
     }
 });
 
-checkMateriale.addEventListener('change', () => {
-    if (checkMateriale.checked) {
-        selectMateriale.disabled = false;
-    }
-    else {
-        selectMateriale.disabled = true;
-    }
-});
-
-checkData.addEventListener('change', () => {
+checkData.addEventListener('change', filtraViewSchede);
+inputDataDa.addEventListener('change', () => {
     if (checkData.checked) {
-        inputDataDa.disabled = false;
-        inputDataA.disabled = false;
+        filtraViewSchede();
     }
-    else {
-        inputDataDa.disabled = true;
-        inputDataA.disabled = true;
+});
+inputDataA.addEventListener('change', () => {
+    if (checkData.checked) {
+        filtraViewSchede();
     }
 });
 
@@ -157,36 +193,6 @@ selectSacroMonte.addEventListener('change', () => {
         }
     });
 });
-
-// setInterval(() => {
-//     // const insiemeTabelle = document.querySelectorAll('.tabella-schede');
-//     // insiemeTabelle.forEach(tbl => {
-//     //     tbl.style.display = 'none';
-//     // });
-//     // if (checkControllo.checked) {filtraSchedeConManRest('SCHEDA CONTROLLO');}
-//     // if (checkManReg.checked) {filtraSchedeConManRest('SCHEDA MANUTENZIONE REGOLARE');}
-//     // if (checkManCorr.checked) {filtraSchedeConManRest('SCHEDA MANUTENZIONE CORRETTIVA');}
-//     // if (checkRestauro.checked) {filtraSchedeConManRest('SCHEDA RESTAURO');}
-//     let listaChecked = [];
-//     const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
-//     listaCheckbox.forEach(cbx => {
-//         if (cbx.checked) {
-//             listaChecked.push(cbx);
-//         }
-//     if (listaChecked.length === 0) {
-//         filtraVediTutto();
-//     }
-//     });
-// }, 100);
-
-// function azioniPreliminari() {
-//     const titoloTabella = document.createElement('h4');
-//     titoloTabella.setAttribute('id', 'tabella-titolo');
-//     titoloTabella.innerHTML = '<b>SCHEDE</b>';
-
-//     tabContenitoreSchede.appendChild(titoloTabella);
-//     // tabContenitoreSchede.appendChild(document.createElement('br'));
-// }
 
 function creaStrutturaSchede() {
     const tabellaSchede = document.createElement('table');
@@ -397,16 +403,16 @@ function filtraSchedeDaID(idScheda) {
 
 function filtraVediTutto() {
     const insiemeTabelle = document.querySelectorAll('.tabella-schede');
-    const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
+    // const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
     insiemeTabelle.forEach(tab => {
         tab.style.display = 'table';
     });
-    if (checkGenerale.checked) {
-        checkGenerale.click();
-    }
-    listaCheckbox.forEach(cbx => {
-        cbx.checked = false;
-    });
+    // if (checkGenerale.checked) {
+    //     checkGenerale.click();
+    // }
+    // listaCheckboxSchede.forEach(cbx => {
+    //     cbx.checked = false;
+    // });
 }
 
 function filtraVediNulla() {
@@ -414,6 +420,31 @@ function filtraVediNulla() {
     insiemeTabelle.forEach(tab => {
         tab.style.display = 'none';
     });
+}
+
+function spuntaTuttoNiente(tutto) {
+    if (tutto) {
+        listaCheckboxSchede.forEach(cbx => {
+            // cbx.checked = true;
+            if (cbx.checked) {
+                return;
+            }
+            else {
+                cbx.click();
+            }
+        });
+    }
+    else {
+        listaCheckboxSchede.forEach(cbx => {
+            // cbx.checked = false;
+            if (cbx.checked) {
+                cbx.click();
+            }
+            else {
+                return;
+            }
+        });
+    }
 }
 
 function filtraSchedeConManRest(filtro) {
@@ -505,12 +536,145 @@ async function popolaSelectStatoCons() {
     });
 }
 
-async function popolaSelectMateriale() {
-    const listaMateriali = await leggiEnum('mat_ty');
-    listaMateriali.forEach(m => {
-        const opz = document.createElement('option');
-        opz.setAttribute('value', m.unnest);
-        opz.innerHTML = m.unnest;
-        selectMateriale.appendChild(opz);
+// async function popolaSelectMateriale() {
+//     const listaMateriali = await leggiEnum('mat_ty');
+//     listaMateriali.forEach(m => {
+//         const opz = document.createElement('option');
+//         opz.setAttribute('value', m.unnest);
+//         opz.innerHTML = m.unnest;
+//         selectMateriale.appendChild(opz);
+//     });
+// }
+
+function creaCondizioneCaption() {
+    return;
+}
+
+function verificaFiltriSchede(tabella) {
+    if (checkTipoScheda.checked) {
+        const tipoSchedaTarget = selectTipoScheda.value.toUpperCase();
+        const captionTarget = tabella.getElementsByTagName('caption')[0];
+        if (!(captionTarget.innerText.startsWith(tipoSchedaTarget))) {
+            return false;
+        }
+    }
+    if (checkSacroMonte.checked) {
+        const sacroMonteTarget = selectSacroMonte.value;
+        let cellTarget;
+        tabella.rows.forEach(r => {
+            if (r.cells[0].innerText.startsWith('Elementi')) {
+                cellTarget = r.cells[1].innerText.split('|')[0];
+            }
+        });
+        if (!(sacroMonteTarget === cellTarget)) {
+            return false;
+        }
+    }
+    if (checkCappella.checked) {
+        const cappellaTarget = selectCappella.value;
+        let cellTarget;
+        tabella.rows.forEach(r => {
+            if (r.cells[0].innerText.startsWith('Elementi')) {
+                let listaNumeriCapp = [];
+                listaIdM10a = r.cells[1].innerText.split(',');
+                listaIdM10a.forEach(id => {
+                    let listaCappelleDaId = id.split('|')[1].split('-');
+                    listaNumeriCapp.push(...listaCappelleDaId);
+                });
+                cellTarget = [... new Set(listaNumeriCapp)];
+            }
+        });
+        if (!(cellTarget.includes(cappellaTarget))) {
+            return false;
+        }
+    }
+    if (checkElemento.checked) {
+        const elementoTarget = selectElemento.value;
+        let cellTarget;
+        tabella.rows.forEach(r => {
+            if (r.cells[0].innerText.startsWith('Elementi')) {
+                let listaElementi = [];
+                listaIdM10a = r.cells[1].innerText.split(',');
+                listaIdM10a.forEach(id => {
+                    let listaElementiDaId = id.split('|')[2].split('-');
+                    listaElementi.push(...listaElementiDaId);
+                });
+                cellTarget = [... new Set(listaElementi)];
+            }
+        });
+        if (!(cellTarget.includes(elementoTarget))) {
+            return false;
+        }
+    }
+    if (checkStatoCons.checked) {
+        const statoConsTarget = selectStatoCons.value;
+        let cellTarget;
+        tabella.rows.forEach(r => {
+            if (r.cells[0].innerText === 'Stato di conservazione') {
+                cellTarget = r.cells[1].innerText;
+            }
+        });
+        if (!(statoConsTarget === cellTarget)) {
+            return false;
+        }
+    }
+    if (checkFenomeno.checked) {
+        const fenomenoTarget = selectFenomeno.value;
+        let cellTarget;
+        tabella.rows.forEach(r => {
+            if ((r.cells[0].innerText === 'Nome fenomeno') || (r.cells[0].innerText === 'Fenomeno interessato')) {
+                cellTarget = r.cells[1].innerText;
+            }
+        });
+        if (!(fenomenoTarget === cellTarget)) {
+            return false;
+        }
+    }
+    if (checkData.checked) {
+        const dataTargetDa = inputDataDa.value;
+        const dataTargetA = inputDataA.value;
+        const tipoScheda = tabella.getElementsByTagName('caption')[0].innerText;
+        if (tipoScheda.startsWith('SCHEDA RESTAURO')) {
+            let targetI;
+            let targetF;
+            tabella.rows.forEach(r => {
+                if (r.cells[0].innerText === 'Anno inizio') {
+                    targetI = r.cells[1].innerText;
+                }
+                if (r.cells[0].innerText === 'Anno fine') {
+                    targetF = r.cells[1].innerText;
+                }
+            });
+            const annoITarget = new Date(dataTargetDa).getFullYear();
+            const annoFTarget = new Date(dataTargetA).getFullYear();
+            if (!((annoITarget <= parseInt(targetI)) && (parseInt(targetF) <= annoFTarget))) {
+                return false;
+            }
+        }
+        else {
+            let cellTarget;
+            tabella.rows.forEach(r => {
+                if ((r.cells[0].innerText === 'Data controllo') || (r.cells[0].innerText === 'Data intervento')) {
+                    cellTarget = r.cells[1].innerText;
+                }
+            });
+            if (!((confrontaDate(dataTargetDa, cellTarget)) && (confrontaDate(cellTarget, dataTargetA)))) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function filtraViewSchede() {
+    const insiemeTabelle = document.querySelectorAll('.tabella-schede');
+    insiemeTabelle.forEach(tab => {
+        const verifica = verificaFiltriSchede(tab);
+        if (verifica) {
+            tab.style.display = 'table';
+        }
+        else {
+            tab.style.display = 'none';
+        }
     });
 }

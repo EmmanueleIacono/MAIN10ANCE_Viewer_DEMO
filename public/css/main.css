@@ -508,6 +508,13 @@ tr:nth-child(even) {
   background-color: var(--verdeMain10anceTrasparenza);
 }
 
+.vedi-schede-disatt {
+  background-color: var(--grigioScuro);
+  color: var(--grigioMoltoScuro);
+  border: none;
+  font-weight: bold;
+}
+
 #pannello-lat-schede-inner {
   overflow: auto;
 }
