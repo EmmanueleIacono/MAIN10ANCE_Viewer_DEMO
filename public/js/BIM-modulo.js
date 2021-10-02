@@ -151,7 +151,11 @@ function inizializzaModulo() {
     else {
         let selezione = viewer.getSelection();
         let isolato = viewer.getIsolatedNodes();
-        if (isolato.length !== 0) {
+        if ((selezione.length !== 0) && (isolato.length !== 0)) {
+            isolato = viewer.isolate(selezione);
+            viewer.select(isolato);
+        }
+        else if (isolato.length !== 0) {
             viewer.select(isolato);
             selezione = viewer.getSelection();
         }
