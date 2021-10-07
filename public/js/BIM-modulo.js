@@ -371,11 +371,17 @@ async function preparaCampiControllo() {
     contInputCosto.setAttribute('type', 'number');
     contInputCosto.setAttribute('step', 0.01);
     contInputCosto.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{costo}');
-    // COMMENTI
+    // NOTE
     const contLabelCommenti = document.createElement('label');
-    contLabelCommenti.innerHTML = '<b>COMMENTI</b>';
+    contLabelCommenti.innerHTML = '<b>NOTE</b>';
     const contInputCommenti = document.createElement('textarea');
+    contInputCommenti.style.height = '20px';
     contInputCommenti.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza|danno_alterazione_degrado]-{commenti}');
+    // DOCUMENTI
+    const contLabelDocumenti = document.createElement('label');
+    contLabelDocumenti.innerHTML = '<b>DOCUMENTI</b>';
+    const contInputDocumenti = document.createElement('input');
+    contInputDocumenti.setAttribute('id', 'scheda-controllo-[controllo_stato_di_conservazione_livello_di_urgenza]-{doc}');
 
     schedaControllo.appendChild(contTitolo);
     schedaControllo.appendChild(document.createElement('br'));
@@ -431,6 +437,9 @@ async function preparaCampiControllo() {
     schedaControllo.appendChild(document.createElement('br'));
     schedaControllo.appendChild(contLabelCommenti);
     schedaControllo.appendChild(contInputCommenti);
+    schedaControllo.appendChild(document.createElement('br'));
+    schedaControllo.appendChild(contLabelDocumenti);
+    schedaControllo.appendChild(contInputDocumenti);
     schedaControllo.appendChild(document.createElement('br'));
 }
 
@@ -558,11 +567,17 @@ async function preparaCampiManOrd(divScheda) {
     intInputCosto.setAttribute('type', 'number');
     intInputCosto.setAttribute('step', 0.01);
     intInputCosto.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{costo}');
-    // COMMENTI
+    // NOTE
     const intLabelCommenti = document.createElement('label');
-    intLabelCommenti.innerHTML = '<b>COMMENTI</b>';
+    intLabelCommenti.innerHTML = '<b>NOTE</b>';
     const intInputCommenti = document.createElement('textarea');
+    intInputCommenti.style.height = '20px';
     intInputCommenti.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{commenti}');
+    // DOCUMENTI
+    const intLabelDocumenti = document.createElement('label');
+    intLabelDocumenti.innerHTML = '<b>DOCUMENTI</b>';
+    const intInputDocumenti = document.createElement('input');
+    intInputDocumenti.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{doc}');
 
     divScheda.appendChild(intTitolo);
     divScheda.appendChild(document.createElement('br'));
@@ -592,6 +607,9 @@ async function preparaCampiManOrd(divScheda) {
     divScheda.appendChild(document.createElement('br'));
     divScheda.appendChild(intLabelCommenti);
     divScheda.appendChild(intInputCommenti);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelDocumenti);
+    divScheda.appendChild(intInputDocumenti);
     divScheda.appendChild(document.createElement('br'));
 }
 
@@ -679,11 +697,17 @@ async function preparaCampiManStr(divScheda) {
     intLabelCausa.innerHTML = '<b>CAUSA</b>';
     const intInputCausa = document.createElement('input');
     intInputCausa.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{causa}');
-    // COMMENTI
+    // NOTE
     const intLabelCommenti = document.createElement('label');
-    intLabelCommenti.innerHTML = '<b>COMMENTI</b>';
+    intLabelCommenti.innerHTML = '<b>NOTE</b>';
     const intInputCommenti = document.createElement('textarea');
+    intInputCommenti.style.height = '20px';
     intInputCommenti.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{commenti}');
+    // DOCUMENTI
+    const intLabelDocumenti = document.createElement('label');
+    intLabelDocumenti.innerHTML = '<b>DOCUMENTI</b>';
+    const intInputDocumenti = document.createElement('input');
+    intInputDocumenti.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{doc}');
 
     divScheda.appendChild(intTitolo);
     divScheda.appendChild(document.createElement('br'));
@@ -716,6 +740,9 @@ async function preparaCampiManStr(divScheda) {
     divScheda.appendChild(document.createElement('br'));
     divScheda.appendChild(intLabelCommenti);
     divScheda.appendChild(intInputCommenti);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelDocumenti);
+    divScheda.appendChild(intInputDocumenti);
     divScheda.appendChild(document.createElement('br'));
 }
 
@@ -775,11 +802,17 @@ async function preparaCampiRestauri(divScheda) {
     intInputCosto.setAttribute('type', 'number');
     intInputCosto.setAttribute('step', 0.01);
     intInputCosto.setAttribute('id', 'scheda-intervento-[restauri]-{costo}');
-    // COMMENTI
+    // NOTE
     const intLabelCommenti = document.createElement('label');
-    intLabelCommenti.innerHTML = '<b>COMMENTI</b>';
+    intLabelCommenti.innerHTML = '<b>NOTE</b>';
     const intInputCommenti = document.createElement('textarea');
+    intInputCommenti.style.height = '20px';
     intInputCommenti.setAttribute('id', 'scheda-intervento-[restauri]-{commenti}');
+    // DOCUMENTI
+    const intLabelDocumenti = document.createElement('label');
+    intLabelDocumenti.innerHTML = '<b>DOCUMENTI</b>';
+    const intInputDocumenti = document.createElement('input');
+    intInputDocumenti.setAttribute('id', 'scheda-intervento-[restauri]-{doc}');
 
     divScheda.appendChild(intTitolo);
     divScheda.appendChild(document.createElement('br'));
@@ -806,6 +839,9 @@ async function preparaCampiRestauri(divScheda) {
     divScheda.appendChild(document.createElement('br'));
     divScheda.appendChild(intLabelCommenti);
     divScheda.appendChild(intInputCommenti);
+    divScheda.appendChild(document.createElement('br'));
+    divScheda.appendChild(intLabelDocumenti);
+    divScheda.appendChild(intInputDocumenti);
     divScheda.appendChild(document.createElement('br'));
 }
 
