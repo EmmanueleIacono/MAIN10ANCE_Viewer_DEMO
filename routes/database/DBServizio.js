@@ -4,6 +4,8 @@ const appServizio = express.Router();
 appServizio.use(express.json());
 appServizio.use(express.static("public"));
 
+const {controllaRuoli, consentiAccesso} = require('../auth/middleware');
+
 const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
@@ -57,6 +59,23 @@ appServizio.get('/DB_Servizio/LOD/3e4', async (req, res) => {
     const lod = await leggiTabelleLOD3e4();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(lod));
+});
+
+// per testare la richiesta:
+// fetch("/utenti", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appServizio.get('/utenti', controllaRuoli, async (req, res) => {
+    const users = await getUtenti();
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(users));
+});
+
+// per testare la richiesta:
+// fetch("/utenti/mario", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appServizio.get(`/utenti/:username`, consentiAccesso, async (req, res) => {
+    const username = req.params.username;
+    const risp = await getUtenteByNome(username);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(risp));
 });
 
 start();
@@ -135,4 +154,24 @@ async function leggiTabelleLOD3e4() {
     }
 }
 
-module.exports = appServizio
+async function getUtenti() {
+    try {
+        const results = await client.query(`SELECT * FROM "utenti";`);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function getUtenteByNome(nome) {
+    try {
+        const results = await client.query(`SELECT "user" AS "username", "pw", "ruolo" AS "role" FROM "utenti" WHERE "user" = ($1);`, [nome]);
+        return results.rows[0];
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+module.exports = {appServizio, getUtenteByNome}
