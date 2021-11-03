@@ -20,13 +20,13 @@ appGIS_BIM.get('/Main10ance_DB/GIS', async (req, res) => {
     res.send(JSON.stringify(rispostaGIS));
 });
 
-// per testare la richiesta:
-// fetch("/Main10ance_DB/tabelle", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appGIS_BIM.get('/Main10ance_DB/tabelle', async (req, res) => {
-    const risposta = await leggiListaTabelle();
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+// // per testare la richiesta:
+// // fetch("/Main10ance_DB/tabelle", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// appGIS_BIM.get('/Main10ance_DB/tabelle', async (req, res) => {
+//     const risposta = await leggiListaTabelle();
+//     res.setHeader('content-type', 'application/json');
+//     res.send(risposta);
+// });
 
 appGIS_BIM.get('/Main10ance_DB/BIMViewer', async (req, res) => {
     const reqJson = req.headers;
@@ -187,15 +187,15 @@ async function leggiGIS(tabella, alias, geometria, colonneUtili) {
     }
 }
 
-async function leggiListaTabelle() {
-    try {
-        const results = await client.query(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'main10ance_sacrimonti';`);
-        return results.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
+// async function leggiListaTabelle() {
+//     try {
+//         const results = await client.query(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'main10ance_sacrimonti';`);
+//         return results.rows;
+//     }
+//     catch(e) {
+//         return [];
+//     }
+// }
 
 async function leggiBIMViewer(nomeCategoria, idElemento) {
     try {

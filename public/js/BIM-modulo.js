@@ -1296,68 +1296,68 @@ function filtraOpzioniMateriale(valore, selectMateriale, enumGlossario) {
     }
 }
 
-async function creaPDF(listaIdMain10ance, listaDatiNascosti, contr_manut) {
-    const stringaID = listaIdMain10ance.join('-');
-    let idUnivoco;
-    listaDatiNascosti.every(ls => {
-        if (ls['colonna'] === 'id_id') {
-            idUnivoco = ls['valore'];
-            return false;
-        }
-        else {
-            return true;
-        }
-    });
-    let pdf = new jsPDF({
-        orientation: 'l',
-        unit: 'mm',
-        format: 'a4'
-    });
-    const nomeFile = `${contr_manut}_${stringaID}_${idUnivoco}.pdf`;
-    pdf.setProperties({
-        title: nomeFile
-    });
-    pdf.setFontSize(14);
+// async function creaPDF(listaIdMain10ance, listaDatiNascosti, contr_manut) {
+//     const stringaID = listaIdMain10ance.join('-');
+//     let idUnivoco;
+//     listaDatiNascosti.every(ls => {
+//         if (ls['colonna'] === 'id_id') {
+//             idUnivoco = ls['valore'];
+//             return false;
+//         }
+//         else {
+//             return true;
+//         }
+//     });
+//     let pdf = new jsPDF({
+//         orientation: 'l',
+//         unit: 'mm',
+//         format: 'a4'
+//     });
+//     const nomeFile = `${contr_manut}_${stringaID}_${idUnivoco}.pdf`;
+//     pdf.setProperties({
+//         title: nomeFile
+//     });
+//     pdf.setFontSize(14);
 
-    const idCanvasScheda = contr_manut.toLowerCase();
-    const canvasScheda = await html2canvas($(`#${idCanvasScheda}`)[0]);
-    const immagineScheda = await canvasScheda.toDataURL("image/png");
-    const canvasForge = document.getElementsByTagName('canvas')[0];
-    const canvasViewer = await html2canvas(canvasForge);
-    const immagineViewer = await canvasViewer.toDataURL("image/png");
+//     const idCanvasScheda = contr_manut.toLowerCase();
+//     const canvasScheda = await html2canvas($(`#${idCanvasScheda}`)[0]);
+//     const immagineScheda = await canvasScheda.toDataURL("image/png");
+//     const canvasForge = document.getElementsByTagName('canvas')[0];
+//     const canvasViewer = await html2canvas(canvasForge);
+//     const immagineViewer = await canvasViewer.toDataURL("image/png");
 
-    pdf.text(5, 10, `ID ELEMENTO: ${stringaID}`);
-    pdf.text(5, 20, `ID RECORD: ${idUnivoco}`);
-    pdf.addImage(immagineViewer, 'PNG', 5, 30, 148, 135);
-    pdf.addImage(immagineScheda, 'PNG', 148, 30);
+//     pdf.text(5, 10, `ID ELEMENTO: ${stringaID}`);
+//     pdf.text(5, 20, `ID RECORD: ${idUnivoco}`);
+//     pdf.addImage(immagineViewer, 'PNG', 5, 30, 148, 135);
+//     pdf.addImage(immagineScheda, 'PNG', 148, 30);
 
-    const fileCreato = pdf.output('bloburl', {filename: nomeFile});
-    window.open(fileCreato, '_blank');
+//     const fileCreato = pdf.output('bloburl', {filename: nomeFile});
+//     window.open(fileCreato, '_blank');
 
-    // pdf.text(20, 20, 'PROVA PROVA');
-    // pdf.addPage();
-    // pdf.text(30, 30, 'PROVA PROVA PAG 2');
+//     // pdf.text(20, 20, 'PROVA PROVA');
+//     // pdf.addPage();
+//     // pdf.text(30, 30, 'PROVA PROVA PAG 2');
 
-    // let specialElementHandlers = {}
+//     // let specialElementHandlers = {}
 
-    // pdf.fromHTML($('#scheda-controllo').get(0), {
-    //     elementHandlers: specialElementHandlers
-    // });
+//     // pdf.fromHTML($('#scheda-controllo').get(0), {
+//     //     elementHandlers: specialElementHandlers
+//     // });
 
-    // pdf.fromHTML($('#scheda-controllo').get(0), 20, 20);
+//     // pdf.fromHTML($('#scheda-controllo').get(0), 20, 20);
 
-    // pdf.save(nomeFile);
-    // const fileCreato = pdf.output('bloburl', {filename: nomeFile}); // QUESTO
-    // const stringaEmbed = `<embed type="application/pdf" src="${fileCreato}" width="1000" height="1000">`;
-    // window.open(fileCreato, '_blank'); // QUESTO
+//     // pdf.save(nomeFile);
+//     // const fileCreato = pdf.output('bloburl', {filename: nomeFile}); // QUESTO
+//     // const stringaEmbed = `<embed type="application/pdf" src="${fileCreato}" width="1000" height="1000">`;
+//     // window.open(fileCreato, '_blank'); // QUESTO
 
-    // let stringaFile = pdf.output('datauristring');
-    // let iframeFile = "<iframe width='100%' height='100%' src='" + stringaFile + "'></iframe>"
-    // let wOp = window.open();
-    // wOp.document.open();
-    // wOp.document.write(stringaEmbed);
-    // wOp.document.close();
-}
+//     // let stringaFile = pdf.output('datauristring');
+//     // let iframeFile = "<iframe width='100%' height='100%' src='" + stringaFile + "'></iframe>"
+//     // let wOp = window.open();
+//     // wOp.document.open();
+//     // wOp.document.write(stringaEmbed);
+//     // wOp.document.close();
+// }
 
 function trovaRidGloss() {
     const elemento = $('[id*="{id_contr}"]')[0];
@@ -1484,9 +1484,3 @@ async function creaPDF2(listaIdMain10ance, listaDatiNascosti, contr_manut) {
     const fileCreato = pdf.output('bloburl', {filename: nomeFile});
     window.open(fileCreato, '_blank');
 }
-
-// viewer.fitToView(null, null, true);setTimeout(() => {creaPDF2(trovaIdMain10ance(), [{colonna: 'id_id', valore: 'ID elemento'}], 'SCHEDA-CONTROLLO')}, 500);
-// viewer.fitToView(null, null, true);setTimeout(() => {creaPDF2(trovaIdMain10ance(), [{colonna: 'id_id', valore: 'ID elemento'}], 'SCHEDA-INTERVENTO')}, 500);
-
-// document.getElementById('apriTabBIM').click();
-// launchViewer('dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2Fjcm8tbW9udGUtdmFyYWxsby9TTVZfQ0FQXzE2LTI0LnJ2dA');
