@@ -518,3 +518,24 @@ tr:nth-child(even) {
 #pannello-lat-schede-inner {
   overflow: auto;
 }
+
+#contenitoreLoginSignup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.auth-div {
+  background-color: var(--grigioScuro);
+  padding: 10px;
+}
+
+#messaggio-errore {
+  display: flex;
+  justify-content: center;
+}
+
+#login-a, #signup-a {
+  cursor: pointer;
+}
