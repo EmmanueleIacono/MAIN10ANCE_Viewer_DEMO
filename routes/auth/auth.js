@@ -1,6 +1,5 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-// const { getUtenteByNome, insertNuovoUtente } = require('../database/DBServizio');
 const router = express.Router();
 router.use(express.json());
 

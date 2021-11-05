@@ -216,7 +216,6 @@ async function transazioneScheda(listaStrVals) {
             }
         }
         catch(e) {
-            // console.log('Errore interno: ' + e);
             throw e;
         }
 
