@@ -1,8 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const { getUtenteByNome } = require('../database/DBServizio');
+// const { getUtenteByNome, insertNuovoUtente } = require('../database/DBServizio');
 const router = express.Router();
 router.use(express.json());
+
+const {clientServ} = require('../database/connessioni');
 
 // questi percorsi di route sono sempre preceduti da /auth (vedi index.js)
 
@@ -91,9 +93,21 @@ function validazioneUsers(user) {
     return validUsername && validPassword;
 }
 
+//////////          QUERY          //////////
+
+async function getUtenteByNome(nome) {
+    try {
+        const results = await clientServ.query(`SELECT "user" AS "username", "pw", "ruolo" AS "role" FROM "utenti" WHERE "user" = ($1);`, [nome]);
+        return results.rows[0];
+    }
+    catch(e) {
+        return [];
+    }
+}
+
 async function insertNuovoUtente(user) {
     try {
-        await client.query(`INSERT INTO "utenti" ("user", "pw", "ruolo") VALUES (($1), ($2), 'turista');`, [user.username, user.pw]);
+        await clientServ.query(`INSERT INTO "utenti" ("user", "pw", "ruolo") VALUES (($1), ($2), 'turista');`, [user.username, user.pw]);
         return true;
     }
     catch(e) {
