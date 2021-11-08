@@ -395,6 +395,15 @@ div[id^="div-form-"] {
   background-color: #aaa;
 }
 
+#liUsernameNavbar {
+  padding: 10px;
+  margin: 10px;
+  color: var(--verdeMain10ance);
+  font-weight: bold;
+  border: none;
+  display: none;
+}
+
 /* INTERFACCIA DATABASE */
 /* #filtroDB {
   column-count: 3;

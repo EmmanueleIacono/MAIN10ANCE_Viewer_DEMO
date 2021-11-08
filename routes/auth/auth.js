@@ -47,6 +47,7 @@ router.post('/login', async (req, res, next) => {
             // confronta con pw in db -> comp è bool
             const comp = await bcrypt.compare(req.body.pw, datiUtente.pw);
             if (comp) {
+                const roleSettings = await getSettingsByRuolo(datiUtente.role);
                 res.cookie('user_id', datiUtente.username, {
                     httpOnly: true,
                     secure: (!process.env.DEV_PLACEHOLDER),
@@ -59,7 +60,8 @@ router.post('/login', async (req, res, next) => {
                 });
                 res.json({
                     message: 'Login completato',
-                    id: datiUtente.username
+                    id: datiUtente.username,
+                    bim_vw_sets: roleSettings.bim_vw_sets
                 });
             }
             else {
@@ -112,6 +114,16 @@ async function insertNuovoUtente(user) {
     catch(e) {
         console.log(e);
         return false;
+    }
+}
+
+async function getSettingsByRuolo(ruolo) {
+    try {
+        const results = await clientServ.query(`SELECT "bim_vw_sets" FROM "ruoli" WHERE "ruolo" = ($1);`, [ruolo]);
+        return results.rows[0];
+    }
+    catch(e) {
+        return [];
     }
 }
 

@@ -30,13 +30,14 @@
   <script src="js/ForgeTree.js"></script>
   <script src="js/ForgeViewer.js"></script>
   <!-- PER QUESTI SOTTO SERVE DEFER PER CARICARLI DOPO L'HTML -->
+  <script src="js/login-signup.js" defer></script>
+  <script src="js/PrimoLoad.js" defer></script>
   <script src="js/BIM-DB.js" defer></script>
   <script src="js/BIM-modulo.js" defer></script>
   <script src="js/MappaGIS.js" defer></script>
   <script src="js/ConsultazioneDB.js" defer></script>
   <script src="js/calendario.js" defer></script>
   <script src="js/schede-viewer.js" defer></script>
-  <script src="js/login-signup.js" defer></script>
 </head>
 <body>
   <!-- CARICAMENTO -->
@@ -81,7 +82,9 @@
       </ul>
       <div class="pull-right">
         <ul class="nav navbar-nav">
+          <li id="liUsernameNavbar"></li>
           <li data-tab-target="#tabLogin" class="tab" id="apriTabLogin">LOGIN</li>
+          <li class="tab" id="navbarLogout" style="display: none;">LOGOUT</li>
         </ul>
       </div>
     </div>
@@ -90,11 +93,11 @@
   <div class="container-fluid fill">
     <div class="row fill tab-content">
       <div class="fill" id="tab1" data-tab-content>
-        <div class="col-sm-7 fill">
+        <div class="col-sm-9 fill" id="pannello-main-bim">
           <div id="forgeViewer"></div>
         </div>
         <!-- SEZIONE DB -->
-        <div class="col-sm-5 fill" id="pannello-db">
+        <div class="col-sm-3 fill" id="pannello-db">
           <div class="panel panel-default fill" id="pannello-db-child">
             <div class="panel-heading" id="pannello-db-header" data-toggle="tooltip">
               <b>EXPLORER</b>
@@ -300,18 +303,18 @@
         <div id="tabDashboard">QUI DASHBOARD</div>
       </div> -->
       <div class="fill" id="tabLogin" data-tab-content>
-        <div id="messaggio-errore" style="color: red; display: none;">
-          <h4>ERRORE:</h4>
+        <div id="messaggio-errore-container">
+          <h4 id="messaggio-errore" style="color: red; display: none;">ERRORE</h4>
         </div>
         <div id="contenitoreLoginSignup">
           <div id="contenitoreLogin" class="auth-div">
             <h4><b>Effettua il login</b></h4>
             <form id="formLogin">
-              <label for="user"></label>
+              <!-- <label for="user"></label> -->
               <input required type="text" id="userLogin" placeholder="nome utente">
               <br>
               <br>
-              <label for="pw"></label>
+              <!-- <label for="pw"></label> -->
               <input required type="password" id="pwLogin" placeholder="password">
               <br>
               <br>
@@ -327,11 +330,15 @@
             <h4><b>Registrati</b></h4>
             <form id="formSignup">
               <input required type="text" id="userSignup" placeholder="nome utente">
-              <label for="user">Inserisci un nome valido</label>
+              <label for="userSignup">Inserisci un nome valido</label>
+              <br>
+              <br>
+              <input required type="email" id="emailSignup" placeholder="e-mail">
+              <label for="emailSignup">Inserisci un indirizzo e-mail valido</label>
               <br>
               <br>
               <input required type="password" id="pwSignup" placeholder="password">
-              <label for="pw">Scegli una password di almeno 6 caratteri</label>
+              <label for="pwSignup">Scegli una password di almeno 6 caratteri</label>
               <br>
               <br>
               <button type="submit">Registrati</button>

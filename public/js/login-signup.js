@@ -26,22 +26,25 @@ $(() => {
         }
         console.log('login');
         console.log(infoUser);
-        // try {
-        //     const res = await login(infoUser);
-        //     const resJson = await res.json();
-        //     if (res.status !== 200) {
-        //         mostraErrore(resJson.message);
-        //     }
-        //     else {
-        //         nascondiErrore();
-        //         localStorage.user_id = resJson.id;
-        //         alert(resJson.message);
-        //         window.location = `/utente.html`;
-        //     }
-        // }
-        // catch(e) {
-        //     mostraErrore(e);
-        // }
+        try {
+            const res = await login(infoUser);
+            const resJson = await res.json();
+            if (res.status !== 200) {
+                mostraErrore(resJson.message);
+            }
+            else {
+                nascondiErrore();
+                localStorage.user_id = resJson.id;
+                localStorage.bim_vw_sets = resJson.bim_vw_sets;
+                alert(resJson.message);
+                // loggedInDisplaySettings();
+                // document.getElementById('tabLogin').classList.remove('active');
+                location.reload();
+            }
+        }
+        catch(e) {
+            mostraErrore(e);
+        }
     });
     $('#formSignup').submit(async (ev) => {
         ev.preventDefault();
@@ -83,8 +86,9 @@ async function logout() {
     const resRaw = await fetch("/auth/logout", {method: "GET", headers: {"content-type": "application/json"} });
     const res = await resRaw.json();
     localStorage.removeItem('user_id');
+    localStorage.removeItem('bim_vw_sets');
     alert(res.message);
-    window.location = '/';
+    location.reload();
 }
 
 function mostraErrore(errore) {
@@ -98,8 +102,8 @@ function nascondiErrore() {
     $('#messaggio-errore').hide();
 }
 
-function redirectSeLoggato() {
+function redirectSeLoggato() { // DA RISCRIVERE PER APP MAIN10ANCE
     if (localStorage.user_id) {
-        window.location = window.location = `/utente.html`;
+        window.location = `/utente.html`;
     }
 }
