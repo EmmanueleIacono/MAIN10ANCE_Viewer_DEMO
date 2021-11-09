@@ -24,8 +24,6 @@ $(() => {
             username,
             pw
         }
-        console.log('login');
-        console.log(infoUser);
         try {
             const res = await login(infoUser);
             const resJson = await res.json();
@@ -36,9 +34,8 @@ $(() => {
                 nascondiErrore();
                 localStorage.user_id = resJson.id;
                 localStorage.bim_vw_sets = resJson.bim_vw_sets;
+                localStorage.usr_vw = resJson.usr_vw;
                 alert(resJson.message);
-                // loggedInDisplaySettings();
-                // document.getElementById('tabLogin').classList.remove('active');
                 location.reload();
             }
         }

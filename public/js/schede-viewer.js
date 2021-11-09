@@ -340,49 +340,49 @@ async function compilaTabelleRestauro() {
 }
 
 async function prendiSchedeControllo() {
-    const risultato = await fetch('/Main10ance_DB/tabellaDB/schede-controllo-2', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/m/Main10ance_DB/tabellaDB/schede-controllo-2', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function prendiSchedeManReg() {
-    const risultato = await fetch('/Main10ance_DB/tabellaDB/schede-manutenzione-regolare', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/m/Main10ance_DB/tabellaDB/schede-manutenzione-regolare', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function prendiSchedeManCorr() {
-    const risultato = await fetch('/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/m/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function prendiSchedeRestauro() {
-    const risultato = await fetch('/Main10ance_DB/tabellaDB/schede-restauro', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/m/Main10ance_DB/tabellaDB/schede-restauro', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function prendiUrn(jsonReq) {
-    const risultato = await fetch('/DB_Servizio/LOD/UrnCappelle', {method: "GET", headers: {"content-type": "application/json", "sm": jsonReq.sm, "capp": jsonReq.capp}});
+    const risultato = await fetch('/m/DB_Servizio/LOD/UrnCappelle', {method: "GET", headers: {"content-type": "application/json", "sm": jsonReq.sm, "capp": jsonReq.capp}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function prendiSigleNumericheCappelle() {
-    const risultato = await fetch('/DB_Servizio/MarkerCapp', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/t/DB_Servizio/MarkerCapp', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function prendiSigleSacriMonti() {
-    const risultato = await fetch('/DB_Servizio/MarkerSM', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/t/DB_Servizio/MarkerSM', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function prendiLOD3e4() {
-    const risultato = await fetch('/DB_Servizio/LOD/3e4', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/m/DB_Servizio/LOD/3e4', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }

@@ -8,7 +8,7 @@ const {clientM10a, clientServ} = require('./connessioni');
 //////////          RICHIESTE          //////////
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/colonne", {method: "GET", headers: {"content-type": "application/json", tab: "catena"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/colonne", {method: "GET", headers: {"content-type": "application/json", tab: "catena"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/colonne', async (req, res) => {
     const reqJson = req.headers;
     const risposta = await leggiColonneTabella(reqJson.tab);
@@ -17,7 +17,7 @@ appM.get('/Main10ance_DB/colonne', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB", {method: "GET", headers: {"content-type": "application/json", tab: "catena"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB", {method: "GET", headers: {"content-type": "application/json", tab: "catena"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB', async (req, res) => {
     const reqJson = req.headers;
     const risposta = await leggiTabellaDB(reqJson.tab);
@@ -26,7 +26,7 @@ appM.get('/Main10ance_DB/tabellaDB', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB/glossario", {method: "GET", headers: {"content-type": "application/json", tab: "glossario"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB/glossario", {method: "GET", headers: {"content-type": "application/json", tab: "glossario"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB/glossario', async (req, res) => {
     const risposta = await leggiTabellaGlossario();
     res.setHeader('content-type', 'application/json');
@@ -34,7 +34,7 @@ appM.get('/Main10ance_DB/tabellaDB/glossario', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB/glossario/degradi", {method: "GET", headers: {"content-type": "application/json", tab: "glossario"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB/glossario/degradi", {method: "GET", headers: {"content-type": "application/json", tab: "glossario"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB/glossario/degradi', async (req, res) => {
     const risposta = await leggiTabellaGlossarioDegradi();
     res.setHeader('content-type', 'application/json');
@@ -42,7 +42,7 @@ appM.get('/Main10ance_DB/tabellaDB/glossario/degradi', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB/enum", {method: "GET", headers: {"content-type": "application/json", nomeenum: "cl_ogg_fr"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB/enum", {method: "GET", headers: {"content-type": "application/json", nomeenum: "cl_ogg_fr"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB/enum', async (req, res) => {
     const reqJson = req.headers;
     const risposta = await leggiEnum(reqJson.nomeenum);
@@ -73,7 +73,7 @@ appM.post('/Main10ance_DB/schede/nuova', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB/schede-controllo", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB/schede-controllo", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB/schede-controllo', async (req, res) => {
     const risposta = await leggiSchedeControllo();
     res.setHeader('content-type', 'application/json');
@@ -81,7 +81,7 @@ appM.get('/Main10ance_DB/tabellaDB/schede-controllo', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB/schede-controllo-2", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB/schede-controllo-2", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB/schede-controllo-2', async (req, res) => {
     const risposta = await leggiSchedeControllo2();
     res.setHeader('content-type', 'application/json');
@@ -89,7 +89,7 @@ appM.get('/Main10ance_DB/tabellaDB/schede-controllo-2', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB/schede-manutenzione-regolare", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB/schede-manutenzione-regolare", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB/schede-manutenzione-regolare', async (req, res) => {
     const risposta = await leggiSchedeManReg();
     res.setHeader('content-type', 'application/json');
@@ -97,7 +97,7 @@ appM.get('/Main10ance_DB/tabellaDB/schede-manutenzione-regolare', async (req, re
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva', async (req, res) => {
     const risposta = await leggiSchedeManCorr();
     res.setHeader('content-type', 'application/json');
@@ -105,7 +105,7 @@ appM.get('/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva', async (req, 
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB/schede-restauro", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB/schede-restauro", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB/schede-restauro', async (req, res) => {
     const risposta = await leggiSchedeRestauro();
     res.setHeader('content-type', 'application/json');
@@ -113,7 +113,7 @@ appM.get('/Main10ance_DB/tabellaDB/schede-restauro', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare', async (req, res) => {
     const risposta = await leggiEventiManutenzioneRegolare();
     res.setHeader('content-type', 'application/json');
@@ -121,7 +121,7 @@ appM.get('/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare', async (req, re
 });
 
 // per testare la richiesta:
-// fetch("/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/m/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appM.get('/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva', async (req, res) => {
     const risposta = await leggiEventiManutenzioneCorrettiva();
     res.setHeader('content-type', 'application/json');
@@ -129,7 +129,7 @@ appM.get('/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva', async (req, 
 });
 
 // per testare la richiesta:
-// fetch("/DB_Servizio/LOD/TabelleLOD", {method: "GET", headers: {"content-type": "application/json", lod: 5} }).then(a => a.json()).then(console.log)
+// fetch("/m/DB_Servizio/LOD/TabelleLOD", {method: "GET", headers: {"content-type": "application/json", lod: 5} }).then(a => a.json()).then(console.log)
 appM.get('/DB_Servizio/LOD/TabelleLOD', async (req, res) => {
     const reqJson = req.headers;
     const tabelleLOD = await leggiListaTabelleLOD(reqJson.lod);
@@ -138,7 +138,7 @@ appM.get('/DB_Servizio/LOD/TabelleLOD', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/DB_Servizio/LOD/UrnCappelle", {method: "GET", headers: {"content-type": "application/json", sm: 'SMV', capp: '38'} }).then(a => a.json()).then(console.log)
+// fetch("/m/DB_Servizio/LOD/UrnCappelle", {method: "GET", headers: {"content-type": "application/json", sm: 'SMV', capp: '38'} }).then(a => a.json()).then(console.log)
 appM.get('/DB_Servizio/LOD/UrnCappelle', async (req, res) => {
     const reqJson = req.headers;
     const urn = await recuperaUrnLOD3(reqJson.sm, reqJson.capp);
@@ -147,7 +147,7 @@ appM.get('/DB_Servizio/LOD/UrnCappelle', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/DB_Servizio/LOD/3e4", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/m/DB_Servizio/LOD/3e4", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appM.get('/DB_Servizio/LOD/3e4', async (req, res) => {
     const lod = await leggiTabelleLOD3e4();
     res.setHeader('content-type', 'application/json');

@@ -1,13 +1,22 @@
 (() => {
-    // FORGE VIEWER 7
-    // EXPLORER 5
-    // GIS VIEWER 9
-    // EXPLORER 3
     if (localStorage.user_id) {
         loggedInDisplaySettings();
         set_bim_vw(localStorage.bim_vw_sets);
+        set_usr_vw(localStorage.usr_vw);
     }
 })();
+
+function loggedInDisplaySettings() {
+    $('#apriTabLogin').hide();
+    $('#navbarLogout').show();
+    $('#navbarLogout').on('click', logout);
+    impostaUsernameNav();
+}
+
+function impostaUsernameNav() {
+    $('#liUsernameNavbar').show();
+    $('#liUsernameNavbar').text(localStorage.user_id);
+}
 
 function set_bim_vw(settingsString) {
     const viewerCol = settingsString.split('-')[0];
@@ -20,14 +29,10 @@ function set_bim_vw(settingsString) {
     bimExp.className = bimExpClsString;
 }
 
-function loggedInDisplaySettings() {
-    $('#apriTabLogin').hide();
-    $('#navbarLogout').show();
-    $('#navbarLogout').on('click', logout);
-    impostaUsernameNav();
-}
-
-function impostaUsernameNav() {
-    $('#liUsernameNavbar').show();
-    $('#liUsernameNavbar').text(localStorage.user_id);
+function set_usr_vw(settingsString) {
+    const settingsList = settingsString.split(',');
+    settingsList.forEach(sett => {
+        console.log(sett);
+        $(`#${sett}`).show();
+    });
 }

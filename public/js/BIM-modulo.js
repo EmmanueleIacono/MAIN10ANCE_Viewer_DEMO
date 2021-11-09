@@ -851,7 +851,7 @@ async function preparaCampiRestauri(divScheda) {
 
 async function leggiEnum(nomeEnum) {
     try {
-        const risultato = await fetch('/Main10ance_DB/tabellaDB/enum', {method: "GET", headers: {"content-type": "application/json", "nomeEnum": nomeEnum} });
+        const risultato = await fetch('/m/Main10ance_DB/tabellaDB/enum', {method: "GET", headers: {"content-type": "application/json", "nomeEnum": nomeEnum} });
         const listaEnum = await risultato.json();
         return listaEnum;
     }
@@ -878,7 +878,7 @@ function creaListaOpzioni(listaOpzioni, targetSelect, parametroValue, parametroT
 
 async function leggiGlossDegradi() {
     try {
-        const risultato = await fetch('/Main10ance_DB/tabellaDB/glossario/degradi', {method: "GET", headers: {"content-type": "application/json"} });
+        const risultato = await fetch('/m/Main10ance_DB/tabellaDB/glossario/degradi', {method: "GET", headers: {"content-type": "application/json"} });
         const listaGloss = await risultato.json();
         return listaGloss;
     }
@@ -890,7 +890,7 @@ async function leggiGlossDegradi() {
 
 async function leggiSchedeControllo() {
     try {
-        const risultato = await fetch('/Main10ance_DB/tabellaDB/schede-controllo', {method: "GET", headers: {"content-type": "application/json"} });
+        const risultato = await fetch('/m/Main10ance_DB/tabellaDB/schede-controllo', {method: "GET", headers: {"content-type": "application/json"} });
         const listaContr = await risultato.json();
         const listaIdMain10ance = trovaIdMain10ance();
         let listaFiltrata = [];
@@ -1051,7 +1051,7 @@ function verificaPresenzaIDm10a() {
 
 async function compilaScheda(jsonReq) {
     try {
-        const resp = await fetch(`/Main10ance_DB/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        const resp = await fetch(`/m/Main10ance_DB/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
         const respData = await resp.json();
         return respData;
     }

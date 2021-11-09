@@ -61,7 +61,8 @@ router.post('/login', async (req, res, next) => {
                 res.json({
                     message: 'Login completato',
                     id: datiUtente.username,
-                    bim_vw_sets: roleSettings.bim_vw_sets
+                    bim_vw_sets: roleSettings.bim_vw_sets,
+                    usr_vw: roleSettings.usr_vw
                 });
             }
             else {
@@ -119,7 +120,7 @@ async function insertNuovoUtente(user) {
 
 async function getSettingsByRuolo(ruolo) {
     try {
-        const results = await clientServ.query(`SELECT "bim_vw_sets" FROM "ruoli" WHERE "ruolo" = ($1);`, [ruolo]);
+        const results = await clientServ.query(`SELECT "bim_vw_sets", "elementi_visibili" AS "usr_vw" FROM "ruoli" WHERE "ruolo" = ($1);`, [ruolo]);
         return results.rows[0];
     }
     catch(e) {

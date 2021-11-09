@@ -237,7 +237,7 @@ function getModel(urn) {
 
 async function leggiDBMarkerSM() {
     try {
-        const risultato = await fetch(`/DB_Servizio/MarkerSM`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/t/DB_Servizio/MarkerSM`, {method: "GET", headers: {"content-type": "application/json"}});
         const sacriMontiJson = await risultato.json();
         sacriMontiJson.forEach((smjson) => {
             new MarkerSacroMonte(smjson.coord, smjson.nome, smjson.sigla, smjson.urn);
@@ -252,7 +252,7 @@ async function leggiDBMarkerSM() {
 
 async function leggiDBMarkerCapp() {
     try {
-        const risultato = await fetch(`/DB_Servizio/MarkerCapp`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/t/DB_Servizio/MarkerCapp`, {method: "GET", headers: {"content-type": "application/json"}});
         const cappelleJson = await risultato.json();
         cappelleJson.forEach((cappjson) => {
             new MarkerCappella(cappjson.coord, cappjson.nome, cappjson.sigla, cappjson.descrizione, cappjson.urn);
@@ -270,7 +270,7 @@ leggiDBMarkerCapp();
 proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
 
 async function getGIS(tabella, alias, geometria, colonneUtili) {
-    let oggettiGIS = await fetch("/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "alias": alias, "geometria": geometria, "colonneUtili": colonneUtili} });
+    let oggettiGIS = await fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "alias": alias, "geometria": geometria, "colonneUtili": colonneUtili} });
     let resp_oggettiGIS = await oggettiGIS.json();
     return resp_oggettiGIS;
 }
@@ -288,7 +288,7 @@ async function leggiDBGIS(tabGIS) {
 }
 
 async function getTabelleGIS() {
-    let tabelleGIS = await fetch("/DB_Servizio/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} });
+    let tabelleGIS = await fetch("/t/DB_Servizio/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} });
     let resp_tabelleGIS = await tabelleGIS.json();
     return resp_tabelleGIS;
 }

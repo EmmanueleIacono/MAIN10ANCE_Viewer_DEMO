@@ -23,12 +23,10 @@ app.use(express.json({ limit: '50mb' }));
 app.use('/api/forge/oauth', require('./routes/oauth'));
 app.use('/api/forge/oss', require('./routes/oss'));
 app.use('/auth', auth);
-app.use('/', reqTurista);
-app.use('/', reqUtenteLoggato);
-app.use('/', reqManutentore);
-app.use('/', reqGestore);
-// app.use('/',/* controllaLoggedIn, */require('./routes/database/serverBIM-GIS'));
-// app.use('/', require('./routes/database/DBServizio').appServizio);
+app.use('/t', reqTurista);
+app.use('/l', controllaLoggedIn, consentiAccesso, reqUtenteLoggato);
+app.use('/m', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_2), reqManutentore);
+app.use('/g', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_4), reqGestore);
 // handler errori
 app.use((err, req, res, next) => {
     console.error(err);

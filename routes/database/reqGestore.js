@@ -8,7 +8,7 @@ const {clientM10a, clientServ} = require('./connessioni');
 //////////          RICHIESTE          //////////
 
 // per testare la richiesta:
-// fetch("/utenti", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("/g/utenti", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appG.get('/utenti', async (req, res) => {
     const users = await getUtenti();
     res.setHeader('content-type', 'application/json');

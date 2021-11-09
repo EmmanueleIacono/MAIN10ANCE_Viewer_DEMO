@@ -8,7 +8,8 @@ function controllaLoggedIn(req, res, next) {
 }
 
 function consentiAccesso(req, res, next) {
-    if (req.signedCookies.user_id === req.params.username) {
+    const usr = req.path.split('/')[2];
+    if (req.signedCookies.user_id === usr) {
         next();
     }
     else {
@@ -16,12 +17,15 @@ function consentiAccesso(req, res, next) {
     }
 }
 
-function controllaRuoli(req, res, next) {
-    if (req.signedCookies.role === 'amministratore') {
-        next();
-    }
-    else {
-        res.status(401).send({message: 'Non autorizzato'});
+function controllaRuoli(stringaRuoli) {
+    return (req, res, next) => {
+        const listaRuoli = stringaRuoli.split(' ');
+        if (listaRuoli.includes(req.signedCookies.role)) {
+            next();
+        }
+        else {
+            res.status(401).send({message: 'Non autorizzato'});
+        }
     }
 }
 

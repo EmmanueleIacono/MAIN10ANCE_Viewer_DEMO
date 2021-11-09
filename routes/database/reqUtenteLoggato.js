@@ -8,7 +8,7 @@ const {clientServ} = require('./connessioni');
 //////////          RICHIESTE          //////////
 
 // per testare la richiesta:
-// fetch("/utenti/mario", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// fetch("l//utenti/mario", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appU.get(`/utenti/:username`, async (req, res) => {
     const username = req.params.username;
     const risp = await getInfoUtenteByNome(username);

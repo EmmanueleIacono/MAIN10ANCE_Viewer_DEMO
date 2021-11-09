@@ -76,7 +76,7 @@
         <li data-tab-target="#tabDashboard" class="tab" id="apriTabDashboard">DASHBOARD</li> -->
         <li data-tab-target="#tab2" class="tab" id="apriTabGIS">GIS VIEWER</li>
         <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
-        <li data-tab-target="#tab4" class="tab" id="apriTabSchede">PLANNER</li>
+        <li data-tab-target="#tab4" class="tab" id="apriTabSchede" style="display: none;">PLANNER</li>
         <li data-tab-target="#tab3" class="tab" id="apriTabDatabase" style="display: none;">DASHBOARD</li>
         <!-- <li data-tab-target="#tab4" class="tab" id="apriTabDashboard">DASHBOARD</li> -->
       </ul>
@@ -109,7 +109,7 @@
                   tree here
                 </div>
               </details>
-              <div class="pannelloDB">
+              <div class="pannelloDB" id="idPannelloDB" style="display: none;">
                 <!-- BOTTONE DI REFRESH -->
                 <button id="refreshParams" class="glyphicon glyphicon-home dbBtn" title="Home" style="cursor: pointer" height="30"></button>
 
@@ -134,7 +134,7 @@
                 <!-- FORM -->
                 <form id="formDB" spellcheck="false"></form>
               </div>
-            <div id="contenitore-controllo-intervento">
+            <div id="contenitore-controllo-intervento" style="display: none;">
               <button class="scheda-controllo" id="apriTabControllo">SCHEDA CONTROLLO</button>
               <button class="scheda-intervento" id="apriTabIntervento">SCHEDA INTERVENTO</button>
               <button id="salvaSchedaControllo" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
