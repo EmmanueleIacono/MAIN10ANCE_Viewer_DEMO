@@ -6,6 +6,14 @@ const selezioneLOD3 = document.getElementById('selectLOD3');
 const selezioneLOD4 = document.getElementById('selectLOD4');
 const selezioneLOD5 = document.getElementById('selectLOD5');
 
+
+(() => {
+    if ((localStorage.bim_vw_sets) && (localStorage.bim_vw_sets === '7-5')) {
+        prendiTabelle();
+        prendiSacriMonti().then(() => {setNumCappelle();});
+    }
+})();
+
 selectSM.addEventListener('change', setNumCappelle);
 
 const applicaQuery = document.getElementById('applicaQuery');
@@ -212,9 +220,6 @@ async function prendiSacriMonti() {
         console.log(e);
     }
 }
-
-prendiTabelle();
-prendiSacriMonti().then(() => {setNumCappelle();});
 
 async function prendiColonne(jsonReq) {
     const risultato = await fetch('/m/Main10ance_DB/colonne', {method: "GET", headers: {"content-type": "application/json", "tab": jsonReq.tab}});

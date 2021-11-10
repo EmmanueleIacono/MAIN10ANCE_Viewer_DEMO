@@ -32,7 +32,6 @@ function set_bim_vw(settingsString) {
 function set_usr_vw(settingsString) {
     const settingsList = settingsString.split(',');
     settingsList.forEach(sett => {
-        console.log(sett);
         $(`#${sett}`).show();
     });
 }

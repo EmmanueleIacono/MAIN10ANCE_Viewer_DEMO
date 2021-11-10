@@ -32,9 +32,19 @@ let listaSigleNumericheCappelle;
 
 divContenitoreSchede.innerHTML = '';
 
-// const tabellaSchede = creaStrutturaSchede();
-// azioniPreliminari();
-visualizzaSchedeStart();
+(() => {
+    if ((localStorage.bim_vw_sets) && (localStorage.bim_vw_sets === '7-5')) {
+        visualizzaSchedeStart();
+
+        popolaSelectSacriMonti();
+        popolaSelectElementi();
+        popolaSelectFenomeno();
+        popolaSelectStatoCons();
+        // popolaSelectMateriale();
+
+        popolaListaSigleNumCapp();
+    }
+})();
 
 function visualizzaSchedeStart() {
     divContenitoreSchede.innerHTML = '';
@@ -48,15 +58,9 @@ function visualizzaSchedeStart() {
     }
 };
 
-popolaSelectSacriMonti();
-popolaSelectElementi();
-popolaSelectFenomeno();
-popolaSelectStatoCons();
-// popolaSelectMateriale();
-
-(async function popolaListaSigleNumCapp() {
-    listaSigleNumericheCappelle = await prendiSigleNumericheCappelle();
-})();
+async function popolaListaSigleNumCapp() {
+    await prendiSigleNumericheCappelle();
+}
 
 aggiornaSchedeStart.addEventListener('click', visualizzaSchedeStart);
 

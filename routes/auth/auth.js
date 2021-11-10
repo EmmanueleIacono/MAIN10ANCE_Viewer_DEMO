@@ -5,8 +5,6 @@ router.use(express.json());
 
 const {clientServ} = require('../database/connessioni');
 
-// questi percorsi di route sono sempre preceduti da /auth (vedi index.js)
-
 router.post('/signup', async (req, res, next) => {
     if (validazioneUsers(req.body)) {
         const datiUtente = await getUtenteByNome(req.body.username);
@@ -16,6 +14,7 @@ router.post('/signup', async (req, res, next) => {
             const hash = await bcrypt.hash(req.body.pw, 10);
             const user = {
                 username: req.body.username,
+                email: req.body.email,
                 pw: hash
             };
             const successo = await insertNuovoUtente(user);
@@ -109,7 +108,7 @@ async function getUtenteByNome(nome) {
 
 async function insertNuovoUtente(user) {
     try {
-        await clientServ.query(`INSERT INTO "utenti" ("user", "pw", "ruolo") VALUES (($1), ($2), 'turista');`, [user.username, user.pw]);
+        await clientServ.query(`INSERT INTO "utenti" ("user", "pw", "ruolo", "email") VALUES (($1), ($2), 'turista', ($3));`, [user.username, user.pw, user.email]);
         return true;
     }
     catch(e) {

@@ -6,14 +6,17 @@ const contenitoreLogin = document.getElementById('contenitoreLogin');
 aLogin.addEventListener('click', () => {
     contenitoreSignup.style.display = 'none';
     contenitoreLogin.style.display = 'block';
+    $('#userSignup').val(null);
+    $('#emailSignup').val(null);
+    $('#pwSignup').val(null);
 });
 
 aSignup.addEventListener('click', () => {
     contenitoreLogin.style.display = 'none';
     contenitoreSignup.style.display = 'block';
+    $('#userLogin').val(null);
+    $('#pwLogin').val(null);
 });
-
-// redirectSeLoggato();
 
 $(() => {
     $('#formLogin').submit(async (ev) => {
@@ -46,28 +49,28 @@ $(() => {
     $('#formSignup').submit(async (ev) => {
         ev.preventDefault();
         const username = $('#userSignup').val();
+        const email = $('#emailSignup').val();
         const pw = $('#pwSignup').val();
         const infoUser = {
             username,
+            email,
             pw
         }
-        console.log('signup');
-        console.log(infoUser);
-        // try {
-        //     const res = await signup(infoUser);
-        //     const resJson = await res.json();
-        //     if (res.status !== 200) {
-        //         mostraErrore(resJson.message);
-        //     }
-        //     else {
-        //         nascondiErrore();
-        //         alert(resJson.message);
-        //         window.location = `/login.html`;
-        //     }
-        // }
-        // catch(e) {
-        //     mostraErrore(e);
-        // }
+        try {
+            const res = await signup(infoUser);
+            const resJson = await res.json();
+            if (res.status !== 200) {
+                mostraErrore(resJson.message);
+            }
+            else {
+                nascondiErrore();
+                alert(resJson.message);
+                aLogin.click();
+            }
+        }
+        catch(e) {
+            mostraErrore(e);
+        }
     });
 });
 
@@ -97,10 +100,4 @@ function mostraErrore(errore) {
 
 function nascondiErrore() {
     $('#messaggio-errore').hide();
-}
-
-function redirectSeLoggato() { // DA RISCRIVERE PER APP MAIN10ANCE
-    if (localStorage.user_id) {
-        window.location = `/utente.html`;
-    }
 }
