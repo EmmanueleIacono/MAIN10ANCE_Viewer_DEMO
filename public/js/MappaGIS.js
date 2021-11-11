@@ -7,6 +7,8 @@ const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const tiles = L.tileLayer(tileUrl, { attribution, "detectRetina": false, "maxNativeZoom": 20, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false});
 tiles.addTo(mappaGIS);
 
+proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
+
 leggiDBMarkerSM();
 leggiDBMarkerCapp();
 
@@ -183,7 +185,6 @@ class LayerGIS {
         }
         
         const creaCheckbox = () => {
-            // console.log('crea check');
             const contenitoreSpegniLiv = document.createElement('div');
             const spegniLivelloCheck = document.createElement('input');
             spegniLivelloCheck.setAttribute('id', `spegni-${this.tabella}`);
@@ -222,22 +223,15 @@ class LayerGIS {
             }
         }
 
-        // const creaGeometrie = async (listaGeo) => {
-        //     listaGeo.forEach(geo => {
-        //         creaGeometria(geo);
-        //     });
-        // }
-        console.log(this.alias);
+        creaCheckbox();
+        
         const gis = await getGIS(this.tabella, this.alias, this.geometria, this.colonne.join(", "));
         const gisLun = gis.length;
-        console.log(gisLun);
-
-        gis.forEach(geo => {
-            creaGeometria(geo);
-        });
-        // creaGeometrie(gis).then(() => {creaCheckbox();});
-
-        creaCheckbox();
+        // console.log(this.alias + ': ' + gisLun);
+        
+        for await (const gisItem of gis) {
+            creaGeometria(gisItem);
+        }
     }
 }
 
@@ -284,27 +278,29 @@ async function leggiDBMarkerCapp() {
     }
 }
 
-proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
-
-async function getGIS(tabella, alias, geometria, colonneUtili) {
-    const oggettiGIS = await fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "alias": alias, "geometria": geometria, "colonneUtili": colonneUtili} });
-    const resp_oggettiGIS = await oggettiGIS.json();
-    return resp_oggettiGIS;
-}
-
 async function leggiDBGIS(tabGIS) {
     try {
-        tabGIS.forEach(async tbl => {
+        // tabGIS.forEach(tbl => {
+        //     if (tbl.colonneUtili) {
+        //         new LayerGIS(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili).inizializza();
+        //     }
+        // });
+        for await (const tbl of tabGIS) {
             if (tbl.colonneUtili) {
-                console.log(tbl.alias);
-                await new LayerGIS(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili).inizializza();
+                new LayerGIS(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili).inizializza();
             }
-        });
+        }
     }
     catch(e) {
         console.log('Errore nella lettura dei dati GIS');
         console.log(e);
     }
+}
+
+async function getGIS(tabella, alias, geometria, colonneUtili) {
+    const oggettiGIS = await fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "alias": alias, "geometria": geometria, "colonneUtili": colonneUtili} });
+    const resp_oggettiGIS = await oggettiGIS.json();
+    return resp_oggettiGIS;
 }
 
 async function getTabelleGIS() {
