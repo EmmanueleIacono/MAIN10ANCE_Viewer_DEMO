@@ -48,12 +48,10 @@ const livelliGISdiv = document.getElementById('contenitore-livelli-div-interno')
 const livelliGISloading = document.getElementById('contenitore-livelli-loading');
 livelliGISdetails.addEventListener('click', async () => {
     if (livelliGISdiv.innerHTML === '') {
-        console.log('inizio');
         const tabelleGIS = await getTabelleGIS();
         leggiDBGIS(tabelleGIS).then(() => {
             livelliGISloading.style.display = 'none';
             livelliGISdiv.style.display = 'block';
-            console.log('fine');
         });
     }
 });
@@ -189,9 +187,19 @@ class LayerGIS {
             const spegniLivelloCheck = document.createElement('input');
             spegniLivelloCheck.setAttribute('id', `spegni-${this.tabella}`);
             spegniLivelloCheck.setAttribute('type', 'checkbox');
+            spegniLivelloCheck.disabled = true;
+            spegniLivelloCheck.style.accentColor = coloreRandom;
+            spegniLivelloCheck.style.marginRight = '10px';
+            spegniLivelloCheck.style.display = 'none';
             const labelCheck = document.createElement('label');
+            labelCheck.setAttribute('id', `label-per-spegni-${this.tabella}`);
             labelCheck.setAttribute('for', `spegni-${this.tabella}`);
             labelCheck.textContent = `${this.alias}`;
+            const loadingGif = document.createElement('img');
+            loadingGif.setAttribute('id', `loading-gif-${this.tabella}`);
+            loadingGif.setAttribute('src', './img/ajax-loader-4.gif');
+            loadingGif.style.marginRight = '10px';
+            contenitoreSpegniLiv.appendChild(loadingGif);
             contenitoreSpegniLiv.appendChild(spegniLivelloCheck);
             contenitoreSpegniLiv.appendChild(labelCheck);
             const contenitoreLivelli = document.getElementById('contenitore-livelli-div-interno');
@@ -207,8 +215,6 @@ class LayerGIS {
                 visibilitàLivello = !visibilitàLivello;
             });
     
-            spegniLivelloCheck.style.accentColor = coloreRandom;
-            spegniLivelloCheck.style.marginRight = '10px';
         }
 
         const creaGeometria = (geo) => {
@@ -223,15 +229,23 @@ class LayerGIS {
             }
         }
 
+        const attivaCheckbox = () => {
+            const checkCorrente = document.getElementById(`spegni-${this.tabella}`);
+            const loadingGif = document.getElementById(`loading-gif-${this.tabella}`);
+            checkCorrente.disabled = false;
+            loadingGif.style.display = 'none';
+            checkCorrente.style.display = 'inline';
+        }
+
         creaCheckbox();
         
         const gis = await getGIS(this.tabella, this.alias, this.geometria, this.colonne.join(", "));
-        const gisLun = gis.length;
-        // console.log(this.alias + ': ' + gisLun);
         
         for await (const gisItem of gis) {
             creaGeometria(gisItem);
         }
+
+        attivaCheckbox();
     }
 }
 
@@ -280,11 +294,6 @@ async function leggiDBMarkerCapp() {
 
 async function leggiDBGIS(tabGIS) {
     try {
-        // tabGIS.forEach(tbl => {
-        //     if (tbl.colonneUtili) {
-        //         new LayerGIS(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili).inizializza();
-        //     }
-        // });
         for await (const tbl of tabGIS) {
             if (tbl.colonneUtili) {
                 new LayerGIS(tbl.tabella, tbl.alias, tbl.geometria, tbl.colonneUtili).inizializza();

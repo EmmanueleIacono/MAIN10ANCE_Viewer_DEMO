@@ -40,10 +40,6 @@
   <script src="js/schede-viewer.js" defer></script>
 </head>
 <body>
-  <!-- CARICAMENTO -->
-  <!-- <div id="loading">
-    <img id="loading-image" src="./img/ajax-loader-2.gif" alt="Loading..." />
-  </div> -->
   <!-- Fixed navbar by Bootstrap: https://getbootstrap.com/examples/navbar-fixed-top/ -->
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
@@ -53,32 +49,10 @@
             <img alt="Main10ance" src="./img/AsseII_MAIN10ANCE.png" height="50">
           </a>
         </li>
-        <li>
-          <div id="dropdown-container">
-            <!-- <button type="button" class="navBtn" id="scegliModello" data-toggle="modal" data-target="#scegliModelloModal">SELEZIONA CAPPELLA</button> -->
-            <!-- <button type="button" class="navBtn dropdown-toggle" id="scegliModello" data-toggle="dropdown">
-              SELEZIONA CAPPELLA <span class="glyphicon glyphicon-triangle-bottom"></span>
-            </button> -->
-            <div class="panel panel-default dropdown-menu">
-              <!-- <div class="panel-heading" id="pannello-modal-header" data-toggle="tooltip">
-                Buckets &amp; Objects
-                <span id="refreshBuckets" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
-              </div> -->
-              <!-- <div id="appBuckets">
-                tree here
-              </div> -->
-            </div>
-          </div>
-        </li>
-        <!-- <li data-tab-target="#forgeViewer" class="tab" id="apriTabBIM">BIM VIEWER</li>
-        <li data-tab-target="#tabMappa" class="tab" id="apriTabGIS">GIS VIEWER</li>
-        <li data-tab-target="#tabDatabase" class="tab" id="apriTabDatabase">DATABASE</li>
-        <li data-tab-target="#tabDashboard" class="tab" id="apriTabDashboard">DASHBOARD</li> -->
         <li data-tab-target="#tab2" class="tab" id="apriTabGIS">GIS VIEWER</li>
         <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
         <li data-tab-target="#tab4" class="tab" id="apriTabSchede" style="display: none;">PLANNER</li>
         <li data-tab-target="#tab3" class="tab" id="apriTabDatabase" style="display: none;">DASHBOARD</li>
-        <!-- <li data-tab-target="#tab4" class="tab" id="apriTabDashboard">DASHBOARD</li> -->
       </ul>
       <div class="pull-right">
         <ul class="nav navbar-nav">
@@ -299,9 +273,6 @@
           </div>
         </div>
       </div>
-      <!-- <div class="fill" id="tab4" data-tab-content>
-        <div id="tabDashboard">QUI DASHBOARD</div>
-      </div> -->
       <div class="fill" id="tabLogin" data-tab-content>
         <div id="messaggio-errore-container">
           <h4 id="messaggio-errore" style="color: red; display: none;">ERRORE</h4>
@@ -353,13 +324,6 @@
       </div>
     </div>
   </div>
-
-  <!-- SCRIPT PER GESTIONE CARICAMENTO -->
-  <!-- <script>
-    $(window).on('load', () => {
-      $('#loading').hide();
-    })
-  </script> -->
 
   <!-- SCRIPT PER GESTIONE TABS -->
 <script>
