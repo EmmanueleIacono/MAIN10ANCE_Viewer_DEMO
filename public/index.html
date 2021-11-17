@@ -38,28 +38,43 @@
   <script src="js/ConsultazioneDB.js" defer></script>
   <script src="js/calendario.js" defer></script>
   <script src="js/schede-viewer.js" defer></script>
+  <script src="js/GestioneUtenti.js" defer></script>
 </head>
 <body>
   <!-- Fixed navbar by Bootstrap: https://getbootstrap.com/examples/navbar-fixed-top/ -->
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
-      <ul class="nav navbar-nav left tabs">
-        <li>
-          <a href="https://main10ance.eu/" target="_blank" id="logoSito">
-            <img alt="Main10ance" src="./img/AsseII_MAIN10ANCE.png" height="50">
-          </a>
-        </li>
-        <li data-tab-target="#tab2" class="tab" id="apriTabGIS">GIS VIEWER</li>
-        <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
-        <li data-tab-target="#tab4" class="tab" id="apriTabSchede" style="display: none;">PLANNER</li>
-        <li data-tab-target="#tab3" class="tab" id="apriTabDatabase" style="display: none;">DASHBOARD</li>
-      </ul>
-      <div class="pull-right">
-        <ul class="nav navbar-nav">
-          <li id="liUsernameNavbar"></li>
-          <li data-tab-target="#tabLogin" class="tab" id="apriTabLogin">LOGIN</li>
-          <li class="tab" id="navbarLogout" style="display: none;">LOGOUT</li>
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+          <!-- <span class="sr-only">Toggle navigation</span> -->
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="https://main10ance.eu/" target="_blank" id="logoSito" class="navbar-brand">
+          <img alt="Main10ance" src="./img/AsseII_MAIN10ANCE.png" height="50">
+        </a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav left tabs">
+          <!-- <li>
+            <a href="https://main10ance.eu/" target="_blank" id="logoSito">
+              <img alt="Main10ance" src="./img/AsseII_MAIN10ANCE.png" height="50">
+            </a>
+          </li> -->
+          <li data-tab-target="#tab2" class="tab" id="apriTabGIS">GIS VIEWER</li>
+          <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
+          <li data-tab-target="#tab4" class="tab" id="apriTabSchede" style="display: none;">PLANNER</li>
+          <li data-tab-target="#tab3" class="tab" id="apriTabDatabase" style="display: none;">DASHBOARD</li>
+          <li data-tab-target="#tab5" class="tab" id="apriTabUtenti" style="display: none;">GESTIONE UTENTI</li>
         </ul>
+        <div class="pull-right">
+          <ul class="nav navbar-nav">
+            <li id="liUsernameNavbar"></li>
+            <li data-tab-target="#tabLogin" class="tab" id="apriTabLogin">LOGIN</li>
+            <li class="tab" id="navbarLogout" style="display: none;">LOGOUT</li>
+          </ul>
+        </div>
       </div>
     </div>
   </nav>
@@ -273,6 +288,22 @@
           </div>
         </div>
       </div>
+      <div class="fill" id="tab5" data-tab-content>
+        <div class="panel panel-default col-sm-9 fill" id="tabUtenti">
+          <h4><b>GESTIONE UTENTI</b></h4>
+          <div id="contenitore-gestione-utenti"></div>
+        </div>
+        <div class="col-sm-3 fill" id="pannello-lat-utenti">
+          <div class="panel panel-default fill">
+            <div class="panel-heading" id="pannello-lat-utenti-header" data-toggle="tooltip">
+              <b>EXPLORER</b>
+            </div>
+            <div class="panel-body pannelloLatDB">
+              qui strumenti aggiuntivi
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="fill" id="tabLogin" data-tab-content>
         <div id="messaggio-errore-container">
           <h4 id="messaggio-errore" style="color: red; display: none;">ERRORE</h4>
@@ -325,7 +356,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT PER GESTIONE TABS -->
+<!-- SCRIPT PER GESTIONE TABS -->
 <script>
   const tabs = document.querySelectorAll('[data-tab-target]');
   const tabContents = document.querySelectorAll('[data-tab-content]');
