@@ -66,13 +66,13 @@ function creaModuloGestioneUtenti(user, id, ruoli) {
 }
 
 async function getInfoGestioneUtenti() {
-    const utentiRaw = await fetch("/g/utenti", {method: "GET", headers: {"content-type": "application/json"} });
+    const utentiRaw = await fetch("/a/utenti", {method: "GET", headers: {"content-type": "application/json"} });
     const utenti = await utentiRaw.json();
     return utenti;
 }
 
 async function getRuoliEnum() {
-    const ruoliRaw = await fetch("/g/ruoli", {method: "GET", headers: {"content-type": "application/json"} });
+    const ruoliRaw = await fetch("/a/ruoli", {method: "GET", headers: {"content-type": "application/json"} });
     const ruoli = await ruoliRaw.json();
     return ruoli;
 }
@@ -95,7 +95,7 @@ async function nuovoRuoloUtente(user, ruolo) {
 async function updateRuoloUtente(infoJson) {
     let ris;
     try {
-        const risultatoRaw = await fetch("/g/ruoli/nuovo-ruolo", {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(infoJson) });
+        const risultatoRaw = await fetch("/a/ruoli/nuovo-ruolo", {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(infoJson) });
         const risultato = await risultatoRaw.json();
         ris = risultato.success;
     }

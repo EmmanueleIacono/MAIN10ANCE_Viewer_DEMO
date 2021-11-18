@@ -8,26 +8,26 @@ const {clientM10a, clientServ} = require('./connessioni');
 //////////          RICHIESTE          //////////
 
 // per testare la richiesta:
-// fetch("/g/utenti", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/utenti', async (req, res) => {
-    const users = await getUtenti();
+// fetch("/g/utenti/smv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appG.get('/utenti/:progetto', async (req, res) => {
+    const users = await getUtentiProgetto();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(users));
 });
 
 // per testare la richiesta
-// fetch("/g/ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/ruoli', async (req, res) => {
-    const ruoli = await getListaRuoli();
+// fetch("/g/ruoli/smv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appG.get('/ruoli/:progetto', async (req, res) => {
+    const ruoli = await getListaRuoliProgetto();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(ruoli));
 });
 
-appG.patch('/ruoli/nuovo-ruolo', async (req, res) => {
+appG.patch('/ruoli/nuovo-ruolo/:progetto', async (req, res) => {
     let result = {}
     try {
         const reqJson = req.body;
-        await updateRuoloUtente(reqJson);
+        await updateRuoloUtenteProgetto(reqJson);
         result.success = true;
     }
     catch(e) {
@@ -41,9 +41,9 @@ appG.patch('/ruoli/nuovo-ruolo', async (req, res) => {
 
 //////////          QUERY          //////////
 
-async function getUtenti() {
+async function getUtentiProgetto() {
     try {
-        const results = await clientServ.query(`SELECT "user", "email", "ruolo" FROM "utenti" ORDER BY "user";`);
+        const results = await clientServ.query(``);
         return results.rows;
     }
     catch(e) {
@@ -51,9 +51,9 @@ async function getUtenti() {
     }
 }
 
-async function getListaRuoli() {
+async function getListaRuoliProgetto() {
     try {
-        const result = await clientServ.query(`SELECT ARRAY(SELECT "ruolo" FROM "ruoli") AS "roles";`);
+        const result = await clientServ.query(``);
         return result.rows[0].roles;
     }
     catch(e) {
@@ -61,9 +61,9 @@ async function getListaRuoli() {
     }
 }
 
-async function updateRuoloUtente(userJson) {
+async function updateRuoloUtenteProgetto(userJson) {
     try {
-        await clientServ.query(`UPDATE "utenti" SET "ruolo" = ($1) WHERE "user" = ($2);`, [userJson.ruolo, userJson.user]);
+        await clientServ.query(``, []);
     }
     catch(e) {
         throw(e);

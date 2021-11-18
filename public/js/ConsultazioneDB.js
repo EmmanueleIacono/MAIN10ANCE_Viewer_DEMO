@@ -222,7 +222,7 @@ async function prendiSacriMonti() {
 }
 
 async function prendiColonne(jsonReq) {
-    const risultato = await fetch('/m/Main10ance_DB/colonne', {method: "GET", headers: {"content-type": "application/json", "tab": jsonReq.tab}});
+    const risultato = await fetch('/o/Main10ance_DB/colonne', {method: "GET", headers: {"content-type": "application/json", "tab": jsonReq.tab}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
@@ -230,17 +230,17 @@ async function prendiColonne(jsonReq) {
 async function prendiDatiTabella(jsonReq) {
     let risultato;
     if (jsonReq.tab === 'glossario') {
-        risultato = await fetch('/m/Main10ance_DB/tabellaDB/glossario', {method: "GET", headers: {"content-type": "application/json"}});
+        risultato = await fetch('/o/Main10ance_DB/tabellaDB/glossario', {method: "GET", headers: {"content-type": "application/json"}});
     }
     else {
-        risultato = await fetch('/m/Main10ance_DB/tabellaDB', {method: "GET", headers: {"content-type": "application/json", "tab": jsonReq.tab}});
+        risultato = await fetch('/o/Main10ance_DB/tabellaDB', {method: "GET", headers: {"content-type": "application/json", "tab": jsonReq.tab}});
     }
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function prendiLOD(lod) {
-    const risultato = await fetch('/m/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
+    const risultato = await fetch('/o/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }

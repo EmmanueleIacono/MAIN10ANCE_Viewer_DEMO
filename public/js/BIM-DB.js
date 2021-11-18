@@ -251,7 +251,7 @@ function cancellaFormDB(form) {
 
 // async function leggiLOD(lod) {
 //     try {
-//         const risultato = await fetch('/m/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod} });
+//         const risultato = await fetch('/o/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod} });
 //         const livelliLOD = await risultato.json();
 //         return livelliLOD;
 //     }

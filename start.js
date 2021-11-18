@@ -11,8 +11,9 @@ if (config.credentials.client_id == null || config.credentials.client_secret == 
 const auth = require('./routes/auth/auth');
 const reqTurista = require('./routes/database/reqTurista');
 const reqUtenteLoggato = require('./routes/database/reqUtenteLoggato');
-const reqManutentore = require('./routes/database/reqManutentore');
+const reqOperatore = require('./routes/database/reqOperatore');
 const reqGestore = require('./routes/database/reqGestore');
+const reqAmministratore = require('./routes/database/reqAmministratore');
 
 const {controllaLoggedIn, consentiAccesso, controllaRuoli} = require('./routes/auth/middleware');
 
@@ -25,8 +26,9 @@ app.use('/api/forge/oss', require('./routes/oss'));
 app.use('/auth', auth);
 app.use('/t', reqTurista);
 app.use('/l', controllaLoggedIn, consentiAccesso, reqUtenteLoggato);
-app.use('/m', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_2), reqManutentore);
-app.use('/g', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_4), reqGestore);
+app.use('/o', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_2), reqOperatore);
+app.use('/g', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_3), reqGestore);
+app.use('/a', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_4), reqAmministratore);
 // handler errori
 app.use((err, req, res, next) => {
     console.error(err);

@@ -269,19 +269,19 @@ function aggiungiMesi(data, mesi) {
 }
 
 async function prendiEventiControllo() {
-    const risultato = await fetch('/m/Main10ance_DB/tabellaDB/schede-controllo', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-controllo', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function prendiEventiManReg() {
-    const risultato = await fetch('/m/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function prendiEventiManCorr() {
-    const risultato = await fetch('/m/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
