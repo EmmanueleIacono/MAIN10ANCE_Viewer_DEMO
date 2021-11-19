@@ -1,3 +1,5 @@
+"use strict";
+
 (() => {
     if (localStorage.user_id) {
         loggedInDisplaySettings();

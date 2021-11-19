@@ -1,3 +1,5 @@
+"use strict";
+
 const contenitoreRicerca = document.getElementById('contenitore-campo-ricerca');
 const formDB = document.getElementById('formDB');
 

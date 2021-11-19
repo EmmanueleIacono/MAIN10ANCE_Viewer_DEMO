@@ -1,3 +1,5 @@
+"use strict";
+
 const contenitoreDB = document.getElementById('tabDatabase');
 const contenitoreRisultatiDB = document.getElementById('risultatiDB');
 const selectSM = document.getElementById('selectSM');

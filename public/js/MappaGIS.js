@@ -1,3 +1,5 @@
+"use strict";
+
 // COORDINATE UTILI
 const posOrigine = [45.61422, 8.410177];
 

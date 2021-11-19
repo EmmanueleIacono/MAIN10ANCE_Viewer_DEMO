@@ -1,3 +1,5 @@
+"use strict";
+
 let urnModelloCorrente;
 
 $(document).ready(function () {

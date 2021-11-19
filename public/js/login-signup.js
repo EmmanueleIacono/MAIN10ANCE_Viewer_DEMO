@@ -1,3 +1,5 @@
+"use strict";
+
 const aLogin = document.getElementById('login-a');
 const aSignup = document.getElementById('signup-a');
 const contenitoreSignup = document.getElementById('contenitoreSignup');

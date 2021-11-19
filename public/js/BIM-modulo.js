@@ -1,3 +1,5 @@
+"use strict";
+
 const bottoneAggiungi = document.getElementById('aggiungiDB');
 const contenitoreSchede = document.getElementById('contenitore-controllo-intervento');
 const apriTabControllo = document.getElementById('apriTabControllo');

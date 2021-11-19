@@ -1,3 +1,5 @@
+"use strict";
+
 const tabContenitoreSchede = document.getElementById('tabSchede');
 const divContenitoreSchede = document.getElementById('contenitore-schede');
 const aggiornaSchedeStart = document.getElementById('refreshSchede');
@@ -580,7 +582,7 @@ function verificaFiltriSchede(tabella) {
         tabella.rows.forEach(r => {
             if (r.cells[0].innerText.startsWith('Elementi')) {
                 let listaNumeriCapp = [];
-                listaIdM10a = r.cells[1].innerText.split(',');
+                const listaIdM10a = r.cells[1].innerText.split(',');
                 listaIdM10a.forEach(id => {
                     let listaCappelleDaId = id.split('|')[1].split('-');
                     listaNumeriCapp.push(...listaCappelleDaId);
@@ -598,7 +600,7 @@ function verificaFiltriSchede(tabella) {
         tabella.rows.forEach(r => {
             if (r.cells[0].innerText.startsWith('Elementi')) {
                 let listaElementi = [];
-                listaIdM10a = r.cells[1].innerText.split(',');
+                const listaIdM10a = r.cells[1].innerText.split(',');
                 listaIdM10a.forEach(id => {
                     let listaElementiDaId = id.split('|')[2].split('-');
                     listaElementi.push(...listaElementiDaId);

@@ -1,3 +1,5 @@
+"use strict";
+
 const apriTabDB = document.getElementById('apriTabDatabase');
 const apriTabSchede = document.getElementById('apriTabSchede');
 
@@ -163,14 +165,16 @@ function creaEventiProgrammati(listaControlli, listaManReg, listaManCorr) {
     // console.log(listaControlli);
     // console.log(listaManReg);
     // console.log(listaManCorr);
-    let listaIdContrManReg = [];
-    listaManReg.forEach(mr => {
-        listaIdContrManReg.push(mr.id_contr);
-    });
-    let listaIdContrManCorr = [];
-    listaManCorr.forEach(mc => {
-        listaIdContrManCorr.push(mc.id_contr);
-    });
+    // let listaIdContrManReg = [];
+    // listaManReg.forEach(mr => {
+    //     listaIdContrManReg.push(mr.id_contr);
+    // });
+    const listaIdContrManReg = listaManReg.map(mr => mr.id_contr);
+    // let listaIdContrManCorr = [];
+    // listaManCorr.forEach(mc => {
+    //     listaIdContrManCorr.push(mc.id_contr);
+    // });
+    const listaIdContrManCorr = listaManCorr.map(mc => mc.id_contr);
     listaControlli.forEach(con => {
         const idC = con.id_dad;
         const dataC = con.data_con;
@@ -226,22 +230,16 @@ function ripulisciEventiProgrammatiMR() {
         if (evt.title === 'Programmata manutenzione regolare') {
             const controlloRif = evt.id.split('-')[1];
             const dataProgrammata = evt.start;
-            // console.log(e.id);
-            // console.log(controlloRif);
-            // console.log(e.start);
-            // console.log(e.extendedProps);
             listaEventiCal.forEach(e => {
                 if ((e.extendedProps.controllo) && (e.extendedProps.controllo === controlloRif)) {
                     const dataManutenzione = e.start;
-                    const manAvvenuta = confrontaDate(dataProgrammata, dataManutenzione);
+                    const manAvvenuta = confrontaMesi(dataProgrammata, dataManutenzione);
                     if (manAvvenuta) {
-                        // console.log('DA RIMUOVERE: '+evt.title+' '+dataProgrammata);
                         evt.remove();
                     }
                 }
             });
         }
-        // console.log(e.id+': '+e.title);
     });
 }
 
@@ -249,10 +247,21 @@ function ripulisciEventiProgrammatiMC() {
     return;
 }
 
-function confrontaDate(dataProgrammata, dataManutenzione) {
-    let msDataProg = Date.parse(dataProgrammata);
-    let msDataMan = Date.parse(dataManutenzione);
-    if (msDataProg<=msDataMan) {
+function confrontaDate(data1, data2) {
+    const msData1 = Date.parse(data1);
+    const msData2 = Date.parse(data2);
+    if (msData1<=msData2) {
+        return true; // data1 viene prima di data2
+    }
+    else {
+        return false; // data2 viene prima di data1
+    }
+}
+
+function confrontaMesi(dataProgrammata, dataManutenzione) {
+    const meseDataProg = Date.parse(new Date(dataProgrammata.getFullYear(), dataProgrammata.getMonth(), 1));
+    const meseDataMan = Date.parse(new Date(dataManutenzione.getFullYear(), dataManutenzione.getMonth(), 1));
+    if (meseDataProg<=meseDataMan) { // controllo il mese, non la data esatta
         return true; // MANUTENZIONE EFFETTUATA, TOGLIERE EVENTO PROGRAMMATO
     }
     else {
