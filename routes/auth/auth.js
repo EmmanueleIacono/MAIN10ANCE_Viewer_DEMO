@@ -5,6 +5,8 @@ router.use(express.json());
 
 const {clientServ} = require('../database/connessioni');
 
+const scadenza = new Date(Date.now() + 1000*60*60*24*365);
+
 router.post('/signup', async (req, res, next) => {
     if (validazioneUsers(req.body)) {
         const datiUtente = await getUtenteByNome(req.body.username);
@@ -50,12 +52,14 @@ router.post('/login', async (req, res, next) => {
                 res.cookie('user_id', datiUtente.username, {
                     httpOnly: true,
                     secure: (!process.env.DEV_PLACEHOLDER),
-                    signed: true
+                    signed: true,
+                    expires: scadenza
                 });
                 res.cookie('role', datiUtente.role, {
                     httpOnly: true,
                     secure: (!process.env.DEV_PLACEHOLDER),
-                    signed: true
+                    signed: true,
+                    expires: scadenza
                 });
                 res.json({
                     message: 'Login completato',
