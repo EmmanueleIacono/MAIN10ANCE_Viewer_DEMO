@@ -67,11 +67,11 @@ async function creaGraficiDashboard($) {
       const w1 = document.getElementById("widgetChart1");
       w1.addEventListener('click', (e) => {
       const label = clickHandler(e, myChart);
-      if(label){
-        f_card("Gestione-utenti")
+      if (label) {
+        f_card("Gestione-utenti");
         }
         else {
-          f_card(null)
+          f_card(null);
         }
       });
     }
@@ -115,17 +115,18 @@ async function creaGraficiDashboard($) {
 
       const w2 = document.getElementById("widgetChart2");
       w2.addEventListener('click', (e) => {
-      const label = clickHandler(e, myChart);
-      f_card(label)
+        const label = clickHandler(e, myChart);
+        f_card(label);
       });
     }
 
     //WidgetChart 3
     const [oggettiBIM, oggettiGIS] = await widgetChart3();
-    function sumOggetti(){ 
+    function sumOggetti() { 
       const sum = parseInt(oggettiBIM) + parseInt(oggettiGIS);
       return sum;
     }
+
     const oggetti = sumOggetti();
     document.getElementById("oggetti").innerText = oggetti;
 
@@ -136,8 +137,7 @@ async function creaGraficiDashboard($) {
         type: 'doughnut',
         data: {
           labels: ['BIM', 'GIS'],
-          datasets: [
-            {
+          datasets: [{
             data: [oggettiBIM, oggettiGIS],
             borderColor: "white",
             borderWidth: 2,
@@ -161,8 +161,8 @@ async function creaGraficiDashboard($) {
     
       const w3 = document.getElementById("widgetChart3");
       w3.addEventListener('click', (e) => {
-      const label = clickHandler(e, myChart);
-      f_card(label);
+        const label = clickHandler(e, myChart);
+        f_card(label);
       });
     }
 
@@ -199,103 +199,95 @@ async function creaGraficiDashboard($) {
         const w4 = document.getElementById("widgetChart4");
         w4.addEventListener('click', (e) => {
         const label = clickHandler(e, myChart);
-        if(label === "Controllo") {
+        if (label === "Controllo") {
           f_card(label);
         }
-        else if(!label){
+        else if (!label) {
           f_card(null);
         }
-        else{
+        else {
           f_card("Intervento");
         }
-        });
-      }
-
+      });
     }
-    catch (error) {
-      console.log(error);
-    }
-
-  try {
-
-  // Analisi costi
-  
-  const controllo = '#a8c956'
-  const intervento = '#1a4f9c'
-
-  var data1 = [52, 60, 55, 50, 65, 80, 57, 70, 105, 115, 100, 0]
-  var data2 = [102, 70, 80, 100, 56, 53, 80, 75, 65, 90]
-  var data3 = [13, 27, 15, 42, 23, 25, 10, 12, 13, 25, 17, 0]
-
-  var ctx = document.getElementById("recent-rep-chart");
-  if (ctx) {
-    var myChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        type: 'bar',
-        labels: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Marzo ', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
-        datasets: [
-          {
-            label: 'attività',
-            type: 'line',
-            backgroundColor: 'orange',
-            pointBorderColor: 'orange',
-            borderRadius: 5,
-            borderWidth: 2,
-            data: data3
-          },
-          {
-            label: 'Costo previsto (€)',
-            type: 'bar',
-            backgroundColor: controllo,
-            borderRadius: 5,
-            data: data1
-          },
-          {
-            label: 'Costo effettivo (€)',
-            type: 'bar',
-            backgroundColor: intervento,
-            borderRadius: 5,
-            data: data2
-          },
-        ]
-      },
-      
-      options: {
-        plugins: {
-          legend: {display: true, position: 'top',
-            font: {size: 12, family: 'Poppins'}},
-          responsive: true,
-          scales: [{
-            x: {display: true, color: 'grey'},
-            y: {display: true, color: 'grey'}
-          }],
-        },
-        elements: {
-          point: {radius: 5, hitRadius: 10, hoverRadius: 15, hoverBorderWidth: 3},
-          line: {backgroundColor: 'grey', borderWidth: 10}
-          },
-        animations: {
-          animation: false,
-          tension: {duration: 1000, easing: 'linear', from: 1, to: 0, loop: true}
-        }
-      }
-    });
-  }
-
   }
   catch (error) {
     console.log(error);
   }
 
+  try {
+    // Analisi costi
+    const controllo = '#a8c956';
+    const intervento = '#1a4f9c';
+
+    const data1 = [52, 60, 55, 50, 65, 80, 57, 70, 105, 115, 100, 0];
+    const data2 = [102, 70, 80, 100, 56, 53, 80, 75, 65, 90];
+    const data3 = [13, 27, 15, 42, 23, 25, 10, 12, 13, 25, 17, 0];
+
+    var ctx = document.getElementById("recent-rep-chart");
+    if (ctx) {
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          type: 'bar',
+          labels: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Marzo ', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
+          datasets: [
+            {
+              label: 'attività',
+              type: 'line',
+              backgroundColor: 'orange',
+              pointBorderColor: 'orange',
+              borderRadius: 5,
+              borderWidth: 2,
+              data: data3
+            },
+            {
+              label: 'Costo previsto (€)',
+              type: 'bar',
+              backgroundColor: controllo,
+              borderRadius: 5,
+              data: data1
+            },
+            {
+              label: 'Costo effettivo (€)',
+              type: 'bar',
+              backgroundColor: intervento,
+              borderRadius: 5,
+              data: data2
+            },
+          ]
+        },
+        options: {
+          plugins: {
+            legend: {display: true, position: 'top',
+              font: {size: 12, family: 'Poppins'}},
+            responsive: true,
+            scales: [{
+              x: {display: true, color: 'grey'},
+              y: {display: true, color: 'grey'}
+            }],
+          },
+          elements: {
+            point: {radius: 5, hitRadius: 10, hoverRadius: 15, hoverBorderWidth: 3},
+            line: {backgroundColor: 'grey', borderWidth: 10}
+            },
+          animations: {
+            animation: false,
+            tension: {duration: 1000, easing: 'linear', from: 1, to: 0, loop: true}
+          }
+        }
+      });
+    }
+  }
+  catch (error) {
+    console.log(error);
+  }
 
   try {
-    
-    const [dataBIM, tableBIM] = await pieChart1()
-    let colorBIM = dataBIM.map(() => (`#${(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6)}`))
+    const [dataBIM, tableBIM] = await pieChart1();
+    const colorBIM = dataBIM.map(() => (`#${(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6)}`));
 
     //pie chart1
-
     var ctx = document.getElementById("pieChart1");
     if (ctx) {
       var myChart = new Chart(ctx, {
@@ -316,20 +308,16 @@ async function creaGraficiDashboard($) {
       responsive: true
       });
     }
-
   }
   catch (error) {
     console.log(error);
   }
 
-
   try {
-    
-    const [dataGIS, tableGIS] = await pieChart2()
-    let colorGIS = dataGIS.map(() => (`#${(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6)}`))
+    const [dataGIS, tableGIS] = await pieChart2();
+    const colorGIS = dataGIS.map(() => (`#${(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6)}`));
 
-    //pie chart2
-
+    // pie chart2
     var ctx = document.getElementById("pieChart2");
     if (ctx) {
       ctx.height = 150
@@ -355,20 +343,17 @@ async function creaGraficiDashboard($) {
           responsive: true
       });
     }
-
-
   }
   catch (error) {
     console.log(error);
   }
 
-
   try {
-    //bar chart
-    var ctx = document.getElementById("barChart1");
-    if (ctx) {
-      ctx.height = 150;
-      var myChart = new Chart(ctx, {
+    // bar chart
+    const ctx1 = document.getElementById("barChart1");
+    if (ctx1) {
+      ctx1.height = 150;
+      var myChart = new Chart(ctx1, {
         type: 'bar',
         defaultFontFamily: 'Poppins',
         data: {
@@ -432,13 +417,11 @@ async function creaGraficiDashboard($) {
       });
     }
 
-
-
-    //radar chart
-    var ctx = document.getElementById("radarChart1");
-    if (ctx) {
-      ctx.height = 150;
-      var myChart = new Chart(ctx, {
+    // radar chart
+    const ctx2 = document.getElementById("radarChart1");
+    if (ctx2) {
+      ctx2.height = 150;
+      var myChart = new Chart(ctx2, {
         type: 'radar',
         data: {
           labels: ["Degrado1", "Degrado2", "Degrado3","Degrado4", "Degrado5", "Degrado6", "Degrado7"],
@@ -488,7 +471,6 @@ async function creaGraficiDashboard($) {
             labels: {
               fontFamily: 'Poppins'
             }
-
           },
           scale: {
             ticks: {
@@ -500,12 +482,11 @@ async function creaGraficiDashboard($) {
       });
     }
 
-
     // polar chart
-    var ctx = document.getElementById("polarChart1");
-    if (ctx) {
-      ctx.height = 150;
-      var myChart = new Chart(ctx, {
+    const ctx3 = document.getElementById("polarChart1");
+    if (ctx3) {
+      ctx3.height = 150;
+      var myChart = new Chart(ctx3, {
         type: 'polarArea',
         data: {
           datasets: [{
@@ -527,18 +508,17 @@ async function creaGraficiDashboard($) {
         }
       });
     }
-
   }
   catch (error) {
     console.log(error);
   }
 
   try {
-    //bar chart
-    var ctx = document.getElementById("barChart2");
-    if (ctx) {
-      ctx.height = 150;
-      var myChart = new Chart(ctx, {
+    // bar chart
+    const ctx1 = document.getElementById("barChart2");
+    if (ctx1) {
+      ctx1.height = 150;
+      var myChart = new Chart(ctx1, {
         type: 'bar',
         defaultFontFamily: 'Poppins',
         data: {
@@ -587,26 +567,24 @@ async function creaGraficiDashboard($) {
             labels: {
               fontFamily: 'Poppins'
             }
-
           },
           scales: {
             x: {
-              stacked: false,
+              stacked: false
             },
             y: {
               stacked: false
             }
           }
         }
-      }
-  )};
+      });
+    }
 
-
-    //radar chart
-    var ctx = document.getElementById("radarChart2");
-    if (ctx) {
-      ctx.height = 150;
-      var myChart = new Chart(ctx, {
+    // radar chart
+    const ctx2 = document.getElementById("radarChart2");
+    if (ctx2) {
+      ctx2.height = 150;
+      var myChart = new Chart(ctx2, {
         type: 'radar',
         data: {
           labels: ["Degrado1", "Degrado2", "Degrado3","Degrado4", "Degrado5", "Degrado6", "Degrado7"],
@@ -668,12 +646,11 @@ async function creaGraficiDashboard($) {
       });
     }
 
-
     // polar chart
-    var ctx = document.getElementById("polarChart2");
-    if (ctx) {
-      ctx.height = 150;
-      var myChart = new Chart(ctx, {
+    const ctx3 = document.getElementById("polarChart2");
+    if (ctx3) {
+      ctx3.height = 150;
+      var myChart = new Chart(ctx3, {
         type: 'polarArea',
         data: {
           datasets: [{
@@ -697,22 +674,20 @@ async function creaGraficiDashboard($) {
         }
       });
     }
-
   }
   catch (error) {
     console.log(error);
   }
-
 }
 
 try {
-  //progress bar
+  // progress bar
   const progressbarSimple = $('.js-progressbar-simple');
   progressbarSimple.each(function () {
     const that = $(this);
     let executed = false;
+    // $(window).on('load', function () {
     $('#apriTabDashboard').on('click', function () {
-
       that.waypoint(function () {
         if (!executed) {
           executed = true;
@@ -729,28 +704,31 @@ try {
       });
     });
 
-  //speedometer
-  function op(elem){return document.querySelector(elem)}
-  function opp(elem){return document.querySelectorAll(elem)}
+  // speedometer
+  function op(elem) {
+    return document.querySelector(elem);
+  }
+  function opp(elem) {
+    return document.querySelectorAll(elem);
+  }
 
   const circles = opp(".circle");
 
-  circles.forEach(val=>{
-    const numDots=val.getAttribute("dot");
-    const markeDots=val.getAttribute("markeDot");
-    let pt=''
-    const rot=360/numDots;
-    for(let a=1; a<= numDots; a++){
+  circles.forEach(val => {
+    const numDots = val.getAttribute("dot");
+    const markeDots = val.getAttribute("markeDot");
+    let pt = '';
+    const rot = 360/numDots;
+    for (let a = 1; a<=numDots; a++) {
       if (a<= markeDots) {
-        pt+=`<div class="points animated" style="--i: ${a}; --r: ${rot}deg;"></div>`
+        pt += `<div class="points animated" style="--i: ${a}; --r: ${rot}deg;"></div>`;
       }
       else {
-        pt+=`<div class="points" style="--i: ${a}; --r: ${rot}deg;"></div>`
+        pt += `<div class="points" style="--i: ${a}; --r: ${rot}deg;"></div>`;
       }
     }
-    val.innerHTML=pt;
+    val.innerHTML = pt;
   });
-
 }
 catch (err) {
   console.log(err);
