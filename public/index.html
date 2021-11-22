@@ -36,7 +36,7 @@
   <script src="js/BIM-DB.js" defer></script>
   <script src="js/BIM-modulo.js" defer></script>
   <script src="js/MappaGIS.js" defer></script>
-  <script src="js/ConsultazioneDB.js" defer></script>
+  <!-- <script src="js/ConsultazioneDB.js" defer></script> -->
   <script src="js/calendario.js" defer></script>
   <script src="js/schede-viewer.js" defer></script>
   <script src="js/GestioneUtenti.js" defer></script>
@@ -249,7 +249,7 @@
       </div>
       <div class="fill" id="tab3" data-tab-content>
         <div class="panel panel-default col-sm-7 fill" id="tabDatabase">
-          <div id="filtroDB">
+          <!-- <div id="filtroDB">
             <div id="colDBLOD34" class="colonnaDB">
               <form>
                 <label for="radioSM">Sacro Monte</label>
@@ -273,20 +273,17 @@
               <button id="applicaQuery">APPLICA</button>
               <button id="modificaDati" disabled>MODIFICA</button>
               <button id="salvaDati" disabled>SALVA</button>
-              <!-- <br> -->
               <button id="creaDati">AGGIUNGI</button>
             </div>
           </div>
-          <div id="risultatiDB"></div>
+          <div id="risultatiDB"></div> -->
         </div>
         <div class="col-sm-5 fill" id="pannello-lat-db">
           <div class="panel panel-default fill">
             <div class="panel-heading" id="pannello-lat-gis-header" data-toggle="tooltip">
               <b>EXPLORER</b>
             </div>
-            <div class="panel-body pannelloLatDB">
-              <!-- <div id="calendar"></div> -->
-            </div>
+            <div class="panel-body pannelloLatDB"></div>
           </div>
         </div>
       </div>
@@ -381,31 +378,6 @@
           target.classList.add('active');
       });
   });
-</script>
-<!-- SCRIPT PER GESTIONE RADIO LOD DB -->
-<script>
-  setInterval(() => {
-    if (document.getElementById('radioLOD3').checked) {
-      // abilito select lod 3
-      document.getElementById('selectLOD3').disabled = false;
-      document.getElementById('selectLOD4').disabled = true;
-      // document.getElementById('selectCappella').disabled = false;
-      // document.getElementById('selectLOD5').disabled = false;
-    }
-    if (document.getElementById('radioLOD4').checked) {
-      // abilito select lod 4
-      document.getElementById('selectLOD4').disabled = false;
-      document.getElementById('selectLOD3').disabled = true;
-      // document.getElementById('selectCappella').disabled = false;
-      // document.getElementById('selectLOD5').disabled = false;
-    }
-    if (document.getElementById('checkLOD5').checked) {
-      document.getElementById('selectLOD5').disabled = false;
-    }
-    if (!(document.getElementById('checkLOD5').checked)) {
-      document.getElementById('selectLOD5').disabled = true;
-    }
-  }, 100);
 </script>
 </body>
 </html>

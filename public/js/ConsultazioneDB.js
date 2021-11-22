@@ -16,6 +16,30 @@ const selezioneLOD5 = document.getElementById('selectLOD5');
     }
 })();
 
+// GESTIONE RADIO LOD
+setInterval(() => {
+    if (document.getElementById('radioLOD3').checked) {
+      // abilito select lod 3
+      document.getElementById('selectLOD3').disabled = false;
+      document.getElementById('selectLOD4').disabled = true;
+      // document.getElementById('selectCappella').disabled = false;
+      // document.getElementById('selectLOD5').disabled = false;
+    }
+    if (document.getElementById('radioLOD4').checked) {
+      // abilito select lod 4
+      document.getElementById('selectLOD4').disabled = false;
+      document.getElementById('selectLOD3').disabled = true;
+      // document.getElementById('selectCappella').disabled = false;
+      // document.getElementById('selectLOD5').disabled = false;
+    }
+    if (document.getElementById('checkLOD5').checked) {
+      document.getElementById('selectLOD5').disabled = false;
+    }
+    if (!(document.getElementById('checkLOD5').checked)) {
+      document.getElementById('selectLOD5').disabled = true;
+    }
+  }, 100);
+
 selectSM.addEventListener('change', setNumCappelle);
 
 const applicaQuery = document.getElementById('applicaQuery');
@@ -108,7 +132,7 @@ function setNumCappelle() {
 }
 
 async function costruisciTabella(tabella, colonne, opera, LOD5_Bool) {
-    jsonTabella = {};
+    let jsonTabella = {};
     jsonTabella.tab = opera;
     const datiDB = await prendiDatiTabella(jsonTabella);
     const tBody = document.createElement('tbody');
@@ -120,9 +144,9 @@ async function costruisciTabella(tabella, colonne, opera, LOD5_Bool) {
         const qualeOpera = ottieniOpera();
         if (dato.id_main10ance) {
             if (LOD5_Bool) {
-                listaSM_DB = [];
-                listaCapp_DB = [];
-                listaOp_DB = [];
+                let listaSM_DB = [];
+                let listaCapp_DB = [];
+                let listaOp_DB = [];
                 (dato.id_main10ance).forEach(id => {
                     listaSM_DB.push(id.split('|')[0]);
                     listaCapp_DB.push(...(id.split('|')[1].split('-')));
@@ -166,7 +190,7 @@ async function costruisciTabella(tabella, colonne, opera, LOD5_Bool) {
 }
 
 async function costruisciIntestazione(tabella, opera) {
-    jsonTabella = {};
+    let jsonTabella = {};
     jsonTabella.tab = opera;
     const cols = await prendiColonne(jsonTabella);
     const tHead = document.createElement('thead');
