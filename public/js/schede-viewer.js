@@ -201,6 +201,11 @@ selectSacroMonte.addEventListener('change', () => {
 });
 
 function creaStrutturaSchede() {
+    const cardSchede = document.createElement('div');
+    cardSchede.className = 'au-card m-b-30';
+    // cardSchede.style.paddingLeft = '5px';
+    // cardSchede.style.paddingRight = '15px';
+
     const tabellaSchede = document.createElement('table');
     // tabellaSchede.setAttribute('id', 'tabella-schede');
     tabellaSchede.className = 'schede tabella-schede';
@@ -212,7 +217,10 @@ function creaStrutturaSchede() {
 
     tabellaSchede.appendChild(captionSchede);
 
-    divContenitoreSchede.appendChild(tabellaSchede);
+    cardSchede.appendChild(tabellaSchede);
+
+    // divContenitoreSchede.appendChild(tabellaSchede);
+    divContenitoreSchede.appendChild(cardSchede);
 
     return [tabellaSchede, captionSchede];
 }

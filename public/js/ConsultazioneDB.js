@@ -1,6 +1,6 @@
 "use strict";
 
-const contenitoreDB = document.getElementById('tabDatabase');
+const contenitoreDB = document.getElementById('tabDashboard');
 const contenitoreRisultatiDB = document.getElementById('risultatiDB');
 const selectSM = document.getElementById('selectSM');
 const selezioneCapp = document.getElementById('selectCappella');

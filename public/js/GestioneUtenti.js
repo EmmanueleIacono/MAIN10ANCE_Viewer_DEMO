@@ -1,6 +1,6 @@
 "use strict";
 
-const bottoneTabUtenti = document.getElementById('apriTabUtenti');
+const bottoneTabUtenti = document.getElementById('apriTabDashboard');
 const contenitoreGestioneUtenti = document.getElementById('contenitore-gestione-utenti');
 const utenteCorrente = document.getElementById('liUsernameNavbar').innerText;
 

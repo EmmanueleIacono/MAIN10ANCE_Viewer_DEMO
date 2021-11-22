@@ -1,6 +1,6 @@
 "use strict";
 
-const apriTabDB = document.getElementById('apriTabDatabase');
+const apriTabDashboard = document.getElementById('apriTabDashboard');
 const apriTabSchede = document.getElementById('apriTabSchede');
 
 const calendarEl = document.getElementById('calendar');
@@ -45,28 +45,50 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
     },
 });
 
-// apriTabDB.addEventListener('click', popolaCalendario);
-apriTabSchede.addEventListener('click', popolaCalendario);
+const calendarEl2 = document.getElementById('calendar2');
+const calendar2 = new FullCalendar.Calendar(calendarEl2, {
+    timeZone: 'local',
+    locale: 'it',
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+        left: 'dayGridMonth,timeGridWeek',
+        center: 'title',
+        right: 'prevYear,prev,next,nextYear'
+    },
 
-function renderizzaCalendario() {
-    calendar.render();
-    const listaEventi = calendar.getEvents();
+    eventMouseEnter: (info) => {
+        info.el.style.cursor = 'pointer';
+        info.el.title = info.event.title;
+    },
+    eventClick: (info) => {
+        alert('bisogna fare qualcosa qui');
+    },
+});
+
+apriTabSchede.addEventListener('click', () => {popolaCalendario(calendar);});
+apriTabDashboard.addEventListener('click', () => {
+    popolaCalendario(calendar2);
+});
+
+function renderizzaCalendario(cal) {
+    cal.render();
+    const listaEventi = cal.getEvents();
     listaEventi.forEach(evt => {
         evt.remove();
     });
 }
 
-async function popolaCalendario() {
-    renderizzaCalendario();
-    const eventiC = await creaEventiControllo();
-    const eventiMR = await creaEventiManReg();
-    const eventiMC = await creaEventiManCorr();
-    creaEventiProgrammati(eventiC, eventiMR, eventiMC);
-    ripulisciEventiProgrammatiMR();
+async function popolaCalendario(cal) {
+    renderizzaCalendario(cal);
+    const eventiC = await creaEventiControllo(cal);
+    const eventiMR = await creaEventiManReg(cal);
+    const eventiMC = await creaEventiManCorr(cal);
+    creaEventiProgrammati(cal, eventiC, eventiMR, eventiMC);
+    ripulisciEventiProgrammatiMR(cal);
     // ripulisciEventiProgrammatiMC();
 }
 
-async function creaEventiControllo() {
+async function creaEventiControllo(cal) {
     const listaEventi = await prendiEventiControllo();
     listaEventi.forEach(ev => {
         let listaOpere = [];
@@ -90,12 +112,12 @@ async function creaEventiControllo() {
             borderColor: '#a8c956',
             textColor: '#f8f8ff',
         };
-        calendar.addEvent(eventoControllo);
+        cal.addEvent(eventoControllo);
     });
     return listaEventi;
 }
 
-async function creaEventiManReg() {
+async function creaEventiManReg(cal) {
     const listaEventi = await prendiEventiManReg();
     listaEventi.forEach(ev => {
         let listaOpere = [];
@@ -120,12 +142,12 @@ async function creaEventiManReg() {
             borderColor: '#5f87c2',
             textColor: '#f8f8ff',
         };
-        calendar.addEvent(eventoManReg);
+        cal.addEvent(eventoManReg);
     });
     return listaEventi;
 }
 
-async function creaEventiManCorr() {
+async function creaEventiManCorr(cal) {
     const listaEventi = await prendiEventiManCorr();
     listaEventi.forEach(ev => {
         let listaOpere = [];
@@ -150,12 +172,12 @@ async function creaEventiManCorr() {
             borderColor: '#1a4f9c',
             textColor: '#f8f8ff',
         };
-        calendar.addEvent(eventoManCorr);
+        cal.addEvent(eventoManCorr);
     });
     return listaEventi;
 }
 
-function creaEventiProgrammati(listaControlli, listaManReg, listaManCorr) {
+function creaEventiProgrammati(cal, listaControlli, listaManReg, listaManCorr) {
     const mesiUrgenze = {
         "uc 0 - a lungo termine": '36',
         "uc 1 - termine intermedio": '12',
@@ -197,7 +219,7 @@ function creaEventiProgrammati(listaControlli, listaManReg, listaManCorr) {
                         borderColor: '#c74646',
                         textColor: '#f8f8ff',
                     };
-                    calendar.addEvent(eventoProgrammato);
+                    cal.addEvent(eventoProgrammato);
                 }
             // }
         }
@@ -218,14 +240,14 @@ function creaEventiProgrammati(listaControlli, listaManReg, listaManCorr) {
                     borderColor: '#c74646',
                     textColor: '#f8f8ff',
                 };
-                calendar.addEvent(eventoProgrammato);
+                cal.addEvent(eventoProgrammato);
             }
         }
     });
 }
 
-function ripulisciEventiProgrammatiMR() {
-    const listaEventiCal = calendar.getEvents();
+function ripulisciEventiProgrammatiMR(cal) {
+    const listaEventiCal = cal.getEvents();
     listaEventiCal.forEach(evt => {
         if (evt.title === 'Programmata manutenzione regolare') {
             const controlloRif = evt.id.split('-')[1];

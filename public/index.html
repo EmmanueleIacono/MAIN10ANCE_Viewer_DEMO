@@ -25,8 +25,18 @@
   <!-- Autodesk Forge Viewer files -->
   <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css" type="text/css">
   <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js"></script>
+  <!-- Chart.js e file per Dashboard -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Fontfaces CSS-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
+  <!-- Vendor CSS-->
+  <link href="vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet" media="all">
+  <script src="vendor/bootstrap-progressbar/bootstrap-progressbar.min.js" defer></script>
+  <script src="vendor/counter-up/jquery.waypoints.min.js" defer></script>
+  <script src="vendor/counter-up/jquery.counterup.min.js" defer></script>
   <!-- this project files -->
   <link href="css/main.css" rel="stylesheet" />
+  <link href="css/theme.css" rel="stylesheet" media="all">
   <script src="js/ForgeTree.js"></script>
   <script src="js/ForgeViewer.js"></script>
   <!-- PER QUESTI SOTTO SERVE DEFER PER CARICARLI DOPO L'HTML -->
@@ -40,6 +50,8 @@
   <script src="js/calendario.js" defer></script>
   <script src="js/schede-viewer.js" defer></script>
   <script src="js/GestioneUtenti.js" defer></script>
+  <script src="js/Dashboard.js" defer></script>
+  <script src="js/Chart.js" defer></script>
 </head>
 <body>
   <!-- Fixed navbar by Bootstrap: https://getbootstrap.com/examples/navbar-fixed-top/ -->
@@ -65,9 +77,8 @@
           </li> -->
           <li data-tab-target="#tab2" class="tab active" id="apriTabGIS">GIS VIEWER</li>
           <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
-          <li data-tab-target="#tab4" class="tab" id="apriTabSchede" style="display: none;">PLANNER</li>
-          <li data-tab-target="#tab3" class="tab" id="apriTabDatabase" style="display: none;">DASHBOARD</li>
-          <li data-tab-target="#tab5" class="tab" id="apriTabUtenti" style="display: none;">GESTIONE UTENTI</li>
+          <li data-tab-target="#tab3" class="tab" id="apriTabSchede" style="display: none;">PLANNER</li>
+          <!-- <li data-tab-target="#tab4" class="tab" id="apriTabDashboard" style="display: none;">DASHBOARD</li> -->
         </ul>
         <div class="pull-right">
           <ul class="nav navbar-nav">
@@ -84,7 +95,12 @@
     <div class="row fill tab-content">
       <div class="fill" id="tab1" data-tab-content>
         <div class="col-sm-9 fill" id="pannello-main-bim">
-          <div id="forgeViewer"></div>
+          <div id="forgeViewer">
+            <div id="contenitore-bim-viewer-placeholder">
+              <!-- <img src="./img/construction-bimviewer-placeholder-nero.png" id="bim-viewer-placeholder"> -->
+              <img src="./img/sacro-monte-varese-c.jpg" id="bim-viewer-placeholder">
+            </div>
+          </div>
         </div>
         <!-- SEZIONE DB -->
         <div class="col-sm-3 fill" id="pannello-db">
@@ -181,7 +197,7 @@
         </div>
         <!-- FINE PANNELLO LATERALE -->
       </div>
-      <div class="fill" id="tab4" data-tab-content>
+      <div class="fill" id="tab3" data-tab-content>
         <div class="panel panel-default col-sm-7 fill" id="tabSchede">
           <h4 id="tabella-titolo">
             <span id="refreshSchede" class="glyphicon glyphicon-refresh" style="cursor: pointer"></span>
@@ -247,58 +263,290 @@
           </div>
         </div>
       </div>
-      <div class="fill" id="tab3" data-tab-content>
-        <div class="panel panel-default col-sm-7 fill" id="tabDatabase">
-          <!-- <div id="filtroDB">
-            <div id="colDBLOD34" class="colonnaDB">
-              <form>
-                <label for="radioSM">Sacro Monte</label>
-                <select name="selectSM" id="selectSM"></select>
-                <br>
-                <label for="selectCappella">Cappella</label>
-                <select name="selectCappella" id="selectCappella"></select>
-                <br>
-                <input type="radio" name="radioLOD" id="radioLOD3">
-                <label for="radioLOD3">Opere immobili</label>
-                <select name="selectLOD3" id="selectLOD3" disabled></select>
-                <br>
-                <input type="radio" name="radioLOD" id="radioLOD4">
-                <label for="radioLOD4">Opere mobili e superfici decorate</label>
-                <select name="selectLOD4" id="selectLOD4" disabled></select>
-                <br>
-                <input type="checkbox" name="checkLOD" id="checkLOD5">
-                <label for="selectLOD5">Attività</label>
-                <select name="selectLOD5" id="selectLOD5" disabled></select>
-              </form>
-              <button id="applicaQuery">APPLICA</button>
-              <button id="modificaDati" disabled>MODIFICA</button>
-              <button id="salvaDati" disabled>SALVA</button>
-              <button id="creaDati">AGGIUNGI</button>
+      <div class="fill" id="tab4" data-tab-content>
+        <div class="panel panel-default col-sm-7 fill" id="tabDashboard">
+          <div class="container-fluid" id='contenitore-dash'>
+            <div class="row" id="Overview">
+              <div class="col-sm-6 col-lg-3">
+                <div class="overview-item overview-item--c1">
+                  <div class="overview-box clearfix">
+                    <div class="row-md-6 m-b-20">
+                      <div class="icon"><i class="zmdi zmdi-account-o"></i></div>
+                      <div class="text"><h2 id="utenti"></h2><span>utenti</span></div>
+                    </div>
+                    <div class="row-md-6 m-b-20">
+                      <div class="overview-chart"><canvas id="widgetChart1"></canvas></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="overview-item overview-item--c2">
+                  <div class="overview-box clearfix">
+                    <div class="row-md-6 m-b-20">
+                      <div class="icon"><i class="zmdi zmdi-home"></i></div>
+                      <div class="text"><h2 id="modelli"></h2><span>modelli</span></div>
+                    </div>
+                    <div class="row-md-6 m-b-20">
+                      <div class="overview-chart"><canvas id="widgetChart2"></canvas></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="overview-item overview-item--c3">
+                  <div class="overview-box clearfix">
+                    <div class="row-md-6 m-b-20">
+                      <div class="icon"><i class="zmdi zmdi-info"></i></div>
+                      <div class="text"><h2 id="oggetti"></h2><span>oggetti</span></div>
+                    </div>
+                    <div class="row-md-6 m-b-20">
+                      <div class="overview-chart"><canvas id="widgetChart3"></canvas></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="overview-item overview-item--c4">
+                  <div class="overview-box clearfix">
+                    <div class="row-md-6 m-b-20">
+                      <div class="icon"><i class="zmdi zmdi-calendar-note"></i></div>
+                      <div class="text"><h2>2386</h2><span>attività</span></div>
+                    </div>
+                    <div class="row-md-6 m-b-20">
+                      <div class="overview-chart"><canvas id="widgetChart4"></canvas></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row active" id="Varallo" data-card>
+              <div class="col-lg-12">
+                <div class="au-card m-b-30">
+                  <div class="au-card-inner">
+                    <div class="col-sm-10 col-lg-11">
+                    <h3 class="title-2 m-b-30">Task Progress</h3>
+                    </div>
+                    <div class="col-sm-2 col-lg-1">
+                      <select name="cars" id="cars">
+                        <option value="anno">2023</option>
+                        <option value="anno">2022</option>
+                        <option value="anno">2021</option>
+                        <option value="anno">2020</option>
+                        <option value="anno">2019</option>
+                        <option value="anno">2018</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-12 col-lg-8">
+                      <div class="card-progress recent-report">
+                        <div class="card-progress-inner">
+                          <div class="recent-report__chart"><canvas id="recent-rep-chart"></canvas></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-4">
+                      <div class="task-progress">
+                        <div class="au-skill-container">
+                            <div class="au-progress">
+                            <span class="au-progress__title">Controllo</span>
+                              <div class="au-progress__bar">
+                                <div class="au-progress__inner js-progressbar-simple" role="progressbar" data-transitiongoal="90">
+                                <span class="au-progress__value js-value"></span>
+                                </div>
+                              </div>
+                            </div>
+                            <!-- <div class="au-progress">
+                            <span class="au-progress__title">Diagnostica</span>
+                              <div class="au-progress__bar">
+                                <div class="au-progress__inner js-progressbar-simple" role="progressbar" data-transitiongoal="75">
+                                <span class="au-progress__value js-value"></span>
+                                </div>
+                              </div>
+                            </div> -->
+                            <div class="au-progress">
+                            <span class="au-progress__title">Manutenzione regolare</span>
+                              <div class="au-progress__bar">
+                                <div class="au-progress__inner js-progressbar-simple" role="progressbar" data-transitiongoal="65">
+                                <span class="au-progress__value js-value"></span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="au-progress">
+                            <span class="au-progress__title">Manutenzione correttiva</span>
+                              <div class="au-progress__bar">
+                                <div class="au-progress__inner js-progressbar-simple" role="progressbar" data-transitiongoal="85">
+                                <span class="au-progress__value js-value"></span>
+                                </div>
+                              </div>
+                            </div>
+                              <div class="au-progress">
+                              <span class="au-progress__title">Restauro</span>
+                                <div class="au-progress__bar">
+                                  <div class="au-progress__inner js-progressbar-simple" role="progressbar" data-transitiongoal="95">
+                                  <span class="au-progress__value js-value"></span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row active" id="BIM" data-card>
+              <div class="col-lg-12">
+                <div class="au-card m-b-30">
+                  <div class="au-card-inner">
+                    <div class="col-sm-12 col-lg-12">
+                      <h3 class="title-2 m-b-20">BIM object</h3>
+                    </div>
+                    <div class="col-sm-12 col-lg-6">
+                      <canvas id="pieChart1"></canvas>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                      <div class="flex">
+                        <div class="circle flex" dot="100" markeDot="55" style="--col: green;"></div>
+                        <div class="text"><h1>55%</h1><h6>nessun sintomo</h6></div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                      <div class="flex">
+                        <div class="circle flex" dot="100" markeDot="15" style="--col: yellow;"></div>
+                        <div class="text"><h1>15%</h1><h6>sintomi lievi</h6></div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                      <div class="flex">
+                        <div class="circle flex" dot="100" markeDot="25" style="--col: orange;"></div>
+                        <div class="text"><h1>25%</h1><h6>sintomi moderati</h6></div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                      <div class="flex">
+                        <div class="circle flex" dot="100" markeDot="5" style="--col: red;"></div>
+                        <div class="text"><h1>5%</h1><h6>sinomi gravi</h6></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row active" id="GIS" data-card>
+              <div class="col-lg-12">
+                <div class="au-card m-b-30">
+                  <div class="au-card-inner">
+                    <h3 class="title-2 m-b-20">GIS object</h3>
+                      <div class="col-lg-12"><canvas id="pieChart2"></canvas></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row active" id="Controllo" data-card>
+              <div class="col-sm-12 col-lg-12">
+                <div class="au-card m-b-30">
+                    <div class="au-card-inner"><h3 class="title-2 m-b-40">Bar chart</h3><canvas id="barChart1"></canvas>
+                    </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <div class="au-card m-b-30">
+                    <div class="au-card-inner"><h3 class="title-2 m-b-40">Polar Chart</h3><canvas id="polarChart1"></canvas>
+                    </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <div class="au-card m-b-30">
+                    <div class="au-card-inner"><h3 class="title-2 m-b-40">Rader chart</h3><canvas id="radarChart1"></canvas>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="row active" id="Intervento" data-card>
+              <div class="col-sm-12 col-lg-12">
+                <div class="au-card m-b-30">
+                    <div class="au-card-inner"><h3 class="title-2 m-b-40">Bar chart</h3><canvas id="barChart2"></canvas>
+                    </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <div class="au-card m-b-30">
+                    <div class="au-card-inner"><h3 class="title-2 m-b-40">Polar Chart</h3><canvas id="polarChart2"></canvas>
+                    </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <div class="au-card m-b-30">
+                    <div class="au-card-inner"><h3 class="title-2 m-b-40">Rader chart</h3><canvas id="radarChart2"></canvas>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="row active" id="Gestione-utenti" data-card>
+              <div class="col-lg-12">
+                <div class="au-card m-b-30">
+                  <div class="au-card-inner"><h3 class="title-2 m-b-40">Gestione Utenti</h3>
+                    <div class="panel panel-default" id="tabUtenti">
+                      <div id="contenitore-gestione-utenti"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div id="risultatiDB"></div> -->
         </div>
         <div class="col-sm-5 fill" id="pannello-lat-db">
-          <div class="panel panel-default fill">
-            <div class="panel-heading" id="pannello-lat-gis-header" data-toggle="tooltip">
+          <div class="panel panel-default fill" id="pannello-lat-schede-inner">
+            <div class="panel-heading" id="pannello-lat-schede-header" data-toggle="tooltip">
               <b>EXPLORER</b>
             </div>
-            <div class="panel-body pannelloLatDB"></div>
-          </div>
-        </div>
-      </div>
-      <div class="fill" id="tab5" data-tab-content>
-        <div class="panel panel-default col-sm-9 fill" id="tabUtenti">
-          <h4><b>GESTIONE UTENTI</b></h4>
-          <div id="contenitore-gestione-utenti"></div>
-        </div>
-        <div class="col-sm-3 fill" id="pannello-lat-utenti">
-          <div class="panel panel-default fill">
-            <div class="panel-heading" id="pannello-lat-utenti-header" data-toggle="tooltip">
-              <b>EXPLORER</b>
-            </div>
-            <div class="panel-body pannelloLatDB">
-              qui strumenti aggiuntivi
+            <div class="panel-body pannelloLatSchede" id="pannello-lat-schede-body">
+                <div id="calendar2"></div>
+                <details id="details-filtri-schede" open>
+                  <summary class="sommario-main10ance"><b>FILTRI</b></summary>
+                  <input type="checkbox" name="check-generale" id="check-generale-2">
+                  <label for="check-generale">ATTIVA FILTRI</label>
+                  <br>
+                  <button id="vedi-schede-tutto-2" class="vedi-schede-disatt" disabled>SELEZIONA TUTTO</button>
+                  <button id="vedi-schede-nulla-2" class="vedi-schede-disatt" disabled>DESELEZIONA TUTTO</button>
+                  <br>
+                  <input type="checkbox" name="check-tipo-scheda" id="check-tipo-scheda-2" class="filtro-schede" disabled>
+                  <label for="check-tipo-scheda">Scheda</label>
+                  <select name="select-tipo-scheda" id="select-tipo-scheda-2">
+                    <option value="scheda controllo">Scheda controllo</option>
+                    <option value="scheda manutenzione regolare">Scheda manutenzione regolare</option>
+                    <option value="scheda manutenzione correttiva">Scheda manutenzione correttiva</option>
+                    <option value="scheda restauro">Scheda restauro</option>
+                  </select>
+                  <br>
+                  <input type="checkbox" name="check-sacro-monte" id="check-sacro-monte-2" class="filtro-schede" disabled>
+                  <label for="check-sacro-monte">Sacro Monte</label>
+                  <select name="select-sacro-monte" id="select-sacro-monte-2"></select>
+                  <br>
+                  <input type="checkbox" name="check-cappella" id="check-cappella-2" class="filtro-schede" disabled>
+                  <label for="check-cappella">Cappella</label>
+                  <select name="select-cappella" id="select-cappella-2"></select>
+                  <br>
+                  <input type="checkbox" name="check-elemento" id="check-elemento-2" class="filtro-schede" disabled>
+                  <label for="check-elemento">Elemento</label>
+                  <select name="select-elemento" id="select-elemento-2"></select>
+                  <br>
+                  <input type="checkbox" name="check-stato-conservazione" id="check-stato-conservazione-2" class="filtro-schede" disabled>
+                  <label for="check-stato-conservazione">Stato di conservazione</label>
+                  <select name="select-stato-conservazione" id="select-stato-conservazione-2"></select>
+                  <br>
+                  <input type="checkbox" name="check-fenomeno" id="check-fenomeno-2" class="filtro-schede" disabled>
+                  <label for="check-fenomeno">Fenomeno</label>
+                  <select name="select-fenomeno" id="select-fenomeno-2"></select>
+                  <br>
+                  <input type="checkbox" name="check-data" id="check-data-2" class="filtro-schede" disabled>
+                  <label for="check-data">Data</label>
+                  <label for="input-data-da" style="font-weight: normal;">Da</label>
+                  <input type="date" name="input-data-da" id="input-data-da-2">
+                  <label for="input-data-a" style="font-weight: normal;">A</label>
+                  <input type="date" name="input-data-a" id="input-data-a-2">
+                  <br>
+                </details>
             </div>
           </div>
         </div>

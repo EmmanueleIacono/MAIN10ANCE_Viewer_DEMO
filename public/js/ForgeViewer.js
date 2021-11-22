@@ -1,11 +1,11 @@
 "use strict";
 
-var viewer;
+let viewer;
 
 function launchViewer(urn, opzioniPostLoading) {
   const opzioniPost = opzioniPostLoading || undefined;
 
-  var options = {
+  const options = {
     env: 'AutodeskProduction',
     getAccessToken: getForgeToken,
     opz: opzioniPost
@@ -14,7 +14,7 @@ function launchViewer(urn, opzioniPostLoading) {
   Autodesk.Viewing.Initializer(options, () => {
     viewer = new Autodesk.Viewing.GuiViewer3D(document.getElementById('forgeViewer'), { extensions: ['Autodesk.DocumentBrowser', 'Autodesk.VisualClusters'] });
     viewer.start();
-    var documentId = 'urn:' + urn;
+    const documentId = 'urn:' + urn;
     let opzFunc = options.opz;
     Autodesk.Viewing.Document.load(documentId, (doc) => {
       onDocumentLoadSuccess(doc, opzFunc);
@@ -23,7 +23,7 @@ function launchViewer(urn, opzioniPostLoading) {
 }
 
 function onDocumentLoadSuccess(doc, opz) {
-  var viewables = doc.getRoot().getDefaultGeometry();
+  const viewables = doc.getRoot().getDefaultGeometry();
   viewer.loadDocumentNode(doc, viewables).then(i => {
     // documented loaded, any action?
     if (opz) {
