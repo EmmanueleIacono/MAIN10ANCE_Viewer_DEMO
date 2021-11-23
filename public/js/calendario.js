@@ -129,7 +129,7 @@ async function creaEventiManReg(cal) {
         });
         const eventoManReg = {
             id: ev.id_mn_reg,
-            title: `Manutenzione regolare ${listaOpere.join(', ')}`,
+            title: `Manutenzione ordinaria ${listaOpere.join(', ')}`,
             start: ev.data_ese,
             defaultAllDay: true,
             extendedProps: {
@@ -207,7 +207,7 @@ function creaEventiProgrammati(cal, listaControlli, listaManReg, listaManCorr) {
                 for (let n=1; n<=quanteRipetizioni; n++) {
                     const eventoProgrammato = {
                         id: `P${n}-${idC}`,
-                        title: `Programmata manutenzione regolare`,
+                        title: `Programmata manutenzione ordinaria`,
                         start: aggiungiMesi(dataC, (parseInt(mesiFuturi)*n)),
                         defaultAllDay: true,
                         extendedProps: {
@@ -249,7 +249,7 @@ function creaEventiProgrammati(cal, listaControlli, listaManReg, listaManCorr) {
 function ripulisciEventiProgrammatiMR(cal) {
     const listaEventiCal = cal.getEvents();
     listaEventiCal.forEach(evt => {
-        if (evt.title === 'Programmata manutenzione regolare') {
+        if (evt.title === 'Programmata manutenzione ordinaria') {
             const controlloRif = evt.id.split('-')[1];
             const dataProgrammata = evt.start;
             listaEventiCal.forEach(e => {

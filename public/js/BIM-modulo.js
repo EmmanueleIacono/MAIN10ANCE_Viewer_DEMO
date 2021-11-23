@@ -1,5 +1,7 @@
 "use strict";
 
+const detailsSelezione = document.getElementById('details-selezionati');
+const divDetailsSelezione = document.getElementById('contenitore-id-selezionati');
 const bottoneAggiungi = document.getElementById('aggiungiDB');
 const contenitoreSchede = document.getElementById('contenitore-controllo-intervento');
 const apriTabControllo = document.getElementById('apriTabControllo');
@@ -72,7 +74,7 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
                 }
             }
             else {
-                alert('ATTENZIONE: Inserire i valori mancanti per i campi sulla manutenzione regolare o correttiva.');
+                alert('ATTENZIONE: Inserire i valori mancanti per i campi sulla manutenzione ordinaria o correttiva.');
             }
         }
         else {
@@ -115,7 +117,7 @@ bottoneSalvaSchedaIntervento.addEventListener('click', async () => {
             }
         }
         else {
-            if ((scelta === 'Manutenzione Regolare') || (scelta === 'Manutenzione Correttiva')) {
+            if ((scelta === 'Manutenzione Ordinaria') || (scelta === 'Manutenzione Correttiva')) {
                 alert('ATTENZIONE: I campi OPERATORE, DATA, e SCHEDA CONTROLLO sono obbligatori.');
             }
             else if (scelta === 'Restauro') {
@@ -129,23 +131,13 @@ bottoneSalvaSchedaIntervento.addEventListener('click', async () => {
     }
 });
 
-bottoneChiudiSchede.addEventListener('click', () => {
-    apriTabControllo.style.display = 'none';
-    apriTabIntervento.style.display = 'none';
-    schedaControllo.style.display = 'none';
-    schedaIntervento.style.display = 'none';
-    bottoneSalvaSchedaControllo.style.display = 'none';
-    bottoneSalvaSchedaIntervento.style.display = 'none';
-    bottoneChiudiSchede.style.display = 'none';
-    if (document.getElementById('apriPDF')) {
-        document.getElementById('apriPDF').remove();
-    }
-});
+bottoneChiudiSchede.addEventListener('click', nascondiBottoniSchede);
 
 /////   FUNZIONI    /////
 
 function inizializzaModulo() {
-    cancellaFormDB(formDB);
+    svuotaContenitore(divDetailsSelezione);
+    svuotaContenitore(formDB);
 
     if (!viewer) {
         alert('Nessun modello selezionato');
@@ -175,6 +167,7 @@ function inizializzaModulo() {
                             // jsonRequest.id = idMain10ance;
                             // jsonRequest.categoria = entità;
                             preparaModulo(nome, idMain10ance);
+                            detailsSelezione.style.display = 'block';
                             mostraBottoniSchede();
                         }
                     });
@@ -200,7 +193,8 @@ function preparaModulo(nome, id) {
     hId.setAttribute('id', `modulo-aggiungi-${id}`);
     hId.innerHTML = `<b>ID ELEMENTO: ${id}</b>`;
     // formDB.appendChild(hNome);
-    formDB.appendChild(hId);
+    // formDB.appendChild(hId);
+    divDetailsSelezione.appendChild(hId);
 }
 
 function mostraBottoniSchede() {
@@ -330,7 +324,7 @@ async function preparaCampiControllo() {
         }
     });
     const contLabelManOrd = document.createElement('label');
-    contLabelManOrd.innerHTML = '<b>MANUTENZIONE REGOLARE</b>';
+    contLabelManOrd.innerHTML = '<b>MANUTENZIONE ORDINARIA</b>';
     const contInputManOrd = document.createElement('input');
     contInputManOrd.setAttribute('id', 'scheda-controllo-[frase_di_rischio]-{mn_reg}');
     contInputManOrd.disabled = true;
@@ -460,7 +454,7 @@ function preparaSceltaIntervento() {
     labelIntervento.innerHTML = '<b>TIPO DI INTERVENTO: </b>';
     const selectIntervento = document.createElement('select');
     selectIntervento.setAttribute('id', 'scelta-intervento');
-    const listaOpzioniIntervento = [{intervento: 'Manutenzione Regolare'}, {intervento: 'Manutenzione Correttiva'}, {intervento: 'Restauro'}];
+    const listaOpzioniIntervento = [{intervento: 'Manutenzione Ordinaria'}, {intervento: 'Manutenzione Correttiva'}, {intervento: 'Restauro'}];
     creaListaOpzioni(listaOpzioniIntervento, selectIntervento, 'intervento', 'intervento', true);
 
     selectIntervento.addEventListener('change', () => {
@@ -478,7 +472,7 @@ function preparaCampiIntervento(select) {
     const contenitoreSchedeIntervento = document.getElementById('contenitore-scheda-intervento');
 
     const interventoTarget = select.value;
-    if (interventoTarget === 'Manutenzione Regolare') {
+    if (interventoTarget === 'Manutenzione Ordinaria') {
         preparaCampiManOrd(contenitoreSchedeIntervento);
     }
     else if (interventoTarget === 'Manutenzione Correttiva') {
@@ -499,7 +493,7 @@ async function preparaCampiManOrd(divScheda) {
 
     // TITOLO
     const intTitolo = document.createElement('h4');
-    intTitolo.innerHTML = '<b>SCHEDA MANUTENZIONE REGOLARE</b>';
+    intTitolo.innerHTML = '<b>SCHEDA MANUTENZIONE ORDINARIA</b>';
 
     // OPERATORE
     const intLabelOperatore = document.createElement('label');
@@ -522,10 +516,10 @@ async function preparaCampiManOrd(divScheda) {
     intSelectSchedaControllo.addEventListener('change', () => {
         if ((intSelectSchedaControllo.value === null) || (intSelectSchedaControllo.value === 'null')) {
             viewer.clearSelection();
-            cancellaFormDB(formDB);
+            svuotaContenitore(formDB);
         }
         else {
-            cancellaFormDB(formDB);
+            svuotaContenitore(formDB);
             listaSchedeControllo.forEach(sc => {
                 if (intSelectSchedaControllo.value === sc.valore) {
                     const nuovaListaId = sc.id_main10ance;
@@ -649,10 +643,10 @@ async function preparaCampiManStr(divScheda) {
     intSelectSchedaControllo.addEventListener('change', () => {
         if ((intSelectSchedaControllo.value === null) || (intSelectSchedaControllo.value === 'null')) {
             viewer.clearSelection();
-            cancellaFormDB(formDB);
+            svuotaContenitore(formDB);
         }
         else {
-            cancellaFormDB(formDB);
+            svuotaContenitore(formDB);
             listaSchedeControllo.forEach(sc => {
                 if (intSelectSchedaControllo.value === sc.valore) {
                     const nuovaListaId = sc.id_main10ance;
@@ -991,7 +985,7 @@ function verificaVincoliControllo() {
 
 function verificaVincoliManutenzioneRestauro(scheda) {
     // console.log(scheda);
-    if ((scheda === 'Manutenzione Regolare') || (scheda === 'Manutenzione Correttiva')) {
+    if ((scheda === 'Manutenzione Ordinaria') || (scheda === 'Manutenzione Correttiva')) {
         const operatore = $('[id*="{esecutori}"]')[0];
         const data = $('[id*="{data_ese}"]')[0];
         const contr = $('[id*="{id_contr}"]')[0];
@@ -1084,7 +1078,7 @@ function preparaDatiNascosti(scheda) {
         listaJSON.push(data_ins_d);
         listaJSON.push(data_ins_f);
     }
-    else if ((scheda === 'Manutenzione Regolare') || (scheda === 'Manutenzione Correttiva')) {
+    else if ((scheda === 'Manutenzione Ordinaria') || (scheda === 'Manutenzione Correttiva')) {
         const tab = trovaTabellaIntervento();
         const id_tab = {tabella: tab, colonna: 'id_id', valore: idUnivoco};
         const data_ins_tab = {tabella: tab, colonna: 'data_ins', valore: dataIns};
@@ -1485,4 +1479,17 @@ async function creaPDF2(listaIdMain10ance, listaDatiNascosti, contr_manut) {
 
     const fileCreato = pdf.output('bloburl', {filename: nomeFile});
     window.open(fileCreato, '_blank');
+}
+
+function nascondiBottoniSchede() {
+    apriTabControllo.style.display = 'none';
+    apriTabIntervento.style.display = 'none';
+    schedaControllo.style.display = 'none';
+    schedaIntervento.style.display = 'none';
+    bottoneSalvaSchedaControllo.style.display = 'none';
+    bottoneSalvaSchedaIntervento.style.display = 'none';
+    bottoneChiudiSchede.style.display = 'none';
+    if (document.getElementById('apriPDF')) {
+        document.getElementById('apriPDF').remove();
+    }
 }

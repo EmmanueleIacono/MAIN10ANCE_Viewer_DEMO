@@ -82,7 +82,7 @@
           <li data-tab-target="#tab2" class="tab active" id="apriTabGIS">GIS VIEWER</li>
           <li data-tab-target="#tab1" class="tab" id="apriTabBIM">BIM VIEWER</li>
           <li data-tab-target="#tab3" class="tab" id="apriTabSchede" style="display: none;">PLANNER</li>
-          <!-- <li data-tab-target="#tab4" class="tab" id="apriTabDashboard" style="display: none;">DASHBOARD</li> -->
+          <li data-tab-target="#tab4" class="tab" id="apriTabDashboard" style="display: none;">DASHBOARD</li>
         </ul>
         <div class="pull-right">
           <ul class="nav navbar-nav">
@@ -142,6 +142,10 @@
                 <div id="contenitore-campo-ricerca"></div>
     
                 <!-- FORM -->
+                <details id="details-selezionati" style="display: none;">
+                  <summary class="sommario-main10ance"><b>Elementi selezionati</b></summary>
+                  <div id="contenitore-id-selezionati"></div>
+                </details>
                 <form id="formDB" spellcheck="false"></form>
               </div>
             <div id="contenitore-controllo-intervento" style="display: none;">
@@ -227,7 +231,7 @@
                 <label for="check-tipo-scheda">Scheda</label>
                 <select name="select-tipo-scheda" id="select-tipo-scheda">
                   <option value="scheda controllo">Scheda controllo</option>
-                  <option value="scheda manutenzione regolare">Scheda manutenzione regolare</option>
+                  <option value="scheda manutenzione ordinaria">Scheda manutenzione ordinaria</option>
                   <option value="scheda manutenzione correttiva">Scheda manutenzione correttiva</option>
                   <option value="scheda restauro">Scheda restauro</option>
                 </select>
@@ -365,7 +369,7 @@
                             </div>
                           </div> -->
                           <div class="au-progress">
-                            <span class="au-progress__title">Manutenzione regolare</span>
+                            <span class="au-progress__title">Manutenzione ordinaria</span>
                             <div class="au-progress__bar">
                               <div class="au-progress__inner js-progressbar-simple" role="progressbar" data-transitiongoal="65">
                                 <span class="au-progress__value js-value"></span>
@@ -509,7 +513,7 @@
                   <label for="check-tipo-scheda">Scheda</label>
                   <select name="select-tipo-scheda" id="select-tipo-scheda-2">
                     <option value="scheda controllo">Scheda controllo</option>
-                    <option value="scheda manutenzione regolare">Scheda manutenzione regolare</option>
+                    <option value="scheda manutenzione regolare">Scheda manutenzione ordinaria</option>
                     <option value="scheda manutenzione correttiva">Scheda manutenzione correttiva</option>
                     <option value="scheda restauro">Scheda restauro</option>
                   </select>

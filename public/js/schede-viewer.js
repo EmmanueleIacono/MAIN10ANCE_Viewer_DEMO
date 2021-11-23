@@ -61,7 +61,7 @@ function visualizzaSchedeStart() {
 };
 
 async function popolaListaSigleNumCapp() {
-    await prendiSigleNumericheCappelle();
+    listaSigleNumericheCappelle = await prendiSigleNumericheCappelle();
 }
 
 aggiornaSchedeStart.addEventListener('click', visualizzaSchedeStart);
@@ -244,6 +244,11 @@ async function compilaTabelleControllo() {
             if ((!valore) || (valore === 'null')) {
                 tdValore.innerHTML = `<i>Nessun valore</i>`;
             }
+            else if (chiave === 'Elementi controllati') {
+                const [tabDetails, detailsDiv] = creaDetailsElementi();
+                detailsDiv.innerText = valore.join(', ');
+                tdValore.appendChild(tabDetails);
+            }
             else {
                 tdValore.innerHTML = `${valore}`;
             }
@@ -263,7 +268,7 @@ async function compilaTabelleManReg() {
         // console.log(scheda);
         const [tabellaSchede, captionSchede] = creaStrutturaSchede();
         tabellaSchede.setAttribute('id', `${scheda["Codice scheda manutenzione regolare"]}`);
-        captionSchede.innerHTML = `<b>SCHEDA MANUTENZIONE REGOLARE N. ${scheda["Codice scheda manutenzione regolare"]}</b>`;
+        captionSchede.innerHTML = `<b>SCHEDA MANUTENZIONE ORDINARIA N. ${scheda["Codice scheda manutenzione regolare"]}</b>`;
         captionSchede.classList.add('caption-schede-mr-mc-r');
         for (const [chiave, valore] of Object.entries(scheda)) {
             const trScheda = document.createElement('tr');
@@ -275,6 +280,11 @@ async function compilaTabelleManReg() {
             const tdValore = document.createElement('td');
             if ((!valore) || (valore === 'null')) {
                 tdValore.innerHTML = `<i>Nessun valore</i>`;
+            }
+            else if (chiave === 'Elementi interessati') {
+                const [tabDetails, detailsDiv] = creaDetailsElementi();
+                detailsDiv.innerText = valore.join(', ');
+                tdValore.appendChild(tabDetails);
             }
             else {
                 tdValore.innerHTML = `${valore}`;
@@ -308,6 +318,11 @@ async function compilaTabelleManCorr() {
             if ((!valore) || (valore === 'null')) {
                 tdValore.innerHTML = `<i>Nessun valore</i>`;
             }
+            else if (chiave === 'Elementi interessati') {
+                const [tabDetails, detailsDiv] = creaDetailsElementi();
+                detailsDiv.innerText = valore.join(', ');
+                tdValore.appendChild(tabDetails);
+            }
             else {
                 tdValore.innerHTML = `${valore}`;
             }
@@ -339,6 +354,11 @@ async function compilaTabelleRestauro() {
             const tdValore = document.createElement('td');
             if ((!valore) || (valore === 'null')) {
                 tdValore.innerHTML = `<i>Nessun valore</i>`;
+            }
+            else if (chiave === 'Elementi interessati') {
+                const [tabDetails, detailsDiv] = creaDetailsElementi();
+                detailsDiv.innerText = valore.join(', ');
+                tdValore.appendChild(tabDetails);
             }
             else {
                 tdValore.innerHTML = `${valore}`;
@@ -404,10 +424,13 @@ async function prendiLOD3e4() {
 function filtraSchedeDaID(idScheda) {
     // compilaTabelleControllo();
     const insiemeTabelle = document.querySelectorAll('.tabella-schede');
-    insiemeTabelle.forEach(tab => {
+    const listaTabelle = [...insiemeTabelle];
+    const listaCards = listaTabelle.map(card => (card.parentNode));
+    listaCards.forEach(tab => {
         // console.log(tab);
-        if (tab.id === idScheda) {
-            tab.style.display = 'table';
+        if (tab.firstElementChild.id === idScheda) {
+            // tab.style.display = 'table';
+            tab.style.display = 'block';
         }
         else {
             tab.style.display = 'none';
@@ -417,9 +440,12 @@ function filtraSchedeDaID(idScheda) {
 
 function filtraVediTutto() {
     const insiemeTabelle = document.querySelectorAll('.tabella-schede');
+    const listaTabelle = [...insiemeTabelle];
+    const listaCards = listaTabelle.map(card => (card.parentNode));
     // const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
-    insiemeTabelle.forEach(tab => {
-        tab.style.display = 'table';
+    listaCards.forEach(tab => {
+        // tab.style.display = 'table';
+        tab.style.display = 'block';
     });
     // if (checkGenerale.checked) {
     //     checkGenerale.click();
@@ -431,7 +457,9 @@ function filtraVediTutto() {
 
 function filtraVediNulla() {
     const insiemeTabelle = document.querySelectorAll('.tabella-schede');
-    insiemeTabelle.forEach(tab => {
+    const listaTabelle = [...insiemeTabelle];
+    const listaCards = listaTabelle.map(card => (card.parentNode));
+    listaCards.forEach(tab => {
         tab.style.display = 'none';
     });
 }
@@ -577,7 +605,7 @@ function verificaFiltriSchede(tabella) {
         let cellTarget;
         tabella.rows.forEach(r => {
             if (r.cells[0].innerText.startsWith('Elementi')) {
-                cellTarget = r.cells[1].innerText.split('|')[0];
+                cellTarget = r.cells[1].children[0].children[1].innerText.split('|')[0];
             }
         });
         if (!(sacroMonteTarget === cellTarget)) {
@@ -685,10 +713,29 @@ function filtraViewSchede() {
     insiemeTabelle.forEach(tab => {
         const verifica = verificaFiltriSchede(tab);
         if (verifica) {
-            tab.style.display = 'table';
+            tab.parentNode.style.display = 'block';
         }
         else {
-            tab.style.display = 'none';
+            tab.parentNode.style.display = 'none';
         }
     });
+}
+
+function creaDetailsElementi() {
+    const det = document.createElement('details');
+    const sum = document.createElement('summary');
+    const divDet = document.createElement('div');
+    sum.className = 'sommario-main10ance';
+    sum.innerHTML = '<b>ESPANDI</b>';
+    det.addEventListener('click', () => {
+        if (det.open) {
+            sum.innerHTML = '<b>ESPANDI</b>';
+        }
+        else {
+            sum.innerHTML = '<b>CHIUDI</b>';
+        }
+    });
+    det.appendChild(sum);
+    det.appendChild(divDet);
+    return [det, divDet];
 }

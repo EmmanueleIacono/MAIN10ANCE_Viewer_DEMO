@@ -8,14 +8,20 @@ const formDB = document.getElementById('formDB');
 // REFRESH VIEWER
 const bottoneRefrViewer = document.getElementById("refreshParams");
 bottoneRefrViewer.addEventListener("click", () => {
-    viewer.clearSelection();
-    viewer.isolate();
-    viewer.fitToView();
+    if (viewer) {
+        viewer.clearSelection();
+        viewer.isolate();
+        viewer.fitToView();
+    }
 });
 
 // BOTTONE RICERCA
 const bottoneRicerca = document.getElementById('cercaID');
 bottoneRicerca.addEventListener('click', () => {
+    if (!viewer) {
+        alert('Nessun modello selezionato');
+        return;
+    }
     if (!contenitoreRicerca.innerHTML) {
         // const labelCerca = document.createElement('label');
         // labelCerca.setAttribute('id', 'labelCerca');
@@ -85,9 +91,14 @@ bottoneQuery.addEventListener("click", mostraSchedeElemento);
 // ANNULLA INTERROGAZIONE - RIPULISCI FORM
 const bottoneCanc = document.getElementById("annullaDB");
 bottoneCanc.addEventListener("click", () => {
-    cancellaFormDB(formDB);
-    viewer.clearSelection();
-    viewer.isolate();
+    svuotaContenitore(divDetailsSelezione);
+    svuotaContenitore(formDB);
+    detailsSelezione.style.display = 'none';
+    if (viewer) {
+        viewer.clearSelection();
+        viewer.isolate();
+    }
+    nascondiBottoniSchede();
 });
 
 //FUNZIONI
@@ -200,9 +211,9 @@ bottoneCanc.addEventListener("click", () => {
 //     }
 // }
 
-function cancellaFormDB(form) {
-    while (form.firstChild) {
-        form.removeChild(form.firstChild);
+function svuotaContenitore(domElem) {
+    while (domElem.firstChild) {
+        domElem.removeChild(domElem.firstChild);
     }
 }
 
@@ -299,20 +310,10 @@ function cancellaFormDB(form) {
 // }
 
 async function mostraSchedeElemento() {
-    cancellaFormDB(formDB);
-
-    const schedeControllo = await prendiSchedeControllo();
-    const schedeManReg = await prendiSchedeManReg();
-    const schedeManCorr = await prendiSchedeManCorr();
-    const schedeRestauro = await prendiSchedeRestauro();
-    const [detailsSchedeControllo, divSchedeControllo] = creaDetailsPerSchede('Schede di controllo');
-    const [detailsSchedeManReg, divSchedeManReg] = creaDetailsPerSchede('Schede di manutenzione regolare');
-    const [detailsSchedeManCorr, divSchedeManCorr] = creaDetailsPerSchede('Schede di manutenzione correttiva');
-    const [detailsSchedeRestauro, divSchedeRestauro] = creaDetailsPerSchede('Schede di restauro');
-    formDB.appendChild(detailsSchedeControllo);
-    formDB.appendChild(detailsSchedeManReg);
-    formDB.appendChild(detailsSchedeManCorr);
-    formDB.appendChild(detailsSchedeRestauro);
+    svuotaContenitore(divDetailsSelezione);
+    detailsSelezione.style.display = 'none';
+    svuotaContenitore(formDB);
+    nascondiBottoniSchede();
 
     if (!viewer) {
         alert('Nessun modello selezionato');
@@ -325,6 +326,19 @@ async function mostraSchedeElemento() {
             selezione = viewer.getSelection();
         }
         if ((selezione.length === 1) || (isolato.length === 1)) {
+            const schedeControllo = await prendiSchedeControllo();
+            const schedeManReg = await prendiSchedeManReg();
+            const schedeManCorr = await prendiSchedeManCorr();
+            const schedeRestauro = await prendiSchedeRestauro();
+            const [detailsSchedeControllo, divSchedeControllo] = creaDetailsPerSchede('Schede di controllo');
+            const [detailsSchedeManReg, divSchedeManReg] = creaDetailsPerSchede('Schede di manutenzione ordinaria');
+            const [detailsSchedeManCorr, divSchedeManCorr] = creaDetailsPerSchede('Schede di manutenzione correttiva');
+            const [detailsSchedeRestauro, divSchedeRestauro] = creaDetailsPerSchede('Schede di restauro');
+            formDB.appendChild(detailsSchedeControllo);
+            formDB.appendChild(detailsSchedeManReg);
+            formDB.appendChild(detailsSchedeManCorr);
+            formDB.appendChild(detailsSchedeRestauro);
+
             selezione.forEach(async (s) => {
                 viewer.getProperties(s, async (props) => {
                     // let nome = props.name;

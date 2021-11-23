@@ -172,7 +172,7 @@ async function creaGraficiDashboard($) {
       const myChart = new Chart(ctx4, {
         type: 'doughnut',
         data: {
-          labels: ['Controllo', 'Manutenzione regolare', 'Manutenzione correttiva', 'Restauro'],
+          labels: ['Controllo', 'Manutenzione ordinaria', 'Manutenzione correttiva', 'Restauro'],
           datasets: [
             {
               data: [65, 40, 25, 5],
