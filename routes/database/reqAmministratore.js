@@ -39,13 +39,13 @@ appA.patch('/ruoli/nuovo-ruolo', async (req, res) => {
     }
 });
 
-// // per testare la richiesta
-// // fetch("/a/conteggio-ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-// appA.get('/conteggio-ruoli', async (req, res) => {
-//     const ruoli = await conteggioRuoli();
-//     res.setHeader('content-type', 'application/json');
-//     res.send(JSON.stringify(ruoli));
-// });
+// per testare la richiesta
+// fetch("/a/conteggio-ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appA.get('/conteggio-ruoli', async (req, res) => {
+    const ruoli = await conteggioRuoli();
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(ruoli));
+});
 
 //////////          QUERY          //////////
 
@@ -78,14 +78,14 @@ async function updateRuoloUtente(userJson) {
     }
 }
 
-// async function conteggioRuoli() {
-//     try {
-//         const result = await clientServ.query(`SELECT ruolo, COUNT(ruolo) FROM utenti GROUP BY ruolo;`);
-//         return result.rows;
-//     }
-//     catch(e) {
-//         return [];
-//     }
-// }
+async function conteggioRuoli() {
+    try {
+        const result = await clientServ.query(`SELECT ruolo, COUNT(ruolo) FROM utenti GROUP BY ruolo;`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
 
 module.exports = appA;

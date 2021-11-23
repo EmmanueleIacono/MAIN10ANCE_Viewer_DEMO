@@ -39,7 +39,6 @@ appG.patch('/ruoli/nuovo-ruolo/:progetto', async (req, res) => {
     }
 });
 
-
 //////////          RICHIESTE DASHBOARD          //////////
 
 // per testare la richiesta:
@@ -86,11 +85,10 @@ appG.get('/SMmodel', async (req, res) => {
 // per testare la richiesta
 // fetch("/g/conteggio-ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appG.get('/conteggio-ruoli', async (req, res) => {
-    const ruoli = await conteggioRuoli();
+    const ruoli = await conteggioRuoliAmbito();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(ruoli));
 });
-
 
 //////////          QUERY          //////////
 
@@ -124,7 +122,6 @@ async function updateRuoloUtenteProgetto(userJson) {
 }
 
 //////////          QUERY DASHBOARD          //////////
-
 
 async function leggiNumeroOggettiBIM() {
     try {
@@ -178,7 +175,7 @@ async function SMmodel() {
     }
 }
 
-async function conteggioRuoli() {
+async function conteggioRuoliAmbito() {
     try {
         const result = await clientServ.query(`SELECT ruolo, COUNT(ruolo) FROM utenti GROUP BY ruolo;`);
         return result.rows;

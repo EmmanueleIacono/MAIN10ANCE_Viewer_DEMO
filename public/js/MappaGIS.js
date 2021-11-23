@@ -256,6 +256,7 @@ function getModel(urn) {
     if ((urn !== null) && (urn !== '')) {
         document.getElementById('apriTabBIM').click();
         if (urn !== urnModelloCorrente) {
+            $("#forgeViewer").empty();
             launchViewer(urn);
             urnModelloCorrente = urn;
         }
