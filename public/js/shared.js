@@ -35,3 +35,17 @@ function hslToHex(h, s, l) { // copiata: non sono sicuro di COME funzioni, ma fu
 function randomNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+// RICHIESTE
+
+async function prendiLOD(lod) {
+    const risultato = await fetch('/o/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+async function getTabelleGIS() {
+    const tabelleGIS = await fetch("/t/DB_Servizio/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} });
+    const resp_tabelleGIS = await tabelleGIS.json();
+    return resp_tabelleGIS;
+}

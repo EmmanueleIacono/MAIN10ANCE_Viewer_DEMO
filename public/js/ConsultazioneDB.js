@@ -264,9 +264,3 @@ async function prendiDatiTabella(jsonReq) {
     const risTradotto = await risultato.json();
     return risTradotto;
 }
-
-async function prendiLOD(lod) {
-    const risultato = await fetch('/o/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
-}

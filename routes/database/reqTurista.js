@@ -74,7 +74,7 @@ async function leggiMarkerCapp() {
 
 async function leggiListaTabelleGIS() {
     try {
-        const results = await clientServ.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias", "geometria", "colonne_utili" AS "colonneUtili" FROM "lod" WHERE "BIM-GIS" = 'GIS' ORDER BY "tabella";`);
+        const results = await clientServ.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias", "geometria", "colonne_utili" AS "colonneUtili" FROM "lod" WHERE "BIM-GIS" = 'GIS' ORDER BY "alias";`);
         return results.rows;
     }
     catch(e) {

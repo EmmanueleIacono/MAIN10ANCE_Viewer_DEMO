@@ -314,9 +314,3 @@ async function getGIS(tabella, alias, geometria, colonneUtili) {
     const resp_oggettiGIS = await oggettiGIS.json();
     return resp_oggettiGIS;
 }
-
-async function getTabelleGIS() {
-    const tabelleGIS = await fetch("/t/DB_Servizio/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} });
-    const resp_tabelleGIS = await tabelleGIS.json();
-    return resp_tabelleGIS;
-}

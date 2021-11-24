@@ -506,7 +506,7 @@ async function apriModelloDaScheda() {
     const stringaCaption = this.innerText;
     const stringaPulita = stringaCaption.split('.')[1].replaceAll(' ', '');
     const tabellaCliccata = document.getElementById(stringaPulita);
-    const tdTarget = tabellaCliccata.querySelectorAll('[id^="[Elementi"]')[0];
+    const tdTarget = tabellaCliccata.querySelectorAll('[id^="[Elementi"]')[0].children[0].children[1];
     const stringaIdMain10ance = tdTarget.innerText;
     const sacroMonteDaCercare = stringaIdMain10ance.split('|')[0];
     const cappellaDaCercare = stringaIdMain10ance.split('|')[1].split('-')[0];
@@ -519,6 +519,7 @@ async function apriModelloDaScheda() {
     if (conferma) {
         // console.log(urn);
         document.getElementById('apriTabBIM').click();
+        $("#forgeViewer").empty();
         launchViewer(urn, () => {
             cercaElementiDaScheda(stringaIdMain10ance);
         });
@@ -618,7 +619,7 @@ function verificaFiltriSchede(tabella) {
         tabella.rows.forEach(r => {
             if (r.cells[0].innerText.startsWith('Elementi')) {
                 let listaNumeriCapp = [];
-                const listaIdM10a = r.cells[1].innerText.split(',');
+                const listaIdM10a = r.cells[1].children[0].children[1].innerText.split(',');
                 listaIdM10a.forEach(id => {
                     let listaCappelleDaId = id.split('|')[1].split('-');
                     listaNumeriCapp.push(...listaCappelleDaId);
@@ -636,7 +637,7 @@ function verificaFiltriSchede(tabella) {
         tabella.rows.forEach(r => {
             if (r.cells[0].innerText.startsWith('Elementi')) {
                 let listaElementi = [];
-                const listaIdM10a = r.cells[1].innerText.split(',');
+                const listaIdM10a = r.cells[1].children[0].children[1].innerText.split(',');
                 listaIdM10a.forEach(id => {
                     let listaElementiDaId = id.split('|')[2].split('-');
                     listaElementi.push(...listaElementiDaId);

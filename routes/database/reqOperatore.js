@@ -301,7 +301,7 @@ async function leggiEventiManutenzioneCorrettiva() {
 
 async function leggiListaTabelleLOD(LOD) {
     try {
-        const results = await clientServ.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM "lod" WHERE "LOD" = ($1) ORDER BY "tabella";`, [LOD]);
+        const results = await clientServ.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM "lod" WHERE "LOD" = ($1) ORDER BY "alias";`, [LOD]);
         return results.rows;
     }
     catch(e) {
@@ -321,7 +321,7 @@ async function recuperaUrnLOD3(sm, capp) {
 
 async function leggiTabelleLOD3e4() {
     try {
-        const results = await clientServ.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM "lod" WHERE "LOD" = 3 OR "LOD" = 4 ORDER BY "tabella";`);
+        const results = await clientServ.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM "lod" WHERE "LOD" = 3 OR "LOD" = 4 ORDER BY "alias";`);
         return results.rows;
     }
     catch(e) {
