@@ -9,27 +9,31 @@ async function conteggioRuoli() {
 
 async function widgetChart1() {
     const result = await conteggioRuoli();
-    const dataUtenti = result.map(element => (element.count))
-    const legendUtenti = result.map(element => (element.ruolo))
+    const dataUtenti = result.map(element => (element.count));
+    const legendUtenti = result.map(element => (element.ruolo));
     return [dataUtenti, legendUtenti];
 }
 
 
 async function SMmodel() {
-    const risultato = await fetch('/g/Main10ance_DB/dashboard/SMmodel', {method: "GET", headers: {"content-type": "application/json"}});
+    const località = await fetch('/g/DB_Servizio/lista-localita', {method: "GET", headers: {"content-type": "application/json"}});
+    const localitàJson = await località.json();
+    const listaNomi = localitàJson.map(tab => tab.nome);
+    const listaSigle = localitàJson.map(tab => tab.sigla);
+    const risultato = await fetch('/g/Main10ance_DB/dashboard/conteggio-modelli', {method: "GET", headers: {"content-type": "application/json", nomi: JSON.stringify(listaNomi), sigle: JSON.stringify(listaSigle)}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 async function widgetChart2() {
     const result = await SMmodel();
-    const modelli= result.map(element => (element.count))
-    const nomi = result.map(element => (element.nome_tabella))
+    const modelli= result.map(element => (element.count));
+    const nomi = result.map(element => (element.nome_tabella));
     return [modelli, nomi];
 }
 
 async function leggiNumeroOggettiBIM() {
-    const tabelleBIM = await fetch("/g/DB_Servizio/LOD/TabelleBIM", {method: "GET", headers: {"content-type": "application/json"} });
+    const tabelleBIM = await fetch("/g/DB_Servizio/LOD/TabelleBIM", {method: "GET", headers: {"content-type": "application/json"}});
     const tabelleBIMjson = await tabelleBIM.json();
     const listaTabelle = tabelleBIMjson.map(tab => tab.tabella);
     const risultato = await fetch('/g/Main10ance_DB/dashboard/numero-oggetti', {method: "GET", headers: {"content-type": "application/json", tabelle: JSON.stringify(listaTabelle)}});

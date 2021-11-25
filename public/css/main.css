@@ -3,7 +3,8 @@
   --white: #fff;
   --grigio: #dddddd;
   --grigioScuro: #bbbbbb;
-  --giallo: #ffd900;
+  --gialloAnagrafica: #ceba4c;
+  --gialloAnagraficaTrasparenza: #ceba4c60;
   --grigioMoltoScuro: #3d3d3d;
   --verdeMain10ance: #a8c956;
   --bluInterreg: #1a4f9c;
@@ -129,8 +130,14 @@ body {
   background-color: var(--verdeMain10anceTrasparenza);
 }
 
-.scheda-con-int, #apriTabControllo, #apriTabIntervento, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento {
+.scheda-con-int, #apriTabControllo, #apriTabIntervento, #apriTabAnagrafica, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento, #salvaSchedaAnagrafica {
   display: none;
+}
+
+#scheda-anagrafica {
+  background-color: var(--gialloAnagraficaTrasparenza);
+  font-size: 13px;
+  padding: 30px 14px;
 }
 
 #scheda-controllo {
@@ -172,6 +179,17 @@ body {
   margin-bottom: 1rem;
 }
 
+#salvaSchedaAnagrafica {
+  cursor: pointer;
+  border: none;
+  font-size: inherit;
+  font-weight: bold;
+  background: var(--gialloAnagrafica);
+  color: var(--ghostWhite);
+  padding: .75rem 1.75rem;
+  margin-bottom: 1rem;
+}
+
 #salvaSchedaIntervento {
   cursor: pointer;
   border: none;
@@ -205,7 +223,7 @@ body {
   margin-bottom: 1rem;
 }
 
-#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento, #cercaID {
+#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento, #salvaSchedaAnagrafica, #cercaID {
   padding: .9rem 1rem;
   font-size: large;
   font-weight: initial;
@@ -229,6 +247,20 @@ body {
   background-color: #aaa;
 }
 
+.scheda-anagrafica {
+  cursor: pointer;
+  padding: 10px;
+  margin: 10px;
+  color: var(--ghostWhite);
+  background-color: var(--gialloAnagrafica);
+  font-weight: bold;
+  border: none;
+}
+
+.scheda-anagrafica.active {
+  background-color: var(--gialloAnagraficaTrasparenza);
+}
+
 .scheda-controllo {
   cursor: pointer;
   padding: 10px;
@@ -241,10 +273,6 @@ body {
 
 .scheda-controllo.active {
   background-color: var(--verdeMain10anceTrasparenza);
-}
-
-.scheda-controllo:hover {
-  background-color: #aaa;
 }
 
 .scheda-intervento {
@@ -261,9 +289,13 @@ body {
   background-color: var(--bluInterregTrasparenza);
 }
 
-.scheda-intervento:hover {
+.scheda-controllo:hover, .scheda-intervento:hover, .scheda-anagrafica:hover {
   background-color: #aaa;
 }
+
+/* .scheda-intervento:hover {
+  background-color: #aaa;
+} */
 
 /* #input-id, #input-comment, #input-id-svuota {
   font-size: 20px;
@@ -278,11 +310,17 @@ input[id^="form-"] {
   line-height: 80%
 }
 
-input[id^="scheda-controllo-"], select[id^="scheda-controllo-"], textarea[id^="scheda-controllo-"], #scelta-intervento, input[id^="scheda-intervento-"], select[id^="scheda-intervento-"], textarea[id^="scheda-intervento-"] {
+input[id^="scheda-anagrafica-"], textarea[id^="scheda-anagrafica-"], input[id^="scheda-controllo-"], select[id^="scheda-controllo-"], textarea[id^="scheda-controllo-"], #scelta-intervento, input[id^="scheda-intervento-"], select[id^="scheda-intervento-"], textarea[id^="scheda-intervento-"] {
   float: right;
   line-height: 100%;
   padding: 1px;
   border: 0;
+}
+
+p[id^="sc-an"] {
+  float: right;
+  line-height: 100%;
+  padding: 0px;
 }
 
 div[id^="div-form-"] {

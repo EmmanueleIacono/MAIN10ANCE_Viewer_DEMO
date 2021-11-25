@@ -146,11 +146,14 @@
                 <form id="formDB" spellcheck="false"></form>
               </div>
             <div id="contenitore-controllo-intervento" style="display: none;">
+              <button class="scheda-anagrafica" id="apriTabAnagrafica">SCHEDA ANAGRAFICA</button>
               <button class="scheda-controllo" id="apriTabControllo">SCHEDA CONTROLLO</button>
               <button class="scheda-intervento" id="apriTabIntervento">SCHEDA INTERVENTO</button>
+              <button id="salvaSchedaAnagrafica" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
               <button id="salvaSchedaControllo" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
               <button id="salvaSchedaIntervento" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
               <button id="chiudiSchede" class="glyphicon glyphicon-remove dbBtn" title="Chiudi schede" style="cursor: pointer" height="30"></button>
+              <div id="scheda-anagrafica" class="scheda-con-int">SCHEDA ANAGRAFICA</div>
               <div id="scheda-controllo" class="scheda-con-int">SCHEDA CONTROLLO</div>
               <div id="scheda-intervento" class="scheda-con-int">SCHEDA INTERVENTO</div>
             </div>
@@ -498,7 +501,7 @@
             </div>
             <div class="panel-body pannelloLatSchede" id="pannello-lat-schede-body">
                 <div id="calendar2"></div>
-                <details id="details-filtri-schede" open>
+                <details id="details-filtri-schede">
                   <summary class="sommario-main10ance"><b>FILTRI</b></summary>
                   <input type="checkbox" name="check-generale" id="check-generale-2" disabled>
                   <label for="check-generale">ATTIVA FILTRI</label>

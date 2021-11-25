@@ -373,30 +373,6 @@ async function compilaTabelleRestauro() {
     });
 }
 
-async function prendiSchedeControllo() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-controllo-2', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
-}
-
-async function prendiSchedeManReg() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-manutenzione-regolare', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
-}
-
-async function prendiSchedeManCorr() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
-}
-
-async function prendiSchedeRestauro() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-restauro', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
-}
-
 async function prendiUrn(jsonReq) {
     const risultato = await fetch('/o/DB_Servizio/LOD/UrnCappelle', {method: "GET", headers: {"content-type": "application/json", "sm": jsonReq.sm, "capp": jsonReq.capp}});
     const risTradotto = await risultato.json();

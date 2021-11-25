@@ -4,11 +4,14 @@ const detailsSelezione = document.getElementById('details-selezionati');
 const divDetailsSelezione = document.getElementById('contenitore-id-selezionati');
 const bottoneAggiungi = document.getElementById('aggiungiDB');
 const contenitoreSchede = document.getElementById('contenitore-controllo-intervento');
+const apriTabAnagrafica = document.getElementById('apriTabAnagrafica');
 const apriTabControllo = document.getElementById('apriTabControllo');
 const apriTabIntervento = document.getElementById('apriTabIntervento');
+const bottoneSalvaSchedaAnagrafica = document.getElementById('salvaSchedaAnagrafica');
 const bottoneSalvaSchedaControllo = document.getElementById('salvaSchedaControllo');
 const bottoneSalvaSchedaIntervento = document.getElementById('salvaSchedaIntervento');
 const bottoneChiudiSchede = document.getElementById('chiudiSchede');
+const schedaAnagrafica = document.getElementById('scheda-anagrafica');
 const schedaControllo = document.getElementById('scheda-controllo');
 const schedaIntervento = document.getElementById('scheda-intervento');
 
@@ -16,11 +19,34 @@ bottoneAggiungi.addEventListener('click', () => {
     inizializzaModulo();
 });
 
+apriTabAnagrafica.addEventListener('click', () => {
+    // SERVE VERIFICA SCHEDA GIA PRESENTE
+    // VUOI MODIFICARE LA SCHEDA ESISTENTE?
+    // true-false
+    schedaControllo.style.display = 'none';
+    apriTabControllo.classList.remove('active');
+    schedaIntervento.style.display = 'none';
+    apriTabIntervento.classList.remove('active');
+    schedaAnagrafica.style.display = 'block';
+    apriTabAnagrafica.classList.add('active');
+    bottoneSalvaSchedaControllo.style.display = 'none';
+    bottoneSalvaSchedaIntervento.style.display = 'none';
+    bottoneSalvaSchedaAnagrafica.style.display = 'inline';
+    bottoneChiudiSchede.style.background = 'var(--gialloAnagrafica)';
+    if (document.getElementById('apriPDF')) {
+        document.getElementById('apriPDF').remove();
+    }
+    preparaCampiAnagrafica();
+});
+
 apriTabControllo.addEventListener('click', () => {
+    schedaAnagrafica.style.display = 'none';
+    apriTabAnagrafica.classList.remove('active');
     schedaIntervento.style.display = 'none';
     apriTabIntervento.classList.remove('active');
     schedaControllo.style.display = 'block';
     apriTabControllo.classList.add('active');
+    bottoneSalvaSchedaAnagrafica.style.display = 'none';
     bottoneSalvaSchedaIntervento.style.display = 'none';
     bottoneSalvaSchedaControllo.style.display = 'inline';
     bottoneChiudiSchede.style.background = 'var(--verdeMain10ance)';
@@ -31,10 +57,13 @@ apriTabControllo.addEventListener('click', () => {
 });
 
 apriTabIntervento.addEventListener('click', () => {
+    schedaAnagrafica.style.display = 'none';
+    apriTabAnagrafica.classList.remove('active');
     schedaControllo.style.display = 'none';
     apriTabControllo.classList.remove('active');
     schedaIntervento.style.display = 'block';
     apriTabIntervento.classList.add('active');
+    bottoneSalvaSchedaAnagrafica.style.display = 'none';
     bottoneSalvaSchedaControllo.style.display = 'none';
     bottoneSalvaSchedaIntervento.style.display = 'inline';
     bottoneChiudiSchede.style.background = 'var(--bluInterreg)';
@@ -42,6 +71,38 @@ apriTabIntervento.addEventListener('click', () => {
         document.getElementById('apriPDF').remove();
     }
     preparaSceltaIntervento();
+});
+
+bottoneSalvaSchedaAnagrafica.addEventListener('click', async () => {
+    if (verificaPresenzaIDm10a()) {
+        const listaDati = preparaDati('scheda-anagrafica-');
+        const [listaDatiNascosti, listaIdMain10ance] = preparaDatiNascosti('anagrafica');
+        const listaDatiCompleta = [...listaDati, ...listaDatiNascosti];
+        const listaFiltrata = filtraOggetti(listaDatiCompleta);
+        const listaTotaleFiltrata = moltiplicaSchede(listaFiltrata, listaIdMain10ance);
+        const listaRinominata = rinominaID(listaTotaleFiltrata);
+        const resp = await compilaScheda(listaRinominata);
+        if (resp.success) {
+            alert('Operazione andata a buon fine');
+            const bottonePDF = document.createElement('button');
+            bottonePDF.setAttribute('id', 'apriPDF');
+            bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
+            bottonePDF.addEventListener('click', () => {
+                viewer.fitToView(null, null, true);
+                setTimeout(() => {
+                    creaPDF2(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-ANAGRAFICA');
+                }, 500);
+            });
+            contenitoreSchede.appendChild(bottonePDF);
+        }
+        else {
+            alert('Operazione non riuscita');
+        }
+    }
+    else {
+        alert('Nessun ID associato alla scheda. Selezionare un elemento e riprovare.');
+        bottoneChiudiSchede.click();
+    }
 });
 
 bottoneSalvaSchedaControllo.addEventListener('click', async () => {
@@ -61,7 +122,6 @@ bottoneSalvaSchedaControllo.addEventListener('click', async () => {
                     bottonePDF.setAttribute('id', 'apriPDF');
                     bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
                     bottonePDF.addEventListener('click', () => {
-                        // creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
                         viewer.fitToView(null, null, true);
                         setTimeout(() => {
                             creaPDF2(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-CONTROLLO');
@@ -104,7 +164,6 @@ bottoneSalvaSchedaIntervento.addEventListener('click', async () => {
                 bottonePDF.setAttribute('id', 'apriPDF');
                 bottonePDF.innerHTML = '<b>VISUALIZZA REPORT</b>';
                 bottonePDF.addEventListener('click', () => {
-                    // creaPDF(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-INTERVENTO');
                     viewer.fitToView(null, null, true);
                     setTimeout(() => {
                         creaPDF2(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-INTERVENTO');
@@ -162,11 +221,7 @@ function inizializzaModulo() {
                             let idMain10ance = p.displayValue;
                             let arrayInfo = idMain10ance.split('|');
                             let entità = arrayInfo[2];
-                            // jsonRequest = {};
-                            // jsonRequest.nome = nome;
-                            // jsonRequest.id = idMain10ance;
-                            // jsonRequest.categoria = entità;
-                            preparaModulo(nome, idMain10ance);
+                            preparaModulo(idMain10ance);
                             detailsSelezione.style.display = 'block';
                             mostraBottoniSchede();
                         }
@@ -185,26 +240,117 @@ function inizializzaModulo() {
     }
 }
 
-function preparaModulo(nome, id) {
-    // const hNome = document.createElement('h4');
-    // hNome.setAttribute('id', `modulo-aggiungi-${nome}`);
-    // hNome.innerHTML = `<b>NOME ELEMENTO: ${nome}</b>`;
+function preparaModulo(id) {
     const hId = document.createElement('h5');
     hId.setAttribute('id', `modulo-aggiungi-${id}`);
     hId.innerHTML = `<b>ID ELEMENTO: ${id}</b>`;
-    // formDB.appendChild(hNome);
-    // formDB.appendChild(hId);
     divDetailsSelezione.appendChild(hId);
 }
 
 function mostraBottoniSchede() {
+    apriTabAnagrafica.style.display = 'inline';
     apriTabControllo.style.display = 'inline';
     apriTabIntervento.style.display = 'inline';
-    // bottoneSalvaSchedaControllo.style.display = 'inline';
     bottoneChiudiSchede.style.display = 'inline';
     bottoneChiudiSchede.style.background = 'var(--blackOlive)';
+    apriTabAnagrafica.classList.remove('active');
     apriTabControllo.classList.remove('active');
     apriTabIntervento.classList.remove('active');
+}
+
+function preparaCampiAnagrafica() {
+    schedaAnagrafica.innerHTML = '';
+
+    // TITOLO
+    const anTitolo = document.createElement('h4');
+    anTitolo.innerHTML = '<b>SCHEDA ANAGRAFICA</b>';
+
+    // OPERATORE
+    const anLabelOperatore = document.createElement('label');
+    anLabelOperatore.innerHTML = '<b>OPERATORE</b>';
+    const anTestoOperatore = document.createElement('p');
+    anTestoOperatore.setAttribute('id', 'sc-an');
+    anTestoOperatore.innerText = localStorage.user_id;
+
+    // DESCRIZIONE SISTEMA
+    const anLabelDescSist = document.createElement('label');
+    anLabelDescSist.innerHTML = '<b>DESCRIZIONE SISTEMA</b>';
+    const anInputDescSist = document.createElement('textarea');
+    anInputDescSist.style.height = '20px';
+    anInputDescSist.setAttribute('id', 'scheda-anagrafica-[scheda_anagrafica]-{descrizione_sistema}');
+
+    // DESCRIZIONE SUBSISTEMA
+    const anLabelDescSubSist = document.createElement('label');
+    anLabelDescSubSist.innerHTML = '<b>DESCRIZIONE SUBSISTEMA</b>';
+    const anInputDescSubSist = document.createElement('textarea');
+    anInputDescSubSist.style.height = '20px';
+    anInputDescSubSist.setAttribute('id', 'scheda-anagrafica-[scheda_anagrafica]-{descrizione_subsistema}');
+
+    // TECNICA COSTRUTTIVA
+    const anLabelTecn = document.createElement('label');
+    anLabelTecn.innerHTML = '<b>TECNICA COSTRUTTIVA</b>';
+    const anInputTecn = document.createElement('input');
+    anInputTecn.setAttribute('id', 'scheda-anagrafica-[scheda_anagrafica]-{tecnica_costruttiva}');
+
+    // DIMENSIONI
+    const anLabelDim = document.createElement('label');
+    anLabelDim.innerHTML = '<b>DIMENSIONI</b>';
+    const anInputDim = document.createElement('input');
+    anInputDim.setAttribute('id', 'scheda-anagrafica-[scheda_anagrafica]-{dimensioni}');
+
+    // MATERIALE
+    const anLabelMat = document.createElement('label');
+    anLabelMat.innerHTML = '<b>MATERIALE/I</b>';
+    const anInputMat = document.createElement('input');
+    anInputMat.setAttribute('id', 'scheda-anagrafica-[scheda_anagrafica]-{materiale}');
+
+    // EPOCA
+    const anLabelEpoc = document.createElement('label');
+    anLabelEpoc.innerHTML = '<b>EPOCA</b>';
+    const anInputEpoc = document.createElement('input');
+    anInputEpoc.setAttribute('id', 'scheda-anagrafica-[scheda_anagrafica]-{epoca}');
+
+    // ISPEZIONABILITÀ
+    const anLabelIsp = document.createElement('label');
+    anLabelIsp.innerHTML = '<b>ISPEZIONABILITÀ</b>';
+    const anInputIsp = document.createElement('input');
+    anInputIsp.setAttribute('id', 'scheda-anagrafica-[scheda_anagrafica]-{ispezionabilità}');
+
+    // FONTI
+    const anLabelFonti = document.createElement('label');
+    anLabelFonti.innerHTML = '<b>FONTI</b>';
+    const anInputFonti = document.createElement('input');
+    anInputFonti.setAttribute('id', 'scheda-anagrafica-[scheda_anagrafica]-{fonti}');
+
+    schedaAnagrafica.appendChild(anTitolo);
+    schedaAnagrafica.appendChild(document.createElement('br'));
+    schedaAnagrafica.appendChild(anLabelOperatore);
+    schedaAnagrafica.appendChild(anTestoOperatore);
+    schedaAnagrafica.appendChild(document.createElement('br'));
+    schedaAnagrafica.appendChild(anLabelDescSist);
+    schedaAnagrafica.appendChild(anInputDescSist);
+    schedaAnagrafica.appendChild(document.createElement('br'));
+    schedaAnagrafica.appendChild(anLabelDescSubSist);
+    schedaAnagrafica.appendChild(anInputDescSubSist);
+    schedaAnagrafica.appendChild(document.createElement('br'));
+    schedaAnagrafica.appendChild(anLabelTecn);
+    schedaAnagrafica.appendChild(anInputTecn);
+    schedaAnagrafica.appendChild(document.createElement('br'));
+    schedaAnagrafica.appendChild(anLabelDim);
+    schedaAnagrafica.appendChild(anInputDim);
+    schedaAnagrafica.appendChild(document.createElement('br'));
+    schedaAnagrafica.appendChild(anLabelMat);
+    schedaAnagrafica.appendChild(anInputMat);
+    schedaAnagrafica.appendChild(document.createElement('br'));
+    schedaAnagrafica.appendChild(anLabelEpoc);
+    schedaAnagrafica.appendChild(anInputEpoc);
+    schedaAnagrafica.appendChild(document.createElement('br'));
+    schedaAnagrafica.appendChild(anLabelIsp);
+    schedaAnagrafica.appendChild(anInputIsp);
+    schedaAnagrafica.appendChild(document.createElement('br'));
+    schedaAnagrafica.appendChild(anLabelFonti);
+    schedaAnagrafica.appendChild(anInputFonti);
+    schedaAnagrafica.appendChild(document.createElement('br'));
 }
 
 async function preparaCampiControllo() {
@@ -525,7 +671,7 @@ async function preparaCampiManOrd(divScheda) {
                     const nuovaListaId = sc.id_main10ance;
                     let listaElementi = [];
                     nuovaListaId.forEach(id => {
-                        preparaModulo(undefined, id);
+                        preparaModulo(id);
                         viewer.search(id, el => {
                             listaElementi.push(el[0]);
                             viewer.select(listaElementi);
@@ -652,7 +798,7 @@ async function preparaCampiManStr(divScheda) {
                     const nuovaListaId = sc.id_main10ance;
                     let listaElementi = [];
                     nuovaListaId.forEach(id => {
-                        preparaModulo(undefined, id);
+                        preparaModulo(id);
                         viewer.search(id, el => {
                             listaElementi.push(el[0]);
                             viewer.select(listaElementi);
@@ -1035,7 +1181,6 @@ function verificaVincoliRadioManut() {
     }
 }
 
-
 function verificaPresenzaIDm10a() {
     if ($(`[id^="modulo-aggiungi-"]`)[0]) {
         return true;
@@ -1093,6 +1238,20 @@ function preparaDatiNascosti(scheda) {
         const data_ins_tab = {tabella: tab, colonna: 'data_ins', valore: dataIns};
         listaJSON.push(id_tab);
         listaJSON.push(data_ins_tab);
+    }
+    else if (scheda === 'anagrafica') {
+        const tab = 'scheda_anagrafica';
+        const utente = localStorage.user_id;
+        const id_tab = {tabella: tab, colonna: 'id_id', valore: idUnivoco};
+        const data_reg = {tabella: tab, colonna: 'data_registrazione', valore: dataIns};
+        const data_mod = {tabella: tab, colonna: 'data_ultima_mod', valore: dataIns};
+        const aut_scheda = {tabella: tab, colonna: 'autore_scheda', valore: utente};
+        const aut_mod = {tabella: tab, colonna: 'autore_ultima_mod', valore: utente};
+        listaJSON.push(id_tab);
+        listaJSON.push(data_reg);
+        listaJSON.push(data_mod);
+        listaJSON.push(aut_scheda);
+        listaJSON.push(aut_mod);
     }
     return [listaJSON, listaIdMain10ance];
 }
@@ -1193,17 +1352,6 @@ function dataCorta() {
 
 function filtraListeDatiId(listaDati, listaId) {
     let listaTotaleFiltrata = [];
-    // listaId.forEach(id => {
-    //     listaDati.forEach(d => {
-    //         const indice = listaId.indexOf(id);
-    //         let dCopia = JSON.parse(JSON.stringify(d));
-    //         dCopia.colonne.push('id_main10ance');
-    //         dCopia.valori.push(id);
-    //         const indiceID = dCopia.colonne.indexOf('id_id');
-    //         dCopia.valori[indiceID] += indice;
-    //         listaTotaleFiltrata.push(dCopia);
-    //     });
-    // });
     listaDati.forEach(d => {
         d.colonne.push('id_main10ance');
         d.valori.push(listaId);
@@ -1232,6 +1380,9 @@ function rinominaID(listaOgg) {
         }
         else if (ogg.tabella === 'restauri') {
             ogg.colonne[ind] = 'id_restaur';
+        }
+        else if (ogg.tabella === 'scheda_anagrafica') {
+            ogg.colonne[ind] = 'id_anagr';
         }
     });
     return listaOgg;
@@ -1456,6 +1607,9 @@ async function creaPDF2(listaIdMain10ance, listaDatiNascosti, contr_manut) {
     if (contr_manut === 'SCHEDA-CONTROLLO') {
         coloreFill = '#a5e09b';
     }
+    else if (contr_manut === 'SCHEDA-ANAGRAFICA') {
+        coloreFill = '#e8d776';
+    }
     else {
         coloreFill = '#9bb7e0';
     }
@@ -1482,14 +1636,30 @@ async function creaPDF2(listaIdMain10ance, listaDatiNascosti, contr_manut) {
 }
 
 function nascondiBottoniSchede() {
+    apriTabAnagrafica.style.display = 'none';
     apriTabControllo.style.display = 'none';
     apriTabIntervento.style.display = 'none';
+    schedaAnagrafica.style.display = 'none';
     schedaControllo.style.display = 'none';
     schedaIntervento.style.display = 'none';
+    bottoneSalvaSchedaAnagrafica.style.display = 'none';
     bottoneSalvaSchedaControllo.style.display = 'none';
     bottoneSalvaSchedaIntervento.style.display = 'none';
     bottoneChiudiSchede.style.display = 'none';
     if (document.getElementById('apriPDF')) {
         document.getElementById('apriPDF').remove();
     }
+}
+
+function moltiplicaSchede(listaDati, listaId) {
+    let listaTotaleFiltrata = [];
+    listaId.forEach((id, ind) => {
+        let dCopia = JSON.parse(JSON.stringify(listaDati[0]));
+        dCopia.colonne.push('id_main10ance');
+        dCopia.valori.push(id);
+        const indiceID = dCopia.colonne.indexOf('id_id');
+        dCopia.valori[indiceID] += ind;
+        listaTotaleFiltrata.push(dCopia);
+    });
+    return listaTotaleFiltrata;
 }

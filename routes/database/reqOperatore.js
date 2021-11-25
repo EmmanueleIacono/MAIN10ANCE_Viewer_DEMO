@@ -73,6 +73,14 @@ appO.post('/Main10ance_DB/schede/nuova', async (req, res) => {
 });
 
 // per testare la richiesta:
+// fetch("/o/Main10ance_DB/tabellaDB/schede-anagrafica", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appO.get('/Main10ance_DB/tabellaDB/schede-anagrafica', async (req, res) => {
+    const risposta = await leggiSchedeAnagrafica();
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+// per testare la richiesta:
 // fetch("/o/Main10ance_DB/tabellaDB/schede-controllo", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appO.get('/Main10ance_DB/tabellaDB/schede-controllo', async (req, res) => {
     const risposta = await leggiSchedeControllo();
@@ -226,6 +234,16 @@ async function transazioneScheda(listaStrVals) {
         console.log(`Errore: ${ex}`);
         await clientM10a.query("ROLLBACK;");
         return false;
+    }
+}
+
+async function leggiSchedeAnagrafica() {
+    try {
+        const result = await clientM10a.query(`SELECT descrizione_sistema AS "Descrizione sistema", descrizione_subsistema AS "Descrizione subsistema", tecnica_costruttiva AS "Tecnica costruttiva", dimensioni AS "Dimensioni", materiale AS "Materiale", epoca AS "Epoca", ispezionabilità AS "Ispezionabilità", fonti AS "Fonti", data_registrazione AS "Data di registrazione", autore_scheda AS "Autore scheda", data_ultima_mod AS "Data ultima modifica", autore_ultima_mod AS "Autore ultima modifica", id_anagr AS "Codice scheda anagrafica", id_main10ance AS "Elemento schedato" FROM main10ance_sacrimonti.scheda_anagrafica ORDER BY data_registrazione;`);
+        return result.rows;
+    }
+    catch(e) {
+        return [];
     }
 }
 
