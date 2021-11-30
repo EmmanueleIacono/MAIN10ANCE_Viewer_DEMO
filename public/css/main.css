@@ -546,6 +546,37 @@ tr:nth-child(even) {
 
 /* DASHBOARD */
 
+.h1-db, .h2-db, .h3-db, .h4-db, .h5-db, .h6-db {
+  color: #333333;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.h1-db {
+  font-size: 36px;
+}
+
+.h2-db {
+  font-size: 30px;
+}
+
+.h3-db {
+  font-size: 24px;
+}
+
+.h4-db {
+  font-size: 18px;
+}
+
+.h5-db {
+  font-size: 15px;
+}
+
+.h6-db {
+  font-size: 13px;
+}
+
 #contenitore-dash {
   height: 100%;
   overflow: auto;

@@ -3,11 +3,10 @@
 const contenitoreRicerca = document.getElementById('contenitore-campo-ricerca');
 const formDB = document.getElementById('formDB');
 
-// QUI SOTTO CI SONO I VARI CONTROLLI CHE REGOLANO LE RICHIESTE AL SERVER
-
 // REFRESH VIEWER
 const bottoneRefrViewer = document.getElementById("refreshParams");
 bottoneRefrViewer.addEventListener("click", () => {
+    svuotaContenitore(contenitoreRicerca);
     if (viewer) {
         viewer.clearSelection();
         viewer.isolate();
@@ -46,6 +45,7 @@ bottoneQuery.addEventListener("click", mostraSchedeElemento);
 // ANNULLA INTERROGAZIONE - RIPULISCI FORM
 const bottoneCanc = document.getElementById("annullaDB");
 bottoneCanc.addEventListener("click", () => {
+    svuotaContenitore(contenitoreRicerca);
     svuotaContenitore(divDetailsSelezione);
     svuotaContenitore(formDB);
     detailsSelezione.style.display = 'none';
@@ -58,13 +58,8 @@ bottoneCanc.addEventListener("click", () => {
 
 // FUNZIONI
 
-function svuotaContenitore(domElem) {
-    while (domElem.firstChild) {
-        domElem.removeChild(domElem.firstChild);
-    }
-}
-
 async function mostraSchedeElemento() {
+    svuotaContenitore(contenitoreRicerca);
     svuotaContenitore(divDetailsSelezione);
     detailsSelezione.style.display = 'none';
     svuotaContenitore(formDB);
@@ -74,13 +69,8 @@ async function mostraSchedeElemento() {
         alert('Nessun modello selezionato');
     }
     else {
-        let selezione = viewer.getSelection();
-        let isolato = viewer.getIsolatedNodes();
-        if (isolato.length !== 0) {
-            viewer.select(isolato);
-            selezione = viewer.getSelection();
-        }
-        if ((selezione.length === 1) || (isolato.length === 1)) {
+        const selezionati = getElementiSelezionati();
+        if (selezionati.length === 1) {
             const schedaAnagrafica = await prendiSchedeAnagrafica();
             const schedeControllo = await prendiSchedeControllo();
             const schedeManReg = await prendiSchedeManReg();
@@ -97,31 +87,62 @@ async function mostraSchedeElemento() {
             formDB.appendChild(detailsSchedeManCorr);
             formDB.appendChild(detailsSchedeRestauro);
 
-            selezione.forEach(async (s) => {
-                viewer.getProperties(s, async (props) => {
-                    props.properties.forEach(p => {
-                        if (p.displayName === "id_main10ance") {
-                            let idMain10ance = p.displayValue;
-                            visualizzaSchedeElemento(divSchedeAnagrafica, schedaAnagrafica, 'Codice scheda anagrafica', 'Elemento schedato', idMain10ance, 'var(--gialloAnagraficaTrasparenza)');
-                            visualizzaSchedeElemento(divSchedeControllo, schedeControllo, 'Codice scheda controllo', 'Elementi controllati', idMain10ance, 'var(--verdeMain10anceTrasparenza)');
-                            visualizzaSchedeElemento(divSchedeManReg, schedeManReg, 'Codice scheda manutenzione regolare', 'Elementi interessati', idMain10ance, 'var(--bluInterregTrasparenza2)');
-                            visualizzaSchedeElemento(divSchedeManCorr, schedeManCorr, 'Codice scheda manutenzione correttiva', 'Elementi interessati', idMain10ance, 'var(--bluInterregTrasparenza2)');
-                            visualizzaSchedeElemento(divSchedeRestauro, schedeRestauro, 'Codice scheda restauro', 'Elementi interessati', idMain10ance, 'var(--bluInterregTrasparenza2)');
-                        }
-                    });
-                }, (e) => {
-                        console.log(`ATTENZIONE: ${e}`)
-                    });
-            });
+            const listaIdMain10ance = await getIdM10AFromSelezione(selezionati);
+            const idMain10ance = listaIdMain10ance[0];
+            visualizzaSchedeElemento(divSchedeAnagrafica, schedaAnagrafica, 'Codice scheda anagrafica', 'Elemento schedato', idMain10ance, 'var(--gialloAnagraficaTrasparenza)');
+            visualizzaSchedeElemento(divSchedeControllo, schedeControllo, 'Codice scheda controllo', 'Elementi controllati', idMain10ance, 'var(--verdeMain10anceTrasparenza)');
+            visualizzaSchedeElemento(divSchedeManReg, schedeManReg, 'Codice scheda manutenzione regolare', 'Elementi interessati', idMain10ance, 'var(--bluInterregTrasparenza2)');
+            visualizzaSchedeElemento(divSchedeManCorr, schedeManCorr, 'Codice scheda manutenzione correttiva', 'Elementi interessati', idMain10ance, 'var(--bluInterregTrasparenza2)');
+            visualizzaSchedeElemento(divSchedeRestauro, schedeRestauro, 'Codice scheda restauro', 'Elementi interessati', idMain10ance, 'var(--bluInterregTrasparenza2)');
         }
-        else if ((selezione.length === 0) && (isolato.length === 0)) {
-            alert('Nessun elemento selezionato');
-        }
-        else {
+        // let selezione = viewer.getSelection();
+        // let isolato = viewer.getIsolatedNodes();
+        // if (isolato.length !== 0) {
+        //     viewer.select(isolato);
+        //     selezione = viewer.getSelection();
+        // }
+        // if ((selezione.length === 1) || (isolato.length === 1)) {
+        //     const schedaAnagrafica = await prendiSchedeAnagrafica();
+        //     const schedeControllo = await prendiSchedeControllo();
+        //     const schedeManReg = await prendiSchedeManReg();
+        //     const schedeManCorr = await prendiSchedeManCorr();
+        //     const schedeRestauro = await prendiSchedeRestauro();
+        //     const [detailsSchedeAnagrafica, divSchedeAnagrafica] = creaDetailsPerSchede('Scheda anagrafica');
+        //     const [detailsSchedeControllo, divSchedeControllo] = creaDetailsPerSchede('Schede di controllo');
+        //     const [detailsSchedeManReg, divSchedeManReg] = creaDetailsPerSchede('Schede di manutenzione ordinaria');
+        //     const [detailsSchedeManCorr, divSchedeManCorr] = creaDetailsPerSchede('Schede di manutenzione correttiva');
+        //     const [detailsSchedeRestauro, divSchedeRestauro] = creaDetailsPerSchede('Schede di restauro');
+        //     formDB.appendChild(detailsSchedeAnagrafica);
+        //     formDB.appendChild(detailsSchedeControllo);
+        //     formDB.appendChild(detailsSchedeManReg);
+        //     formDB.appendChild(detailsSchedeManCorr);
+        //     formDB.appendChild(detailsSchedeRestauro);
+
+        //     selezione.forEach(async (s) => {
+        //         viewer.getProperties(s, async (props) => {
+        //             props.properties.forEach(p => {
+        //                 if (p.displayName === "id_main10ance") {
+        //                     let idMain10ance = p.displayValue;
+        //                     visualizzaSchedeElemento(divSchedeAnagrafica, schedaAnagrafica, 'Codice scheda anagrafica', 'Elemento schedato', idMain10ance, 'var(--gialloAnagraficaTrasparenza)');
+        //                     visualizzaSchedeElemento(divSchedeControllo, schedeControllo, 'Codice scheda controllo', 'Elementi controllati', idMain10ance, 'var(--verdeMain10anceTrasparenza)');
+        //                     visualizzaSchedeElemento(divSchedeManReg, schedeManReg, 'Codice scheda manutenzione regolare', 'Elementi interessati', idMain10ance, 'var(--bluInterregTrasparenza2)');
+        //                     visualizzaSchedeElemento(divSchedeManCorr, schedeManCorr, 'Codice scheda manutenzione correttiva', 'Elementi interessati', idMain10ance, 'var(--bluInterregTrasparenza2)');
+        //                     visualizzaSchedeElemento(divSchedeRestauro, schedeRestauro, 'Codice scheda restauro', 'Elementi interessati', idMain10ance, 'var(--bluInterregTrasparenza2)');
+        //                 }
+        //             });
+        //         }, (e) => {
+        //                 console.log(`ATTENZIONE: ${e}`);
+        //             });
+        //     });
+        // }
+        // else if ((selezione.length === 0) && (isolato.length === 0)) {
+        //     alert('Nessun elemento selezionato');
+        // }
+        else if (selezionati.length > 1) {
             alert('Selezionare un solo elemento per volta');
         }
-        viewer.isolate(selezione);
-        viewer.fitToView(selezione);
+        viewer.isolate(selezionati);
+        viewer.fitToView(selezionati);
     }
 }
 

@@ -1,5 +1,8 @@
 "use strict";
-// FUNZIONI UTILI E/O CONDIVISE TRA PIU' FILE JS
+
+let viewer;
+
+////////// FUNZIONI UTILI E/O CONDIVISE TRA PIU' FILE JS //////////
 
 // GENERAZIONE DI PALETTE DI COLORI
 
@@ -34,6 +37,61 @@ function hslToHex(h, s, l) { // copiata: non sono sicuro di COME funzioni, ma fu
 
 function randomNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// GET PROPERTIES MA CHE RITORNA PROMISE CON QUELLO CHE INTERESSA
+
+function getProps(model, dbids, options) {
+    return new Promise((resolve, reject) => {
+        model.getBulkProperties(dbids, options, resolve, reject);
+    });
+}
+
+// RITORNA UNA LISTA DI ID_MAIN10ANCE A PARTIRE DA UNA LISTA DI DBID DEL VIEWER
+
+async function getIdM10AFromSelezione(selezione) {
+    const opz = {
+        propFilter: ['id_main10ance'],
+        ignoreHidden: true
+    };
+    const listaOggettiIdM10A = await getProps(viewer.model, selezione, opz);
+    const listaIdM10A = listaOggettiIdM10A.map(ogg => (ogg.properties[0].displayValue));
+    return listaIdM10A;
+}
+
+// RITORNA LA LISTA DEGLI ELEMENTI SELEZIONATI O ISOLATI
+
+function getElementiSelezionati() {
+    let selezione = viewer.getSelection();
+    let isolato = viewer.getIsolatedNodes();
+    if (selezione.length === 0 && isolato.length === 0) {
+        alert('Nessun elemento selezionato');
+    }
+    else if (isolato.length !== 0 && selezione.length === 0) { // se ho solo elementi isolati, li seleziono
+        viewer.select(isolato);
+        selezione = viewer.getSelection();
+    }
+    else if (selezione.length !== 0 && isolato.length !== 0) { // se ho sia elementi selezionati che isolati, vince la selezione
+        isolato = viewer.isolate(selezione);
+        viewer.select(isolato);
+    }
+    return selezione;
+}
+
+// SVUOTA UN ELEMENTO DEL DOM
+
+function svuotaContenitore(domElem) {
+    while (domElem.firstChild) {
+        domElem.removeChild(domElem.firstChild);
+    }
+}
+
+// VIEWER.SEARCH MA CHE RITORNA PROMISE CON DBID DELL'ELEMENTO CERCATO
+
+function ricercaIdM10A(ids) {
+    return new Promise((resolve, reject) => {
+        viewer.search(ids, resolve, reject, ['id_main10ance']);
+    });
 }
 
 // RICHIESTE

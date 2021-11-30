@@ -508,11 +508,17 @@ function cercaElementiDaScheda(strID) {
     listaID.forEach(id => {
         viewer.search(id, el => {
             listaElems.push(el[0]);
+            // QUESTI SOTTO DA TOGLIERE, PORTARE FUORI, E USARE FUNZIONE "ricercaIdM10A(id)" DA shared.js
             viewer.isolate(listaElems);
+            viewer.select(listaElems);
+            viewer.fitToView();
         }, () => {
             alert('Errore nella ricerca');
         }, ['id_main10ance']);
     });
+    // viewer.isolate(listaElems);
+    // viewer.select(listaElems);
+    // viewer.fitToView();
 }
 
 async function popolaSelectSacriMonti() {

@@ -15,14 +15,19 @@ const schedaAnagrafica = document.getElementById('scheda-anagrafica');
 const schedaControllo = document.getElementById('scheda-controllo');
 const schedaIntervento = document.getElementById('scheda-intervento');
 
-bottoneAggiungi.addEventListener('click', () => {
-    inizializzaModulo();
-});
+bottoneAggiungi.addEventListener('click', inizializzaModulo);
 
-apriTabAnagrafica.addEventListener('click', () => {
-    // SERVE VERIFICA SCHEDA GIA PRESENTE
-    // VUOI MODIFICARE LA SCHEDA ESISTENTE?
-    // true-false
+apriTabAnagrafica.addEventListener('click', async () => {
+    const nSchedati = await verificaPresenzaSchedaAnagrafica();
+    if (nSchedati) {
+        const verbo = nSchedati === 1 ? 'possiede' : 'possiedono';
+        const sovrascrivi = confirm(`${nSchedati} degli elementi selezionati ${verbo} già una scheda anagrafica, desideri sovrascriverla?`);
+        if (!sovrascrivi) {
+            svuotaContenitore(divDetailsSelezione);
+            bottoneChiudiSchede.click();
+            return;
+        }
+    }
     schedaControllo.style.display = 'none';
     apriTabControllo.classList.remove('active');
     schedaIntervento.style.display = 'none';
@@ -194,7 +199,8 @@ bottoneChiudiSchede.addEventListener('click', nascondiBottoniSchede);
 
 /////   FUNZIONI    /////
 
-function inizializzaModulo() {
+async function inizializzaModulo() {
+    svuotaContenitore(contenitoreRicerca);
     svuotaContenitore(divDetailsSelezione);
     svuotaContenitore(formDB);
 
@@ -202,38 +208,48 @@ function inizializzaModulo() {
         alert('Nessun modello selezionato');
     }
     else {
-        let selezione = viewer.getSelection();
-        let isolato = viewer.getIsolatedNodes();
-        if ((selezione.length !== 0) && (isolato.length !== 0)) {
-            isolato = viewer.isolate(selezione);
-            viewer.select(isolato);
-        }
-        else if (isolato.length !== 0) {
-            viewer.select(isolato);
-            selezione = viewer.getSelection();
-        }
-        if ((selezione.length !== 0) || (isolato.length !== 0)) {
-            selezione.forEach(async (s) => {
-                viewer.getProperties(s, async (props) => {
-                    let nome = props.name;
-                    props.properties.forEach(p => {
-                        if (p.displayName === "id_main10ance") {
-                            let idMain10ance = p.displayValue;
-                            let arrayInfo = idMain10ance.split('|');
-                            let entità = arrayInfo[2];
-                            preparaModulo(idMain10ance);
-                            detailsSelezione.style.display = 'block';
-                            mostraBottoniSchede();
-                        }
-                    });
-                }, (e) => {
-                        console.log(`ATTENZIONE: ${e}`)
-                    });
-            });
-        }
-        else {
-            alert('Nessun elemento selezionato');
-        }
+        // let selezione = viewer.getSelection();
+        // let isolato = viewer.getIsolatedNodes();
+        // if (selezione.length === 0 && isolato.length === 0) {
+        //     alert('Nessun elemento selezionato');
+        // }
+        // else if (selezione.length !== 0 && isolato.length !== 0) { // se ho sia elementi selezionati che isolati, vince la selezione
+        //     isolato = viewer.isolate(selezione);
+        //     viewer.select(isolato);
+        // }
+        // else if (isolato.length !== 0 && selezione.length === 0) { // se ho solo elementi isolati, li seleziono
+        //     viewer.select(isolato);
+        //     selezione = viewer.getSelection();
+        // }
+        const selezione = getElementiSelezionati();
+        const listaIds = await getIdM10AFromSelezione(selezione);
+        listaIds.forEach(id => {
+            preparaModulo(id);
+        });
+        detailsSelezione.style.display = 'block';
+        mostraBottoniSchede();
+        // selezione.forEach(async (s) => {
+        //     viewer.getProperties(s, async (props) => {
+        //         const idDaArray = props.properties.filter(p => p.displayName === 'id_main10ance');
+        //         const p = idDaArray[0];
+        //         let idMain10ance = p.displayValue;
+        //         preparaModulo(idMain10ance);
+        //         detailsSelezione.style.display = 'block';
+        //         mostraBottoniSchede();
+        //         // props.properties.forEach(p => {
+        //         //     if (p.displayName === "id_main10ance") {
+        //         //         let idMain10ance = p.displayValue;
+        //         //         let arrayInfo = idMain10ance.split('|');
+        //         //         let entità = arrayInfo[2];
+        //         //         preparaModulo(idMain10ance);
+        //         //         detailsSelezione.style.display = 'block';
+        //         //         mostraBottoniSchede();
+        //         //     }
+        //         // });
+        //     }, (e) => {
+        //             console.log(`ATTENZIONE: ${e}`);
+        //         });
+        // });
         // viewer.clearSelection();
         viewer.isolate(selezione);
         viewer.fitToView(selezione);
@@ -1662,4 +1678,12 @@ function moltiplicaSchede(listaDati, listaId) {
         listaTotaleFiltrata.push(dCopia);
     });
     return listaTotaleFiltrata;
+}
+
+async function verificaPresenzaSchedaAnagrafica() {
+    const listaIdM10A = trovaIdMain10ance();
+    const schedeAn = await prendiSchedeAnagrafica();
+    const listaSchedati = schedeAn.map(sc => (sc['Elemento schedato']));
+    const idGiaSchedati = listaIdM10A.filter(sc => (listaSchedati.includes(sc)));
+    return idGiaSchedati.length;
 }
