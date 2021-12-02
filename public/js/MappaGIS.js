@@ -258,7 +258,7 @@ function getModel(urn) {
         if (urn !== urnModelloCorrente) {
             $("#forgeViewer").empty();
             launchViewer(urn);
-            urnModelloCorrente = urn;
+            // urnModelloCorrente = urn;
         }
     }
     else {

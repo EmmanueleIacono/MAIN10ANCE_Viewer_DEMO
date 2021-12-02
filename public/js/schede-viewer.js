@@ -10,10 +10,6 @@ const selezionaTutto = document.getElementById('vedi-schede-tutto');
 const selezionaNulla = document.getElementById('vedi-schede-nulla');
 const checkTipoScheda = document.getElementById('check-tipo-scheda');
 const selectTipoScheda = document.getElementById('select-tipo-scheda');
-// const checkControllo = document.getElementById('check-controllo');
-// const checkManReg = document.getElementById('check-man-reg');
-// const checkManCorr = document.getElementById('check-man-corr');
-// const checkRestauro = document.getElementById('check-restauro');
 const checkSacroMonte = document.getElementById('check-sacro-monte');
 const selectSacroMonte = document.getElementById('select-sacro-monte');
 const checkCappella = document.getElementById('check-cappella');
@@ -24,8 +20,6 @@ const checkStatoCons = document.getElementById('check-stato-conservazione');
 const selectStatoCons = document.getElementById('select-stato-conservazione');
 const checkFenomeno = document.getElementById('check-fenomeno');
 const selectFenomeno = document.getElementById('select-fenomeno');
-// const checkMateriale = document.getElementById('check-materiale');
-// const selectMateriale = document.getElementById('select-materiale');
 const checkData = document.getElementById('check-data');
 const inputDataDa = document.getElementById('input-data-da');
 const inputDataA = document.getElementById('input-data-a');
@@ -42,8 +36,6 @@ divContenitoreSchede.innerHTML = '';
         popolaSelectElementi();
         popolaSelectFenomeno();
         popolaSelectStatoCons();
-        // popolaSelectMateriale();
-
         popolaListaSigleNumCapp();
     }
 })();
@@ -67,21 +59,12 @@ async function popolaListaSigleNumCapp() {
 aggiornaSchedeStart.addEventListener('click', visualizzaSchedeStart);
 
 checkGenerale.addEventListener('change', () => {
-    // const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
     const listaSelect = contenitoreFiltriSchede.getElementsByTagName('select');
     const listaInput = contenitoreFiltriSchede.getElementsByTagName('input');
     if (checkGenerale.checked) {
         listaCheckboxSchede.forEach(cbx => {
             cbx.disabled = false;
         });
-        // listaSelect.forEach(sl => {
-        //     sl.disabled = false;
-        // });
-        // listaInput.forEach(inp => {
-        //     if (inp.type === 'date') {
-        //         inp.disabled = false;
-        //     }
-        // });
         selezionaTutto.disabled = false;
         selezionaTutto.classList.toggle('vedi-schede');
         selezionaTutto.classList.toggle('vedi-schede-disatt');
@@ -95,14 +78,6 @@ checkGenerale.addEventListener('change', () => {
         listaCheckboxSchede.forEach(cbx => {
             cbx.disabled = true;
         });
-        // listaSelect.forEach(sl => {
-        //     sl.disabled = true;
-        // });
-        // listaInput.forEach(inp => {
-        //     if (inp.type === 'date') {
-        //         inp.disabled = true;
-        //     }
-        // });
         selezionaTutto.disabled = true;
         selezionaTutto.classList.toggle('vedi-schede');
         selezionaTutto.classList.toggle('vedi-schede-disatt');
@@ -110,7 +85,6 @@ checkGenerale.addEventListener('change', () => {
         selezionaNulla.classList.toggle('vedi-schede');
         selezionaNulla.classList.toggle('vedi-schede-disatt');
         filtraVediTutto();
-        // spuntaTuttoNiente(false);
     }
 });
 
@@ -228,7 +202,6 @@ function creaStrutturaSchede() {
 async function compilaTabelleControllo() {
     const listaSchedeControlloComplete = await prendiSchedeControllo();
     listaSchedeControlloComplete.forEach(scheda => {
-        // console.log(scheda);
         const [tabellaSchede, captionSchede] = creaStrutturaSchede();
         tabellaSchede.setAttribute('id', `${scheda["Codice scheda controllo"]}`);
         captionSchede.innerHTML = `<b>SCHEDA CONTROLLO N. ${scheda["Codice scheda controllo"]}</b>`;
@@ -265,7 +238,6 @@ async function compilaTabelleControllo() {
 async function compilaTabelleManReg() {
     const listaSchedeManRegComplete = await prendiSchedeManReg();
     listaSchedeManRegComplete.forEach(scheda => {
-        // console.log(scheda);
         const [tabellaSchede, captionSchede] = creaStrutturaSchede();
         tabellaSchede.setAttribute('id', `${scheda["Codice scheda manutenzione regolare"]}`);
         captionSchede.innerHTML = `<b>SCHEDA MANUTENZIONE ORDINARIA N. ${scheda["Codice scheda manutenzione regolare"]}</b>`;
@@ -302,7 +274,6 @@ async function compilaTabelleManReg() {
 async function compilaTabelleManCorr() {
     const listaSchedeManCorrComplete = await prendiSchedeManCorr();
     listaSchedeManCorrComplete.forEach(scheda => {
-        // console.log(scheda);
         const [tabellaSchede, captionSchede] = creaStrutturaSchede();
         tabellaSchede.setAttribute('id', `${scheda["Codice scheda manutenzione correttiva"]}`);
         captionSchede.innerHTML = `<b>SCHEDA MANUTENZIONE CORRETTIVA N. ${scheda["Codice scheda manutenzione correttiva"]}</b>`;
@@ -339,7 +310,6 @@ async function compilaTabelleManCorr() {
 async function compilaTabelleRestauro() {
     const listaSchedeRestauroComplete = await prendiSchedeRestauro();
     listaSchedeRestauroComplete.forEach(scheda => {
-        // console.log(scheda);
         const [tabellaSchede, captionSchede] = creaStrutturaSchede();
         tabellaSchede.setAttribute('id', `${scheda["Codice scheda restauro"]}`);
         captionSchede.innerHTML = `<b>SCHEDA RESTAURO N. ${scheda["Codice scheda restauro"]}</b>`;
@@ -398,14 +368,11 @@ async function prendiLOD3e4() {
 }
 
 function filtraSchedeDaID(idScheda) {
-    // compilaTabelleControllo();
     const insiemeTabelle = document.querySelectorAll('.tabella-schede');
     const listaTabelle = [...insiemeTabelle];
     const listaCards = listaTabelle.map(card => (card.parentNode));
     listaCards.forEach(tab => {
-        // console.log(tab);
         if (tab.firstElementChild.id === idScheda) {
-            // tab.style.display = 'table';
             tab.style.display = 'block';
         }
         else {
@@ -418,17 +385,9 @@ function filtraVediTutto() {
     const insiemeTabelle = document.querySelectorAll('.tabella-schede');
     const listaTabelle = [...insiemeTabelle];
     const listaCards = listaTabelle.map(card => (card.parentNode));
-    // const listaCheckbox = contenitoreFiltriSchede.getElementsByClassName('filtro-schede');
     listaCards.forEach(tab => {
-        // tab.style.display = 'table';
         tab.style.display = 'block';
     });
-    // if (checkGenerale.checked) {
-    //     checkGenerale.click();
-    // }
-    // listaCheckboxSchede.forEach(cbx => {
-    //     cbx.checked = false;
-    // });
 }
 
 function filtraVediNulla() {
@@ -443,7 +402,6 @@ function filtraVediNulla() {
 function spuntaTuttoNiente(tutto) {
     if (tutto) {
         listaCheckboxSchede.forEach(cbx => {
-            // cbx.checked = true;
             if (cbx.checked) {
                 return;
             }
@@ -454,7 +412,6 @@ function spuntaTuttoNiente(tutto) {
     }
     else {
         listaCheckboxSchede.forEach(cbx => {
-            // cbx.checked = false;
             if (cbx.checked) {
                 cbx.click();
             }
@@ -472,9 +429,6 @@ function filtraSchedeConManRest(filtro) {
         if (caption.innerText.startsWith(filtro)) {
             tab.style.display = 'table';
         }
-        // else {
-        //     tab.style.display = 'none';
-        // }
     });
 }
 
@@ -493,32 +447,20 @@ async function apriModelloDaScheda() {
     const urn = await urnRes.urn;
     const conferma = confirm('Visualizzare gli elementi nel BIM Viewer?');
     if (conferma) {
-        // console.log(urn);
         document.getElementById('apriTabBIM').click();
-        $("#forgeViewer").empty();
+        // $("#forgeViewer").empty();
         launchViewer(urn, () => {
             cercaElementiDaScheda(stringaIdMain10ance);
         });
     }
 }
 
-function cercaElementiDaScheda(strID) {
+async function cercaElementiDaScheda(strID) {
     const listaID = strID.split(',');
-    let listaElems = [];
-    listaID.forEach(id => {
-        viewer.search(id, el => {
-            listaElems.push(el[0]);
-            // QUESTI SOTTO DA TOGLIERE, PORTARE FUORI, E USARE FUNZIONE "ricercaIdM10A(id)" DA shared.js
-            viewer.isolate(listaElems);
-            viewer.select(listaElems);
-            viewer.fitToView();
-        }, () => {
-            alert('Errore nella ricerca');
-        }, ['id_main10ance']);
-    });
-    // viewer.isolate(listaElems);
-    // viewer.select(listaElems);
-    // viewer.fitToView();
+    const listaElems = await Promise.all(listaID.map(async id => (await ricercaIdM10A(id))));
+    viewer.isolate(listaElems);
+    viewer.select(listaElems);
+    viewer.fitToView();
 }
 
 async function popolaSelectSacriMonti() {
@@ -559,20 +501,6 @@ async function popolaSelectStatoCons() {
         opz.innerHTML = st.unnest;
         selectStatoCons.appendChild(opz);
     });
-}
-
-// async function popolaSelectMateriale() {
-//     const listaMateriali = await leggiEnum('mat_ty');
-//     listaMateriali.forEach(m => {
-//         const opz = document.createElement('option');
-//         opz.setAttribute('value', m.unnest);
-//         opz.innerHTML = m.unnest;
-//         selectMateriale.appendChild(opz);
-//     });
-// }
-
-function creaCondizioneCaption() {
-    return;
 }
 
 function verificaFiltriSchede(tabella) {

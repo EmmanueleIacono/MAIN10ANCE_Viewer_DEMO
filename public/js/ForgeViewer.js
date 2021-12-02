@@ -9,28 +9,31 @@ function launchViewer(urn, opzioniPostLoading) {
     opz: opzioniPost
   };
 
-  Autodesk.Viewing.Initializer(options, () => {
-    viewer = new Autodesk.Viewing.GuiViewer3D(document.getElementById('forgeViewer'), { extensions: ['Autodesk.DocumentBrowser', 'Autodesk.VisualClusters'] });
-    // QUESTO LISTENER QUA SOTTO PUO' TORNARE UTILE
+  if (urn !== urnModelloCorrente) {
+    Autodesk.Viewing.Initializer(options, () => {
+      viewer = new Autodesk.Viewing.GuiViewer3D(document.getElementById('forgeViewer'), { extensions: ['Autodesk.DocumentBrowser', 'Autodesk.VisualClusters'] });
+      if (options.opz) {
+        viewer.addEventListener(Autodesk.Viewing.GEOMETRY_LOADED_EVENT, () => {
+          options.opz();
+        });
+      }
+      viewer.start();
+      const documentId = 'urn:' + urn;
+      Autodesk.Viewing.Document.load(documentId, doc => {onDocumentLoadSuccess(doc, urn)}, onDocumentLoadFailure);
+    });
+  }
+  else {
     if (options.opz) {
-      viewer.addEventListener(Autodesk.Viewing.GEOMETRY_LOADED_EVENT, () => {
         options.opz();
-      });
     }
-    viewer.start();
-    const documentId = 'urn:' + urn;
-    Autodesk.Viewing.Document.load(documentId, onDocumentLoadSuccess, onDocumentLoadFailure);
-  });
+  }
 }
 
-function onDocumentLoadSuccess(doc) {
+function onDocumentLoadSuccess(doc, urn) {
   const viewables = doc.getRoot().getDefaultGeometry();
   viewer.loadDocumentNode(doc, viewables).then(i => {
     // documented loaded, any action?
-    // if (opz) {
-    //   opz();
-    // }
-    // viewer.fitToView();
+    urnModelloCorrente = urn;
   });
 }
 

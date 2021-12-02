@@ -3,6 +3,7 @@
 const formDB = document.getElementById('formDB');
 
 let viewer;
+let urnModelloCorrente;
 
 ////////// FUNZIONI UTILI E/O CONDIVISE TRA PIU' FILE JS //////////
 
@@ -90,10 +91,15 @@ function svuotaContenitore(domElem) {
 
 // VIEWER.SEARCH MA CHE RITORNA PROMISE CON DBID DELL'ELEMENTO CERCATO
 
-function ricercaIdM10A(ids) {
-    return new Promise((resolve, reject) => {
-        viewer.search(ids, resolve, reject, ['id_main10ance']);
-    });
+async function ricercaIdM10A(id) {
+    const el = await promiseCercaId(id);
+    return el[0];
+
+    function promiseCercaId(id) {
+        return new Promise((resolve, reject) => {
+            viewer.search(id, resolve, reject, ['id_main10ance']);
+        });
+    }
 }
 
 // RICHIESTE

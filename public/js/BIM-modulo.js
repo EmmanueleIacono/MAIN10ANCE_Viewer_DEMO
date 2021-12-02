@@ -639,29 +639,37 @@ async function preparaCampiManOrd(divScheda) {
     const intSelectSchedaControllo = document.createElement('select');
     intSelectSchedaControllo.setAttribute('id', 'scheda-intervento-[manutenzione_regolare]-{id_contr}');
     creaListaOpzioni(listaSchedeControllo, intSelectSchedaControllo, 'valore', 'scheda', true);
-    intSelectSchedaControllo.addEventListener('change', () => {
+    intSelectSchedaControllo.addEventListener('change', async () => {
         if ((intSelectSchedaControllo.value === null) || (intSelectSchedaControllo.value === 'null')) {
             viewer.clearSelection();
-            svuotaContenitore(formDB);
+            svuotaContenitore(divDetailsSelezione);
         }
         else {
-            svuotaContenitore(formDB);
-            listaSchedeControllo.forEach(sc => {
-                if (intSelectSchedaControllo.value === sc.valore) {
-                    const nuovaListaId = sc.id_main10ance;
-                    let listaElementi = [];
-                    nuovaListaId.forEach(id => {
-                        preparaModulo(id);
-                        viewer.search(id, el => {
-                            listaElementi.push(el[0]);
-                            viewer.select(listaElementi);
-                            // viewer.fitToView();
-                        }, () => {
-                            alert('Errore nella ricerca');
-                        }, ['id_main10ance']);
-                    });
-                }
-            });
+            svuotaContenitore(divDetailsSelezione);
+            const schedaSelezionata = listaSchedeControllo.filter(sc => (sc.valore === intSelectSchedaControllo.value))[0];
+            const listaIdM10A = schedaSelezionata.id_main10ance;
+            listaIdM10A.forEach(id => preparaModulo(id));
+            // QUESTO PROMISE.ALL CON MODELLI GRANDI DIVENTA LENTISSIMO -> PROBLEMATICO
+            const listaElementi = await Promise.all(listaIdM10A.map(async id => (await ricercaIdM10A(id))));
+            viewer.isolate(listaElementi);
+            viewer.select(listaElementi);
+            viewer.fitToView();
+            // listaSchedeControllo.forEach(sc => {
+            //     if (intSelectSchedaControllo.value === sc.valore) {
+            //         const nuovaListaId = sc.id_main10ance;
+            //         let listaElementi = [];
+            //         nuovaListaId.forEach(id => {
+            //             // preparaModulo(id);
+            //             viewer.search(id, el => {
+            //                 listaElementi.push(el[0]);
+            //                 viewer.select(listaElementi);
+            //                 // viewer.fitToView();
+            //             }, () => {
+            //                 alert('Errore nella ricerca');
+            //             }, ['id_main10ance']);
+            //         });
+            //     }
+            // });
         }
     });
     // FREQUENZA EFFETTIVA
@@ -766,29 +774,37 @@ async function preparaCampiManStr(divScheda) {
     const intSelectSchedaControllo = document.createElement('select');
     intSelectSchedaControllo.setAttribute('id', 'scheda-intervento-[manutenzione_correttiva_o_a_guasto]-{id_contr}');
     creaListaOpzioni(listaSchedeControllo, intSelectSchedaControllo, 'valore', 'scheda', true);
-    intSelectSchedaControllo.addEventListener('change', () => {
+    intSelectSchedaControllo.addEventListener('change', async () => {
         if ((intSelectSchedaControllo.value === null) || (intSelectSchedaControllo.value === 'null')) {
             viewer.clearSelection();
-            svuotaContenitore(formDB);
+            svuotaContenitore(divDetailsSelezione);
         }
         else {
-            svuotaContenitore(formDB);
-            listaSchedeControllo.forEach(sc => {
-                if (intSelectSchedaControllo.value === sc.valore) {
-                    const nuovaListaId = sc.id_main10ance;
-                    let listaElementi = [];
-                    nuovaListaId.forEach(id => {
-                        preparaModulo(id);
-                        viewer.search(id, el => {
-                            listaElementi.push(el[0]);
-                            viewer.select(listaElementi);
-                            // viewer.fitToView();
-                        }, () => {
-                            alert('Errore nella ricerca');
-                        }, ['id_main10ance']);
-                    });
-                }
-            });
+            svuotaContenitore(divDetailsSelezione);
+            const schedaSelezionata = listaSchedeControllo.filter(sc => (sc.valore === intSelectSchedaControllo.value))[0];
+            const listaIdM10A = schedaSelezionata.id_main10ance;
+            listaIdM10A.forEach(id => preparaModulo(id));
+            // QUESTO PROMISE.ALL CON MODELLI GRANDI DIVENTA LENTISSIMO -> PROBLEMATICO
+            const listaElementi = await Promise.all(listaIdM10A.map(async id => (await ricercaIdM10A(id))));
+            viewer.isolate(listaElementi);
+            viewer.select(listaElementi);
+            viewer.fitToView();
+            // listaSchedeControllo.forEach(sc => {
+            //     if (intSelectSchedaControllo.value === sc.valore) {
+            //         const nuovaListaId = sc.id_main10ance;
+            //         let listaElementi = [];
+            //         nuovaListaId.forEach(id => {
+            //             // preparaModulo(id);
+            //             viewer.search(id, el => {
+            //                 listaElementi.push(el[0]);
+            //                 viewer.select(listaElementi);
+            //                 // viewer.fitToView();
+            //             }, () => {
+            //                 alert('Errore nella ricerca');
+            //             }, ['id_main10ance']);
+            //         });
+            //     }
+            // });
         }
     });
     // PROGETTISTI
@@ -1016,11 +1032,6 @@ async function leggiSchedeControllo() {
         const listaContr = await risultato.json();
         const listaIdMain10ance = trovaIdMain10ance();
         let listaFiltrata = [];
-        // listaContr.forEach(contr => {
-        //     if (listaIdMain10ance.includes(contr['id_main10ance'])) {
-        //         listaFiltrata.push(contr);
-        //     }
-        // });
         listaIdMain10ance.forEach(id => {
             listaContr.forEach(contr => {
                 if (contr['id_main10ance'].includes(id)) {
@@ -1031,11 +1042,6 @@ async function leggiSchedeControllo() {
             });
         });
         let listaFinale = [];
-        // listaFiltrata.forEach(filtr => {
-        //     let ogg = {};
-        //     ogg.scheda = `${filtr['id_contr']}`;
-        //     listaFinale.push(ogg);
-        // });
         listaFiltrata.forEach(filtr => {
             let ogg = {};
             ogg.scheda = `${filtr['data_con']} - ${filtr['rid_gloss']}`;

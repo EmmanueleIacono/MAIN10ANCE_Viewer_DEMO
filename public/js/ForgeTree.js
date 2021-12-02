@@ -1,7 +1,5 @@
 "use strict";
 
-let urnModelloCorrente;
-
 $(document).ready(function () {
     prepareAppBucketTree();
     $('#refreshBuckets').click(function () {
@@ -50,12 +48,15 @@ $(document).ready(function () {
           try {
             document.getElementById('apriTabBIM').click();
             launchViewer(urn);
-            urnModelloCorrente = urn;
+            // urnModelloCorrente = urn;
           }
           catch {
             let messaggioDiErrore = 'Modello non disponibile.';
             $('#forgeViewer').html(messaggioDiErrore);
           }
+        }
+        else {
+          alert('ATTENZIONE: Il modello selezionato è già visibile');
         }
       }
     });
