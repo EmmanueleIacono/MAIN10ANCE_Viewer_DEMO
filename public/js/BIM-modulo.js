@@ -208,19 +208,6 @@ async function inizializzaModulo() {
         alert('Nessun modello selezionato');
     }
     else {
-        // let selezione = viewer.getSelection();
-        // let isolato = viewer.getIsolatedNodes();
-        // if (selezione.length === 0 && isolato.length === 0) {
-        //     alert('Nessun elemento selezionato');
-        // }
-        // else if (selezione.length !== 0 && isolato.length !== 0) { // se ho sia elementi selezionati che isolati, vince la selezione
-        //     isolato = viewer.isolate(selezione);
-        //     viewer.select(isolato);
-        // }
-        // else if (isolato.length !== 0 && selezione.length === 0) { // se ho solo elementi isolati, li seleziono
-        //     viewer.select(isolato);
-        //     selezione = viewer.getSelection();
-        // }
         const selezione = getElementiSelezionati();
         const listaIds = await getIdM10AFromSelezione(selezione);
         listaIds.forEach(id => {
@@ -228,29 +215,6 @@ async function inizializzaModulo() {
         });
         detailsSelezione.style.display = 'block';
         mostraBottoniSchede();
-        // selezione.forEach(async (s) => {
-        //     viewer.getProperties(s, async (props) => {
-        //         const idDaArray = props.properties.filter(p => p.displayName === 'id_main10ance');
-        //         const p = idDaArray[0];
-        //         let idMain10ance = p.displayValue;
-        //         preparaModulo(idMain10ance);
-        //         detailsSelezione.style.display = 'block';
-        //         mostraBottoniSchede();
-        //         // props.properties.forEach(p => {
-        //         //     if (p.displayName === "id_main10ance") {
-        //         //         let idMain10ance = p.displayValue;
-        //         //         let arrayInfo = idMain10ance.split('|');
-        //         //         let entità = arrayInfo[2];
-        //         //         preparaModulo(idMain10ance);
-        //         //         detailsSelezione.style.display = 'block';
-        //         //         mostraBottoniSchede();
-        //         //     }
-        //         // });
-        //     }, (e) => {
-        //             console.log(`ATTENZIONE: ${e}`);
-        //         });
-        // });
-        // viewer.clearSelection();
         viewer.isolate(selezione);
         viewer.fitToView(selezione);
     }
@@ -1146,7 +1110,6 @@ function verificaVincoliControllo() {
 }
 
 function verificaVincoliManutenzioneRestauro(scheda) {
-    // console.log(scheda);
     if ((scheda === 'Manutenzione Ordinaria') || (scheda === 'Manutenzione Correttiva')) {
         const operatore = $('[id*="{esecutori}"]')[0];
         const data = $('[id*="{data_ese}"]')[0];
@@ -1564,7 +1527,6 @@ async function creaPDF2(listaIdMain10ance, listaDatiNascosti, contr_manut) {
     let listaCoppieValori = [];
     for (let n=0; n<listaPulita.length; n++) {
         let tag = listaPulita[n].tagName;
-        // if ((tag !== 'INPUT') && (tag !== 'SELECT') && (tag !== 'TEXTAREA')) {
         if ((tag === 'LABEL') || (tag === 'H4')) {
             let testo = listaPulita[n].innerText;
             listaStringhe.push(testo);
@@ -1595,7 +1557,6 @@ async function creaPDF2(listaIdMain10ance, listaDatiNascosti, contr_manut) {
         unit: 'mm',
         format: 'a3'
     });
-    // const nomeFile = `${contr_manut}_${stringaID}_${idUnivoco}.pdf`;
     const nomeFile = `${contr_manut}_${idUnivoco}.pdf`;
     pdf.setProperties({
         title: nomeFile

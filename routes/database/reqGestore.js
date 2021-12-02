@@ -51,14 +51,6 @@ appG.get('/Main10ance_DB/dashboard/numero-oggetti', async (req, res) => {
     res.send(risposta);
 });
 
-// // per testare la richiesta:
-// // fetch("/g/Main10ance_DB/dashboard/SMmodel", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-// appG.get('/Main10ance_DB/dashboard/SMmodel', async (req, res) => {
-//     const risposta = await SMmodel();
-//     res.setHeader('content-type', 'application/json');
-//     res.send(risposta);
-// });
-
 // per testare la richiesta:
 // fetch("/g/Main10ance_DB/dashboard/conteggio-elementi", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appG.get('/Main10ance_DB/dashboard/conteggio-elementi', async (req, res) => {
@@ -89,7 +81,7 @@ appG.get('/DB_Servizio/LOD/TabelleBIM', async (req, res) => {
 // per testare la richiesta:
 // fetch("/g/DB_Servizio/lista-localita", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appG.get('/DB_Servizio/lista-localita', async (req, res) => {
-    const località = await getLocalitàeSigle();
+    const località = await getLocalitaeSigle();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(località));
 });
@@ -170,16 +162,6 @@ async function conteggioElementi(listaTabelle, listaAlias) {
     }
 }
 
-// async function SMmodel() {
-//     try {
-//         const result = await clientServ.query(`SELECT COUNT(DISTINCT urn), 'Varallo' AS nome_tabella FROM dati_cappelle WHERE sacro_monte = 'SMV' UNION SELECT COUNT(DISTINCT urn), 'Ghiffa' AS nome_tabella FROM dati_cappelle WHERE sacro_monte = 'SMG';`);
-//         return result.rows;
-//     }
-//     catch(e) {
-//         return [];
-//     }
-// }
-
 async function conteggioRuoliAmbito() {
     try {
         const result = await clientServ.query(`SELECT ruolo, COUNT(ruolo) FROM utenti GROUP BY ruolo;`);
@@ -200,7 +182,7 @@ async function leggiListaTabelleBIM() {
     }
 }
 
-async function getLocalitàeSigle() {
+async function getLocalitaeSigle() {
     try {
         const results = await clientServ.query(`SELECT "nome", "sigla" FROM "dati_sm" ORDER BY "nome";`);
         return results.rows;
@@ -224,6 +206,27 @@ async function conteggioModelli(listaLocalità, listaSigle) {
         return results.rows;
     }
     catch(e) {
+        return [];
+    }
+}
+
+///////////////// PROVVISORIE //////////////
+
+// per testare la richiesta:
+// fetch("/g/utenti-provv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appG.get('/utenti-provv', async (req, res) => {
+    const users = await getUtentiProvv();
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(users));
+});
+
+async function getUtentiProvv() {
+    try {
+        const results = await clientServ.query(`SELECT "user", "email", "ruolo" FROM "utenti" WHERE NOT "ruolo" = 'amministratore' ORDER BY "user";`);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
         return [];
     }
 }

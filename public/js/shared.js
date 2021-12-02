@@ -1,5 +1,7 @@
 "use strict";
 
+const formDB = document.getElementById('formDB');
+
 let viewer;
 
 ////////// FUNZIONI UTILI E/O CONDIVISE TRA PIU' FILE JS //////////
