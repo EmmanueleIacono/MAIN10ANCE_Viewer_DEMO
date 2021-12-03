@@ -10,6 +10,7 @@ function launchViewer(urn, opzioniPostLoading) {
   };
 
   if (urn !== urnModelloCorrente) {
+    $("#forgeViewer").empty();
     Autodesk.Viewing.Initializer(options, () => {
       viewer = new Autodesk.Viewing.GuiViewer3D(document.getElementById('forgeViewer'), { extensions: ['Autodesk.DocumentBrowser', 'Autodesk.VisualClusters'] });
       if (options.opz) {

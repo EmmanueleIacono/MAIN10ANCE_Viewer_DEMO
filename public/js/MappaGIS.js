@@ -251,14 +251,12 @@ class LayerGIS {
     }
 }
 
-// questa funzione è molto carina ma si potrebbe riarrangiare per ottenere l'URN da un'altra richiesta anziché da DB...
+// questa funzione è molto carina ma si potrebbe riarrangiare per ottenere l'URN da un'altra richiesta anziché da DB... -> NO, per ora va bene così
 function getModel(urn) {
     if ((urn !== null) && (urn !== '')) {
         document.getElementById('apriTabBIM').click();
         if (urn !== urnModelloCorrente) {
-            $("#forgeViewer").empty();
             launchViewer(urn);
-            // urnModelloCorrente = urn;
         }
     }
     else {

@@ -448,7 +448,6 @@ async function apriModelloDaScheda() {
     const conferma = confirm('Visualizzare gli elementi nel BIM Viewer?');
     if (conferma) {
         document.getElementById('apriTabBIM').click();
-        // $("#forgeViewer").empty();
         launchViewer(urn, () => {
             cercaElementiDaScheda(stringaIdMain10ance);
         });

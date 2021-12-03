@@ -16,7 +16,6 @@ $(document).ready(function () {
           "dataType": "json",
           'multiple': false,
           "data": function (node) {
-            // console.log(node); //voglio capire che cosa sono questi NODE
             return { "id": node.id };
           }
         }
@@ -37,18 +36,14 @@ $(document).ready(function () {
       },
       "plugins": ["types",/* "state",*/ "sort", /*"contextmenu"*/],
     }).on('loaded.jstree', function () {
-      // $('#appBuckets').jstree('open_all');
-    }).bind("activate_node.jstree", function (evt, data) { // "activate_node.jstree" è l'evento tipo "click", che invoca una callback
-      // console.log(data); // voglio capire che cos'è DATA
+      // questo .bind() è di jQuery (!== JavaScript .bind()) e serve per associare un event handler al nodo
+    }).bind("activate_node.jstree", function (evt, data) { // "activate_node.jstree" è un evento di jsTree tipo "click" su un nodo
       if (data != null && data.node != null && data.node.type == 'object') {
-        // $("#forgeViewer").empty();
         var urn = data.node.id;
         if (urn !== urnModelloCorrente) {
-          $("#forgeViewer").empty();
           try {
             document.getElementById('apriTabBIM').click();
             launchViewer(urn);
-            // urnModelloCorrente = urn;
           }
           catch {
             let messaggioDiErrore = 'Modello non disponibile.';
@@ -61,7 +56,3 @@ $(document).ready(function () {
       }
     });
   }
-
-// function testDocLoading() {
-//   console.log('OK!');
-// }
