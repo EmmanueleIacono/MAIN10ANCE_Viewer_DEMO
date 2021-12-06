@@ -69,6 +69,7 @@ function getElementiSelezionati() {
     let isolato = viewer.getIsolatedNodes();
     if (selezione.length === 0 && isolato.length === 0) {
         alert('Nessun elemento selezionato');
+        return false;
     }
     else if (isolato.length !== 0 && selezione.length === 0) { // se ho solo elementi isolati, li seleziono
         viewer.select(isolato);
