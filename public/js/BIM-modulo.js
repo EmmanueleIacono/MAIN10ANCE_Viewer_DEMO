@@ -989,18 +989,6 @@ async function preparaCampiRestauri(divScheda) {
     divScheda.appendChild(document.createElement('br'));
 }
 
-async function leggiEnum(nomeEnum) {
-    try {
-        const risultato = await fetch('/o/Main10ance_DB/tabellaDB/enum', {method: "GET", headers: {"content-type": "application/json", "nomeEnum": nomeEnum} });
-        const listaEnum = await risultato.json();
-        return listaEnum;
-    }
-    catch(e) {
-        console.log('Errore nella lettura delle Enumeration');
-        console.log(e);
-    }
-}
-
 function creaListaOpzioni(listaOpzioni, targetSelect, parametroValue, parametroTesto, opzVuota) {
     if (opzVuota) {
         const opzioneVuota = document.createElement('option');

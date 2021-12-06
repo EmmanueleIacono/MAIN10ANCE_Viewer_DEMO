@@ -685,3 +685,22 @@ tr:nth-child(even) {
   text-decoration-thickness: 2px;
   text-decoration-color: #fff;
 } */
+
+.tabella-prog-controlli {
+  /* table-layout: fixed; */
+  width: 100%;
+  word-wrap: normal;
+}
+
+.tabella-prog-controlli th, .tabella-prog-controlli td{
+  width: 90%;
+  overflow: hidden;
+}
+
+.tabella-prog-controlli td {
+  height: 10%;
+}
+
+.tabella-prog-controlli input {
+  width: 90%
+}

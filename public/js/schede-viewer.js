@@ -355,12 +355,6 @@ async function prendiSigleNumericheCappelle() {
     return risTradotto;
 }
 
-async function prendiSigleSacriMonti() {
-    const risultato = await fetch('/t/DB_Servizio/MarkerSM', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
-}
-
 async function prendiLOD3e4() {
     const risultato = await fetch('/o/DB_Servizio/LOD/3e4', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();

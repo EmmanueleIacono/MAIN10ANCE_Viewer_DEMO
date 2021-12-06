@@ -1,8 +1,8 @@
 const { Client } = require('pg');
 
 const clientM10a = new Client({
-    connectionString: process.env.MAIN10ANCE_DB_URL,
-    ssl: { rejectUnauthorized: false }
+    connectionString: process.env.MAIN10ANCE_DB_LOCALE,
+    // ssl: { rejectUnauthorized: false }
 });
 
 const clientServ = new Client({

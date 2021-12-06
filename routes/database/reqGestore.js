@@ -81,7 +81,7 @@ appG.get('/DB_Servizio/LOD/TabelleBIM', async (req, res) => {
 // per testare la richiesta:
 // fetch("/g/DB_Servizio/lista-localita", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appG.get('/DB_Servizio/lista-localita', async (req, res) => {
-    const località = await getLocalitaeSigle();
+    const località = await getSigleSacriMonti();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(località));
 });
@@ -95,6 +95,22 @@ appG.get('/Main10ance_DB/dashboard/conteggio-modelli', async (req, res) => {
     const risposta = await conteggioModelli(listaLocalità, listaSigle);
     res.setHeader('content-type', 'application/json');
     res.send(risposta);
+});
+
+// per testare la richiesta:
+// fetch("/g/DB_Servizio/sigle-edifici", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appG.get('/DB_Servizio/sigle-edifici', async (req, res) => {
+    const edifici = await getSigleEdifici();
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(edifici));
+});
+
+// per testare la richiesta:
+// fetch("/g/Main10ance_DB/frasi-rischio", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appG.get('/Main10ance_DB/frasi-rischio', async (req, res) => {
+    const frasi = await getFrasiDiRischio();
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(frasi));
 });
 
 //////////          QUERY          //////////
@@ -182,7 +198,7 @@ async function leggiListaTabelleBIM() {
     }
 }
 
-async function getLocalitaeSigle() {
+async function getSigleSacriMonti() {
     try {
         const results = await clientServ.query(`SELECT "nome", "sigla" FROM "dati_sm" ORDER BY "nome";`);
         return results.rows;
@@ -203,6 +219,26 @@ async function conteggioModelli(listaLocalità, listaSigle) {
     const stringheJoin = listaStringhe.join(' UNION ');
     try {
         const results = await clientServ.query(`${stringheJoin} ORDER BY nome_tabella;`);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function getSigleEdifici() {
+    try {
+        const results = await clientServ.query(`SELECT DISTINCT "edificio", "sacro_monte" FROM "dati_cappelle" WHERE "urn" IS NOT null ORDER BY "edificio";`);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function getFrasiDiRischio() {
+    try {
+        const results = await clientM10a.query(`SELECT "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM main10ance_sacrimonti."frase_di_rischio" ORDER BY "cl_ogg_fr";`);
         return results.rows;
     }
     catch(e) {

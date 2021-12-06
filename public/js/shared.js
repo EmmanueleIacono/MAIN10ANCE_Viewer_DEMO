@@ -146,3 +146,21 @@ async function prendiSchedeRestauro() {
     const risTradotto = await risultato.json();
     return risTradotto;
 }
+
+async function prendiSigleSacriMonti() {
+    const risultato = await fetch('/t/DB_Servizio/MarkerSM', {method: "GET", headers: {"content-type": "application/json"}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+async function leggiEnum(nomeEnum) {
+    try {
+        const risultato = await fetch('/o/Main10ance_DB/tabellaDB/enum', {method: "GET", headers: {"content-type": "application/json", "nomeEnum": nomeEnum} });
+        const listaEnum = await risultato.json();
+        return listaEnum;
+    }
+    catch(e) {
+        console.log('Errore nella lettura delle Enumeration');
+        console.log(e);
+    }
+}

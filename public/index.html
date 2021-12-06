@@ -52,6 +52,7 @@
   <script src="js/GestioneUtenti.js" defer></script>
   <script src="js/Dashboard-richieste.js" defer></script>
   <script src="js/Dashboard.js" defer></script>
+  <script src="js/Dashboard-programmazione.js" defer></script>
 </head>
 <body>
   <!-- Fixed navbar by Bootstrap: https://getbootstrap.com/examples/navbar-fixed-top/ -->
@@ -500,49 +501,23 @@
             </div>
             <div class="panel-body pannelloLatSchede" id="pannello-lat-schede-body">
                 <div id="calendar2"></div>
-                <details id="details-filtri-schede">
-                  <summary class="sommario-main10ance"><b>FILTRI</b></summary>
-                  <input type="checkbox" name="check-generale" id="check-generale-2" disabled>
-                  <label for="check-generale">ATTIVA FILTRI</label>
+                <details id="details-filtri-schede" open>
+                  <summary class="sommario-main10ance"><b>PIANIFICAZIONE</b></summary>
+                  <label for="check-sacro-monte-prog">Sacro Monte</label>
+                  <select name="select-sacro-monte-prog" id="select-sacro-monte-prog"></select>
                   <br>
-                  <button id="vedi-schede-tutto-2" class="vedi-schede-disatt" disabled>SELEZIONA TUTTO</button>
-                  <button id="vedi-schede-nulla-2" class="vedi-schede-disatt" disabled>DESELEZIONA TUTTO</button>
+                  <!-- <label for="check-edificio-prog">Edificio</label> -->
+                  <!-- <select name="select-edificio-prog" id="select-edificio-prog"></select> -->
+                  <div><b>Edificio</b></div>
+                  <div id="div-edificio-prog"></div>
+                  <label for="select-cl-ogg">Classe oggetti</label>
+                  <select name="select-cl-ogg" id="select-cl-ogg"></select>
+                  <!-- <br>
+                  <label for="check-frase-rischio-2">Frase di rischio</label>
+                  <select name="select-frase-rischio-2" id="select-frase-rischio-2"></select> -->
                   <br>
-                  <input type="checkbox" name="check-tipo-scheda" id="check-tipo-scheda-2" class="filtro-schede" disabled>
-                  <label for="check-tipo-scheda">Scheda</label>
-                  <select name="select-tipo-scheda" id="select-tipo-scheda-2">
-                    <option value="scheda controllo">Scheda controllo</option>
-                    <option value="scheda manutenzione regolare">Scheda manutenzione ordinaria</option>
-                    <option value="scheda manutenzione correttiva">Scheda manutenzione correttiva</option>
-                    <option value="scheda restauro">Scheda restauro</option>
-                  </select>
-                  <br>
-                  <input type="checkbox" name="check-sacro-monte" id="check-sacro-monte-2" class="filtro-schede" disabled>
-                  <label for="check-sacro-monte">Sacro Monte</label>
-                  <select name="select-sacro-monte" id="select-sacro-monte-2"></select>
-                  <br>
-                  <input type="checkbox" name="check-cappella" id="check-cappella-2" class="filtro-schede" disabled>
-                  <label for="check-cappella">Cappella</label>
-                  <select name="select-cappella" id="select-cappella-2"></select>
-                  <br>
-                  <input type="checkbox" name="check-elemento" id="check-elemento-2" class="filtro-schede" disabled>
-                  <label for="check-elemento">Elemento</label>
-                  <select name="select-elemento" id="select-elemento-2"></select>
-                  <br>
-                  <input type="checkbox" name="check-stato-conservazione" id="check-stato-conservazione-2" class="filtro-schede" disabled>
-                  <label for="check-stato-conservazione">Stato di conservazione</label>
-                  <select name="select-stato-conservazione" id="select-stato-conservazione-2"></select>
-                  <br>
-                  <input type="checkbox" name="check-fenomeno" id="check-fenomeno-2" class="filtro-schede" disabled>
-                  <label for="check-fenomeno">Fenomeno</label>
-                  <select name="select-fenomeno" id="select-fenomeno-2"></select>
-                  <br>
-                  <input type="checkbox" name="check-data" id="check-data-2" class="filtro-schede" disabled>
-                  <label for="check-data">Data</label>
-                  <label for="input-data-da" style="font-weight: normal;">Da</label>
-                  <input type="date" name="input-data-da" id="input-data-da-2">
-                  <label for="input-data-a" style="font-weight: normal;">A</label>
-                  <input type="date" name="input-data-a" id="input-data-a-2">
+                  <div><b>Valutazione dei rischi</b></div>
+                  <table id="tabella-attività" class="tabella-prog-controlli"></table>
                   <br>
                 </details>
             </div>
