@@ -209,14 +209,16 @@ async function inizializzaModulo() {
     }
     else {
         const selezione = getElementiSelezionati();
-        const listaIds = await getIdM10AFromSelezione(selezione);
-        listaIds.forEach(id => {
-            preparaModulo(id);
-        });
-        detailsSelezione.style.display = 'block';
-        mostraBottoniSchede();
-        viewer.isolate(selezione);
-        viewer.fitToView(selezione);
+        if (selezione) {
+            const listaIds = await getIdM10AFromSelezione(selezione);
+            listaIds.forEach(id => {
+                preparaModulo(id);
+            });
+            detailsSelezione.style.display = 'block';
+            mostraBottoniSchede();
+            viewer.isolate(selezione);
+            viewer.fitToView(selezione);
+        }
     }
 }
 
