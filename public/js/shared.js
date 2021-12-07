@@ -103,6 +103,39 @@ async function ricercaIdM10A(id) {
     }
 }
 
+// RITORNA BOOL IN BASE A QUALE DATA VIENE PRIMA
+
+function confrontaDate(data1, data2) {
+    const msData1 = Date.parse(data1);
+    const msData2 = Date.parse(data2);
+    if (msData1<=msData2) {
+        return true; // data1 viene prima di data2
+    }
+    else {
+        return false; // data2 viene prima di data1
+    }
+}
+
+// AGGIUNGE TOT MESI ALLA DATA INSERITA
+
+function aggiungiMesi(data, mesi) {
+    const dataDiPartenza = new Date(Date.parse(data));
+    const mesiDaAggiungere = parseInt(mesi);
+    const dataFuturaFull = new Date(dataDiPartenza.setMonth(dataDiPartenza.getMonth()+mesiDaAggiungere));
+    const dataFutura = dataFuturaFull.toISOString().split('T')[0];
+    return dataFutura;
+}
+
+// AGGIUNGE TOT ANNI ALLA DATA INSERITA
+
+function aggiungiAnni(data, anni) {
+    const dataDiPartenza = new Date(Date.parse(data));
+    const anniDaAggiungere = parseInt(anni);
+    const dataFuturaFull = new Date(dataDiPartenza.setFullYear(dataDiPartenza.getFullYear()+anniDaAggiungere));
+    const dataFutura = dataFuturaFull.toISOString().split('T')[0];
+    return dataFutura;
+}
+
 // RICHIESTE
 
 async function prendiLOD(lod) {

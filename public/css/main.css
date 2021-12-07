@@ -686,21 +686,71 @@ tr:nth-child(even) {
   text-decoration-color: #fff;
 } */
 
+.bottone-prog {
+  background-color: var(--bluInterreg);
+  color: white;
+  border: none;
+  margin-left: 10px;
+}
+
+.bottone-prog:hover {
+  background-color: var(--grigioScuro);
+}
+
 .tabella-prog-controlli {
-  /* table-layout: fixed; */
+  table-layout: fixed;
   width: 100%;
   word-wrap: normal;
 }
 
 .tabella-prog-controlli th, .tabella-prog-controlli td{
   width: 90%;
-  overflow: hidden;
+  max-width: 50px;
+  word-break: normal;
 }
 
 .tabella-prog-controlli td {
   height: 10%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.tabella-prog-controlli .tab-div {
+  z-index: 10;
+  height: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* .tabella-prog-controlli .tab-div:hover {
+  height: 100%;
+  overflow: visible;
+} */
 
 .tabella-prog-controlli input {
   width: 90%
+}
+
+.tooltip-prog {
+  position: relative;
+}
+
+.tooltip-prog-text {
+  display: none;
+  position: absolute;
+  z-index: 100;
+  border: 1px;
+  background-color: #eee;
+  border-style: solid;
+  border-width: 1px;
+  border-color: blue;
+  border-radius: 6px;
+  padding: 3px;
+  color: blue;
+  top: 20px;
+  left: 20px;
+}
+
+.tooltip-prog:hover span.tooltip-prog-text {
+  display: block;
 }

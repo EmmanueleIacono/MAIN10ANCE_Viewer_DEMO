@@ -45,8 +45,8 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
     },
 });
 
-const calendarEl2 = document.getElementById('calendar2');
-const calendar2 = new FullCalendar.Calendar(calendarEl2, {
+const calendarElProg = document.getElementById('calendar-prog');
+const calendarProg = new FullCalendar.Calendar(calendarElProg, {
     timeZone: 'local',
     locale: 'it',
     initialView: 'dayGridMonth',
@@ -67,7 +67,8 @@ const calendar2 = new FullCalendar.Calendar(calendarEl2, {
 
 apriTabSchede.addEventListener('click', () => {popolaCalendario(calendar);});
 apriTabDashboard.addEventListener('click', () => {
-    popolaCalendario(calendar2);
+    // popolaCalendario(calendarProg);
+    renderizzaCalendario(calendarProg);
 });
 
 function renderizzaCalendario(cal) {
@@ -269,17 +270,6 @@ function ripulisciEventiProgrammatiMC() {
     return;
 }
 
-function confrontaDate(data1, data2) {
-    const msData1 = Date.parse(data1);
-    const msData2 = Date.parse(data2);
-    if (msData1<=msData2) {
-        return true; // data1 viene prima di data2
-    }
-    else {
-        return false; // data2 viene prima di data1
-    }
-}
-
 function confrontaMesi(dataProgrammata, dataManutenzione) {
     const meseDataProg = Date.parse(new Date(dataProgrammata.getFullYear(), dataProgrammata.getMonth(), 1));
     const meseDataMan = Date.parse(new Date(dataManutenzione.getFullYear(), dataManutenzione.getMonth(), 1));
@@ -289,14 +279,6 @@ function confrontaMesi(dataProgrammata, dataManutenzione) {
     else {
         return false; // MANUTENZIONE NON EFFETTUATA, MANTENERE EVENTO PROGRAMMATO
     }
-}
-
-function aggiungiMesi(data, mesi) {
-    const dataDiPartenza = new Date(Date.parse(data));
-    const mesiDaAggiungere = parseInt(mesi);
-    const dataFuturaFull = new Date(dataDiPartenza.setMonth(dataDiPartenza.getMonth()+mesiDaAggiungere));
-    const dataFutura = dataFuturaFull.toISOString().split('T')[0];
-    return dataFutura;
 }
 
 async function prendiEventiControllo() {

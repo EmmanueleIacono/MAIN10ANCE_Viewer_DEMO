@@ -113,6 +113,27 @@ appG.get('/Main10ance_DB/frasi-rischio', async (req, res) => {
     res.send(JSON.stringify(frasi));
 });
 
+// per testare la richiesta:
+// fetch("/g/DB_Servizio/entita-oggetti", {method: "GET", headers: {"content-type": "application/json", "cl_ogg": "3.1 superfici interne"} }).then(a => a.json()).then(console.log)
+appG.get('/DB_Servizio/entita-oggetti', async (req, res) => {
+    const reqJson = req.headers;
+    const cl_ogg = reqJson.cl_ogg;
+    const entità = await getEntitàDaClOgg(cl_ogg);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(entità));
+});
+
+// per testare la richiesta:
+// fetch("/g/Main10ance_DB/lista-identificativi", {method: "GET", headers: {"content-type": "application/json", "entità": "tetto", "id_parziale": "SMV|16-24|tetto|"} }).then(a => a.json()).then(console.log)
+appG.get('/Main10ance_DB/lista-identificativi', async (req, res) => {
+    const reqJson = req.headers;
+    const ent = reqJson.entita;
+    const id = reqJson.id_parziale;
+    const frasi = await getIdentificativiDaEntità(ent, id);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(frasi));
+});
+
 //////////          QUERY          //////////
 
 async function getUtentiProgetto() {
@@ -238,7 +259,28 @@ async function getSigleEdifici() {
 
 async function getFrasiDiRischio() {
     try {
-        const results = await clientM10a.query(`SELECT "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM main10ance_sacrimonti."frase_di_rischio" ORDER BY "cl_ogg_fr";`);
+        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM main10ance_sacrimonti."frase_di_rischio" ORDER BY "cl_ogg_fr";`);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function getEntitàDaClOgg(cl_ogg) {
+    try {
+        const results = await clientServ.query(`SELECT "entità_db_m10a" FROM "lod" WHERE ($1)=ANY("cl_ogg_fr");`, [cl_ogg]);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function getIdentificativiDaEntità(entità, id) {
+    try {
+        // QUESTO FUNZIONA, MA CAPIRE COME FARE MEGLIO LIKE '${}%' USANDO ($1) ECC.
+        const results = await clientM10a.query(`SELECT "id_main10ance" FROM main10ance_sacrimonti."${entità}" WHERE "id_main10ance" LIKE '${id}%';`);
         return results.rows;
     }
     catch(e) {
