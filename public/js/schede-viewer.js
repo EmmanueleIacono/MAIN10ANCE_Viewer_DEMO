@@ -42,10 +42,11 @@ divContenitoreSchede.innerHTML = '';
 
 function visualizzaSchedeStart() {
     divContenitoreSchede.innerHTML = '';
-    compilaTabelleControllo();
-    compilaTabelleManReg();
-    compilaTabelleManCorr();
-    compilaTabelleRestauro();
+    // compilaTabelleControllo();
+    // compilaTabelleManReg();
+    // compilaTabelleManCorr();
+    // compilaTabelleRestauro();
+    compilaTabelleControlloProg();
 
     if (checkGenerale.checked) {
         checkGenerale.click();
@@ -186,7 +187,10 @@ function creaStrutturaSchede() {
     const captionSchede = document.createElement('caption');
     // captionSchede.setAttribute('id', 'caption-schede');
     captionSchede.className = 'schede caption-schede';
-    captionSchede.addEventListener('click', apriModelloDaScheda);
+    captionSchede.addEventListener('click', async () => {
+        const [idScheda, schedaTarget, stringaIdMain10ance] = await apriModelloDaScheda.bind(captionSchede)();
+        mostraModuloSchedaControllo(idScheda, schedaTarget, stringaIdMain10ance);
+    });
     // captionSchede.innerHTML = ``;
 
     tabellaSchede.appendChild(captionSchede);
@@ -430,7 +434,7 @@ async function apriModelloDaScheda() {
     const stringaCaption = this.innerText;
     const stringaPulita = stringaCaption.split('.')[1].replaceAll(' ', '');
     const tabellaCliccata = document.getElementById(stringaPulita);
-    const tdTarget = tabellaCliccata.querySelectorAll('[id^="[Elementi"]')[0].children[0].children[1];
+    const tdTarget = tabellaCliccata.querySelectorAll('[id^="[id_main10ance"]')[0].children[0].children[1];
     const stringaIdMain10ance = tdTarget.innerText;
     const sacroMonteDaCercare = stringaIdMain10ance.split('|')[0];
     const cappellaDaCercare = stringaIdMain10ance.split('|')[1].split('-')[0];
@@ -446,6 +450,7 @@ async function apriModelloDaScheda() {
             cercaElementiDaScheda(stringaIdMain10ance);
         });
     }
+    return [stringaPulita, tabellaCliccata, stringaIdMain10ance];
 }
 
 async function cercaElementiDaScheda(strID) {
@@ -508,7 +513,7 @@ function verificaFiltriSchede(tabella) {
         const sacroMonteTarget = selectSacroMonte.value;
         let cellTarget;
         tabella.rows.forEach(r => {
-            if (r.cells[0].innerText.startsWith('Elementi')) {
+            if (r.cells[0].innerText.startsWith('id_main10ance')) {
                 cellTarget = r.cells[1].children[0].children[1].innerText.split('|')[0];
             }
         });
@@ -520,7 +525,7 @@ function verificaFiltriSchede(tabella) {
         const cappellaTarget = selectCappella.value;
         let cellTarget;
         tabella.rows.forEach(r => {
-            if (r.cells[0].innerText.startsWith('Elementi')) {
+            if (r.cells[0].innerText.startsWith('id_main10ance')) {
                 let listaNumeriCapp = [];
                 const listaIdM10a = r.cells[1].children[0].children[1].innerText.split(',');
                 listaIdM10a.forEach(id => {
@@ -538,7 +543,7 @@ function verificaFiltriSchede(tabella) {
         const elementoTarget = selectElemento.value;
         let cellTarget;
         tabella.rows.forEach(r => {
-            if (r.cells[0].innerText.startsWith('Elementi')) {
+            if (r.cells[0].innerText.startsWith('id_main10ance')) {
                 let listaElementi = [];
                 const listaIdM10a = r.cells[1].children[0].children[1].innerText.split(',');
                 listaIdM10a.forEach(id => {
@@ -642,4 +647,40 @@ function creaDetailsElementi() {
     det.appendChild(sum);
     det.appendChild(divDet);
     return [det, divDet];
+}
+
+async function compilaTabelleControlloProg() {
+    const datiControllo = await recuperaDatiControlliProg();
+    datiControllo.forEach(scheda => {
+        const [tabellaSchede, captionSchede] = creaStrutturaSchede();
+        tabellaSchede.setAttribute('id', `${scheda.id}`);
+        captionSchede.innerHTML = `<b>SCHEDA DI RISCHIO N. ${scheda.id}</b>`;
+        captionSchede.classList.add('caption-schede-c');
+        for (const [chiave, valore] of Object.entries(scheda)) {
+            const trScheda = document.createElement('tr');
+            trScheda.className = 'schede tr-schede-c';
+            const tdChiave = document.createElement('td');
+            tdChiave.innerHTML = `<b>${chiave}</b>`;
+            tdChiave.style.width = '400px';
+            tdChiave.className = 'schede td-schede-c';
+            const tdValore = document.createElement('td');
+            if ((!valore) || (valore === 'null')) {
+                tdValore.innerHTML = `<i>Nessun valore</i>`;
+            }
+            else if (chiave === 'id_main10ance') {
+                const [tabDetails, detailsDiv] = creaDetailsElementi();
+                detailsDiv.innerText = valore.join(', ');
+                tdValore.appendChild(tabDetails);
+            }
+            else {
+                tdValore.innerHTML = `${valore}`;
+            }
+            tdValore.className = 'schede td-schede-c';
+            tdValore.setAttribute('id', `[${chiave.replaceAll(' ', '')}]{${scheda.id}}`);
+            trScheda.appendChild(tdChiave);
+            trScheda.appendChild(tdValore);
+            tabellaSchede.appendChild(trScheda);
+        }
+        tabellaSchede.appendChild(document.createElement('br'));
+    });
 }

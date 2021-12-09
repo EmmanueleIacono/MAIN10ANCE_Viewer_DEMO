@@ -10,12 +10,14 @@ const bottoneProg = document.getElementById('bottone-prog');
 let listaSigleEdifici;
 let listaFrasiDiRischio;
 
-(() => {
+(async () => {
     if ((localStorage.bim_vw_sets) && (localStorage.bim_vw_sets === '7-5')) {
         popolaSelectSMProg();
         popolaListaSigleEdifici();
         popolaSelectClOgg();
         popolaListaFrasiDiRischio();
+        // const datiControllo = await recuperaDatiControlliProg();
+        // creaEventiControlloProg(datiControllo);
     }
 })();
 
@@ -25,10 +27,6 @@ selectSMProg.addEventListener('change', () => {
         if (s.sacro_monte === selectSMProg.value) {
             creaCheckbox(divEdifProg, s.edificio, s.edificio);
             divEdifProg.appendChild(document.createElement('br'));
-            // const opz = document.createElement('option');
-            // opz.setAttribute('value', s.edificio);
-            // opz.innerHTML = s.edificio;
-            // selectEdifProg.appendChild(opz);
         }
     });
 });
@@ -94,25 +92,55 @@ selectClOggProg.addEventListener('change', () => {
 });
 
 bottoneProg.addEventListener('click', async () => {
-    const elementi = await preparaSchedeContrDaProg();
-    const listaEdifici = [... new Set(elementi.map(e => (e.edificio)))];
-    const listaElems = [];
-    listaEdifici.forEach(ed => {
-        const oggNew = {};
-        oggNew.edificio = ed;
-        oggNew.elementi = [];
-        listaElems.push(oggNew);
-    });
-    elementi.forEach(el => {
-        listaElems.forEach(elm => {
-            if (elm.edificio === el.edificio) {
-                elm.elementi.push(...el.elementi);
+    const vincoliOK = verificaVincoliProg(); // non mi ricordo a cosa servisse...
+    if (vincoliOK) {
+        const eventi = await combinaElementiEdEventi();
+        const vincoliEventiOK = verificaVincoliEventiProg(eventi);
+        if (vincoliEventiOK) {
+            const listaJsonReq = [];
+            let contatoreProgressivi = 0;
+            const idUnivoco = dataInteger();
+            const dataIns = dataCorta();
+            eventi.elementi.forEach(el => {
+                eventi.frasi.forEach(fr => {
+                    const jsonReq = {};
+                    jsonReq.id_contr = idUnivoco+contatoreProgressivi;
+                    contatoreProgressivi += 1;
+                    jsonReq.cl_ogg = eventi.classe;
+                    jsonReq.controllo = fr.controllo;
+                    jsonReq.data_con = fr.data;
+                    jsonReq.data_ins = dataIns;
+                    jsonReq.id_main10ance = el.elementi;
+                    jsonReq.rid_fr_risc = parseInt(fr.id);
+                    jsonReq.frequenza = fr.frequenza;
+                    if (fr.manutenzione) {
+                        const jsonMan = {};
+                        jsonReq.dati_manutenzione = jsonMan;
+                        jsonMan.id_mn_reg = jsonReq.id_contr;
+                        jsonMan.cl_ogg = jsonReq.cl_ogg;
+                        jsonMan.azione = fr.manutenzione;
+                        jsonMan.data_ese = fr.data;
+                        jsonMan.data_ins = dataIns;
+                        jsonMan.id_main10ance = el.elementi;
+                    }
+                    listaJsonReq.push(jsonReq);
+                });
+            });
+            const resp = await registraControlli(listaJsonReq);
+            if (resp) {
+                alert('Programmazione andata a buon fine');
+                // proseguo, faccio query eventi e schede
+                const datiControllo = await recuperaDatiControlliProg();
+                console.log(datiControllo);
             }
-        });
-    });
-    console.log(elementi);
-    console.log(listaEdifici);
-    console.log(listaElems);
+            else {
+                alert('ATTENZIONE: Si è verificato un errore durante la registrazione dei dati');
+            }
+        }
+        else {
+            alert('ATTENZIONE: Informazioni non sufficienti');
+        }
+    }
 });
 
 async function popolaSelectSMProg() {
@@ -293,5 +321,80 @@ async function preparaSchedeContrDaProg() {
             }
         }
     }
-    return listaElementi;
+    return [listaElementi, eventi];
+}
+
+async function combinaElementiEdEventi() {
+    const [elementi, eventi] = await preparaSchedeContrDaProg();
+    const listaEdifici = [... new Set(elementi.map(e => (e.edificio)))];
+    const listaElems = [];
+    listaEdifici.forEach(ed => {
+        const oggNew = {};
+        oggNew.edificio = ed;
+        oggNew.elementi = [];
+        listaElems.push(oggNew);
+    });
+    elementi.forEach(el => {
+        listaElems.forEach(elm => {
+            if (elm.edificio === el.edificio) {
+                elm.elementi.push(...el.elementi);
+            }
+        });
+    });
+    eventi.elementi = listaElems;
+    return eventi;
+}
+
+function verificaVincoliProg() {
+    return true;
+}
+
+function verificaVincoliEventiProg(eventi) {
+    if (eventi.edifici.length && eventi.elementi.length && eventi.entità.length && eventi.frasi.length) {
+        const bool = eventi.frasi.every(fr => (fr.data && fr.frequenza));
+        return bool;
+    }
+    else {
+        return false;
+    }
+}
+
+async function registraControlli(jsonReq) {
+    try {
+        const resp = await fetch(`/g/Main10ance_DB/programmazione/nuovi-controlli`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        const respData = await resp.json();
+        return respData;
+    }
+    catch(e) {
+        console.log(e);
+    }
+}
+
+function creaEventiControlloProg(datiProg, calendario) {
+    datiProg.forEach(dt => {
+        const dateEventi = calcolaDateEventi(dt.data_operazione, parseInt(dt.frequenza));
+        dateEventi.forEach(d => {
+            const nuovoEventoProg = {
+                id: `C-${dt.id}`,
+                title: `Attività programmata`,
+                start: d,
+                defaultAllDay: true,
+                extendedProps: {
+                    classe: dt.classe,
+                    frase_di_rischio: dt.frase,
+                    controllo: dt.controllo,
+                    manutenzione_regolare: dt.manutenzione_regolare,
+                    manutenzione_correttiva: dt.manutenzione_correttiva
+                },
+                backgroundColor: '#a8c956',
+                borderColor: '#c74646',
+                texcColor: '#fff'
+            };
+            calendario.addEvent(nuovoEventoProg);
+        });
+    });
+}
+
+function creaSchedeControlloProg(datiProg) {
+    return;
 }

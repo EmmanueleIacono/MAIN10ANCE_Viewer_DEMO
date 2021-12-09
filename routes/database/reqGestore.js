@@ -134,6 +134,22 @@ appG.get('/Main10ance_DB/lista-identificativi', async (req, res) => {
     res.send(JSON.stringify(frasi));
 });
 
+appG.post('/Main10ance_DB/programmazione/nuovi-controlli', async (req, res) => {
+    let result = {}
+    try {
+        const reqJson = req.body;
+        await registraNuoviControlli(reqJson);
+        result.success = true;
+    }
+    catch(e) {
+        result.success = false;
+    }
+    finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
+});
+
 //////////          QUERY          //////////
 
 async function getUtentiProgetto() {
@@ -285,6 +301,31 @@ async function getIdentificativiDaEntità(entità, id) {
     }
     catch(e) {
         return [];
+    }
+}
+
+async function registraNuoviControlli(listaReqJson) {
+    try {
+        await clientM10a.query("BEGIN;");
+        try {
+            for (const reqJson of listaReqJson) {
+                await clientM10a.query(`INSERT INTO main10ance_sacrimonti."controllo_stato_di_conservazione_livello_di_urgenza" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "data_ins", "id_main10ance", "rid_fr_risc", "freq") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, [reqJson.id_contr, reqJson.cl_ogg, reqJson.controllo, reqJson.data_con, reqJson.data_ins, reqJson.id_main10ance, reqJson.rid_fr_risc, reqJson.frequenza]);
+                if (reqJson.dati_manutenzione) {
+                    await clientM10a.query(`INSERT INTO main10ance_sacrimonti."manutenzione_regolare" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "data_ins", "id_main10ance") VALUES (($1), ($2), ($3), ($4), ($5), ($6));`, [reqJson.dati_manutenzione.id_mn_reg, reqJson.dati_manutenzione.cl_ogg, reqJson.dati_manutenzione.azione, reqJson.dati_manutenzione.data_ese, reqJson.dati_manutenzione.data_ins, reqJson.dati_manutenzione.id_main10ance]);
+                }
+            }
+        }
+        catch(e) {
+            throw e;
+        }
+
+        await clientM10a.query("COMMIT;");
+        return true;
+    }
+    catch (ex) {
+        console.log(`Errore: ${ex}`);
+        await clientM10a.query("ROLLBACK;");
+        return false;
     }
 }
 

@@ -223,7 +223,16 @@ body {
   margin-bottom: 1rem;
 }
 
-#refreshParams, #modificaDB, #queryDB, #annullaDB, #aggiungiDB, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento, #salvaSchedaAnagrafica, #cercaID {
+#refreshParams,
+#modificaDB,
+#queryDB,
+#annullaDB,
+#aggiungiDB,
+#chiudiSchede,
+#salvaSchedaControllo,
+#salvaSchedaIntervento,
+#salvaSchedaAnagrafica,
+#cercaID {
   padding: .9rem 1rem;
   font-size: large;
   font-weight: initial;
@@ -310,17 +319,30 @@ input[id^="form-"] {
   line-height: 80%
 }
 
-input[id^="scheda-anagrafica-"], textarea[id^="scheda-anagrafica-"], input[id^="scheda-controllo-"], select[id^="scheda-controllo-"], textarea[id^="scheda-controllo-"], #scelta-intervento, input[id^="scheda-intervento-"], select[id^="scheda-intervento-"], textarea[id^="scheda-intervento-"] {
+input[id^="mod-sc-cont-"],
+select[id^="mod-sc-cont-"],
+input[id^="scheda-anagrafica-"],
+textarea[id^="scheda-anagrafica-"],
+input[id^="scheda-controllo-"],
+select[id^="scheda-controllo-"],
+textarea[id^="scheda-controllo-"],
+#scelta-intervento,
+input[id^="scheda-intervento-"],
+select[id^="scheda-intervento-"],
+textarea[id^="scheda-intervento-"] {
   float: right;
   line-height: 100%;
   padding: 1px;
   border: 0;
 }
 
-p[id^="sc-an"] {
+p[id^="sc-an"],
+p[id^="mod-sc-cont-"] {
   float: right;
   line-height: 100%;
   padding: 0px;
+  /* max-width: 60%; */
+  text-align: right;
 }
 
 div[id^="div-form-"] {
@@ -374,7 +396,7 @@ div[id^="div-form-"] {
   display: block;
 }
 
-.tab {
+.tab, .bottone-main10ance {
   cursor: pointer;
   padding: 10px;
   margin: 10px;
@@ -521,6 +543,18 @@ tr:nth-child(even) {
 
 #pannello-lat-schede-inner {
   overflow: auto;
+}
+
+/* TABELLA SCHEDA CONTROLLO PROGRAMMATO EFFETTUATO */
+
+#mod-sc-cont-tabella td {
+  border: none;
+  background-color: var(--verdeMain10anceTrasparenza);
+  word-break: normal;
+}
+
+#mod-sc-cont-tabella tr:nth-child(even) {
+  background-color: var(--verdeMain10anceTrasparenza2);
 }
 
 #contenitoreLoginSignup {
@@ -703,21 +737,22 @@ tr:nth-child(even) {
   word-wrap: normal;
 }
 
-.tabella-prog-controlli th, .tabella-prog-controlli td{
+.tabella-prog-controlli th, .tabella-prog-controlli td {
   width: 90%;
   max-width: 50px;
   word-break: normal;
-}
-
-.tabella-prog-controlli td {
-  height: 10%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* .tabella-prog-controlli td {
+  height: 10%;
+} */
+
 .tabella-prog-controlli .tab-div {
   z-index: 10;
-  height: 70px;
+  height: 60px;
+  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -736,7 +771,8 @@ tr:nth-child(even) {
 }
 
 .tooltip-prog-text {
-  display: none;
+  /* display: none; */
+  visibility: hidden;
   position: absolute;
   z-index: 100;
   border: 1px;
@@ -744,7 +780,7 @@ tr:nth-child(even) {
   border-style: solid;
   border-width: 1px;
   border-color: blue;
-  border-radius: 6px;
+  border-radius: 3px;
   padding: 3px;
   color: blue;
   top: 20px;
@@ -752,5 +788,6 @@ tr:nth-child(even) {
 }
 
 .tooltip-prog:hover span.tooltip-prog-text {
-  display: block;
+  /* display: block; */
+  visibility: visible;
 }

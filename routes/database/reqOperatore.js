@@ -162,6 +162,14 @@ appO.get('/DB_Servizio/LOD/3e4', async (req, res) => {
     res.send(JSON.stringify(lod));
 });
 
+// per testare la richiesta:
+// fetch("/o/Main10ance_DB/controlli-programmati", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appO.get('/Main10ance_DB/controlli-programmati', async (req, res) => {
+    const contr = await leggiDatiControlloProg();
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(contr));
+});
+
 //////////          QUERY          //////////
 
 async function leggiColonneTabella(nomeTab) {
@@ -340,6 +348,16 @@ async function recuperaUrnLOD3(sm, capp) {
 async function leggiTabelleLOD3e4() {
     try {
         const results = await clientServ.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM "lod" WHERE "LOD" = 3 OR "LOD" = 4 ORDER BY "alias";`);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiDatiControlloProg() {
+    try {
+        const results = await clientM10a.query(`SELECT "c".id_contr AS "id", "fr".cl_ogg_fr AS "classe", "fr".fr_risc AS "frase", "fr".controllo, "fr".mn_reg AS "manutenzione_regolare", "fr".mn_nec AS "manutenzione_correttiva", "c".data_con AS "data_operazione", "c".freq AS "frequenza", "c".data_ins AS "data_registrazione", "c".id_main10ance FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza AS "c" JOIN main10ance_sacrimonti.frase_di_rischio AS "fr" ON "c".rid_fr_risc = "fr".id_fr_risc ORDER BY data_con;`);
         return results.rows;
     }
     catch(e) {

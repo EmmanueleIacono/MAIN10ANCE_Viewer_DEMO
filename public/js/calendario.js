@@ -18,30 +18,8 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
         info.el.title = info.event.title;
     },
     eventClick: (info) => {
-        if (info.event.title.startsWith('Controllo')) {
-            const aprireScheda = confirm(`Visualizzare scheda? \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nControllo: ${info.event.extendedProps.attività} \nElementi controllati: ${(info.event.extendedProps.elementi).join(', ')}`);
-            if (aprireScheda) {
-                if (checkGenerale.checked) {checkGenerale.click();}
-                filtraSchedeDaID(info.event.id);
-            }
-        }
-        else if (info.event.title.startsWith('Manutenzione')) {
-            const aprireScheda = confirm(`Visualizzare scheda? \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nAttività: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
-            if (aprireScheda) {
-                if (checkGenerale.checked) {checkGenerale.click();}
-                filtraSchedeDaID(info.event.id);
-            }
-        }
-        else if (info.event.title.startsWith('Programmata')) {
-            const aprireScheda = confirm(`Visualizzare scheda controllo collegata? \n \nIntervento PROGRAMMATO: \n \nFenomeno: ${info.event.extendedProps.fenomeno} \nIntervento: ${info.event.extendedProps.attività} \nElementi interessati: ${(info.event.extendedProps.elementi).join(', ')}`);
-            if (aprireScheda) {
-                const idSchedaCollegata = info.event.id.split('-')[1];
-                filtraSchedeDaID(idSchedaCollegata);
-            }
-        }
-        else {
-            alert(info.event.title);
-        }
+        const idSchedaCollegata = info.event.id.split('-')[1];
+        filtraSchedeDaID(idSchedaCollegata);
     },
 });
 
@@ -65,10 +43,17 @@ const calendarProg = new FullCalendar.Calendar(calendarElProg, {
     },
 });
 
-apriTabSchede.addEventListener('click', () => {popolaCalendario(calendar);});
-apriTabDashboard.addEventListener('click', () => {
+apriTabSchede.addEventListener('click', async () => {
+    renderizzaCalendario(calendar);
+    const datiControllo = await recuperaDatiControlliProg();
+    creaEventiControlloProg(datiControllo, calendar);
+});
+apriTabDashboard.addEventListener('click', async () => {
     // popolaCalendario(calendarProg);
     renderizzaCalendario(calendarProg);
+    const datiControllo = await recuperaDatiControlliProg();
+    creaEventiControlloProg(datiControllo, calendarProg);
+
 });
 
 function renderizzaCalendario(cal) {

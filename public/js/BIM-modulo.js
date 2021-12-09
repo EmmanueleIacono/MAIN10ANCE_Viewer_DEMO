@@ -5,8 +5,8 @@ const divDetailsSelezione = document.getElementById('contenitore-id-selezionati'
 const bottoneAggiungi = document.getElementById('aggiungiDB');
 const contenitoreSchede = document.getElementById('contenitore-controllo-intervento');
 const apriTabAnagrafica = document.getElementById('apriTabAnagrafica');
-const apriTabControllo = document.getElementById('apriTabControllo');
-const apriTabIntervento = document.getElementById('apriTabIntervento');
+// const apriTabControllo = document.getElementById('apriTabControllo');
+// const apriTabIntervento = document.getElementById('apriTabIntervento');
 const bottoneSalvaSchedaAnagrafica = document.getElementById('salvaSchedaAnagrafica');
 const bottoneSalvaSchedaControllo = document.getElementById('salvaSchedaControllo');
 const bottoneSalvaSchedaIntervento = document.getElementById('salvaSchedaIntervento');
@@ -29,9 +29,9 @@ apriTabAnagrafica.addEventListener('click', async () => {
         }
     }
     schedaControllo.style.display = 'none';
-    apriTabControllo.classList.remove('active');
+    // apriTabControllo.classList.remove('active');
     schedaIntervento.style.display = 'none';
-    apriTabIntervento.classList.remove('active');
+    // apriTabIntervento.classList.remove('active');
     schedaAnagrafica.style.display = 'block';
     apriTabAnagrafica.classList.add('active');
     bottoneSalvaSchedaControllo.style.display = 'none';
@@ -44,39 +44,39 @@ apriTabAnagrafica.addEventListener('click', async () => {
     preparaCampiAnagrafica();
 });
 
-apriTabControllo.addEventListener('click', () => {
-    schedaAnagrafica.style.display = 'none';
-    apriTabAnagrafica.classList.remove('active');
-    schedaIntervento.style.display = 'none';
-    apriTabIntervento.classList.remove('active');
-    schedaControllo.style.display = 'block';
-    apriTabControllo.classList.add('active');
-    bottoneSalvaSchedaAnagrafica.style.display = 'none';
-    bottoneSalvaSchedaIntervento.style.display = 'none';
-    bottoneSalvaSchedaControllo.style.display = 'inline';
-    bottoneChiudiSchede.style.background = 'var(--verdeMain10ance)';
-    if (document.getElementById('apriPDF')) {
-        document.getElementById('apriPDF').remove();
-    }
-    preparaCampiControllo();
-});
+// apriTabControllo.addEventListener('click', () => {
+//     schedaAnagrafica.style.display = 'none';
+//     apriTabAnagrafica.classList.remove('active');
+//     schedaIntervento.style.display = 'none';
+//     apriTabIntervento.classList.remove('active');
+//     schedaControllo.style.display = 'block';
+//     apriTabControllo.classList.add('active');
+//     bottoneSalvaSchedaAnagrafica.style.display = 'none';
+//     bottoneSalvaSchedaIntervento.style.display = 'none';
+//     bottoneSalvaSchedaControllo.style.display = 'inline';
+//     bottoneChiudiSchede.style.background = 'var(--verdeMain10ance)';
+//     if (document.getElementById('apriPDF')) {
+//         document.getElementById('apriPDF').remove();
+//     }
+//     preparaCampiControllo();
+// });
 
-apriTabIntervento.addEventListener('click', () => {
-    schedaAnagrafica.style.display = 'none';
-    apriTabAnagrafica.classList.remove('active');
-    schedaControllo.style.display = 'none';
-    apriTabControllo.classList.remove('active');
-    schedaIntervento.style.display = 'block';
-    apriTabIntervento.classList.add('active');
-    bottoneSalvaSchedaAnagrafica.style.display = 'none';
-    bottoneSalvaSchedaControllo.style.display = 'none';
-    bottoneSalvaSchedaIntervento.style.display = 'inline';
-    bottoneChiudiSchede.style.background = 'var(--bluInterreg)';
-    if (document.getElementById('apriPDF')) {
-        document.getElementById('apriPDF').remove();
-    }
-    preparaSceltaIntervento();
-});
+// apriTabIntervento.addEventListener('click', () => {
+//     schedaAnagrafica.style.display = 'none';
+//     apriTabAnagrafica.classList.remove('active');
+//     schedaControllo.style.display = 'none';
+//     apriTabControllo.classList.remove('active');
+//     schedaIntervento.style.display = 'block';
+//     apriTabIntervento.classList.add('active');
+//     bottoneSalvaSchedaAnagrafica.style.display = 'none';
+//     bottoneSalvaSchedaControllo.style.display = 'none';
+//     bottoneSalvaSchedaIntervento.style.display = 'inline';
+//     bottoneChiudiSchede.style.background = 'var(--bluInterreg)';
+//     if (document.getElementById('apriPDF')) {
+//         document.getElementById('apriPDF').remove();
+//     }
+//     preparaSceltaIntervento();
+// });
 
 bottoneSalvaSchedaAnagrafica.addEventListener('click', async () => {
     if (verificaPresenzaIDm10a()) {
@@ -231,13 +231,13 @@ function preparaModulo(id) {
 
 function mostraBottoniSchede() {
     apriTabAnagrafica.style.display = 'inline';
-    apriTabControllo.style.display = 'inline';
-    apriTabIntervento.style.display = 'inline';
+    // apriTabControllo.style.display = 'inline';
+    // apriTabIntervento.style.display = 'inline';
     bottoneChiudiSchede.style.display = 'inline';
     bottoneChiudiSchede.style.background = 'var(--blackOlive)';
     apriTabAnagrafica.classList.remove('active');
-    apriTabControllo.classList.remove('active');
-    apriTabIntervento.classList.remove('active');
+    // apriTabControllo.classList.remove('active');
+    // apriTabIntervento.classList.remove('active');
 }
 
 function preparaCampiAnagrafica() {
@@ -989,21 +989,6 @@ async function preparaCampiRestauri(divScheda) {
     divScheda.appendChild(document.createElement('br'));
 }
 
-function creaListaOpzioni(listaOpzioni, targetSelect, parametroValue, parametroTesto, opzVuota) {
-    if (opzVuota) {
-        const opzioneVuota = document.createElement('option');
-        opzioneVuota.setAttribute('value', null);
-        opzioneVuota.innerHTML = '';
-        targetSelect.appendChild(opzioneVuota);
-    }
-    listaOpzioni.forEach(op => {
-        const opzioneSel = document.createElement('option');
-        opzioneSel.setAttribute('value', `${op[parametroValue]}`);
-        opzioneSel.innerHTML = `${op[parametroTesto]}`;
-        targetSelect.appendChild(opzioneSel);
-    });
-}
-
 async function leggiGlossDegradi() {
     try {
         const risultato = await fetch('/o/Main10ance_DB/tabellaDB/glossario/degradi', {method: "GET", headers: {"content-type": "application/json"} });
@@ -1255,74 +1240,6 @@ function filtraOggetti(listaOggetti) {
         }
     });
     return listaFiltrata;
-}
-
-function dataInteger() {
-    const dataFull = new Date();
-    const annoGrezzo = dataFull.getFullYear();
-    const annoLista = [...`${annoGrezzo}`];
-    const anno = `${annoLista[2]}${annoLista[3]}`;
-    const meseGrezzo = dataFull.getMonth();
-    let mese;
-    if ((meseGrezzo+1) < 10) {
-        mese = `0${meseGrezzo+1}`;
-    }
-    else {
-        mese = meseGrezzo+1;
-    }
-    const giornoGrezzo = dataFull.getDate();
-    let giorno;
-    if ((giornoGrezzo) < 10) {
-        giorno = `0${giornoGrezzo}`;
-    }
-    else {
-        giorno = giornoGrezzo;
-    }
-    const oraGrezzo = dataFull.getHours();
-    let ora;
-    if ((oraGrezzo) < 10) {
-        ora = `0${oraGrezzo}`;
-    }
-    else {
-        ora = oraGrezzo;
-    }
-    const minutiGrezzo = dataFull.getMinutes();
-    let minuti;
-    if ((minutiGrezzo) < 10) {
-        minuti = `0${minutiGrezzo}`;
-    }
-    else {
-        minuti = minutiGrezzo;
-    }
-    const secondiGrezzo = dataFull.getSeconds();
-    let secondi;
-    if ((secondiGrezzo) < 10) {
-        secondi = `0${secondiGrezzo}`;
-    }
-    else {
-        secondi = secondiGrezzo;
-    }
-    const millisecondiGrezzo = dataFull.getMilliseconds();
-    let millisecondi;
-    if ((millisecondiGrezzo) < 10) {
-        millisecondi = `00${millisecondiGrezzo}`;
-    }
-    else if (((millisecondiGrezzo) >= 10) && ((millisecondiGrezzo) < 100)) {
-        millisecondi = `0${millisecondiGrezzo}`;
-    }
-    else {
-        millisecondi = millisecondiGrezzo;
-    }
-    const dataStringa = `${anno}${mese}${giorno}${ora}${minuti}${secondi}${millisecondi}`;
-    const dataInteger = parseInt(dataStringa);
-    return dataInteger;
-}
-
-function dataCorta() {
-    const dataFull = new Date();
-    const dataStringa = dataFull.toISOString();
-    const dataCorta = dataStringa.split('T')[0];
-    return dataCorta;
 }
 
 function filtraListeDatiId(listaDati, listaId) {
@@ -1610,8 +1527,8 @@ async function creaPDF2(listaIdMain10ance, listaDatiNascosti, contr_manut) {
 
 function nascondiBottoniSchede() {
     apriTabAnagrafica.style.display = 'none';
-    apriTabControllo.style.display = 'none';
-    apriTabIntervento.style.display = 'none';
+    // apriTabControllo.style.display = 'none';
+    // apriTabIntervento.style.display = 'none';
     schedaAnagrafica.style.display = 'none';
     schedaControllo.style.display = 'none';
     schedaIntervento.style.display = 'none';

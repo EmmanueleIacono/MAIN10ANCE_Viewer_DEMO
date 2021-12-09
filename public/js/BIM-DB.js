@@ -53,6 +53,7 @@ bottoneCanc.addEventListener("click", () => {
         viewer.isolate();
     }
     nascondiBottoniSchede();
+    moduloSchedaControllo.style.display = 'none';
 });
 
 // FUNZIONI

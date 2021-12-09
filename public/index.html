@@ -53,6 +53,7 @@
   <script src="js/Dashboard-richieste.js" defer></script>
   <script src="js/Dashboard.js" defer></script>
   <script src="js/Dashboard-programmazione.js" defer></script>
+  <script src="js/modulo-scheda-controllo.js" defer></script>
 </head>
 <body>
   <!-- Fixed navbar by Bootstrap: https://getbootstrap.com/examples/navbar-fixed-top/ -->
@@ -147,8 +148,8 @@
               </div>
             <div id="contenitore-controllo-intervento" style="display: none;">
               <button class="scheda-anagrafica" id="apriTabAnagrafica">SCHEDA ANAGRAFICA</button>
-              <button class="scheda-controllo" id="apriTabControllo">SCHEDA CONTROLLO</button>
-              <button class="scheda-intervento" id="apriTabIntervento">SCHEDA INTERVENTO</button>
+              <!-- <button class="scheda-controllo" id="apriTabControllo">SCHEDA CONTROLLO</button>
+              <button class="scheda-intervento" id="apriTabIntervento">SCHEDA INTERVENTO</button> -->
               <button id="salvaSchedaAnagrafica" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
               <button id="salvaSchedaControllo" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
               <button id="salvaSchedaIntervento" class="glyphicon glyphicon-floppy-disk dbBtn" title="Salva" style="cursor: pointer" height="30"></button>
@@ -156,6 +157,8 @@
               <div id="scheda-anagrafica" class="scheda-con-int">SCHEDA ANAGRAFICA</div>
               <div id="scheda-controllo" class="scheda-con-int">SCHEDA CONTROLLO</div>
               <div id="scheda-intervento" class="scheda-con-int">SCHEDA INTERVENTO</div>
+
+              <div id="modulo-scheda-controllo" style="display: none;" data-id-scheda-cont="">modulo scheda controllo</div>
             </div>
             </div>
           </div>
