@@ -138,8 +138,8 @@ appG.post('/Main10ance_DB/programmazione/nuovi-controlli', async (req, res) => {
     let result = {}
     try {
         const reqJson = req.body;
-        await registraNuoviControlli(reqJson);
-        result.success = true;
+        const res = await registraNuoviControlli(reqJson);
+        result.success = res;
     }
     catch(e) {
         result.success = false;

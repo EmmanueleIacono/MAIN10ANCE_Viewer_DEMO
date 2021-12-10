@@ -37,3 +37,7 @@ function set_usr_vw(settingsString) {
         $(`#${sett}`).show();
     });
 }
+
+(() => {
+    sessionStorage.listaEventi = JSON.stringify([]);
+})();

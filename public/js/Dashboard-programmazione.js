@@ -127,7 +127,7 @@ bottoneProg.addEventListener('click', async () => {
                 });
             });
             const resp = await registraControlli(listaJsonReq);
-            if (resp) {
+            if (resp.success) {
                 alert('Programmazione andata a buon fine');
                 // proseguo, faccio query eventi e schede
                 const datiControllo = await recuperaDatiControlliProg();

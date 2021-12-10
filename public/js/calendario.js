@@ -47,12 +47,14 @@ apriTabSchede.addEventListener('click', async () => {
     renderizzaCalendario(calendar);
     const datiControllo = await recuperaDatiControlliProg();
     creaEventiControlloProg(datiControllo, calendar);
+    aggiungiEventiDaSessionStorage(calendar);
 });
 apriTabDashboard.addEventListener('click', async () => {
     // popolaCalendario(calendarProg);
     renderizzaCalendario(calendarProg);
     const datiControllo = await recuperaDatiControlliProg();
     creaEventiControlloProg(datiControllo, calendarProg);
+    aggiungiEventiDaSessionStorage(calendarProg);
 
 });
 
@@ -282,4 +284,11 @@ async function prendiEventiManCorr() {
     const risultato = await fetch('/o/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
+}
+
+function aggiungiEventiDaSessionStorage(calendario) {
+    const listaEventi = JSON.parse(sessionStorage.listaEventi);
+    listaEventi.forEach(ev => {
+        calendario.addEvent(ev);
+    });
 }

@@ -9,6 +9,7 @@ async function mostraModuloSchedaControllo(id, scheda, stringaIdM10a) {
 
     const frase = scheda.querySelectorAll('[id^="[frase"]')[0].innerText;
     const listaId = stringaIdM10a.split(', ');
+    sessionStorage.listaId = JSON.stringify(listaId);
     moduloSchedaControllo.dataset.idSchedaCont = id;
     moduloSchedaControllo.innerHTML = '';
 
@@ -117,7 +118,8 @@ async function mostraModuloSchedaControllo(id, scheda, stringaIdM10a) {
     bott.style.margin = '10px';
     bott.innerText = 'SALVA';
     bott.className = 'dbBtn bottone-main10ance';
-    bott.addEventListener('click', () => {proceduraDiRegistrazione.bind(moduloSchedaControllo)([...listaId]);});
+    // bott.addEventListener('click', () => {proceduraDiRegistrazione.bind(moduloSchedaControllo)([...listaId]);});
+    bott.addEventListener('click', () => {proceduraDiRegistrazione.bind(moduloSchedaControllo)();});
 
     moduloSchedaControllo.appendChild(titolo);
     moduloSchedaControllo.appendChild(tabellaModCont);
@@ -170,29 +172,25 @@ function gestisciCU_CR() {
     }
 }
 
-async function proceduraDiRegistrazione(listaIdM10A) {
+async function proceduraDiRegistrazione() {
+    const listaIdM10A = JSON.parse(sessionStorage.listaId);
     const tabellaCont = this.children[1];
     const listaTr = Array.from(tabellaCont.children);
     const listaInput = listaTr.map(tr => (tr.children[1]));
     const listaChiaviValori = listaInput.map(inp => {
         const CV = {};
         CV.chiave = inp.firstChild.id;
-        CV.valore = inp.firstChild.innerText;
+        CV.valore = inp.firstChild.value;
         return CV;
     });
-    console.log(listaChiaviValori);
-    console.log(listaIdM10A);
     const idSchedaOrigine = parseInt(this.dataset.idSchedaCont);
-    console.log(idSchedaOrigine);
     const elementiSelezionati = await getIdM10AFromSelezione(viewer.getSelection());
-    console.log(elementiSelezionati);
     const numeroElementiRimasti = listaIdM10A.length - elementiSelezionati.length;
-    console.log(numeroElementiRimasti);
     if (numeroElementiRimasti) {
         const parola = numeroElementiRimasti === 1 ? 'elemento rimasto' : 'elementi rimasti';
         alert(`Operazione andata a buon fine. ${numeroElementiRimasti} ${parola}, procedere.`);
         const listaIdElementiRimasti = listaIdM10A.filter(id => (!elementiSelezionati.includes(id)));
-        console.log(listaIdElementiRimasti);
+        sessionStorage.listaId = JSON.stringify(listaIdElementiRimasti);
         const listaElementiRestanti = await Promise.all(listaIdElementiRimasti.map(async id => (await ricercaIdM10A(id))));
         viewer.select(listaElementiRestanti);
         viewer.isolate(listaElementiRestanti);
@@ -200,8 +198,53 @@ async function proceduraDiRegistrazione(listaIdM10A) {
     }
     else {
         alert('Operazione completata');
+        sessionStorage.removeItem('listaId');
         viewer.isolate();
         viewer.clearSelection();
+        viewer.fitToView();
         moduloSchedaControllo.style.display = 'none';
+    }
+    registraEventoSuCalendarioProvvisoriamente(listaChiaviValori, idSchedaOrigine);
+}
+
+function registraEventoSuCalendarioProvvisoriamente(listaJson, idSchedaCont) {
+    const data = listaJson.filter(js => (js.chiave === 'mod-sc-cont-data'))[0].valore;
+    const urgenza = listaJson.filter(js => (js.chiave === 'mod-sc-cont-livurg'))[0].valore;
+    console.log(data);
+    console.log(urgenza);
+    let mesiDaAggiungere;
+    let colore;
+    if (urgenza.startsWith('uc 1')) {
+        mesiDaAggiungere = 12;
+        colore = '#a4a832';
+    }
+    else if (urgenza.startsWith('uc 2')) {
+        mesiDaAggiungere = 6;
+        colore = '#a86b32';
+    }
+    else if (urgenza.startsWith('uc 3')) {
+        mesiDaAggiungere = 1;
+        colore = '#a83232';
+    }
+    else {
+        return;
+    }
+    if (mesiDaAggiungere) {
+        const nuovaData = aggiungiMesi(data, mesiDaAggiungere);
+        const nuovoEventoProg = {
+            id: `P-${idSchedaCont}-${nuovaData}`,
+            title: `Intervento programmato`,
+            start: nuovaData,
+            defaultAllDay: true,
+            extendedProps: {},
+            backgroundColor: colore,
+            borderColor: '#c74646',
+            texcColor: '#fff'
+        };
+        // calendar.addEvent(nuovoEventoProg);
+        // calendarProg.addEvent(nuovoEventoProg);
+        const listaEventi = JSON.parse(sessionStorage.listaEventi);
+        listaEventi.push(nuovoEventoProg);
+        sessionStorage.listaEventi = JSON.stringify(listaEventi);
     }
 }
