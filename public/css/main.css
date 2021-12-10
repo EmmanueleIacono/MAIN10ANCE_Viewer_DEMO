@@ -785,9 +785,16 @@ tr:nth-child(even) {
   color: blue;
   top: 20px;
   left: 20px;
+  /* width: 250%; */
+  width: fit-content;
+  min-width: 150%;
 }
 
 .tooltip-prog:hover span.tooltip-prog-text {
   /* display: block; */
   visibility: visible;
+}
+
+.tooltip-prog:hover {
+  overflow: visible;
 }

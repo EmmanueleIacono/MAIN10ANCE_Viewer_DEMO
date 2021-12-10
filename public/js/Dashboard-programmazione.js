@@ -42,34 +42,40 @@ selectClOggProg.addEventListener('change', () => {
         row.setAttribute('id', `prog-frase-n-${ind}`);
 
         const tdFr = document.createElement('td');
-        tdFr.classList.add('tooltip-prog');
         // tdFr.innerText = fr.fr_risc;
         tdFr.innerHTML = `<div class="tab-div">${fr.fr_risc ? fr.fr_risc : ''}</div>`;
-        const spanFr = document.createElement('span');
-        spanFr.classList.add('tooltip-prog-text');
-        spanFr.innerText = fr.fr_risc;
-        // tdFr.innerHTML = `<span class="tooltip-prog-text">${fr.fr_risc}</span>`;
-        tdFr.appendChild(spanFr);
+        if (fr.fr_risc) {
+            tdFr.classList.add('tooltip-prog');
+            const spanFr = document.createElement('span');
+            spanFr.classList.add('tooltip-prog-text');
+            spanFr.innerText = fr.fr_risc;
+            // tdFr.innerHTML = `<span class="tooltip-prog-text">${fr.fr_risc}</span>`;
+            tdFr.appendChild(spanFr);
+        }
 
         const tdCon = document.createElement('td');
-        tdCon.classList.add('tooltip-prog');
         // tdCon.innerText = fr.controllo;
         tdCon.innerHTML = `<div class="tab-div">${fr.controllo ? fr.controllo : ''}</div>`;
-        const spanCon = document.createElement('span');
-        spanCon.classList.add('tooltip-prog-text');
-        spanCon.innerText = fr.controllo;
-        // tdCon.innerHTML = `<span class="tooltip-prog-text">${fr.controllo}</span>`;
-        tdCon.appendChild(spanCon);
+        if (fr.controllo) {
+            tdCon.classList.add('tooltip-prog');
+            const spanCon = document.createElement('span');
+            spanCon.classList.add('tooltip-prog-text');
+            spanCon.innerText = fr.controllo;
+            // tdCon.innerHTML = `<span class="tooltip-prog-text">${fr.controllo}</span>`;
+            tdCon.appendChild(spanCon);
+        }
 
         const tdMan = document.createElement('td');
-        tdMan.classList.add('tooltip-prog');
         // tdMan.innerText = fr.mn_reg;
         tdMan.innerHTML = `<div class="tab-div">${fr.mn_reg ? fr.mn_reg : ''}</div>`;
-        const spanMan = document.createElement('span');
-        spanMan.classList.add('tooltip-prog-text');
-        spanMan.innerText = fr.mn_reg;
-        // tdMan.innerHTML = `<span class="tooltip-prog-text">${fr.mn_reg}</span>`;
-        tdMan.appendChild(spanMan);
+        if (fr.mn_reg) {
+            tdMan.classList.add('tooltip-prog');
+            const spanMan = document.createElement('span');
+            spanMan.classList.add('tooltip-prog-text');
+            spanMan.innerText = fr.mn_reg;
+            // tdMan.innerHTML = `<span class="tooltip-prog-text">${fr.mn_reg}</span>`;
+            tdMan.appendChild(spanMan);
+        }
 
         const tdFreq = document.createElement('td');
         const inpFreq = document.createElement('input');

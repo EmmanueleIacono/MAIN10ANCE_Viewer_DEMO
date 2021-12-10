@@ -287,8 +287,10 @@ async function prendiEventiManCorr() {
 }
 
 function aggiungiEventiDaSessionStorage(calendario) {
-    const listaEventi = JSON.parse(sessionStorage.listaEventi);
-    listaEventi.forEach(ev => {
-        calendario.addEvent(ev);
-    });
+    if (sessionStorage && sessionStorage.listaEventi) {
+        const listaEventi = JSON.parse(sessionStorage.listaEventi);
+        listaEventi.forEach(ev => {
+            calendario.addEvent(ev);
+        });
+    }
 }
