@@ -13,6 +13,8 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
         center: 'title',
         right: 'prevYear,prev,next,nextYear'
     },
+    dayMaxEvents: true,
+    
     eventMouseEnter: (info) => {
         info.el.style.cursor = 'pointer';
         info.el.title = info.event.title;
@@ -33,6 +35,7 @@ const calendarProg = new FullCalendar.Calendar(calendarElProg, {
         center: 'title',
         right: 'prevYear,prev,next,nextYear'
     },
+    dayMaxEvents: true,
 
     eventMouseEnter: (info) => {
         info.el.style.cursor = 'pointer';
