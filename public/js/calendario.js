@@ -14,7 +14,7 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
         right: 'prevYear,prev,next,nextYear'
     },
     dayMaxEvents: true,
-    
+
     eventMouseEnter: (info) => {
         info.el.style.cursor = 'pointer';
         info.el.title = info.event.title;
