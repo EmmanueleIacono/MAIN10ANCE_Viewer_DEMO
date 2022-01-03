@@ -1,4 +1,6 @@
 
+# N.B.: QUESTO BRANCH SERVE ALLA CONVERSIONE DELL'APP IN VUE
+
 # MAIN10ANCE_Viewer_DEMO
 
 Repository per l'app web del progetto Main10ance
