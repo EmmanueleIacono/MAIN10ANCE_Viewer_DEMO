@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
+// const cors = require('cors');
 
 const PORT = process.env.PORT || 3000;
 const config = require('./config');
@@ -18,6 +19,7 @@ const reqAmministratore = require('./routes/database/reqAmministratore');
 const {controllaLoggedIn, consentiAccesso, controllaRuoli} = require('./routes/auth/middleware');
 
 let app = express();
+// app.use(cors());
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '50mb' }));

@@ -57,17 +57,17 @@ body {
   box-shadow: 0 0 0 5px var(--grigioScuro);
 }
 
-.navBtn {
+/* .navBtn {
   margin-top: 12.5px;
-}
+} */
 
-#scegliModello {
+/* #scegliModello {
   margin-left: 60px;
 }
 
 #scegliGIS {
   margin-left: 50px;
-}
+} */
 
 /* SUMMARY */
 
@@ -368,9 +368,9 @@ div[id^="div-form-"] {
   height: 100%;
 }
 
-#scegliGISModal {
+/* #scegliGISModal {
   overflow: auto;
-}
+} */
 
 .modal-content, .modal-header, .modal-body, .modal-footer, .panel, .panel-heading, #pannello-modal-header {
   background-color: var(--grigio);
