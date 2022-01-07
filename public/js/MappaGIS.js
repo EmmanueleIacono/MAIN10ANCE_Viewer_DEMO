@@ -36,12 +36,12 @@ setInterval(() => {
 // gruppi layer per marker sacri monti e marker cappelle
 let gruppoMarkerCappelle = L.layerGroup();
 let gruppoMarkerSacriMonti = L.layerGroup();
-const LivelloGIS = L.layerGroup();
+// const LivelloGIS = L.layerGroup();
 
 // reset vista totale default mappa
 const bottoneRefresh = document.getElementById('refreshGIS');
 bottoneRefresh.addEventListener("click", () => {
-    mappaGIS.setView(posOrigine, 8)
+    mappaGIS.setView(posOrigine, 8);
 });
 
 // prima interrogazione livelli GIS
@@ -240,9 +240,9 @@ class LayerGIS {
         }
 
         creaCheckbox();
-        
-        const gis = await getGIS(this.tabella, this.alias, this.geometria, this.colonne.join(", "));
-        
+
+        const gis = await getGIS(this.tabella, this.geometria, this.colonne.join(", "));
+
         for await (const gisItem of gis) {
             creaGeometria(gisItem);
         }
@@ -307,8 +307,8 @@ async function leggiDBGIS(tabGIS) {
     }
 }
 
-async function getGIS(tabella, alias, geometria, colonneUtili) {
-    const oggettiGIS = await fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "alias": alias, "geometria": geometria, "colonneUtili": colonneUtili} });
+async function getGIS(tabella, geometria, colonneUtili) {
+    const oggettiGIS = await fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "geometria": geometria, "colonneUtili": colonneUtili} });
     const resp_oggettiGIS = await oggettiGIS.json();
     return resp_oggettiGIS;
 }

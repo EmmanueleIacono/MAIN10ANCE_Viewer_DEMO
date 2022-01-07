@@ -1,4 +1,6 @@
-import {reactive, readonly} from 'vue';
+import {reactive, readonly, watch} from 'vue';
+import {generaColoreRandom} from '../assets/js/shared';
+// import {getGIS} from '../assets/js/richieste';
 
 const state = reactive({
     tabAttivo: 'Tab2',
@@ -7,6 +9,28 @@ const state = reactive({
         bim_vw_sets: '9-3',
         usr_vw: ''
     },
+    tabelleGIS: null,
+    entitàGIS: {},
+});
+
+watch(() => state.tabelleGIS, (tabelle) => {
+    if (tabelle && tabelle.length) {
+        // console.log('partito');
+        // tabelle.forEach(async tab => {
+        //     const gruppoGis = {}
+        //     const gisTabella = await getGIS(tab.tabella, tab.geometria, tab.colonneUtili);
+        //     console.log(gisTabella);
+        //     gruppoGis.alias = tab.alias;
+        //     gruppoGis.geometria = gisTabella.geom;
+        //     gruppoGis.info = gisTabella.info;
+        //     state.entitàGIS.push(gruppoGis);
+        // });
+        // console.log(state.entitàGIS);
+        // console.log('finito');
+    }
+}, {
+    immediate: true,
+    deep: true,
 });
 
 const methods = {
@@ -34,6 +58,26 @@ const methods = {
         state.userSettings.user_id = '';
         state.userSettings.bim_vw_sets = '9-3';
         state.userSettings.usr_vw = '';
+    },
+
+    setTabelleGIS(tabelle) {
+        state.tabelleGIS = tabelle;
+        tabelle.forEach(tab => {
+            if (tab.colonneUtili) {
+                const oggEntità = {
+                    ready: false,
+                    alias: tab.alias,
+                    gis: [],
+                    colore: generaColoreRandom()
+                }
+                state.entitàGIS[tab.tabella] = oggEntità;
+            }
+        });
+    },
+
+    setEntitàGIS(tabella, listaGIS) {
+        state.entitàGIS[tabella].gis = listaGIS;
+        state.entitàGIS[tabella].ready = true;
     }
 }
 
@@ -43,7 +87,10 @@ const getters = {
     },
     getBimVwSets() {
         return state.userSettings.bim_vw_sets.split('-');
-    }
+    },
+    // getLivelliGISCompilati() {
+    //     return state.tabelleGIS.filter(tab => state.entitàGIS[tab].gis.length);
+    // }
 }
 
 export default {

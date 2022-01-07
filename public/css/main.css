@@ -372,7 +372,7 @@ div[id^="div-form-"] {
   overflow: auto;
 } */
 
-.modal-content, .modal-header, .modal-body, .modal-footer, .panel, .panel-heading, #pannello-modal-header {
+/*.modal-content, .modal-header, .modal-body, .modal-footer, */.panel, .panel-heading/*, #pannello-modal-header*/ {
   background-color: var(--grigio);
 }
 
@@ -382,10 +382,10 @@ div[id^="div-form-"] {
   position: static;
 }
 
-#legendaLayer {
+/* #legendaLayer {
   position: static;
   z-index: 1000;
-}
+} */
 
 /* STILI PER TABS */
 [data-tab-content] {

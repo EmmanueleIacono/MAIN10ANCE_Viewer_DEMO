@@ -11,8 +11,8 @@
 
 <script>
 import {reactive, toRefs, inject} from 'vue';
-import PannelloLogin from './PannelloLogin.vue';
-import PannelloSignup from './PannelloSignup.vue';
+import PannelloLogin from './TabAuthPannelloLogin.vue';
+import PannelloSignup from './TabAuthPannelloSignup.vue';
 
 export default {
     name: 'TabAuth',

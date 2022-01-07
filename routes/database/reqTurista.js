@@ -8,10 +8,10 @@ const {clientM10a, clientServ} = require('./connessioni');
 //////////          RICHIESTE          //////////
 
 // per testare la richiesta:
-// fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "alias": "Bosco", "geometria": "geom_pol", "colonneUtili": ["bosco_gov", "bosco_ty"]} }).then(a => a.json()).then(console.log)
+// fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "geometria": "geom_pol", "colonneUtili": ["bosco_gov", "bosco_ty"]} }).then(a => a.json()).then(console.log)
 appT.get('/Main10ance_DB/GIS', async (req, res) => {
     const reqJson = req.headers;
-    const rispostaGIS = await leggiGIS(reqJson.tabella, reqJson.alias, reqJson.geometria, reqJson.colonneutili); //N.B.: scrivo "colonneutili" tutto minuscolo perché arriva così dagli headers della richiesta
+    const rispostaGIS = await leggiGIS(reqJson.tabella, reqJson.geometria, reqJson.colonneutili); //N.B.: scrivo "colonneutili" tutto minuscolo perché arriva così dagli headers della richiesta
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(rispostaGIS));
 });
@@ -42,9 +42,9 @@ appT.get('/DB_Servizio/LOD/TabelleGIS', async (req, res) => {
 
 //////////          QUERY          //////////
 
-async function leggiGIS(tabella, alias, geometria, colonneUtili) {
+async function leggiGIS(tabella, geometria, colonneUtili) {
     try {
-        const result = await clientM10a.query(`SELECT ST_AsGeoJSON(${geometria}) AS "geom", CONCAT_WS(', ', ${colonneUtili}) AS "info" FROM main10ance_sacrimonti.${tabella} AS "${alias}";`);
+        const result = await clientM10a.query(`SELECT ST_AsGeoJSON(${geometria}) AS "geom", CONCAT_WS(', ', ${colonneUtili}) AS "info" FROM main10ance_sacrimonti.${tabella};`);
         return result.rows;
     }
     catch(e) {

@@ -44,7 +44,8 @@
 </template>
 
 <script>
-import {provide} from 'vue';
+import {provide, onMounted} from 'vue';
+import {getTabelleGIS, getGIS} from './assets/js/richieste';
 import store from '@/store';
 import Tab1 from './components/TabBIM.vue';
 import Tab2 from './components/TabGIS.vue';
@@ -65,6 +66,17 @@ export default {
     provide('store', store);
 
     primoLoad();
+
+    onMounted(async () => {
+      const tabelleGIS = await getTabelleGIS();
+      store.methods.setTabelleGIS(tabelleGIS);
+      for await (const tab of tabelleGIS) {
+        if (tab.colonneUtili) {
+          const gis = await getGIS(tab.tabella, tab.geometria, tab.colonneUtili.join(", "));
+          store.methods.setEntitàGIS(tab.tabella, gis);
+        }
+      }
+    });
 
     function primoLoad() {
       if (localStorage.user_id) {
