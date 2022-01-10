@@ -45,7 +45,7 @@
 
 <script>
 import {provide, onMounted} from 'vue';
-import {getTabelleGIS, getGIS} from './assets/js/richieste';
+import {getTabelleGIS, getGIS} from './js/richieste';
 import store from '@/store';
 import Tab1 from './components/TabBIM.vue';
 import Tab2 from './components/TabGIS.vue';

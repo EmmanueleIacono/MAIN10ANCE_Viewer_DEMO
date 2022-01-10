@@ -1,5 +1,6 @@
-import {reactive, readonly, watch} from 'vue';
-import {generaColoreRandom} from '../assets/js/shared';
+import {reactive, /*readonly, */watch} from 'vue';
+import {generaColoreRandom} from '../js/shared';
+import {creaMappa, setVistaMappa, aggiungiLayer, rimuoviLayer, creaLivelloGISeAggiungiLayer} from '../js/GIS';
 // import {getGIS} from '../assets/js/richieste';
 
 const state = reactive({
@@ -9,6 +10,7 @@ const state = reactive({
         bim_vw_sets: '9-3',
         usr_vw: ''
     },
+    mappaGIS: null,
     tabelleGIS: null,
     entitàGIS: {},
 });
@@ -68,7 +70,8 @@ const methods = {
                     ready: false,
                     alias: tab.alias,
                     gis: [],
-                    colore: generaColoreRandom()
+                    colore: generaColoreRandom(),
+                    geometria: {},
                 }
                 state.entitàGIS[tab.tabella] = oggEntità;
             }
@@ -78,7 +81,37 @@ const methods = {
     setEntitàGIS(tabella, listaGIS) {
         state.entitàGIS[tabella].gis = listaGIS;
         state.entitàGIS[tabella].ready = true;
-    }
+    },
+
+    setGeometriaEntità(tabella, livello) {
+        state.entitàGIS[tabella].geometria = livello;
+    },
+
+    creaMappaGIS(divId, pos) {
+        state.mappaGIS = creaMappa(divId, pos);
+    },
+
+    setViewMappa(pos, zoom) {
+        setVistaMappa(state.mappaGIS, pos, zoom);
+    },
+
+    aggiungiLivello(livello) {
+        aggiungiLayer(livello, state.mappaGIS);
+    },
+
+    rimuoviLivello(livello) {
+        rimuoviLayer(livello, state.mappaGIS);
+    },
+
+    aggiungiLivelloGIS(tabella) {
+        // const liv = creaLivelloGIS(state.entitàGIS[tabella]);
+        // aggiungiLayer(liv, state.mappaGIS);
+        creaLivelloGISeAggiungiLayer(tabella);
+    },
+
+    // rimuoviLivelloGIS(livello) {
+    //     rimuoviLayer(livello, state.mappaGIS);
+    // }
 }
 
 const getters = {
@@ -87,16 +120,14 @@ const getters = {
     },
     getBimVwSets() {
         return state.userSettings.bim_vw_sets.split('-');
-    },
-    // getLivelliGISCompilati() {
-    //     return state.tabelleGIS.filter(tab => state.entitàGIS[tab].gis.length);
-    // }
+    }
 }
 
 export default {
     // se voglio che lo state sia modificabile solo attraverso i methods e non direttamente dai component,
     // esporto "state" tramite la funzione "readonly"
-    state: readonly(state),
+    // state: readonly(state),
+    state,
     methods,
     getters,
 }

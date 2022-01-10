@@ -162,7 +162,7 @@ class LayerGIS {
         this.geometria = geometria;
         this.colonne = colonne;
     }
-    
+
     async inizializza() {
         const livelloTabella = L.layerGroup();
         const coloreRandom = `#${(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6)}`;
@@ -172,18 +172,18 @@ class LayerGIS {
             color: coloreRandom,
             fillColor: coloreRandom,
             fillOpacity: 0.8,
-        };
-        
+        }
+
         function stileGeoJSON(feature) {
             return {
                 color: coloreRandom,
             }
         }
-        
+
         function stileGeoPointToLayer(feature, latlng) {
             return L.circleMarker(latlng, geojsonMarkerOptions);
         }
-        
+
         const creaCheckbox = () => {
             const contenitoreSpegniLiv = document.createElement('div');
             const spegniLivelloCheck = document.createElement('input');

@@ -7,6 +7,8 @@
     <button @click="chiamaResetMappa" class="selettoreSM-dropdown">
       <span class="glyphicon glyphicon-home" style="margin-right: 10px;"></span>HOME
     </button>
+    <span>{{state.livelliGISAttivi}}</span>
+    <button @click="stampaEnG">stampa entitàGIS</button>
     <CheckboxGIS
       v-for="(liv, key) in store.state.entitàGIS"
       :key="key"
@@ -21,7 +23,7 @@
 </template>
 
 <script>
-import {ref, inject} from 'vue';
+import {ref, reactive, provide, inject} from 'vue';
 import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
 import MappaGIS from './TabGISMappa.vue';
@@ -38,14 +40,25 @@ export default {
   setup() {
     const store = inject('store');
     const mappaRef = ref(null);
+    const state = reactive({
+      livelliGISAttivi: [],
+    });
+    provide('livelliGISAttivi', state);
 
     function chiamaResetMappa() {
       mappaRef.value.resetMap();
     }
+
+    function stampaEnG() {
+      console.log(store.state.entitàGIS);
+    }
+
     return {
       store,
+      state,
       mappaRef,
       chiamaResetMappa,
+      stampaEnG,
     }
   }
 }
