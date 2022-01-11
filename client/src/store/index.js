@@ -1,7 +1,5 @@
-import {reactive, /*readonly, */watch} from 'vue';
+import {reactive, readonly} from 'vue';
 import {generaColoreRandom} from '../js/shared';
-import {creaMappa, setVistaMappa, aggiungiLayer, rimuoviLayer, creaLivelloGISeAggiungiLayer} from '../js/GIS';
-// import {getGIS} from '../assets/js/richieste';
 
 const state = reactive({
     tabAttivo: 'Tab2',
@@ -10,29 +8,11 @@ const state = reactive({
         bim_vw_sets: '9-3',
         usr_vw: ''
     },
-    mappaGIS: null,
-    tabelleGIS: null,
-    entitàGIS: {},
 });
 
-watch(() => state.tabelleGIS, (tabelle) => {
-    if (tabelle && tabelle.length) {
-        // console.log('partito');
-        // tabelle.forEach(async tab => {
-        //     const gruppoGis = {}
-        //     const gisTabella = await getGIS(tab.tabella, tab.geometria, tab.colonneUtili);
-        //     console.log(gisTabella);
-        //     gruppoGis.alias = tab.alias;
-        //     gruppoGis.geometria = gisTabella.geom;
-        //     gruppoGis.info = gisTabella.info;
-        //     state.entitàGIS.push(gruppoGis);
-        // });
-        // console.log(state.entitàGIS);
-        // console.log('finito');
-    }
-}, {
-    immediate: true,
-    deep: true,
+const stateGIS = reactive({
+    tabelleGIS: null,
+    entitàGIS: {},
 });
 
 const methods = {
@@ -63,7 +43,7 @@ const methods = {
     },
 
     setTabelleGIS(tabelle) {
-        state.tabelleGIS = tabelle;
+        stateGIS.tabelleGIS = tabelle;
         tabelle.forEach(tab => {
             if (tab.colonneUtili) {
                 const oggEntità = {
@@ -72,46 +52,21 @@ const methods = {
                     gis: [],
                     colore: generaColoreRandom(),
                     geometria: {},
+                    presente: false,
                 }
-                state.entitàGIS[tab.tabella] = oggEntità;
+                stateGIS.entitàGIS[tab.tabella] = oggEntità;
             }
         });
     },
 
     setEntitàGIS(tabella, listaGIS) {
-        state.entitàGIS[tabella].gis = listaGIS;
-        state.entitàGIS[tabella].ready = true;
+        stateGIS.entitàGIS[tabella].gis = listaGIS;
+        stateGIS.entitàGIS[tabella].ready = true;
     },
 
     setGeometriaEntità(tabella, livello) {
-        state.entitàGIS[tabella].geometria = livello;
-    },
-
-    creaMappaGIS(divId, pos) {
-        state.mappaGIS = creaMappa(divId, pos);
-    },
-
-    setViewMappa(pos, zoom) {
-        setVistaMappa(state.mappaGIS, pos, zoom);
-    },
-
-    aggiungiLivello(livello) {
-        aggiungiLayer(livello, state.mappaGIS);
-    },
-
-    rimuoviLivello(livello) {
-        rimuoviLayer(livello, state.mappaGIS);
-    },
-
-    aggiungiLivelloGIS(tabella) {
-        // const liv = creaLivelloGIS(state.entitàGIS[tabella]);
-        // aggiungiLayer(liv, state.mappaGIS);
-        creaLivelloGISeAggiungiLayer(tabella);
-    },
-
-    // rimuoviLivelloGIS(livello) {
-    //     rimuoviLayer(livello, state.mappaGIS);
-    // }
+        stateGIS.entitàGIS[tabella].geometria = livello;
+    }
 }
 
 const getters = {
@@ -124,10 +79,8 @@ const getters = {
 }
 
 export default {
-    // se voglio che lo state sia modificabile solo attraverso i methods e non direttamente dai component,
-    // esporto "state" tramite la funzione "readonly"
-    // state: readonly(state),
-    state,
+    state: readonly(state),
+    stateGIS,
     methods,
     getters,
 }

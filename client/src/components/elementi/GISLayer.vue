@@ -3,8 +3,8 @@
 </template>
 
 <script>
-import {onMounted, inject} from 'vue';
-// import {creaLivelloGIS} from '../../js/GIS';
+import {inject, watch} from 'vue';
+import {creaLivelloGIS} from '../../js/GIS';
 
 export default {
   name: 'GISLayer',
@@ -15,11 +15,9 @@ export default {
   setup(props) {
     const store = inject('store');
 
-    onMounted(() => {
-      // const liv = creaLivelloGIS(store.state.entitàGIS[props.livello]);
-      // console.log(liv);
-      // store.methods.setGeometriaEntità(props.livello, liv);
-      store.methods.aggiungiLivelloGIS(props.livello);
+    watch(() => store.stateGIS.entitàGIS[props.livello].ready, () => {
+      const liv = creaLivelloGIS(store.stateGIS.entitàGIS[props.livello]);
+      store.methods.setGeometriaEntità(props.livello, liv);
     });
   }
 }

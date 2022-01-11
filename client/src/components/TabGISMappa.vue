@@ -3,12 +3,13 @@
   <div id="appGIS">
     <div id="mappa">Qui mappa GIS</div>
   </div>
-  <GISLayer v-for="(liv, key) in store.state.entitàGIS" :key="key" :livello="key" :mappa="store.state.mappaGIS" />
+  <GISLayer v-for="(liv, key) in store.stateGIS.entitàGIS" :key="key" :livello="key" :mappa="store.stateGIS.mappaGIS" />
 </div>
 </template>
 
 <script>
 import {onMounted, inject, watch} from 'vue';
+import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa} from '../js/GIS';
 import L from 'leaflet';
 import GISLayer from './elementi/GISLayer.vue';
 
@@ -19,10 +20,11 @@ export default {
   },
   setup() {
     const store = inject('store');
+    const stateGIS = inject('stateGIS');
 
-    watch(() => store.state.tabelleGIS, (newLista) => {
+    watch(() => store.stateGIS.tabelleGIS, (newLista) => {
       if (newLista) {
-        console.log(newLista);
+        //
       }
     }, {
       immediate: true,
@@ -31,34 +33,35 @@ export default {
     const posOrigine = [45.61422, 8.410177];
 
     onMounted(() => {
-      store.methods.creaMappaGIS('mappa', posOrigine);
+      stateGIS.mappaGIS = creaMappa('mappa', posOrigine);
 
       const gruppoMarkerCappelle = L.layerGroup();
       const gruppoMarkerSacriMonti = L.layerGroup();
 
       setInterval(() => {
         const zoomComune = 17;
-        if (store.state.mappaGIS.getZoom() < zoomComune) {
-          store.methods.aggiungiLivello(gruppoMarkerSacriMonti);
-          store.methods.rimuoviLivello(gruppoMarkerCappelle);
+        if (stateGIS.mappaGIS.getZoom() < zoomComune) {
+          aggiungiLayer(gruppoMarkerSacriMonti, stateGIS.mappaGIS);
+          rimuoviLayer(gruppoMarkerCappelle, stateGIS.mappaGIS);
         }
-        else if (store.state.mappaGIS.getZoom() > zoomComune) {
-          store.methods.aggiungiLivello(gruppoMarkerCappelle);
-          store.methods.rimuoviLivello(gruppoMarkerSacriMonti);
+        else if (stateGIS.mappaGIS.getZoom() > zoomComune) {
+          aggiungiLayer(gruppoMarkerCappelle, stateGIS.mappaGIS);
+          rimuoviLayer(gruppoMarkerSacriMonti, stateGIS.mappaGIS);
         }
         else {
-          store.methods.aggiungiLivello(gruppoMarkerSacriMonti);
-          store.methods.aggiungiLivello(gruppoMarkerCappelle);
+          aggiungiLayer(gruppoMarkerSacriMonti, stateGIS.mappaGIS);
+          aggiungiLayer(gruppoMarkerCappelle, stateGIS.mappaGIS);
         }
       }, 100);
     });
 
     function resetMap() {
-      store.methods.setViewMappa(posOrigine, 8);
+      setVistaMappa(stateGIS.mappaGIS, posOrigine, 8);
     }
 
     return {
       store,
+      stateGIS,
       resetMap,
     }
   }

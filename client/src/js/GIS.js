@@ -34,75 +34,52 @@ export function creaLivelloGIS(livello) {
     proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
 
     const livelloTabella = L.layerGroup();
+    const featureColl = {
+        type: "FeatureCollection",
+        features: [],
+    };
     const geojsonMarkerOptions = {
-      radius: 8,
-      color: livello.colore,
-      fillColor: livello.colore,
-      fillOpacity: 0.8,
+        radius: 8,
+        color: livello.colore,
+        fillColor: livello.colore,
+        fillOpacity: 0.8,
     }
     function stileGeoJSON(feature) {
-      return {
-        color: livello.colore,
-      }
+        return {
+            color: livello.colore,
+        }
     }
     function stileGeoPointToLayer(feature, latlng) {
-      return L.circleMarker(latlng, geojsonMarkerOptions);
+        return L.circleMarker(latlng, geojsonMarkerOptions);
+    }
+    function bindPopupOnEach(feature, layer) {
+        if (feature.properties && feature.properties.info) {
+            layer.bindPopup(`<b>${feature.properties.info}</b>`);
+        }
     }
     function creaGeometria(geo) {
         const geoRaw = JSON.parse(geo.geom);
-        if (geoRaw.type === "Point") {
-            const geoGeoJSON = L.Proj.geoJson(geoRaw, {pointToLayer: stileGeoPointToLayer}).addTo(livelloTabella);
-            geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
-        }
-        else {
-        const geoGeoJSON = L.Proj.geoJson(geoRaw, {style: stileGeoJSON}).addTo(livelloTabella);
+        const geoGeoJSON = L.Proj.geoJson(geoRaw, {style: stileGeoJSON, pointToLayer: stileGeoPointToLayer}).addTo(livelloTabella);
         geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
-        }
+    }
+    function aggiungiFeatureColl(featureCollection) {
+        L.Proj.geoJson(featureCollection, {style: stileGeoJSON, pointToLayer: stileGeoPointToLayer, onEachFeature: bindPopupOnEach}).addTo(livelloTabella);
     }
 
     for (const gisGeom of livello.gis) {
-      creaGeometria(gisGeom);
+        // creaGeometria(gisGeom);
+        const feature = {
+            type: "Feature",
+            properties: {
+                info: gisGeom.info,
+            },
+            geometry: JSON.parse(gisGeom.geom),
+        }
+        featureColl.features.push(feature);
     }
+
+    aggiungiFeatureColl(featureColl);
+    console.log(livelloTabella);
 
     return livelloTabella;
-}
-
-// CREAZIONE NUOVO LIVELLO GIS E AGGIUNTA A MAPPA
-export function creaLivelloGISeAggiungiLayer(livello, mappa) {
-    proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
-
-    const livelloTabella = L.layerGroup();
-    const geojsonMarkerOptions = {
-      radius: 8,
-      color: livello.colore,
-      fillColor: livello.colore,
-      fillOpacity: 0.8,
-    }
-    function stileGeoJSON(feature) {
-      return {
-        color: livello.colore,
-      }
-    }
-    function stileGeoPointToLayer(feature, latlng) {
-      return L.circleMarker(latlng, geojsonMarkerOptions);
-    }
-    function creaGeometria(geo) {
-        const geoRaw = JSON.parse(geo.geom);
-        if (geoRaw.type === "Point") {
-            const geoGeoJSON = L.Proj.geoJson(geoRaw, {pointToLayer: stileGeoPointToLayer}).addTo(livelloTabella);
-            geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
-        }
-        else {
-        const geoGeoJSON = L.Proj.geoJson(geoRaw, {style: stileGeoJSON}).addTo(livelloTabella);
-        geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
-        }
-    }
-
-    for (const gisGeom of livello.gis) {
-      creaGeometria(gisGeom);
-    }
-
-    mappa.addLayer(livelloTabella);
-
-    // return livelloTabella;
 }
