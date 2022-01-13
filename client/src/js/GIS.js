@@ -4,6 +4,8 @@ import L from 'leaflet';
 import proj4 from 'proj4';
 import 'proj4leaflet';
 
+export let mappaGlb;
+
 // CREAZIONE MAPPA
 export function creaMappa(divId, posizioneIniziale) {
     const mappaGIS = L.map(divId).setView(posizioneIniziale, 8);
@@ -11,6 +13,7 @@ export function creaMappa(divId, posizioneIniziale) {
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     const tiles = L.tileLayer(tileUrl, { attribution, "detectRetina": false, "maxNativeZoom": 20, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false});
     tiles.addTo(mappaGIS);
+    mappaGlb = mappaGIS;
     return mappaGIS;
 }
 
@@ -34,10 +37,10 @@ export function creaLivelloGIS(livello) {
     proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
 
     const livelloTabella = L.layerGroup();
-    const featureColl = {
-        type: "FeatureCollection",
-        features: [],
-    };
+    // const featureColl = {
+    //     type: "FeatureCollection",
+    //     features: [],
+    // };
     const geojsonMarkerOptions = {
         radius: 8,
         color: livello.colore,
@@ -60,25 +63,29 @@ export function creaLivelloGIS(livello) {
     function creaGeometria(geo) {
         const geoRaw = JSON.parse(geo.geom);
         const geoGeoJSON = L.Proj.geoJson(geoRaw, {style: stileGeoJSON, pointToLayer: stileGeoPointToLayer}).addTo(livelloTabella);
+        // const geoGeoJSON = L.Proj.geoJson(geo, {style: stileGeoJSON, pointToLayer: stileGeoPointToLayer}).addTo(livelloTabella);
         geoGeoJSON.bindPopup(`<b>${geo.info}</b>`);
+        // geoGeoJSON.bindPopup(`<b>${geo.properties.info}</b>`);
     }
-    function aggiungiFeatureColl(featureCollection) {
-        L.Proj.geoJson(featureCollection, {style: stileGeoJSON, pointToLayer: stileGeoPointToLayer, onEachFeature: bindPopupOnEach}).addTo(livelloTabella);
-    }
+    // function aggiungiFeatureColl(featureCollection) {
+    //     L.Proj.geoJson(featureCollection, {style: stileGeoJSON, pointToLayer: stileGeoPointToLayer, onEachFeature: bindPopupOnEach}).addTo(livelloTabella);
+    //     console.log(featureCollection);
+    // }
 
     for (const gisGeom of livello.gis) {
-        // creaGeometria(gisGeom);
-        const feature = {
-            type: "Feature",
-            properties: {
-                info: gisGeom.info,
-            },
-            geometry: JSON.parse(gisGeom.geom),
-        }
-        featureColl.features.push(feature);
+        creaGeometria(gisGeom);
+        // const feature = {
+        //     type: "Feature",
+        //     properties: {
+        //         info: gisGeom.info,
+        //     },
+        //     geometry: JSON.parse(gisGeom.geom),
+        // }
+        // featureColl.features.push(feature);
+        // creaGeometria(feature);
     }
 
-    aggiungiFeatureColl(featureColl);
+    // aggiungiFeatureColl(featureColl);
     console.log(livelloTabella);
 
     return livelloTabella;

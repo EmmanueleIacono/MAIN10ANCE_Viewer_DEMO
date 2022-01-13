@@ -10,7 +10,6 @@ export default {
   name: 'GISLayer',
   props: {
     livello: String,
-    mappa: Object
   },
   setup(props) {
     const store = inject('store');

@@ -7,7 +7,7 @@
     <button @click="chiamaResetMappa" class="selettoreSM-dropdown">
       <span class="glyphicon glyphicon-home" style="margin-right: 10px;"></span>HOME
     </button>
-    <button @click="stampaEnG">stampa mappa</button>
+    <!-- <button @click="stampaEnG">stampa mappa</button> -->
     <CheckboxGIS
       v-for="(liv, key) in store.stateGIS.entitàGIS"
       :key="key"
@@ -40,7 +40,7 @@ export default {
     const store = inject('store');
     const mappaRef = ref(null);
     const state = reactive({
-      mappaGIS: null,
+      // mappaGIS: null,
       livelliGISAttivi: [],
     });
     provide('stateGIS', state);
@@ -49,16 +49,16 @@ export default {
       mappaRef.value.resetMap();
     }
 
-    function stampaEnG() {
-      console.log(state.mappaGIS);
-    }
+    // function stampaEnG() {
+    //   console.log(state.mappaGIS);
+    // }
 
     return {
       store,
       state,
       mappaRef,
       chiamaResetMappa,
-      stampaEnG,
+      // stampaEnG,
     }
   }
 }

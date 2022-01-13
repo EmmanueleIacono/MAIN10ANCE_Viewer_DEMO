@@ -1,14 +1,15 @@
 <template>
   <div>
     <img v-if="!condizione" src="../../assets/img/ajax-loader-4.gif" class="img-cbx-gis">
-    <input v-if="condizione" :id="`cbx-${idUnivoco}`" :value="valore" v-model="stateGIS.livelliGISAttivi" :style="{'accent-color': colore}" type="checkbox" class="cbx-gis">
+    <!-- <input v-if="condizione" :id="`cbx-${idUnivoco}`" :value="valore" v-model="stateGIS.livelliGISAttivi" :style="{'accent-color': colore}" type="checkbox" class="cbx-gis"> -->
+    <input v-if="condizione" :id="`cbx-${idUnivoco}`" :value="valore" :style="{'accent-color': colore}" type="checkbox" class="cbx-gis">
     <label :for="`cbx-${idUnivoco}`">{{nome}}</label>
   </div>
 </template>
 
 <script>
 import {inject, watch} from 'vue';
-import {aggiungiLayer, rimuoviLayer} from '../../js/GIS';
+// import {aggiungiLayer, mappaGlb, rimuoviLayer} from '../../js/GIS';
 
 export default {
   name: 'Checkbox',
@@ -19,33 +20,41 @@ export default {
     colore: String,
     condizione: Boolean,
   },
-  setup() {
+  setup(props) {
     const store = inject('store');
     const stateGIS = inject('stateGIS');
 
-    watch(() => stateGIS.livelliGISAttivi, (newList, oldList) => {
-      if (newList.length > oldList.length) {
-        newList.forEach(liv => {
-          if (!oldList.includes(liv) && !store.stateGIS.entitàGIS[liv].presente) {
-            store.stateGIS.entitàGIS[liv].presente = true;
-            aggiungiLayer(store.stateGIS.entitàGIS[liv].geometria, stateGIS.mappaGIS);
-            console.log(store.stateGIS.entitàGIS[liv].geometria);
-            console.log(`ho aggiunto ${liv}`);
-          }
-        });
+    // watch(() => stateGIS.livelliGISAttivi, (newList, oldList) => {
+    //   if (newList.length > oldList.length) {
+    //     newList.forEach(liv => {
+    //       if (!oldList.includes(liv) && !store.stateGIS.entitàGIS[liv].presente) {
+    //         store.stateGIS.entitàGIS[liv].presente = true;
+    //         // aggiungiLayer(store.stateGIS.entitàGIS[liv].geometria, stateGIS.mappaGIS);
+    //         aggiungiLayer(store.stateGIS.entitàGIS[liv].geometria, mappaGlb);
+    //         console.log(store.stateGIS.entitàGIS[liv].geometria);
+    //         console.log(`ho aggiunto ${liv}`);
+    //       }
+    //     });
+    //   }
+    //   else {
+    //     oldList.forEach(liv => {
+    //       if (!newList.includes(liv) && store.stateGIS.entitàGIS[liv].presente) {
+    //         store.stateGIS.entitàGIS[liv].presente = false;
+    //         // rimuoviLayer(store.stateGIS.entitàGIS[liv].geometria, stateGIS.mappaGIS);
+    //         rimuoviLayer(store.stateGIS.entitàGIS[liv].geometria, mappaGlb);
+    //         console.log(store.stateGIS.entitàGIS[liv].geometria);
+    //         console.log(`ho tolto ${liv}`);
+    //       }
+    //     });
+    //   }
+    // }, {
+    //   deep: true,
+    // });
+
+    watch(() => props.condizione, (newCond) => {
+      if (newCond) {
+        console.log(`${props.idUnivoco} è pronto`);
       }
-      else {
-        oldList.forEach(liv => {
-          if (!newList.includes(liv) && store.stateGIS.entitàGIS[liv].presente) {
-            store.stateGIS.entitàGIS[liv].presente = false;
-            rimuoviLayer(store.stateGIS.entitàGIS[liv].geometria, stateGIS.mappaGIS);
-            console.log(store.stateGIS.entitàGIS[liv].geometria);
-            console.log(`ho tolto ${liv}`);
-          }
-        });
-      }
-    }, {
-      deep: true,
     });
 
     return {
