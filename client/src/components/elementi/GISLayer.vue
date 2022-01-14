@@ -1,3 +1,4 @@
+<!-- QUESTO COMPONENT NON VIENE MAI USATO, POI DA ELIMINARE -->
 <template>
 <div></div>
 </template>

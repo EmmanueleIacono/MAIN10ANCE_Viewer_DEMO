@@ -206,7 +206,7 @@ class LayerGIS {
             contenitoreSpegniLiv.appendChild(labelCheck);
             const contenitoreLivelli = document.getElementById('contenitore-livelli-div-interno');
             contenitoreLivelli.appendChild(contenitoreSpegniLiv);
-            let visibilitàLivello = false;
+            // let visibilitàLivello = false;
             spegniLivelloCheck.addEventListener("click", () => {
                 if (!spegniLivelloCheck.checked) {
                     mappaGIS.removeLayer(livelloTabella);
@@ -214,9 +214,8 @@ class LayerGIS {
                 else {
                     mappaGIS.addLayer(livelloTabella);
                 }
-                visibilitàLivello = !visibilitàLivello;
+                // visibilitàLivello = !visibilitàLivello;
             });
-    
         }
 
         const creaGeometria = (geo) => {

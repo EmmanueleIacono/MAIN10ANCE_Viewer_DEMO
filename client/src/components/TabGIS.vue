@@ -7,26 +7,27 @@
     <button @click="chiamaResetMappa" class="selettoreSM-dropdown">
       <span class="glyphicon glyphicon-home" style="margin-right: 10px;"></span>HOME
     </button>
-    <!-- <button @click="stampaEnG">stampa mappa</button> -->
     <CheckboxGIS
       v-for="(liv, key) in store.stateGIS.entitàGIS"
       :key="key"
       :idUnivoco="key"
       :valore="key"
-      :condizione="liv.ready"
+      :pronto="liv.ready"
       :nome="liv.alias"
       :colore="liv.colore"
+      @creazioneLivello="creaLivello"
     />
   </Explorer>
 </div>
 </template>
 
 <script>
-import {ref, reactive, provide, inject} from 'vue';
+import {ref, inject} from 'vue';
 import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
 import MappaGIS from './TabGISMappa.vue';
 import CheckboxGIS from './elementi/CheckboxGIS.vue';
+import {mappaGlb, creaLivelloGIS} from '../js/GIS';
 
 export default {
   name: 'TabGIS',
@@ -39,26 +40,31 @@ export default {
   setup() {
     const store = inject('store');
     const mappaRef = ref(null);
-    const state = reactive({
-      // mappaGIS: null,
-      livelliGISAttivi: [],
-    });
-    provide('stateGIS', state);
 
     function chiamaResetMappa() {
       mappaRef.value.resetMap();
     }
 
-    // function stampaEnG() {
-    //   console.log(state.mappaGIS);
-    // }
+    function creaLivello(livId) {
+      const liv = creaLivelloGIS(store.stateGIS.entitàGIS[livId]);
+      const cbx = document.getElementById(`cbx-${livId}`);
+      cbx.addEventListener('click', () => toggleLivello(liv, cbx));
+    }
+
+    function toggleLivello(livello, checkbox) {
+      if (!checkbox.checked) {
+        mappaGlb.removeLayer(livello);
+      }
+      else {
+        mappaGlb.addLayer(livello);
+      }
+    }
 
     return {
       store,
-      state,
       mappaRef,
       chiamaResetMappa,
-      // stampaEnG,
+      creaLivello,
     }
   }
 }
