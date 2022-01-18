@@ -4,6 +4,8 @@ import L from 'leaflet';
 import proj4 from 'proj4';
 import 'proj4leaflet';
 
+import {getModel} from './BIM';
+
 export let mappaGlb;
 
 // CREAZIONE MAPPA
@@ -13,7 +15,7 @@ export function creaMappa(divId, posizioneIniziale) {
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     const tiles = L.tileLayer(tileUrl, { attribution, "detectRetina": false, "maxNativeZoom": 20, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false});
     tiles.addTo(mappaGIS);
-    mappaGlb = mappaGIS;
+    if (!mappaGlb) {mappaGlb = mappaGIS};
     return mappaGIS;
 }
 
@@ -51,11 +53,6 @@ export function creaLivelloGIS(livello) {
     function stileGeoPointToLayer(feature, latlng) {
         return L.circleMarker(latlng, geojsonMarkerOptions);
     }
-    function bindPopupOnEach(feature, layer) {
-        if (feature.properties && feature.properties.info) {
-            layer.bindPopup(`<b>${feature.properties.info}</b>`);
-        }
-    }
     function creaGeometria(geo) {
         const geoRaw = JSON.parse(geo.geom);
         const geoGeoJSON = L.Proj.geoJson(geoRaw, {style: stileGeoJSON, pointToLayer: stileGeoPointToLayer}).addTo(livelloTabella);
@@ -67,4 +64,64 @@ export function creaLivelloGIS(livello) {
     }
 
     return livelloTabella;
+}
+
+export function creaMarkerSM(sm) {
+    const iconaSacriMonti = L.icon({
+        iconUrl: require('/src/assets/img/logo_b.png'),
+        shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        shadowSize: [36, 36],
+        shadowAnchor: [18, 15]
+    });
+
+    const marker = L.marker(sm.coord, {icon: iconaSacriMonti}).bindPopup();
+
+    const contenitorePopup = document.createElement('div');
+    contenitorePopup.innerHTML = `<b>Sacro Monte di ${sm.nome}</b><br>`;
+    const selettoreSM = document.createElement('button');
+    selettoreSM.id = `selettore_${sm.sigla}`;
+    selettoreSM.innerText = 'MODELLO';
+    contenitorePopup.appendChild(selettoreSM);
+    selettoreSM.addEventListener('click', () => {
+        getModel(sm.urn);
+        mappaGlb.closePopup();
+    });
+
+    marker.on('popupopen', () => {
+        marker._popup.setContent(contenitorePopup);
+    });
+
+    return marker;
+}
+
+export function creaMarkerCapp(capp) {
+    const iconaCappelle = L.icon({
+        iconUrl: require('/src/assets/img/icona_capp_blue_small.png'),
+        shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        shadowSize: [36, 36],
+        shadowAnchor: [18, 15]
+    });
+
+    const marker = L.marker(capp.coord, {icon: iconaCappelle}).bindPopup();
+
+    const contenitorePopup = document.createElement('div');
+    contenitorePopup.innerHTML = `<b>${capp.nome}</b><br>${capp.descrizione}<br>`;
+    const selettoreCapp = document.createElement('button');
+    selettoreCapp.id = `selettore_${capp.sigla}`;
+    selettoreCapp.innerText = 'MODELLO';
+    contenitorePopup.appendChild(selettoreCapp);
+    selettoreCapp.addEventListener('click', () => {
+        getModel(capp.urn);
+        mappaGlb.closePopup();
+    });
+    
+    marker.on('popupopen', () => {
+        marker._popup.setContent(contenitorePopup);
+    });
+
+    return marker;
 }

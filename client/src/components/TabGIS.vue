@@ -4,19 +4,25 @@
     <MappaGIS ref="mappaRef" />
   </MainPanel>
   <Explorer :colonna="'col-sm-3'">
-    <button @click="chiamaResetMappa" class="selettoreSM-dropdown">
-      <span class="glyphicon glyphicon-home" style="margin-right: 10px;"></span>HOME
-    </button>
-    <CheckboxGIS
-      v-for="(liv, key) in store.stateGIS.entitàGIS"
-      :key="key"
-      :idUnivoco="key"
-      :valore="key"
-      :pronto="liv.ready"
-      :nome="liv.alias"
-      :colore="liv.colore"
-      @creazioneLivello="creaLivello"
-    />
+    <Details summary="NAVIGAZIONE">
+      <button @click="chiamaResetMappa" class="selettoreSM-dropdown">
+        <span class="glyphicon glyphicon-home" style="margin-right: 10px;"></span>HOME
+      </button>
+      <button v-for="(sm, ind) in store.stateGIS.markerSM" :key="ind" @click="setVistaMappa(sm.coord)" class="selettoreSM-dropdown">Sacro Monte di {{sm.nome}}</button>
+    </Details>
+    <br />
+    <Details summary="LIVELLI GIS" @click="emettiLoadLivelli">
+      <CheckboxGIS
+        v-for="(liv, key) in store.stateGIS.entitàGIS"
+        :key="key"
+        :idUnivoco="key"
+        :valore="key"
+        :pronto="liv.ready"
+        :nome="liv.alias"
+        :colore="liv.colore"
+        @creazioneLivello="creaLivello"
+      />
+    </Details>
   </Explorer>
 </div>
 </template>
@@ -27,6 +33,7 @@ import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
 import MappaGIS from './TabGISMappa.vue';
 import CheckboxGIS from './elementi/CheckboxGIS.vue';
+import Details from './elementi/Details.vue';
 import {mappaGlb, creaLivelloGIS} from '../js/GIS';
 
 export default {
@@ -36,13 +43,19 @@ export default {
     Explorer,
     MappaGIS,
     CheckboxGIS,
+    Details,
   },
-  setup() {
+  setup(props, context) {
     const store = inject('store');
     const mappaRef = ref(null);
+    const primoLoadLivelli = ref(false);
 
     function chiamaResetMappa() {
       mappaRef.value.resetMap();
+    }
+
+    function setVistaMappa(posizione) {
+      mappaGlb.setView(posizione, 17);
     }
 
     function creaLivello(livId) {
@@ -60,11 +73,21 @@ export default {
       }
     }
 
+    function emettiLoadLivelli() {
+      if (!primoLoadLivelli.value) {
+        context.emit('loadLivelli');
+        primoLoadLivelli.value = true;
+      }
+    }
+
     return {
+      props,
       store,
       mappaRef,
       chiamaResetMappa,
+      setVistaMappa,
       creaLivello,
+      emettiLoadLivelli,
     }
   }
 }

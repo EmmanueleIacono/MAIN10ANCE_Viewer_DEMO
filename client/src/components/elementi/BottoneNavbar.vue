@@ -1,10 +1,11 @@
+<!-- MAGARI IMPOSTABILE, SE NO ELIMINABILE -->
 <template>
-    <div>BOTTONE NAVBAR</div>
+  <div>BOTTONE NAVBAR</div>
 </template>
 
 <script>
 export default {
-    name: 'BottoneNavbar',
+  name: 'BottoneNavbar',
 }
 </script>
 

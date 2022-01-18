@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import {onMounted, inject} from 'vue';
-import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb} from '../js/GIS';
+import {onMounted, inject, watch} from 'vue';
+import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarkerSM, creaMarkerCapp} from '../js/GIS';
 import L from 'leaflet';
 
 export default {
@@ -24,9 +24,20 @@ export default {
       const gruppoMarkerCappelle = L.layerGroup();
       const gruppoMarkerSacriMonti = L.layerGroup();
 
-      for (const key in store.stateGIS.entitàGIS) {
-        console.log(key);
-      }
+      watch(() => [store.stateGIS.markerSM, store.stateGIS.markerCapp], () => {
+        if (store.stateGIS.markerSM) {
+          store.stateGIS.markerSM.forEach(sm => {
+            const markerSM = creaMarkerSM(sm);
+            markerSM.addTo(gruppoMarkerSacriMonti);
+          });
+        }
+        if (store.stateGIS.markerCapp) {
+          store.stateGIS.markerCapp.forEach(capp => {
+            const markerCapp = creaMarkerCapp(capp);
+            markerCapp.addTo(gruppoMarkerCappelle);
+          });
+        }
+      });
 
       setInterval(() => {
         const zoomComune = 17;

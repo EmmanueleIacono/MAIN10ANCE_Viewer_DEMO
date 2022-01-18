@@ -35,7 +35,7 @@
     <div class="row fill">
       <div class="fill">
         <keep-alive>
-          <component :is="store.state.tabAttivo" />
+          <component :is="store.state.tabAttivo" @loadLivelli="loadLayers" />
         </keep-alive>
       </div>
     </div>
@@ -45,7 +45,7 @@
 
 <script>
 import {provide, onMounted} from 'vue';
-import {getTabelleGIS, getGIS} from './js/richieste';
+import {getTabelleGIS, getGIS, leggiDBMarkerSM, leggiDBMarkerCapp} from './js/richieste';
 import store from '@/store';
 import Tab1 from './components/TabBIM.vue';
 import Tab2 from './components/TabGIS.vue';
@@ -68,14 +68,10 @@ export default {
     primoLoad();
 
     onMounted(async () => {
-      const tabelleGIS = await getTabelleGIS();
-      store.methods.setTabelleGIS(tabelleGIS);
-      for await (const tab of tabelleGIS) {
-        if (tab.colonneUtili) {
-          const gis = await getGIS(tab.tabella, tab.geometria, tab.colonneUtili.join(", "));
-          store.methods.setEntitàGIS(tab.tabella, gis);
-        }
-      }
+      const sacriMontiJson = await leggiDBMarkerSM();
+      const cappelleJson = await leggiDBMarkerCapp();
+      store.methods.setMarkerSM(sacriMontiJson);
+      store.methods.setMarkerCapp(cappelleJson);
     });
 
     function primoLoad() {
@@ -92,9 +88,21 @@ export default {
       store.methods.setTabAttivo('Tab2');
     }
 
+    async function loadLayers() {
+      const tabelleGIS = await getTabelleGIS();
+      store.methods.setTabelleGIS(tabelleGIS);
+      for await (const tab of tabelleGIS) {
+        if (tab.colonneUtili) {
+          const gis = await getGIS(tab.tabella, tab.geometria, tab.colonneUtili.join(", "));
+          store.methods.setEntitàGIS(tab.tabella, gis);
+        }
+      }
+    }
+
     return {
       store,
       logout,
+      loadLayers,
     }
   }
 }

@@ -13,6 +13,13 @@ const state = reactive({
 const stateGIS = reactive({
     tabelleGIS: null,
     entitàGIS: {},
+    markerSM: null,
+    markerCapp: null,
+});
+
+const stateBIM = reactive({
+    modelPlaceholder: true,
+    urnModelloCorrente: null,
 });
 
 const methods = {
@@ -51,8 +58,8 @@ const methods = {
                     alias: tab.alias,
                     gis: [],
                     colore: generaColoreRandom(),
-                    geometria: {},
-                    presente: false,
+                    geometria: {}, // eliminabile
+                    presente: false, // eliminabile
                 }
                 stateGIS.entitàGIS[tab.tabella] = oggEntità;
             }
@@ -66,6 +73,14 @@ const methods = {
 
     setGeometriaEntità(tabella, livello) {
         stateGIS.entitàGIS[tabella].geometria = livello;
+    },
+
+    setMarkerSM(listaMarker) {
+        stateGIS.markerSM = listaMarker;
+    },
+
+    setMarkerCapp(listaCapp) {
+        stateGIS.markerCapp = listaCapp;
     }
 }
 
@@ -81,6 +96,7 @@ const getters = {
 export default {
     state: readonly(state),
     stateGIS,
+    stateBIM,
     methods,
     getters,
 }

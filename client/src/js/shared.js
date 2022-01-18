@@ -2,8 +2,7 @@
 
 // const formDB = document.getElementById('formDB');
 
-let viewer;
-// let urnModelloCorrente;
+import {viewer} from './shared';
 
 ////////// FUNZIONI UTILI E/O CONDIVISE TRA PIU' FILE JS //////////
 

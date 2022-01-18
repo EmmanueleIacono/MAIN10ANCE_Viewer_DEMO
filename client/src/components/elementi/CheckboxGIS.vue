@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <img v-if="!pronto" src="../../assets/img/ajax-loader-4.gif" class="img-cbx-gis">
-    <input v-show="pronto" :id="`cbx-${idUnivoco}`" :value="valore" :style="{'accent-color': colore}" type="checkbox" class="cbx-gis">
-    <label :for="`cbx-${idUnivoco}`">{{nome}}</label>
-  </div>
+<div>
+  <img v-if="!pronto" src="../../assets/img/ajax-loader-4.gif" class="img-cbx-gis">
+  <input v-show="pronto" :id="`cbx-${idUnivoco}`" :value="valore" :style="{'accent-color': colore}" type="checkbox" class="cbx-gis">
+  <label :for="`cbx-${idUnivoco}`">{{nome}}</label>
+</div>
 </template>
 
 <script>
@@ -21,11 +21,11 @@ export default {
   setup(props, context) {
     watch(() => props.pronto, (newCond) => {
       if (newCond) {
-        emettiCambioTab(props.idUnivoco);
+        emettiCreaLivello(props.idUnivoco);
       }
     });
 
-    function emettiCambioTab(idLiv) {
+    function emettiCreaLivello(idLiv) {
       context.emit('creazioneLivello', idLiv);
     }
   }
