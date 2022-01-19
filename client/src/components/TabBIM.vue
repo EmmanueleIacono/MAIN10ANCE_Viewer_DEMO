@@ -8,7 +8,13 @@
     </div>
   </div>
   <Explorer :colonna="`col-sm-${store.getters.getBimVwSets()[1]}`">
-    <button @click="stampastate">stampa state</button>
+    <!-- <button @click="stampastate">stampa state</button> -->
+    <Details summary="SELEZIONE MODELLI">
+      <div id="appBuckets">
+        tree here
+      </div>
+    </Details>
+    <PannelloDB />
   </Explorer>
 </div>
 </template>
@@ -16,11 +22,15 @@
 <script>
 import {inject} from 'vue';
 import Explorer from './elementi/Explorer.vue';
+import Details from './elementi/Details.vue';
+import PannelloDB from './TabBIMPannelloDB.vue';
 
 export default {
   name: 'TabBIM',
   components: {
     Explorer,
+    Details,
+    PannelloDB,
   },
   setup() {
     const store = inject('store');
@@ -56,5 +66,10 @@ export default {
 #bim-viewer-placeholder {
   width: 100%;
   opacity: 15%;
+}
+
+#appBuckets {
+  width: 100%;
+  height: 100%;
 }
 </style>

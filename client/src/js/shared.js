@@ -2,7 +2,7 @@
 
 // const formDB = document.getElementById('formDB');
 
-import {viewer} from './shared';
+import {viewer} from './BIM';
 
 ////////// FUNZIONI UTILI E/O CONDIVISE TRA PIU' FILE JS //////////
 

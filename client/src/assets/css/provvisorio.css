@@ -1,0 +1,499 @@
+/* ELIMINARE DI VOLTA IN VOLTA DA QUESTO FILE GLI STILI USATI SUI COMPONENT, COME FORMA DI CONTROLLO */
+
+.scheda-con-int, #apriTabControllo, #apriTabIntervento, #apriTabAnagrafica, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento, #salvaSchedaAnagrafica {
+  display: none;
+}
+
+#scheda-anagrafica {
+  background-color: var(--gialloAnagraficaTrasparenza);
+  font-size: 13px;
+  padding: 30px 14px;
+}
+
+#scheda-controllo {
+  background-color: var(--verdeMain10anceTrasparenza);
+  font-size: 13px;
+  padding: 30px 14px;
+}
+
+#scheda-intervento {
+  background-color: var(--bluInterregTrasparenza);
+  font-size: 13px;
+  padding: 30px 14px;
+}
+
+#salvaSchedaAnagrafica {
+  cursor: pointer;
+  border: none;
+  font-size: inherit;
+  font-weight: bold;
+  background: var(--gialloAnagrafica);
+  color: var(--ghostWhite);
+  padding: .75rem 1.75rem;
+  margin-bottom: 1rem;
+}
+
+#salvaSchedaIntervento {
+  cursor: pointer;
+  border: none;
+  font-size: inherit;
+  font-weight: bold;
+  background: var(--bluInterreg);
+  color: var(--ghostWhite);
+  padding: .75rem 1.75rem;
+  margin-bottom: 1rem;
+}
+
+#salvaSchedaControllo {
+  cursor: pointer;
+  border: none;
+  font-size: inherit;
+  font-weight: bold;
+  background: var(--verdeMain10ance);
+  color: var(--ghostWhite);
+  padding: .75rem 1.75rem;
+  margin-bottom: 1rem;
+}
+
+#chiudiSchede {
+  cursor: pointer;
+  border: none;
+  font-size: inherit;
+  font-weight: bold;
+  background: var(--blackOlive);
+  color: var(--ghostWhite);
+  padding: .75rem 1.75rem;
+  margin-bottom: 1rem;
+}
+
+#chiudiSchede,
+#salvaSchedaControllo,
+#salvaSchedaIntervento,
+#salvaSchedaAnagrafica {
+  padding: .9rem 1rem;
+  font-size: large;
+  font-weight: initial;
+}
+
+.scheda, #apriPDF {
+  cursor: pointer;
+  padding: 10px;
+  margin: 10px;
+  color: var(--ghostWhite);
+  background-color: var(--blackOlive);
+  font-weight: bold;
+  border: none;
+}
+
+.scheda.active {
+  background-color: var(--bluInterregTrasparenza);
+}
+
+.scheda:hover {
+  background-color: #aaa;
+}
+
+.scheda-anagrafica {
+  cursor: pointer;
+  padding: 10px;
+  margin: 10px;
+  color: var(--ghostWhite);
+  background-color: var(--gialloAnagrafica);
+  font-weight: bold;
+  border: none;
+}
+
+.scheda-anagrafica.active {
+  background-color: var(--gialloAnagraficaTrasparenza);
+}
+
+.scheda-controllo {
+  cursor: pointer;
+  padding: 10px;
+  margin: 10px;
+  color: var(--ghostWhite);
+  background-color: var(--verdeMain10ance);
+  font-weight: bold;
+  border: none;
+}
+
+.scheda-controllo.active {
+  background-color: var(--verdeMain10anceTrasparenza);
+}
+
+.scheda-intervento {
+  cursor: pointer;
+  padding: 10px;
+  margin: 10px;
+  color: var(--ghostWhite);
+  background-color: var(--bluInterreg);
+  font-weight: bold;
+  border: none;
+}
+
+.scheda-intervento.active {
+  background-color: var(--bluInterregTrasparenza);
+}
+
+.scheda-controllo:hover, .scheda-intervento:hover, .scheda-anagrafica:hover {
+  background-color: #aaa;
+}
+
+input[id^="form-"] {
+  float: right;
+  line-height: 80%
+}
+
+input[id^="mod-sc-cont-"],
+select[id^="mod-sc-cont-"],
+input[id^="scheda-anagrafica-"],
+textarea[id^="scheda-anagrafica-"],
+input[id^="scheda-controllo-"],
+select[id^="scheda-controllo-"],
+textarea[id^="scheda-controllo-"],
+#scelta-intervento,
+input[id^="scheda-intervento-"],
+select[id^="scheda-intervento-"],
+textarea[id^="scheda-intervento-"] {
+  float: right;
+  line-height: 100%;
+  padding: 1px;
+  border: 0;
+}
+
+p[id^="sc-an"],
+p[id^="mod-sc-cont-"] {
+  float: right;
+  line-height: 100%;
+  padding: 0px;
+  text-align: right;
+}
+
+div[id^="div-form-"] {
+  float: right;
+}
+
+#labelCerca {
+  padding-right: 10px;
+}
+
+#formDB {
+  line-height: 150%;
+}
+
+/* INTERFACCIA DATABASE */
+
+#tabDashboard {
+  padding: 10px;
+}
+
+/* TABELLA DB */
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  padding: 10px;
+  overflow: auto;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  max-width: 200px;
+}
+
+td {
+  word-break: break-all;
+}
+
+th {
+  background-color: #b6b4b4;
+} 
+
+tr:nth-child(even) {
+  background-color: #cacaca;
+}
+
+#risultatiDB {
+  overflow: auto;
+  padding: 10px;
+  width: 100%;
+  height: 80%;
+}
+
+/* TABELLE SCHEDE CONTROLLO-INTERVENTO */
+
+#tabella-titolo {
+  padding: 15px 0 10px;
+}
+
+#contenitore-schede {
+  height: 90%;
+  overflow: auto;
+  padding-left: 5px;
+  padding-right: 15px;
+}
+
+.caption-schede {
+  color: var(--bluInterreg);
+}
+
+.caption-schede:hover {
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-thickness: 3px;
+}
+
+.td-schede-mr-mc-r {
+  border: none;
+  background-color: var(--bluInterregTrasparenza2);
+  max-width: 500px;
+}
+
+.tr-schede-mr-mc-r:nth-child(even) {
+  background-color: var(--bluInterregTrasparenza3);
+}
+
+.td-schede-c {
+  border: none;
+  background-color: var(--verdeMain10anceTrasparenza);
+  max-width: 500px;
+}
+
+.tr-schede-c:nth-child(even) {
+  background-color: var(--verdeMain10anceTrasparenza2);
+}
+
+.vedi-schede {
+  background-color: var(--verdeMain10ance);
+  color: var(--grigioMoltoScuro);
+  border: none;
+  font-weight: bold;
+}
+
+.vedi-schede:hover {
+  background-color: var(--verdeMain10anceTrasparenza);
+}
+
+.vedi-schede-disatt {
+  background-color: var(--grigioScuro);
+  color: var(--grigioMoltoScuro);
+  border: none;
+  font-weight: bold;
+}
+
+#pannello-lat-schede-inner {
+  overflow: auto;
+}
+
+/* TABELLA SCHEDA CONTROLLO PROGRAMMATO EFFETTUATO */
+
+#mod-sc-cont-tabella td {
+  border: none;
+  background-color: var(--verdeMain10anceTrasparenza);
+  word-break: normal;
+}
+
+#mod-sc-cont-tabella tr:nth-child(even) {
+  background-color: var(--verdeMain10anceTrasparenza2);
+}
+
+/* DASHBOARD */
+
+.h1-db, .h2-db, .h3-db, .h4-db, .h5-db, .h6-db {
+  color: #333333;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.h1-db {
+  font-size: 36px;
+}
+
+.h2-db {
+  font-size: 30px;
+}
+
+.h3-db {
+  font-size: 24px;
+}
+
+.h4-db {
+  font-size: 18px;
+}
+
+.h5-db {
+  font-size: 15px;
+}
+
+.h6-db {
+  font-size: 13px;
+}
+
+#contenitore-dash {
+  height: 100%;
+  overflow: auto;
+  padding: 2%;
+}
+
+/* ----- Progress ----- */
+
+.au-progress .au-progress__bar {
+  height: 10px;
+  position: relative;
+  background: #d9d9d9;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.au-progress .au-progress__bar .au-progress__inner {
+  position: absolute;
+  width: 0;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-transition: width 1s ease-in-out;
+  -o-transition: width 1s ease-in-out;
+  -moz-transition: width 1s ease-in-out;
+  transition: width 1s ease-in-out;
+  background-color: orange;
+  overflow: visible;
+}
+
+.au-progress__title {
+  font-size: 14px;
+  color: #808080;
+  display: inline-block;
+  margin-bottom: 9px;
+}
+
+.au-progress__value {
+  font-size: 14px;
+  color: #808080;
+  position: absolute;
+  top: -28px;
+  right: -15px;
+}
+
+/* ----- Speedometer ----- */
+
+.flex{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.text{
+  position: absolute;
+  text-align: center;
+}
+
+.circle{
+  width: 200px;
+  height: 200px;
+}
+
+.points{
+  width: 3px;
+  height: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  position: absolute;
+  transform: rotate(calc(var(--i)*var(--r))) translateY(-80px);
+  border-radius: 3px;
+}
+
+.animated{
+  animation: glow .01s linear forwards;
+  animation-delay: calc(var(--i)*0.05s);
+}
+
+@keyframes glow {
+  100%{
+    background: var(--col);
+    box-shadow: 0 0 20px var(--col);
+  }
+}
+
+[data-card] {
+  display: none;
+}
+
+.active[data-card] {
+  display: block;
+}
+
+.bottone-prog {
+  background-color: var(--bluInterreg);
+  color: white;
+  border: none;
+  margin-left: 10px;
+}
+
+.bottone-prog:hover {
+  background-color: var(--grigioScuro);
+}
+
+.tabella-prog-controlli {
+  table-layout: fixed;
+  width: 100%;
+  word-wrap: normal;
+}
+
+.tabella-prog-controlli th, .tabella-prog-controlli td {
+  width: 90%;
+  max-width: 50px;
+  word-break: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabella-prog-controlli .tab-div {
+  z-index: 10;
+  height: 60px;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabella-prog-controlli input {
+  width: 90%
+}
+
+.tooltip-prog {
+  position: relative;
+}
+
+.tooltip-prog-text {
+  visibility: hidden;
+  position: absolute;
+  z-index: 100;
+  border: 1px;
+  background-color: #eee;
+  border-style: solid;
+  border-width: 1px;
+  border-color: blue;
+  border-radius: 3px;
+  padding: 3px;
+  color: blue;
+  top: 20px;
+  left: 20px;
+  width: fit-content;
+  min-width: 150%;
+}
+
+.tooltip-prog:hover span.tooltip-prog-text {
+  visibility: visible;
+}
+
+.tooltip-prog:hover {
+  overflow: visible;
+}

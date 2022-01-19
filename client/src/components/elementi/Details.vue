@@ -2,7 +2,7 @@
 <div>
   <details>
     <summary class="sommario-main10ance"><b>{{summary}}</b></summary>
-    <slot>Default content</slot>
+    <slot><img id="loading-image" src="../../assets/img/ajax-loader-3.gif" alt="Loading..." /></slot>
   </details>
 </div>
 </template>
