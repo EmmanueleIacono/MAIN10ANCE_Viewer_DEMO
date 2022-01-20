@@ -9,7 +9,7 @@ export function getModel(urn) {
         store.methods.setTabAttivo('Tab1');
         if (urn !== store.stateBIM.urnModelloCorrente) {
             launchViewer(urn);
-            }
+        }
         console.log(urn);
     }
     else {

@@ -40,6 +40,12 @@ export async function getGIS(tabella, geometria, colonneUtili) {
     return resp_oggettiGIS;
 }
 
+export async function getObjects(bucketId = '#') {
+    const objectsRaw = await fetch(`/api/forge/oss/buckets?id=${bucketId}`);
+    const objects = await objectsRaw.json();
+    return objects;
+}
+
 export async function prendiSchedeAnagrafica() {
     const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-anagrafica', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();

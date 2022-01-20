@@ -2,9 +2,9 @@
 
 $(document).ready(function () {
   prepareAppBucketTree();
-  $('#refreshBuckets').click(function () {
-    $('#appBuckets').jstree(true).refresh();
-  });
+  // $('#refreshBuckets').click(function () {
+  //   $('#appBuckets').jstree(true).refresh();
+  // });
 });
   
 function prepareAppBucketTree() {
