@@ -5,7 +5,7 @@
     <i :class="icone[node.type] || icone['default']" class="glyphicon icona"></i>
     {{node.text}}
   </div>
-  <div class="children-container">
+  <div v-if="node.children" class="children-container">
     <img v-if="state.childLoad && !state.childNodes" src="../../assets/img/ajax-loader-3.gif" style="height: 15px;">
     <div v-if="state.childNodes && state.nodeOpen">
       <TreeNode @click="apriModello(nodo.id)" v-for="nodo in state.childNodes" :key="nodo.id" :node="nodo" />

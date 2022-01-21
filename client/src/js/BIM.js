@@ -17,7 +17,7 @@ export function getModel(urn) {
     }
 }
 
-export function launchViewer(urn, opzioniPostLoading) {
+function launchViewer(urn, opzioniPostLoading) {
     const opzioniPost = opzioniPostLoading || undefined;
 
     const options = {
@@ -65,4 +65,20 @@ function getForgeToken(callback) {
             callback(data.access_token, data.expires_in);
         });
     });
+}
+
+export function resetVista() {
+    if (viewer) {
+        viewer.clearSelection();
+        viewer.isolate();
+        viewer.fitToView();
+    }
+}
+
+export function cercaSelezionaId(id) {
+    viewer.search(id, el => {
+        viewer.select(el);
+    }, () => {
+        alert('Errore nella ricerca');
+    }, ['id_main10ance']);
 }
