@@ -8,6 +8,8 @@ const state = reactive({
         bim_vw_sets: '9-3',
         usr_vw: ''
     },
+    alertVisibile: false,
+    alertMessaggio: '',
 });
 
 const stateGIS = reactive({
@@ -20,6 +22,7 @@ const stateGIS = reactive({
 const stateBIM = reactive({
     modelPlaceholder: true,
     urnModelloCorrente: null,
+    elementiSelezionati: null,
 });
 
 const methods = {
@@ -47,6 +50,16 @@ const methods = {
         state.userSettings.user_id = '';
         state.userSettings.bim_vw_sets = '9-3';
         state.userSettings.usr_vw = '';
+    },
+
+    setAlert(messaggio) {
+        state.alertMessaggio = messaggio;
+        state.alertVisibile = true;
+    },
+
+    resetAlert() {
+        state.alertVisibile = false;
+        state.alertMessaggio = '';
     },
 
     setTabelleGIS(tabelle) {

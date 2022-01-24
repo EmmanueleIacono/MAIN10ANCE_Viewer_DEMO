@@ -40,6 +40,7 @@
       </div>
     </div>
   </div>
+  <Alert />
 </div>
 </template>
 
@@ -52,6 +53,7 @@ import Tab2 from './components/TabGIS.vue';
 import Tab3 from './components/TabPlanner.vue';
 import Tab4 from './components/TabDashboard.vue';
 import TabAuth from './components/TabAuth.vue';
+import Alert from './components/Alert.vue';
 
 export default {
   name: 'App',
@@ -61,6 +63,7 @@ export default {
     Tab3,
     Tab4,
     TabAuth,
+    Alert,
   },
   setup() {
     provide('store', store);
@@ -192,6 +195,7 @@ body {
   font-weight: bold;
   border: none;
 }
+
 .panel, .panel-heading {
   background-color: var(--grigio);
 }
