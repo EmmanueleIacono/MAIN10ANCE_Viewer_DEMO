@@ -45,7 +45,7 @@ export default {
     CheckboxGIS,
     Details,
   },
-  setup(props, context) {
+  setup(props, {emit}) {
     const store = inject('store');
     const mappaRef = ref(null);
     const primoLoadLivelli = ref(false);
@@ -75,7 +75,7 @@ export default {
 
     function emettiLoadLivelli() {
       if (!primoLoadLivelli.value) {
-        context.emit('loadLivelli');
+        emit('loadLivelli');
         primoLoadLivelli.value = true;
       }
     }

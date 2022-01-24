@@ -87,7 +87,7 @@ export default {
       const resRaw = await fetch("/auth/logout", {method: "GET", headers: {"content-type": "application/json"} });
       const res = await resRaw.json();
       store.methods.setLogoutUserSettings();
-      alert(res.message);
+      store.methods.setAlert(res.message);
       store.methods.setTabAttivo('Tab2');
     }
 

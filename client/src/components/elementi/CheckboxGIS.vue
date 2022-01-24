@@ -18,7 +18,7 @@ export default {
     colore: String,
     pronto: Boolean,
   },
-  setup(props, context) {
+  setup(props, {emit}) {
     watch(() => props.pronto, (newCond) => {
       if (newCond) {
         emettiCreaLivello(props.idUnivoco);
@@ -26,7 +26,7 @@ export default {
     });
 
     function emettiCreaLivello(idLiv) {
-      context.emit('creazioneLivello', idLiv);
+      emit('creazioneLivello', idLiv);
     }
   }
 }

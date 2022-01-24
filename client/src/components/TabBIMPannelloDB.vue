@@ -20,7 +20,7 @@
 
 <script>
 import {inject, reactive, watch} from 'vue';
-import {resetVista, cercaSelezionaId, getElementiSelezionati, getIdM10AFromSelezione} from '../js/BIM';
+import {resetVista, cercaSelezionaId, getElementiSelezionati, getIdM10AFromSelezione, focusVista} from '../js/BIM';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 import Details from './elementi/Details.vue';
 import SchedeDB from './TabBIMSchedeRisultati.vue';
@@ -77,6 +77,8 @@ export default {
       if (selezionati) {
         const idSelezionati = await getIdM10AFromSelezione(selezionati);
         store.stateBIM.elementiSelezionati = idSelezionati;
+
+        focusVista(selezionati);
       }
       else {
         store.stateBIM.elementiSelezionati = null;

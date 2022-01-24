@@ -24,7 +24,7 @@ export default {
   props: {
     node: Object,
   },
-  setup(props, context) {
+  setup(props, {emit}) {
     const idCliccato = inject('idCliccato');
     const state = reactive({
       nodeOpen: false,
@@ -44,7 +44,7 @@ export default {
     }
 
     async function apriNodo() {
-      context.emit('cambiaIdCliccato', props.node.id);
+      emit('cambiaIdCliccato', props.node.id);
       state.nodeOpen = !state.nodeOpen;
       if (!state.childNodes && props.node.children) {
         state.childLoad = true;
@@ -53,7 +53,7 @@ export default {
       }
     }
     function apriModello(id) {
-      context.emit('cambiaIdCliccato', id);
+      emit('cambiaIdCliccato', id);
       getModel(id);
     }
 

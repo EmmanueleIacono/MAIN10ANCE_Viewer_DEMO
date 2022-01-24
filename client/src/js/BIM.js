@@ -13,7 +13,7 @@ export function getModel(urn) {
         console.log(urn);
     }
     else {
-        alert('Nessun modello presente per questo elemento');
+        store.methods.setAlert('Nessun modello presente per questo elemento');
     }
 }
 
@@ -79,7 +79,7 @@ export function cercaSelezionaId(id) {
     viewer.search(id, el => {
         viewer.select(el);
     }, () => {
-        alert('Errore nella ricerca');
+        store.methods.setAlert('Errore nella ricerca');
     }, ['id_main10ance']);
 }
 
@@ -106,7 +106,7 @@ export function getElementiSelezionati() {
     let selezione = viewer.getSelection();
     let isolato = viewer.getIsolatedNodes();
     if (selezione.length === 0 && isolato.length === 0) {
-        alert('Nessun elemento selezionato');
+        store.methods.setAlert('Nessun elemento selezionato');
         return false;
     }
     else if (isolato.length !== 0 && selezione.length === 0) { // se ho solo elementi isolati, li seleziono
@@ -118,4 +118,12 @@ export function getElementiSelezionati() {
         viewer.select(isolato);
     }
     return selezione;
+}
+
+export function focusVista(selezione) {
+    if (viewer) {
+        viewer.isolate(selezione);
+        viewer.select(selezione);
+        viewer.fitToView();
+    }
 }
