@@ -23,6 +23,8 @@ const stateBIM = reactive({
     modelPlaceholder: true,
     urnModelloCorrente: null,
     elementiSelezionati: null,
+    schedeRisultatiVisibile: false,
+    schedeModuliVisibile: false,
 });
 
 const methods = {

@@ -1,6 +1,6 @@
 /* ELIMINARE DI VOLTA IN VOLTA DA QUESTO FILE GLI STILI USATI SUI COMPONENT, COME FORMA DI CONTROLLO */
 
-.scheda-con-int, #apriTabControllo, #apriTabIntervento, #apriTabAnagrafica, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento, #salvaSchedaAnagrafica {
+#apriTabControllo, #apriTabIntervento, #apriTabAnagrafica, #chiudiSchede, #salvaSchedaControllo, #salvaSchedaIntervento, #salvaSchedaAnagrafica {
   display: none;
 }
 
@@ -146,8 +146,6 @@ input[id^="form-"] {
 
 input[id^="mod-sc-cont-"],
 select[id^="mod-sc-cont-"],
-input[id^="scheda-anagrafica-"],
-textarea[id^="scheda-anagrafica-"],
 input[id^="scheda-controllo-"],
 select[id^="scheda-controllo-"],
 textarea[id^="scheda-controllo-"],
@@ -161,7 +159,6 @@ textarea[id^="scheda-intervento-"] {
   border: 0;
 }
 
-p[id^="sc-an"],
 p[id^="mod-sc-cont-"] {
   float: right;
   line-height: 100%;

@@ -99,3 +99,14 @@ export async function recuperaDatiControlliProg() {
     const risTradotto = await risultato.json();
     return risTradotto;
 }
+
+export async function compilaScheda(jsonReq) {
+    try {
+        const resp = await fetch(`/o/Main10ance_DB/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        const respData = await resp.json();
+        return respData;
+    }
+    catch(e) {
+        console.log(e);
+    }
+}

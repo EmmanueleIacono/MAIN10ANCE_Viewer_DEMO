@@ -1,5 +1,5 @@
 <template>
-  <button :id="nome" :class="icona" :title="title" class="glyphicon dbBtn" height="30"></button>
+  <button :id="nome" :class="[icona, colore]" :title="title" class="glyphicon dbBtn" height="30"></button>
 </template>
 
 <script>
@@ -9,6 +9,7 @@ export default {
     icona: String,
     nome: String,
     title: String,
+    colore: String,
   }
 }
 </script>
@@ -20,11 +21,19 @@ export default {
   margin-right: 5px;
   cursor: pointer;
   border: none;
-  background: var(--verdeMain10ance);
   color: var(--ghostWhite);
   margin-bottom: 1rem;
   padding: .9rem 1rem;
   font-size: large;
   font-weight: initial;
+}
+.verde {
+  background: var(--verdeMain10ance);
+}
+.blu {
+  background: var(--bluInterreg);
+}
+.giallo {
+  background: var(--gialloAnagrafica);
 }
 </style>
