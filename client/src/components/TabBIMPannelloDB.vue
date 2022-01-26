@@ -2,10 +2,8 @@
   <div class="pannelloDB" v-if="verificaDisplay()">
     <BtnBIM @click="homeFunc" class="btn-bim" icona="glyphicon-home" nome="refreshParams" title="Home" colore="verde" />
     <BtnBIM @click="toggleInputCerca" class="btn-bim" icona="glyphicon-search" nome="cercaID" title="Trova" colore="verde" />
-    <BtnBIM @click="interroga" class="btn-bim" icona="glyphicon-list-alt" nome="queryDB" title="Interroga e modifica" colore="verde" />
-    <BtnBIM @click="aggiungi" class="btn-bim" icona="glyphicon-plus" nome="aggiungiDB" title="Aggiungi" colore="verde" />
-    <!-- <BtnBIM class="btn-bim" icona="glyphicon-floppy-disk" nome="modificaDB" title="Salva" />  colore="verde"-->
-    <BtnBIM class="btn-bim" icona="glyphicon-erase" nome="annullaDB" title="Annulla" colore="verde" />
+    <BtnBIM @click="interroga" class="btn-bim" icona="glyphicon-list-alt" nome="queryDB" title="Interroga" colore="verde" />
+    <BtnBIM @click="aggiungi" class="btn-bim" icona="glyphicon-plus" nome="aggiungiDB" title="Aggiungi o modifica" colore="verde" />
     <br />
     <div id="contenitore-campo-ricerca">
       <input v-if="state.campoRicercaVisibile" v-model="state.valoreInputRicerca" placeholder="id_main10ance" />
@@ -14,13 +12,13 @@
       <h5 v-for="idSel in store.stateBIM.elementiSelezionati" :key="idSel"><b>{{idSel}}</b></h5>
     </Details>
     <br />
-    <SchedeDB />
+    <SchedeDB ref="SchedeDBRef" />
     <SchedeModuli />
   </div>
 </template>
 
 <script>
-import {inject, reactive, watch} from 'vue';
+import {inject, reactive, watch, ref} from 'vue';
 import {resetVista, cercaSelezionaId, getElementiSelezionati, getIdM10AFromSelezione, focusVista} from '../js/BIM';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 import Details from './elementi/Details.vue';
@@ -37,6 +35,7 @@ export default {
   },
   setup() {
     const store = inject('store');
+    const SchedeDBRef = ref(null);
     const state = reactive({
       campoRicercaVisibile: false,
       valoreInputRicerca: '',
@@ -73,7 +72,13 @@ export default {
       store.stateBIM.schedeModuliVisibile = false;
       const elementiPronti = await preparaElementi();
       if (elementiPronti) {
-        store.stateBIM.schedeRisultatiVisibile = true;
+        if (store.stateBIM.elementiSelezionati.length === 1) {
+          store.stateBIM.schedeRisultatiVisibile = true;
+          SchedeDBRef.value.popolaSchede();
+        }
+        else if (store.stateBIM.elementiSelezionati.length > 1) {
+          store.methods.setAlert('Selezionare un solo elemento per volta');
+        }
       }
       else {
         store.stateBIM.schedeRisultatiVisibile = false;
@@ -114,6 +119,7 @@ export default {
 
     return {
       store,
+      SchedeDBRef,
       state,
       verificaDisplay,
       homeFunc,

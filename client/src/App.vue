@@ -199,4 +199,31 @@ body {
 .panel, .panel-heading {
   background-color: var(--grigio);
 }
+
+/* STILI TABELLE FULLCALENDAR --- PER ORA NON FUNZIONANO BENISSIMO */
+/* table[class^="fc-"] {
+  border-collapse: collapse;
+  width: 100%;
+  padding: 10px;
+  overflow: auto;
+}
+
+td[class^="fc-"], th[class^="fc-"] {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  max-width: 200px;
+}
+
+td[class^="fc-"] {
+  word-break: break-all;
+}
+
+th[class^="fc-"] {
+  background-color: #b6b4b4;
+} 
+
+tr:nth-child(even)[class^="fc-"] {
+  background-color: #cacaca;
+} */
 </style>

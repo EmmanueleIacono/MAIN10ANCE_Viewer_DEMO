@@ -70,6 +70,13 @@ export async function prendiSchedeManCorr() {
     return risTradotto;
 }
 
+export async function prendiSchedeManStr() {
+    // const risultato = await fetch('', {method: "GET", headers: {"content-type": "application/json"}});
+    // const risTradotto = await risultato.json();
+    // return risTradotto;
+    return [];
+}
+
 export async function prendiSchedeRestauro() {
     const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-restauro', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();

@@ -26,6 +26,7 @@ export default {
   },
   setup(props, {emit}) {
     const idCliccato = inject('idCliccato');
+    const store = inject('store');
     const state = reactive({
       nodeOpen: false,
       childNodes: null,
@@ -54,7 +55,15 @@ export default {
     }
     function apriModello(id) {
       emit('cambiaIdCliccato', id);
-      getModel(id);
+      try {
+        getModel(id);
+      }
+      catch {
+        let messaggioDiErrore = 'Si è verificato un errore. Modello non disponibile.';
+        store.stateBIM.urnModelloCorrente = null;
+        store.stateBIM.modelPlaceholder = true;
+        store.methods.setAlert(messaggioDiErrore);
+      }
     }
 
     return {

@@ -1,8 +1,10 @@
 <template>
+<div>
   <div class="scheda-anagrafica">
     <div class="div-titolo-bottoni">
       <div class="float-dx div-bottoni">
         <BtnBIM @click="salvaScheda" icona="glyphicon-floppy-disk" nome="salvaScAnag" title="Salva" colore="giallo" />
+        <BtnBIM @click="resetState" icona="glyphicon-erase" nome="annullaDB" title="Cancella tutti i campi" colore="giallo" />
         <BtnBIM @click="chiudiScheda" icona="glyphicon-remove" nome="chiudiScAnag" title="Salva" colore="giallo" />
       </div>
       <h4><b>SCHEDA ANAGRAFICA</b></h4>
@@ -12,34 +14,37 @@
     <p class="user-field float-dx">{{store.state.userSettings.user_id}}</p>
     <br />
     <label><b>DESCRIZIONE SISTEMA</b></label>
-    <textarea v-model="descrizione_sistema" style="height: 20px;"></textarea>
+    <textarea v-model="descrizione_sistema" :disabled="schedaRegistrata" style="height: 20px;"></textarea>
     <br />
     <label><b>DESCRIZIONE SUBSISTEMA</b></label>
-    <textarea v-model="descrizione_subsistema" style="height: 20px;"></textarea>
+    <textarea v-model="descrizione_subsistema" :disabled="schedaRegistrata" style="height: 20px;"></textarea>
     <br />
     <label><b>TECNICA COSTRUTTIVA</b></label>
-    <input v-model="tecnica_costruttiva">
+    <input v-model="tecnica_costruttiva" :disabled="schedaRegistrata">
     <br />
     <label><b>DIMENSIONI</b></label>
-    <input v-model="dimensioni">
+    <input v-model="dimensioni" :disabled="schedaRegistrata">
     <br />
     <label><b>MATERIALE/I</b></label>
-    <input v-model="materiale">
+    <input v-model="materiale" :disabled="schedaRegistrata">
     <br />
     <label><b>EPOCA</b></label>
-    <input v-model="epoca">
+    <input v-model="epoca" :disabled="schedaRegistrata">
     <br />
     <label><b>ISPEZIONABILITÀ</b></label>
-    <input v-model="ispezionabilità">
+    <input v-model="ispezionabilità" :disabled="schedaRegistrata">
     <br />
     <label><b>FONTI</b></label>
-    <input v-model="fonti">
+    <input v-model="fonti" :disabled="schedaRegistrata">
     <br />
   </div>
+  <button @click="preparaPDF" v-if="schedaRegistrata" id="apriPDF" class="float-dx"><b>VISUALIZZA REPORT</b></button>
+</div>
 </template>
 
 <script>
-import { inject, reactive, toRefs } from 'vue';
+import { inject, reactive, toRefs, computed, ref } from 'vue';
+import {fitToViewImmediato} from '../js/BIM';
 import {dataCorta, dataInteger} from '../js/shared';
 import {compilaScheda} from '../js/richieste';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
@@ -51,6 +56,7 @@ export default {
   },
   setup() {
     const store = inject('store');
+    const schedaRegistrata = ref(false);
     const state = reactive({
       descrizione_sistema: '',
       descrizione_subsistema: '',
@@ -67,12 +73,26 @@ export default {
       autore_ultima_mod: null,
     });
 
+    const schedaVuota = computed(() => {
+      return !(state.descrizione_sistema || state.descrizione_subsistema || state.tecnica_costruttiva || state.dimensioni || state.materiale || state.epoca || state.ispezionabilità || state.fonti);
+    });
+
     async function salvaScheda() {
       if (store.stateBIM.elementiSelezionati) {
+        if (schedaVuota.value) {
+          store.methods.setAlert('Non è possibile salvare una scheda vuota');
+          return;
+        }
         impostaMetadati();
         const jsonReq = impostaOggetti(Object.entries(state), store.stateBIM.elementiSelezionati);
         const resp = await compilaScheda(jsonReq);
-        console.log(resp);
+        if (resp.success) {
+          schedaRegistrata.value = true;
+          store.methods.setAlert('Operazione andata a buon fine');
+        }
+        else {
+          store.methods.setAlert('Operazione non riuscita');
+        }
       }
       else {
         store.methods.setAlert('Nessun ID associato alla scheda. Selezionare un elemento e riprovare.');
@@ -99,6 +119,7 @@ export default {
       state.data_ultima_mod = null;
       state.autore_scheda = null;
       state.autore_ultima_mod = null;
+      schedaRegistrata.value = false;
     }
 
     function impostaMetadati() {
@@ -132,11 +153,24 @@ export default {
       return listaOgg;
     }
 
+    function preparaPDF() { // DA FINIRE
+      fitToViewImmediato();
+      console.log('preparo un pdf');
+      // bottonePDF.addEventListener('click', () => {
+      //   setTimeout(() => {
+      //     creaPDF2(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-ANAGRAFICA');
+      //   }, 500);
+      // });
+    }
+
     return {
       store,
+      schedaRegistrata,
       ...toRefs(state),
       salvaScheda,
+      resetState,
       chiudiScheda,
+      preparaPDF,
     }
   }
 }
@@ -169,5 +203,14 @@ input, textarea {
   position: absolute;
   bottom: -1rem;
   right: 0;
+}
+#apriPDF {
+  cursor: pointer;
+  padding: 10px;
+  margin-top: 10px;
+  color: var(--ghostWhite);
+  background-color: var(--blackOlive);
+  font-weight: bold;
+  border: none;
 }
 </style>

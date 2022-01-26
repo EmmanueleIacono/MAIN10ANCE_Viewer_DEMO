@@ -10,6 +10,9 @@ export function getModel(urn) {
         if (urn !== store.stateBIM.urnModelloCorrente) {
             launchViewer(urn);
         }
+        else {
+            store.methods.setAlert('ATTENZIONE: Il modello selezionato è già visibile');
+        }
         console.log(urn);
     }
     else {
@@ -125,5 +128,12 @@ export function focusVista(selezione) {
         viewer.isolate(selezione);
         viewer.select(selezione);
         viewer.fitToView();
+    }
+}
+
+export function fitToViewImmediato() {
+    if (viewer) {
+        viewer.select();
+        viewer.fitToView(null, null, true);
     }
 }

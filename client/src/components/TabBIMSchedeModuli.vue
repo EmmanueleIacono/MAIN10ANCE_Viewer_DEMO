@@ -18,7 +18,7 @@ export default {
 
     onUpdated(() => {
       if (store.stateBIM.schedeModuliVisibile) {
-        console.log('modulo pronto');
+        // fare query schede esistenti di elementi selezionati
       }
     });
 

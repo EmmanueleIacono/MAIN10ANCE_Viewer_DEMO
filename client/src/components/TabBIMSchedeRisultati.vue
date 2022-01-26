@@ -1,35 +1,38 @@
 <template>
   <div v-if="store.stateBIM.schedeRisultatiVisibile" id="formDB">
-    <Details summary="Scheda anagrafica">
-      <div v-for="(scheda, ind) in schedeAnagrafica" :key="ind">{{scheda.title}}</div>
+    <img v-if="schedeNonPronte" id="loading-image" src="../assets/img/ajax-loader-3.gif" alt="Loading..." height="20" />
+    <Details v-if="schedeAnagrafica && schedeAnagrafica.length" summary="Scheda anagrafica">
+      <BIMScheda v-for="scheda in schedeAnagrafica" :key="scheda['Codice scheda anagrafica']" :scheda="scheda" tipo="anagrafica" />
     </Details>
-    <Details summary="Schede di controllo">
-      <div v-for="(scheda, ind) in schedeControllo" :key="ind">{{scheda.title}}</div>
+    <Details v-if="schedeControllo && schedeControllo.length" summary="Schede di controllo">
+      <BIMScheda v-for="scheda in schedeControllo" :key="scheda['Codice scheda controllo']" :scheda="scheda" tipo="controllo" />
     </Details>
-    <Details summary="Schede di manutenzione ordinaria">
-      <div v-for="(scheda, ind) in schedeManOrd" :key="ind">{{scheda.title}}</div>
+    <Details v-if="schedeManOrd && schedeManOrd.length" summary="Schede di manutenzione ordinaria">
+      <BIMScheda v-for="scheda in schedeManOrd" :key="scheda['Codice scheda manuetenzione regolare']" :scheda="scheda" tipo="intervento" />
     </Details>
-    <Details summary="Schede di manutenzione correttiva">
-      <div v-for="(scheda, ind) in schedeManCorr" :key="ind">{{scheda.title}}</div>
+    <Details v-if="schedeManCorr && schedeManCorr.length" summary="Schede di manutenzione correttiva">
+      <BIMScheda v-for="scheda in schedeManCorr" :key="scheda['Codice scheda manutenzione correttiva']" :scheda="scheda" tipo="intervento" />
     </Details>
-    <Details summary="Schede di manutenzione straordinaria">
-      <div v-for="(scheda, ind) in schedeManStr" :key="ind">{{scheda.title}}</div>
+    <Details v-if="schedeManStr && schedeManStr.length" summary="Schede di manutenzione straordinaria">
+      <BIMScheda v-for="scheda in schedeManStr" :key="scheda['Codice scheda manutenzione straordinaria']" :scheda="scheda" tipo="intervento" />
     </Details>
-    <Details summary="Schede di restauro">
-      <div v-for="(scheda, ind) in schedeRestauro" :key="ind">{{scheda.title}}</div>
+    <Details v-if="schedeRestauro && schedeRestauro.length" summary="Schede di restauro">
+      <BIMScheda v-for="scheda in schedeRestauro" :key="scheda['Codice scheda restauro']" :scheda="scheda" tipo="intervento" />
     </Details>
   </div>
 </template>
 
 <script>
-import { inject, reactive, toRefs, onUpdated } from 'vue';
-// import {prendiSchedeAnagrafica, prendiSchedeControllo, prendiSchedeManReg, prendiSchedeManCorr, prendiSchedeRestauro} from '../js/richieste';
+import { inject, reactive, toRefs, computed } from 'vue';
+import {prendiSchedeAnagrafica, prendiSchedeControllo, prendiSchedeManReg, prendiSchedeManCorr, prendiSchedeManStr, prendiSchedeRestauro} from '../js/richieste';
 import Details from './elementi/Details.vue';
+import BIMScheda from './elementi/BIMScheda.vue';
 
 export default {
   name: 'SchedeDB',
   components: {
     Details,
+    BIMScheda,
   },
   setup() {
     const store = inject('store');
@@ -42,34 +45,46 @@ export default {
       schedeRestauro: null,
     });
 
-    onUpdated(async () => {
-      if (store.stateBIM.schedeRisultatiVisibile) {
-        await popolaSchede();
-      }
+    const schedeNonPronte = computed(() => {
+      return !(state.schedeAnagrafica && state.schedeControllo && state.schedeManOrd && state.schedeManCorr && state.schedeManStr && state.schedeRestauro);
     });
 
-    // watch(() => store.stateBIM.elementiSelezionati, async newVal => {
-    //   console.log(newVal);
-    //   console.log(store.stateBIM.schedeRisultatiVisibile);
-    //   if (newVal && store.stateBIM.schedeRisultatiVisibile) {
-    //     await popolaSchede();
-    //   }
-    // });
-
     async function popolaSchede() {
-      const schedeJson = await fetch('https://jsonplaceholder.typicode.com/todos');
-      const schedeFull = await schedeJson.json();
-      state.schedeAnagrafica = schedeFull.splice(0, 10);
-      state.schedeControllo = schedeFull.splice(10, 10);
-      state.schedeManOrd = schedeFull.splice(20, 10);
-      state.schedeManCorr = schedeFull.splice(30, 10);
-      state.schedeManStr = schedeFull.splice(40, 10);
-      state.schedeRestauro = schedeFull.splice(50, 10);
+      resetSchede();
+      const schedeAnagrafica = await prendiSchedeAnagrafica();
+      const schedeControllo = await prendiSchedeControllo();
+      const schedeManOrd = await prendiSchedeManReg();
+      const schedeManCorr = await prendiSchedeManCorr();
+      const schedeManStr = await prendiSchedeManStr();
+      const schedeRestauro = await prendiSchedeRestauro();
+      const schedeAnFiltrate = schedeAnagrafica.filter(scheda => store.stateBIM.elementiSelezionati.includes(scheda['Elemento schedato']));
+      const schedeConFiltrate = schedeControllo.filter(scheda => store.stateBIM.elementiSelezionati.includes(scheda['Elementi controllati']));
+      const schedeManOrdFiltrate = schedeManOrd.filter(scheda => store.stateBIM.elementiSelezionati.includes(scheda['Elementi interessati']));
+      const schedeManCorrFiltrate = schedeManCorr.filter(scheda => store.stateBIM.elementiSelezionati.includes(scheda['Elementi interessati']));
+      const schedeManStrFiltrate = schedeManStr.filter(scheda => store.stateBIM.elementiSelezionati.includes(scheda['Elementi interessati']));
+      const schedeRestFiltrate = schedeRestauro.filter(scheda => store.stateBIM.elementiSelezionati.includes(scheda['Elementi interessati']));
+      state.schedeAnagrafica = schedeAnFiltrate;
+      state.schedeControllo = schedeConFiltrate;
+      state.schedeManOrd = schedeManOrdFiltrate;
+      state.schedeManCorr = schedeManCorrFiltrate;
+      state.schedeManStr = schedeManStrFiltrate;
+      state.schedeRestauro = schedeRestFiltrate;
+    }
+
+    function resetSchede() {
+      state.schedeAnagrafica = null;
+      state.schedeControllo = null;
+      state.schedeManOrd = null;
+      state.schedeManCorr = null;
+      state.schedeManStr = null;
+      state.schedeRestauro = null;
     }
 
     return {
       store,
       ...toRefs(state),
+      popolaSchede,
+      schedeNonPronte,
     }
   }
 }
