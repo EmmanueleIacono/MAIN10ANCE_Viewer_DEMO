@@ -201,6 +201,13 @@ body {
 }
 
 /* STILI TABELLE FULLCALENDAR --- PER ORA NON FUNZIONANO BENISSIMO */
+th {
+  /* background-color: #b6b4b4; */
+  background-color: var(--verdeMain10anceTrasparenza);
+}
+.fc-theme-standard td, .fc-theme-standard th {
+  border: 1px solid var(--verdeMain10anceTrasparenza);
+}
 /* table[class^="fc-"] {
   border-collapse: collapse;
   width: 100%;

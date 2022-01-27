@@ -1,6 +1,6 @@
 <template>
 <div :class="tipo" class="scheda-container">
-  <Details :summary="`Scheda n. ${scheda['Codice scheda anagrafica']}`">
+  <Details :summary="`Scheda n. ${scheda['Codice scheda anagrafica']}` /*qui generalizzare, non va bene 'Codice scheda anagrafica'*/">
     <div v-for="(valore, chiave) in scheda" :key="chiave">
       <p><b>{{chiave}}:</b></p>
       <p v-if="valore || valore === 'null'" class="brk-w">{{valore}}</p>

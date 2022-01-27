@@ -112,24 +112,6 @@ div[id^="div-form-"] {
   background-color: var(--verdeMain10anceTrasparenza2);
 }
 
-.vedi-schede {
-  background-color: var(--verdeMain10ance);
-  color: var(--grigioMoltoScuro);
-  border: none;
-  font-weight: bold;
-}
-
-.vedi-schede:hover {
-  background-color: var(--verdeMain10anceTrasparenza);
-}
-
-.vedi-schede-disatt {
-  background-color: var(--grigioScuro);
-  color: var(--grigioMoltoScuro);
-  border: none;
-  font-weight: bold;
-}
-
 #pannello-lat-schede-inner {
   overflow: auto;
 }
@@ -230,7 +212,7 @@ div[id^="div-form-"] {
 
 /* ----- Speedometer ----- */
 
-.flex{
+.flex {
   margin-top: 10px;
   margin-bottom: 10px;
   display: flex;
@@ -239,17 +221,17 @@ div[id^="div-form-"] {
   position: relative;
 }
 
-.text{
+.text {
   position: absolute;
   text-align: center;
 }
 
-.circle{
+.circle {
   width: 200px;
   height: 200px;
 }
 
-.points{
+.points {
   width: 3px;
   height: 15px;
   background: rgba(255, 255, 255, 0.2);
@@ -258,7 +240,7 @@ div[id^="div-form-"] {
   border-radius: 3px;
 }
 
-.animated{
+.animated {
   animation: glow .01s linear forwards;
   animation-delay: calc(var(--i)*0.05s);
 }
@@ -276,71 +258,4 @@ div[id^="div-form-"] {
 
 .active[data-card] {
   display: block;
-}
-
-.bottone-prog {
-  background-color: var(--bluInterreg);
-  color: white;
-  border: none;
-  margin-left: 10px;
-}
-
-.bottone-prog:hover {
-  background-color: var(--grigioScuro);
-}
-
-.tabella-prog-controlli {
-  table-layout: fixed;
-  width: 100%;
-  word-wrap: normal;
-}
-
-.tabella-prog-controlli th, .tabella-prog-controlli td {
-  width: 90%;
-  max-width: 50px;
-  word-break: normal;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tabella-prog-controlli .tab-div {
-  z-index: 10;
-  height: 60px;
-  max-width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tabella-prog-controlli input {
-  width: 90%
-}
-
-.tooltip-prog {
-  position: relative;
-}
-
-.tooltip-prog-text {
-  visibility: hidden;
-  position: absolute;
-  z-index: 100;
-  border: 1px;
-  background-color: #eee;
-  border-style: solid;
-  border-width: 1px;
-  border-color: blue;
-  border-radius: 3px;
-  padding: 3px;
-  color: blue;
-  top: 20px;
-  left: 20px;
-  width: fit-content;
-  min-width: 150%;
-}
-
-.tooltip-prog:hover span.tooltip-prog-text {
-  visibility: visible;
-}
-
-.tooltip-prog:hover {
-  overflow: visible;
 }

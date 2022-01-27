@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="store.getters.getUsrVwList().includes('apriTabSchede')">
   <MainPanel :colonna="'col-sm-7'">
     <h4 id="tabella-titolo">
       <span id="refreshSchede" class="glyphicon glyphicon-refresh"></span>
@@ -10,20 +10,21 @@
     </div>
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
-    <FullCalendar :options="calendarOptions" />
+    <FullCalendar ref="fullCalendarPlanner" :options="calendarOptions" />
+    <br />
+    <Filtri />
   </Explorer>
 </div>
 </template>
 
 <script>
-// import '@fullcalendar/core/vdom'
-import {reactive} from 'vue';
+import {inject, reactive, ref/*, onActivated*/} from 'vue';
 import FullCalendar from '@fullcalendar/vue3';
 import DayGridPlugin from '@fullcalendar/daygrid';
-import TimeGridPlugin from '@fullcalendar/timegrid';
 import itLocale from '@fullcalendar/core/locales/it';
 import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
+import Filtri from './TabPlannerFiltri.vue';
 
 export default {
   name: 'TabPlanner',
@@ -31,15 +32,18 @@ export default {
     MainPanel,
     Explorer,
     FullCalendar,
+    Filtri,
   },
   setup() {
+    const store = inject('store');
+    const fullCalendarPlanner = ref(null);
     const calendarOptions = reactive({
-      plugins: [DayGridPlugin, TimeGridPlugin],
+      plugins: [DayGridPlugin],
       initialView: 'dayGridMonth',
       timeZone: 'local',
       locale: itLocale,
       headerToolbar: {
-        left: 'dayGridMonth,dayGridWeek', //non so se sia meglio dayGridWeek o timeGridWeek
+        left: 'dayGridMonth,dayGridWeek',
         center: 'title',
         right: 'prevYear,prev,next,nextYear'
       },
@@ -53,7 +57,18 @@ export default {
       },
     });
 
+    // onActivated(() => {
+    //   console.log('planner');
+    //   const calendarAPI_P = fullCalendarPlanner.value.getApi();
+    //   setTimeout(() => {
+    //     calendarAPI_P.updateSize();
+    //     console.log(calendarAPI_P);
+    //   }, 100);
+    // });
+
     return {
+      store,
+      fullCalendarPlanner,
       calendarOptions,
     }
   }

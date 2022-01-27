@@ -117,3 +117,33 @@ export async function compilaScheda(jsonReq) {
         console.log(e);
     }
 }
+
+export async function prendiLOD3e4() {
+    const risultato = await fetch('/o/DB_Servizio/LOD/3e4', {method: "GET", headers: {"content-type": "application/json"}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+export async function leggiGlossDegradi() {
+    try {
+        const risultato = await fetch('/o/Main10ance_DB/tabellaDB/glossario/degradi', {method: "GET", headers: {"content-type": "application/json"} });
+        const listaGloss = await risultato.json();
+        return listaGloss;
+    }
+    catch(e) {
+        console.log('Errore nella lettura del glossario');
+        console.log(e);
+    }
+}
+
+export async function prendiSigleEdifici() {
+    const risultato = await fetch('/g/DB_Servizio/sigle-edifici', {method: "GET", headers: {"content-type": "application/json"}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+export async function prendiFrasiDiRischio() {
+    const risultato = await fetch('/g/Main10ance_DB/frasi-rischio', {method: "GET", headers: {"content-type": "application/json"}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}

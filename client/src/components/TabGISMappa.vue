@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import {onMounted, inject, watch} from 'vue';
+import {onMounted, inject, watch, onActivated} from 'vue';
 import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarkerSM, creaMarkerCapp} from '../js/GIS';
 import L from 'leaflet';
 
@@ -54,6 +54,12 @@ export default {
           aggiungiLayer(gruppoMarkerSacriMonti, mappaGlb);
           aggiungiLayer(gruppoMarkerCappelle, mappaGlb);
         }
+      }, 100);
+    });
+
+    onActivated(() => {
+      setTimeout(() => {
+        mappaGlb.invalidateSize();
       }, 100);
     });
 

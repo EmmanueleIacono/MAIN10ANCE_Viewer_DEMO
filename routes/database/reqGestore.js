@@ -275,7 +275,7 @@ async function getSigleEdifici() {
 
 async function getFrasiDiRischio() {
     try {
-        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM main10ance_sacrimonti."frase_di_rischio" ORDER BY "cl_ogg_fr";`);
+        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM main10ance_sacrimonti."frase_di_rischio" ORDER BY "id_fr_risc";`);
         return results.rows;
     }
     catch(e) {
