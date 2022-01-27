@@ -39,7 +39,7 @@ export default {
       timeZone: 'local',
       locale: itLocale,
       headerToolbar: {
-        left: 'dayGridMonth,timeGridWeek', //eventualmente si potrebbe usare dayGridWeek al posto di timeGridWeek
+        left: 'dayGridMonth,dayGridWeek', //non so se sia meglio dayGridWeek o timeGridWeek
         center: 'title',
         right: 'prevYear,prev,next,nextYear'
       },

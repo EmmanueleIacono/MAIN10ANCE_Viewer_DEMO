@@ -14,6 +14,7 @@ import L from 'leaflet';
 export default {
   name: 'TabGISMappa',
   setup() {
+    // DA FARE: IMPOSTARE MAPPA.INVALIDATESIZE(); SULLA MAPPA QUANDO RIATTIVO IL TAB GIS
     const store = inject('store');
 
     const posOrigine = [45.61422, 8.410177];
