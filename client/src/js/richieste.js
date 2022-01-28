@@ -147,3 +147,30 @@ export async function prendiFrasiDiRischio() {
     const risTradotto = await risultato.json();
     return risTradotto;
 }
+
+export async function getEntitàDaClOgg(cl_ogg) {
+    try {
+        const res = await fetch("/g/DB_Servizio/entita-oggetti", {method: "GET", headers: {"content-type": "application/json", "cl_ogg": cl_ogg} });
+        const resJson = await res.json();
+        const entità = resJson.map(r => (r.entità_db_m10a));
+        return entità;
+    }
+    catch(e) {
+        console.log('Errore nella richiesta al server');
+        console.log(e);
+    }
+}
+
+export async function getElementiDaEntità(sm, edificio, entità) {
+    const id = `${sm}|${edificio}|${entità}|`;
+    try {
+        const res = await fetch("/g/Main10ance_DB/lista-identificativi", {method: "GET", headers: {"content-type": "application/json", "entita": entità, "id_parziale": id} });
+        const resJson = await res.json();
+        const elementi = resJson.map(r => (r.id_main10ance));
+        return elementi;
+    }
+    catch(e) {
+        console.log('Errore nella richiesta al server');
+        console.log(e);
+    }
+}

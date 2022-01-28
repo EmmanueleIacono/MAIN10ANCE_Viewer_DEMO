@@ -14,7 +14,6 @@ import L from 'leaflet';
 export default {
   name: 'TabGISMappa',
   setup() {
-    // DA FARE: IMPOSTARE MAPPA.INVALIDATESIZE(); SULLA MAPPA QUANDO RIATTIVO IL TAB GIS
     const store = inject('store');
 
     const posOrigine = [45.61422, 8.410177];
@@ -22,8 +21,30 @@ export default {
     onMounted(() => {
       creaMappa('mappa', posOrigine);
 
+      mappaGlb.on('zoomend', () => {
+        const zoomComune = 17;
+        if (mappaGlb.getZoom() <= 5) {
+          rimuoviLayer(gruppoMarkerSacriMonti, mappaGlb);
+          rimuoviLayer(gruppoMarkerCappelle, mappaGlb);
+        }
+        else if (mappaGlb.getZoom() < zoomComune && mappaGlb.getZoom() > 5) {
+          aggiungiLayer(gruppoMarkerSacriMonti, mappaGlb);
+          rimuoviLayer(gruppoMarkerCappelle, mappaGlb);
+        }
+        else if (mappaGlb.getZoom() > zoomComune) {
+          aggiungiLayer(gruppoMarkerCappelle, mappaGlb);
+          rimuoviLayer(gruppoMarkerSacriMonti, mappaGlb);
+        }
+        else {
+          aggiungiLayer(gruppoMarkerSacriMonti, mappaGlb);
+          aggiungiLayer(gruppoMarkerCappelle, mappaGlb);
+        }
+      });
+
       const gruppoMarkerCappelle = L.layerGroup();
       const gruppoMarkerSacriMonti = L.layerGroup();
+
+      aggiungiLayer(gruppoMarkerSacriMonti, mappaGlb);
 
       watch(() => [store.stateGIS.markerSM, store.stateGIS.markerCapp], () => {
         if (store.stateGIS.markerSM) {
@@ -39,22 +60,6 @@ export default {
           });
         }
       });
-
-      setInterval(() => {
-        const zoomComune = 17;
-        if (mappaGlb.getZoom() < zoomComune) {
-          aggiungiLayer(gruppoMarkerSacriMonti, mappaGlb);
-          rimuoviLayer(gruppoMarkerCappelle, mappaGlb);
-        }
-        else if (mappaGlb.getZoom() > zoomComune) {
-          aggiungiLayer(gruppoMarkerCappelle, mappaGlb);
-          rimuoviLayer(gruppoMarkerSacriMonti, mappaGlb);
-        }
-        else {
-          aggiungiLayer(gruppoMarkerSacriMonti, mappaGlb);
-          aggiungiLayer(gruppoMarkerCappelle, mappaGlb);
-        }
-      }, 100);
     });
 
     onActivated(() => {

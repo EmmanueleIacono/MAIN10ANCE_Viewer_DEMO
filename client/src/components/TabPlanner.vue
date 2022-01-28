@@ -1,6 +1,9 @@
 <template>
 <div v-if="store.getters.getUsrVwList().includes('apriTabSchede')">
   <MainPanel :colonna="'col-sm-7'">
+    <br />
+    <br />
+    <Pianificazione />
     <h4 id="tabella-titolo">
       <span id="refreshSchede" class="glyphicon glyphicon-refresh"></span>
       <b>SCHEDE</b>
@@ -25,6 +28,7 @@ import itLocale from '@fullcalendar/core/locales/it';
 import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
 import Filtri from './TabPlannerFiltri.vue';
+import Pianificazione from './TabPlannerPianificazione.vue';
 
 export default {
   name: 'TabPlanner',
@@ -33,6 +37,7 @@ export default {
     Explorer,
     FullCalendar,
     Filtri,
+    Pianificazione,
   },
   setup() {
     const store = inject('store');

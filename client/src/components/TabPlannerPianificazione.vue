@@ -54,7 +54,7 @@
 
 <script>
 import {reactive, onMounted, toRefs, watch, inject} from 'vue';
-import {prendiSigleEdifici, prendiSigleSacriMonti, leggiEnum, prendiFrasiDiRischio} from '../js/richieste';
+import {prendiSigleEdifici, prendiSigleSacriMonti, leggiEnum, prendiFrasiDiRischio, getEntitàDaClOgg, getElementiDaEntità} from '../js/richieste';
 import Details from './elementi/Details.vue';
 
 export default {
@@ -101,9 +101,10 @@ export default {
       state.listaFrasiDiRischio = listaFrasiDiRischio;
     });
 
-    function programmaControlli() {
+    async function programmaControlli() {
       if (controllaSelezioni() && controllaCampiCompilati()) {
-        console.log('campi pronti per programmazione');
+        const dati = await raccogliDati();
+        console.log(dati);
       }
       else {
         store.methods.setAlert('ATTENZIONE: Informazioni non sufficienti');
@@ -116,6 +117,40 @@ export default {
 
     function controllaCampiCompilati() {
       return state.datiFrasiDiRischioFiltrate && !!state.datiFrasiDiRischioFiltrate.length && state.datiFrasiDiRischioFiltrate.every(dato => dato.freq && dato.data);
+    }
+
+    async function raccogliDati() {
+      const datiProgrammazione = state.datiFrasiDiRischioFiltrate;
+      const listaEdifici = state.listaSigleEdificiSelezionati;
+      const sacroMonte = state.selectSacroMonte;
+      // const metadati = qualcosa...
+      const listaEntità = await getEntitàDaClOgg(state.selectClOgg);
+      const listaIdM10a = await compilaIdM10a(listaEdifici, listaEntità, sacroMonte);
+      return [datiProgrammazione, listaIdM10a];
+    }
+
+    async function compilaIdM10a(edifici, entità, sm) {
+      const listaElementi = [];
+      for (const ed of edifici) {
+        const idOgg = {};
+        idOgg.edificio = ed;
+        idOgg.elementi = [];
+        for (const en of entità) {
+          if (en === 'grata') {
+            const numeri = ed.split('-');
+            for (const n of numeri) {
+              const elementi = await getElementiDaEntità(sm, n, en);
+              idOgg.elementi.push(...elementi);
+            }
+          }
+          else {
+            const elementi = await getElementiDaEntità(sm, ed, en);
+            idOgg.elementi.push(...elementi);
+          }
+        }
+        listaElementi.push(idOgg);
+      }
+      return listaElementi;
     }
 
     return {
@@ -171,7 +206,7 @@ tr:nth-child(odd) {
 .tabella-prog-controlli .tab-div {
   z-index: 10;
   height: 60px;
-  max-width: 100px;
+  /* max-width: 100px; */
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -186,13 +221,17 @@ tr:nth-child(odd) {
   position: absolute;
   z-index: 100;
   border: 1px;
-  background-color: #eee;
+  /* background-color: #eee; */
+  background-color: var(--blackOlive);
   border-style: solid;
   border-width: 1px;
-  border-color: blue;
+  /* border-color: blue; */
+  border-color: var(--verdeMain10ance);
   border-radius: 3px;
   padding: 3px;
-  color: blue;
+  /* color: blue; */
+  /* color: var(--verdeMain10ance); */
+  color: var(--grigio);
   top: 20px;
   left: 20px;
   width: fit-content;
