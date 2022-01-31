@@ -174,3 +174,9 @@ export async function getElementiDaEntità(sm, edificio, entità) {
         console.log(e);
     }
 }
+
+export async function creaAttProgControllo(listaAtt) {
+    const res = await fetch('/g/Main10ance_DB/pianificazione/rischi', {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(listaAtt)});
+    const resJson = await res.json();
+    return resJson;
+}

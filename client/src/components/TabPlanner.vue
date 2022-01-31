@@ -2,7 +2,6 @@
 <div v-if="store.getters.getUsrVwList().includes('apriTabSchede')">
   <MainPanel :colonna="'col-sm-7'">
     <br />
-    <br />
     <Pianificazione />
     <h4 id="tabella-titolo">
       <span id="refreshSchede" class="glyphicon glyphicon-refresh"></span>

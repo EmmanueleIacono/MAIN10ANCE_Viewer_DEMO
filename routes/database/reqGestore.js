@@ -134,6 +134,22 @@ appG.get('/Main10ance_DB/lista-identificativi', async (req, res) => {
     res.send(JSON.stringify(frasi));
 });
 
+appG.post('/Main10ance_DB/pianificazione/rischi', async (req, res) => {
+    const result = {};
+    try {
+        const reqJson = req.body;
+        const res = await creaAttProgControllo(reqJson);
+        result.success = res;
+    }
+    catch(e) {
+        result.success = false;
+    }
+    finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
+});
+
 appG.post('/Main10ance_DB/programmazione/nuovi-controlli', async (req, res) => {
     let result = {}
     try {
@@ -304,6 +320,30 @@ async function getIdentificativiDaEntità(entità, id) {
     }
 }
 
+async function creaAttProgControllo(listaAtt) {
+    try {
+        await clientM10a.query("BEGIN;");
+        try {
+            for (const att of listaAtt) {
+                const tipo_att = att.man_reg ? ['controllo', 'manutenzione regolare'] : ['controllo'];
+                const valuesArray = [att.id_att_prog, tipo_att, att.cl_ogg, att.rid_fr_risc, att.freq, att.data_prog, att.id_group, att.elementi, att.data_ins];
+                await clientM10a.query(`INSERT INTO main10ance_sacrimonti."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9));`, valuesArray);
+            }
+        }
+        catch(e) {
+            throw e;
+        }
+        await clientM10a.query("COMMIT;");
+        return true;
+    }
+    catch(er) {
+        console.log(`Errore: ${er}`);
+        await clientM10a.query("ROLLBACK;");
+        return false;
+    }
+}
+
+///////////// QUESTA DA ELIMINARE FORSE, O DA RIUTILIZZARE PER FASE 2 PROG CONTROLLI ////////////////
 async function registraNuoviControlli(listaReqJson) {
     try {
         await clientM10a.query("BEGIN;");

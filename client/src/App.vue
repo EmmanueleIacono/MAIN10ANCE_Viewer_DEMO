@@ -233,4 +233,8 @@ th[class^="fc-"] {
 tr:nth-child(even)[class^="fc-"] {
   background-color: #cacaca;
 } */
+
+.loading-wrapper {
+  position: relative;
+}
 </style>

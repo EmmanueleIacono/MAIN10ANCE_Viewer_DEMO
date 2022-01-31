@@ -1,28 +1,34 @@
 <template>
-  <Details summary="PIANIFICAZIONE" :open="true">
+<Card>
+  <Details class="loading-wrapper" summary="PIANIFICAZIONE" :open="true">
+    <LoadingScreen :caricamento="caricamento" />
     <button @click="programmaControlli" class="bottone-prog">Programma</button>
+      <br />
     <div class="main-container">
       <label for="check-sacro-monte-prog">Sacro Monte</label>
       <select v-model="selectSacroMonte" id="select-sacro-monte-prog">
         <option value=""></option>
         <option v-for="sm in listaSigleSM" :key="sm.sigla" :value="sm.sigla">{{sm.nome}}</option>
       </select>
-      <br>
+      <br />
+      <br />
       <div><b>Edificio</b></div>
       <div id="div-edificio-prog">
-        <div v-for="s in listaSigleEdificiFiltrata" :key="s.edificio">
+        <div v-for="s in listaSigleEdificiFiltrata" :key="s.edificio" class="checkbox-edifici">
           <input v-model="listaSigleEdificiSelezionati" :id="`check-edif-prog-${s.edificio}`" :value="s.edificio" type="checkbox">
           <label :for="`check-edif-prog-${s.edificio}`">{{s.edificio}}</label>
         </div>
       </div>
+      <br />
       <label for="select-cl-ogg">Classe oggetti</label>
       <select v-model="selectClOgg" id="select-cl-ogg">
         <option value=""></option>
         <option v-for="cl in listaClOgg" :key="cl.unnest" :value="cl.unnest">{{cl.unnest}}</option>
       </select>
-      <br>
-      <div><b>Valutazione dei rischi</b></div>
+      <br />
+      <br />
       <table v-if="selectClOgg" class="tabella-prog-controlli">
+        <caption class="caption-prog-controlli"><b>Valutazione dei rischi</b></caption>
         <tr>
           <th><b>Frase di rischio</b></th>
           <th><b>Controllo</b></th>
@@ -50,21 +56,28 @@
       <br>
     </div>
   </Details>
+</Card>
 </template>
 
 <script>
 import {reactive, onMounted, toRefs, watch, inject} from 'vue';
-import {prendiSigleEdifici, prendiSigleSacriMonti, leggiEnum, prendiFrasiDiRischio, getEntitàDaClOgg, getElementiDaEntità} from '../js/richieste';
+import {prendiSigleEdifici, prendiSigleSacriMonti, leggiEnum, prendiFrasiDiRischio, getEntitàDaClOgg, getElementiDaEntità, creaAttProgControllo} from '../js/richieste';
+import {dataInteger, dataCorta} from '../js/shared';
 import Details from './elementi/Details.vue';
+import LoadingScreen from './elementi/LoadingScreen.vue';
+import Card from './elementi/Card.vue';
 
 export default {
   name: 'TabDashboardPianificazione',
   components: {
     Details,
+    LoadingScreen,
+    Card,
   },
   setup() {
     const store = inject('store');
     const state = reactive({
+      caricamento: true,
       selectSacroMonte: '',
       selectClOgg: '',
       listaSigleSM: [],
@@ -86,11 +99,12 @@ export default {
     watch(() => state.selectClOgg, newVal => {
       const listaFrasiDiRischioFiltrate = state.listaFrasiDiRischio.filter(fr => fr.cl_ogg_fr === newVal);
       state.listaFrasiDiRischioFiltrate = listaFrasiDiRischioFiltrate;
-      const listaIdFrRiscFiltrati = listaFrasiDiRischioFiltrate.map(fr => ({id_fr_risc: fr.id_fr_risc, freq: null, data: null}));
+      const listaIdFrRiscFiltrati = listaFrasiDiRischioFiltrate.map(fr => ({id_fr_risc: fr.id_fr_risc, freq: null, data: null, man_reg: !!fr.mn_reg}));
       state.datiFrasiDiRischioFiltrate = listaIdFrRiscFiltrati;
     });
 
     onMounted(async () => {
+      state.caricamento = true;
       const listaSigleSM = await prendiSigleSacriMonti();
       const listaSigleEdifici = await prendiSigleEdifici();
       const listaClOgg = await leggiEnum('cl_ogg_fr');
@@ -99,12 +113,18 @@ export default {
       state.listaSigleEdifici = listaSigleEdifici;
       state.listaClOgg = listaClOgg;
       state.listaFrasiDiRischio = listaFrasiDiRischio;
+      state.caricamento = false;
     });
 
     async function programmaControlli() {
       if (controllaSelezioni() && controllaCampiCompilati()) {
+        state.caricamento = true;
         const dati = await raccogliDati();
+        const res = await creaAttProgControllo(dati);
         console.log(dati);
+        console.log(res);
+        // se res false mostrare avviso, se res true aggiungere eventi calendario, refresh schede, ecc.
+        state.caricamento = false;
       }
       else {
         store.methods.setAlert('ATTENZIONE: Informazioni non sufficienti');
@@ -123,10 +143,29 @@ export default {
       const datiProgrammazione = state.datiFrasiDiRischioFiltrate;
       const listaEdifici = state.listaSigleEdificiSelezionati;
       const sacroMonte = state.selectSacroMonte;
-      // const metadati = qualcosa...
       const listaEntità = await getEntitàDaClOgg(state.selectClOgg);
       const listaIdM10a = await compilaIdM10a(listaEdifici, listaEntità, sacroMonte);
-      return [datiProgrammazione, listaIdM10a];
+      const listaAttività = [];
+      datiProgrammazione.forEach(dato => {
+        listaIdM10a.forEach(id => {
+          const oggAtt = {};
+          oggAtt['cl_ogg'] = state.selectClOgg;
+          oggAtt['rid_fr_risc'] = dato.id_fr_risc;
+          oggAtt['man_reg'] = dato.man_reg;
+          oggAtt['freq'] = dato.freq;
+          oggAtt['data_prog'] = dato.data;
+          oggAtt['edificio'] = id.edificio;
+          oggAtt['elementi'] = id.elementi;
+          listaAttività.push(oggAtt);
+        });
+      });
+      const metadati = creaMetadati();
+      listaAttività.forEach((att, ind) => {
+        att['id_att_prog'] = metadati.idUnivoco + ind;
+        att['id_group'] = metadati.id_group;
+        att['data_ins'] = metadati.data_ins;
+      });
+      return listaAttività;
     }
 
     async function compilaIdM10a(edifici, entità, sm) {
@@ -153,6 +192,13 @@ export default {
       return listaElementi;
     }
 
+    function creaMetadati() {
+      const idUnivoco = dataInteger();
+      const data_ins = dataCorta();
+      const id_group = `${state.selectClOgg.split(' ')[0]}_${idUnivoco}`;
+      return {id_group, idUnivoco, data_ins}
+    }
+
     return {
       ...toRefs(state),
       programmaControlli,
@@ -163,7 +209,7 @@ export default {
 
 <style scoped>
 select {
-  margin-left: .4rem;
+  margin-left: 1rem;
 }
 input[type=checkbox] {
   margin-right: .4rem;
@@ -242,5 +288,18 @@ tr:nth-child(odd) {
 }
 .tooltip-prog:hover {
   overflow: visible;
+}
+.checkbox-edifici {
+  flex: 0 0 25%;
+}
+#div-edificio-prog {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.caption-prog-controlli {
+  color: unset;
+  text-align: center;
+  background-color: var(--verdeMain10anceTrasparenza);
 }
 </style>

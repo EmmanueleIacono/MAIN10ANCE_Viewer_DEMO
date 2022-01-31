@@ -1,5 +1,6 @@
 <template>
-  <Details summary="FILTRI" :open="true">
+  <Details class="loading-wrapper" summary="FILTRI" :open="true">
+    <LoadingScreen :caricamento="caricamento" />
     <input v-model="vediSchedeAttivi" type="checkbox" id="check-generale">
     <label for="check-generale">ATTIVA FILTRI</label>
     <br>
@@ -61,14 +62,17 @@
 import {onMounted, reactive, toRefs, watch} from 'vue';
 import {prendiSigleSacriMonti, leggiDBMarkerCapp, prendiLOD3e4, leggiEnum, leggiGlossDegradi} from '../js/richieste';
 import Details from './elementi/Details.vue';
+import LoadingScreen from './elementi/LoadingScreen.vue';
 
 export default {
   name: 'TabPlannerFiltri',
   components: {
     Details,
+    LoadingScreen,
   },
   setup() {
     const state = reactive({
+      caricamento: true,
       vediSchedeAttivi: false,
       cbxTipoScheda: false,
       cbxSacroMonte: false,
@@ -100,6 +104,7 @@ export default {
     });
 
     onMounted(async () => {
+      state.caricamento = true;
       const listaSigleSM = await prendiSigleSacriMonti();
       const listaNumCapp = await leggiDBMarkerCapp();
       const listaElementi = await prendiLOD3e4();
@@ -114,6 +119,7 @@ export default {
       state.selectElemento = listaElementi[0].tabella;
       state.selectStCons = listaStCons[0].unnest;
       state.selectFenomeno = listaFenomeni[0].id_gloss;
+      state.caricamento = false;
     });
 
     function attivaTutto(tutto) {

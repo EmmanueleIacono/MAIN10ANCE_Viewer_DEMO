@@ -133,16 +133,16 @@ bottoneProg.addEventListener('click', async () => {
                 });
             });
             console.log(listaJsonReq);
-            // const resp = await registraControlli(listaJsonReq);
-            // if (resp.success) {
-            //     alert('Programmazione andata a buon fine');
-            //     // proseguo, faccio query eventi e schede
-            //     const datiControllo = await recuperaDatiControlliProg();
-            //     console.log(datiControllo);
-            // }
-            // else {
-            //     alert('ATTENZIONE: Si è verificato un errore durante la registrazione dei dati');
-            // }
+            const resp = await registraControlli(listaJsonReq);
+            if (resp.success) {
+                alert('Programmazione andata a buon fine');
+                // proseguo, faccio query eventi e schede
+                const datiControllo = await recuperaDatiControlliProg();
+                console.log(datiControllo);
+            }
+            else {
+                alert('ATTENZIONE: Si è verificato un errore durante la registrazione dei dati');
+            }
         }
         else {
             alert('ATTENZIONE: Informazioni non sufficienti');
