@@ -27,7 +27,7 @@ export default {
   z-index: 9000;
 }
 .immagine-loading {
-  height: 40px;
+  height: 30px;
   opacity: .5;
 }
 </style>

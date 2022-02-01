@@ -49,8 +49,15 @@
             <div class="tab-div">{{fr.mn_reg ? fr.mn_reg : ''}}</div>
             <span v-if="fr.mn_reg" class="tooltip-prog-text">{{fr.mn_reg}}</span>
           </td>
-          <td><input v-model="datiFrasiDiRischioFiltrate[ind].freq" type="number" min="1"></td>
-          <td><input v-model="datiFrasiDiRischioFiltrate[ind].data" type="date"></td>
+          <td>
+            <input v-model="datiFrasiDiRischioFiltrate[ind].freq" type="number" min="1">
+            <!-- FORSE CAMBIARE E METTERE QUESTA COSA, MA DA RIVEDERE BENE -->
+            <!-- <button class="glyphicon glyphicon-link" title="Vincola"></button>
+            <input v-model="datiFrasiDiRischioFiltrate[ind].freq_mr" type="number" min="1"> -->
+          </td>
+          <td>
+            <input v-model="datiFrasiDiRischioFiltrate[ind].data" type="date">
+          </td>
         </tr>
       </table>
       <br>
@@ -74,7 +81,7 @@ export default {
     LoadingScreen,
     Card,
   },
-  setup() {
+  setup(props, {emit}) {
     const store = inject('store');
     const state = reactive({
       caricamento: true,
@@ -119,12 +126,24 @@ export default {
     async function programmaControlli() {
       if (controllaSelezioni() && controllaCampiCompilati()) {
         state.caricamento = true;
-        const dati = await raccogliDati();
-        const res = await creaAttProgControllo(dati);
-        console.log(dati);
-        console.log(res);
-        // se res false mostrare avviso, se res true aggiungere eventi calendario, refresh schede, ecc.
-        state.caricamento = false;
+        try {
+          const dati = await raccogliDati();
+          const res = await creaAttProgControllo(dati);
+          if (res.success) {
+            store.methods.setAlert('Programmazione andata a buon fine');
+            emit('aggiornaCalendario');
+            // se res true aggiungere eventi calendario, refresh schede, ecc.
+          }
+          else {
+            store.methods.setAlert('ATTENZIONE: Si è verificato un errore durante la registrazione dei dati');
+          }
+        }
+        catch(e) {
+          store.methods.setAlert(e);
+        }
+        finally {
+          state.caricamento = false;
+        }
       }
       else {
         store.methods.setAlert('ATTENZIONE: Informazioni non sufficienti');
@@ -145,6 +164,7 @@ export default {
       const sacroMonte = state.selectSacroMonte;
       const listaEntità = await getEntitàDaClOgg(state.selectClOgg);
       const listaIdM10a = await compilaIdM10a(listaEdifici, listaEntità, sacroMonte);
+      if (listaIdM10a.some(id => !id.elementi.length)) throw new Error('ERRORE: Nessun identificativo associato alla classe corrente o identificativi insufficienti per gli edifici selezionati.');
       const listaAttività = [];
       datiProgrammazione.forEach(dato => {
         listaIdM10a.forEach(id => {

@@ -180,3 +180,9 @@ export async function creaAttProgControllo(listaAtt) {
     const resJson = await res.json();
     return resJson;
 }
+
+export async function leggiAttivitàProg() {
+    const res = await fetch('/o/Main10ance_DB/attivita-programmate');
+    const resJson = await res.json();
+    return resJson;
+}

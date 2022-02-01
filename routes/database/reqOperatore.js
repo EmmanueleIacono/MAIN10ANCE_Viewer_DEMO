@@ -170,6 +170,12 @@ appO.get('/Main10ance_DB/controlli-programmati', async (req, res) => {
     res.send(JSON.stringify(contr));
 });
 
+appO.get('/Main10ance_DB/attivita-programmate', async (req, res) => {
+    const resp = await leggiAttivitàProg();
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(resp));
+});
+
 //////////          QUERY          //////////
 
 async function leggiColonneTabella(nomeTab) {
@@ -355,9 +361,21 @@ async function leggiTabelleLOD3e4() {
     }
 }
 
+/////// DA ELIMINARE O DA RIVEDERE PER FASE 2 //////////////
 async function leggiDatiControlloProg() {
     try {
         const results = await clientM10a.query(`SELECT "c".id_contr AS "id", "fr".cl_ogg_fr AS "classe", "fr".fr_risc AS "frase", "fr".controllo, "fr".mn_reg AS "manutenzione_regolare", "fr".mn_nec AS "manutenzione_correttiva", "c".data_con AS "data_operazione", "c".freq AS "frequenza", "c".data_ins AS "data_registrazione", "c".id_main10ance FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza AS "c" JOIN main10ance_sacrimonti.frase_di_rischio AS "fr" ON "c".rid_fr_risc = "fr".id_fr_risc ORDER BY data_con;`);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiAttivitàProg() {
+    try {
+        // const results = await clientM10a.query('SELECT * FROM main10ance_sacrimonti."attività_prog" ORDER BY "id_att_prog";');
+        const results = await clientM10a.query('SELECT "id_att_prog", "rid_fr_risc", "data_prog", "costo", "ore", "esecutori", "strumentaz", "commenti", to_json("id_main10ance") AS "id_main10ance", "id_group", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM main10ance_sacrimonti."attività_prog" ORDER BY "id_att_prog";');
         return results.rows;
     }
     catch(e) {

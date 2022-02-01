@@ -326,8 +326,8 @@ async function creaAttProgControllo(listaAtt) {
         try {
             for (const att of listaAtt) {
                 const tipo_att = att.man_reg ? ['controllo', 'manutenzione regolare'] : ['controllo'];
-                const valuesArray = [att.id_att_prog, tipo_att, att.cl_ogg, att.rid_fr_risc, att.freq, att.data_prog, att.id_group, att.elementi, att.data_ins];
-                await clientM10a.query(`INSERT INTO main10ance_sacrimonti."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9));`, valuesArray);
+                const valuesArray = [att.id_att_prog, tipo_att, att.cl_ogg, att.rid_fr_risc, att.freq, att.data_prog, att.id_group, att.elementi, att.data_ins, true];
+                await clientM10a.query(`INSERT INTO main10ance_sacrimonti."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins", "da_integrare") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10));`, valuesArray);
             }
         }
         catch(e) {
