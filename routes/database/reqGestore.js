@@ -166,6 +166,14 @@ appG.post('/Main10ance_DB/programmazione/nuovi-controlli', async (req, res) => {
     }
 });
 
+appG.get('/Main10ance_DB/integrazione/attivita-per-integrazione', async (req, res) => {
+    const reqJson = req.headers;
+    const bool = JSON.parse(reqJson.bool);
+    const resp = await leggiAttProgPerIntegrazione(bool);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(resp));
+});
+
 //////////          QUERY          //////////
 
 async function getUtentiProgetto() {
@@ -340,6 +348,17 @@ async function creaAttProgControllo(listaAtt) {
         console.log(`Errore: ${er}`);
         await clientM10a.query("ROLLBACK;");
         return false;
+    }
+}
+
+async function leggiAttProgPerIntegrazione(bool) {
+    try {
+        // const resp = await clientM10a.query('SELECT * FROM main10ance_sacrimonti."attività_prog" WHERE "da_integrare" = ($1);', [bool]);
+        const resp = await clientM10a.query('SELECT "id_att_prog", "rid_fr_risc", "data_prog", to_json("id_main10ance") AS "id_main10ance", "id_group", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM main10ance_sacrimonti."attività_prog" WHERE "da_integrare" = ($1) ORDER BY "id_att_prog";', [bool]);
+        return resp.rows;
+    }
+    catch(e) {
+        return [];
     }
 }
 
