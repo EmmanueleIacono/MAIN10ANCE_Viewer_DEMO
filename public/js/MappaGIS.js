@@ -11,8 +11,8 @@ tiles.addTo(mappaGIS);
 
 proj4.defs("EPSG:32632","+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs");
 
-leggiDBMarkerSM();
-leggiDBMarkerCapp();
+leggiDBMarkerLoc();
+leggiDBMarkerEdif();
 
 // utili
 setInterval(() => {
@@ -263,9 +263,9 @@ function getModel(urn) {
     }
 }
 
-async function leggiDBMarkerSM() {
+async function leggiDBMarkerLoc() {
     try {
-        const risultato = await fetch(`/t/DB_Servizio/MarkerSM`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/t/DB_Servizio/MarkerLoc`, {method: "GET", headers: {"content-type": "application/json"}});
         const sacriMontiJson = await risultato.json();
         sacriMontiJson.forEach((smjson) => {
             new MarkerSacroMonte(smjson.coord, smjson.nome, smjson.sigla, smjson.urn);
@@ -278,9 +278,9 @@ async function leggiDBMarkerSM() {
     }
 }
 
-async function leggiDBMarkerCapp() {
+async function leggiDBMarkerEdif() {
     try {
-        const risultato = await fetch(`/t/DB_Servizio/MarkerCapp`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/t/DB_Servizio/MarkerEdif`, {method: "GET", headers: {"content-type": "application/json"}});
         const cappelleJson = await risultato.json();
         cappelleJson.forEach((cappjson) => {
             new MarkerCappella(cappjson.coord, cappjson.nome, cappjson.sigla, cappjson.descrizione, cappjson.urn);

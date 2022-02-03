@@ -5,10 +5,10 @@
     <button @click="programmaControlli" class="bottone-prog">Programma</button>
       <br />
     <div class="main-container">
-      <label for="check-sacro-monte-prog">Sacro Monte</label>
-      <select v-model="selectSacroMonte" id="select-sacro-monte-prog">
+      <label for="select-località-prog">Località</label>
+      <select v-model="selectLocalità" id="select-località-prog">
         <option value=""></option>
-        <option v-for="sm in listaSigleSM" :key="sm.sigla" :value="sm.sigla">{{sm.nome}}</option>
+        <option v-for="loc in listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
       </select>
       <br />
       <br />
@@ -67,8 +67,8 @@
 </template>
 
 <script>
-import {reactive, onMounted, toRefs, watch, inject} from 'vue';
-import {prendiSigleEdifici, prendiSigleSacriMonti, leggiEnum, prendiFrasiDiRischio, getEntitàDaClOgg, getElementiDaEntità, creaAttProgControllo} from '../js/richieste';
+import {reactive, onMounted, toRefs, watch, inject, computed} from 'vue';
+import {prendiSigleEdifici, prendiSigleLocalità, leggiEnum, prendiFrasiDiRischio, getEntitàDaClOgg, getElementiDaEntità, creaAttProgControllo} from '../js/richieste';
 import {dataInteger, dataCorta} from '../js/shared';
 import Details from './elementi/Details.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
@@ -85,9 +85,9 @@ export default {
     const store = inject('store');
     const state = reactive({
       caricamento: true,
-      selectSacroMonte: '',
+      selectLocalità: '',
       selectClOgg: '',
-      listaSigleSM: [],
+      listaSigleLoc: [],
       listaSigleEdifici: [],
       listaSigleEdificiFiltrata: [],
       listaSigleEdificiSelezionati: [],
@@ -97,7 +97,12 @@ export default {
       datiFrasiDiRischioFiltrate: [],
     });
 
-    watch(() => state.selectSacroMonte, newVal => {
+    const nomeLocalità = computed(() => {
+      if (state.selectLocalità) return state.listaSigleLoc.filter(loc => loc.sigla === state.selectLocalità)[0].nome;
+      return '';
+    });
+
+    watch(() => state.selectLocalità, newVal => {
       const listaSigleEdificiFiltrata = state.listaSigleEdifici.filter(s => s.sacro_monte === newVal);
       state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
       state.listaSigleEdificiSelezionati = [];
@@ -112,11 +117,11 @@ export default {
 
     onMounted(async () => {
       state.caricamento = true;
-      const listaSigleSM = await prendiSigleSacriMonti();
+      const listaSigleLoc = await prendiSigleLocalità();
       const listaSigleEdifici = await prendiSigleEdifici();
       const listaClOgg = await leggiEnum('cl_ogg_fr');
       const listaFrasiDiRischio = await prendiFrasiDiRischio();
-      state.listaSigleSM = listaSigleSM;
+      state.listaSigleLoc = listaSigleLoc;
       state.listaSigleEdifici = listaSigleEdifici;
       state.listaClOgg = listaClOgg;
       state.listaFrasiDiRischio = listaFrasiDiRischio;
@@ -131,7 +136,7 @@ export default {
           const res = await creaAttProgControllo(dati);
           if (res.success) {
             store.methods.setAlert('Programmazione andata a buon fine');
-            emit('aggiornaCalendario');
+            emit('pianificazioneAggiornata');
             // se res true aggiungere eventi calendario, refresh schede, ecc.
           }
           else {
@@ -151,7 +156,7 @@ export default {
     }
 
     function controllaSelezioni() {
-      return state.selectSacroMonte && state.selectClOgg && !!state.listaSigleEdificiSelezionati.length;
+      return state.selectLocalità && state.selectClOgg && !!state.listaSigleEdificiSelezionati.length;
     }
 
     function controllaCampiCompilati() {
@@ -161,9 +166,9 @@ export default {
     async function raccogliDati() {
       const datiProgrammazione = state.datiFrasiDiRischioFiltrate;
       const listaEdifici = state.listaSigleEdificiSelezionati;
-      const sacroMonte = state.selectSacroMonte;
+      const località = state.selectLocalità;
       const listaEntità = await getEntitàDaClOgg(state.selectClOgg);
-      const listaIdM10a = await compilaIdM10a(listaEdifici, listaEntità, sacroMonte);
+      const listaIdM10a = await compilaIdM10a(listaEdifici, listaEntità, località);
       if (listaIdM10a.some(id => !id.elementi.length)) throw new Error('ERRORE: Nessun identificativo associato alla classe corrente o identificativi insufficienti per gli edifici selezionati.');
       const listaAttività = [];
       datiProgrammazione.forEach(dato => {
@@ -176,6 +181,7 @@ export default {
           oggAtt['data_prog'] = dato.data;
           oggAtt['edificio'] = id.edificio;
           oggAtt['elementi'] = id.elementi;
+          oggAtt['loc_estesa'] = nomeLocalità.value;
           listaAttività.push(oggAtt);
         });
       });
@@ -272,7 +278,6 @@ tr:nth-child(odd) {
 .tabella-prog-controlli .tab-div {
   z-index: 10;
   height: 60px;
-  /* max-width: 100px; */
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -287,16 +292,12 @@ tr:nth-child(odd) {
   position: absolute;
   z-index: 100;
   border: 1px;
-  /* background-color: #eee; */
   background-color: var(--blackOlive);
   border-style: solid;
   border-width: 1px;
-  /* border-color: blue; */
   border-color: var(--verdeMain10ance);
   border-radius: 3px;
   padding: 3px;
-  /* color: blue; */
-  /* color: var(--verdeMain10ance); */
   color: var(--grigio);
   top: 20px;
   left: 20px;

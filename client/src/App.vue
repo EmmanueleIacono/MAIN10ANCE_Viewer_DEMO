@@ -46,7 +46,7 @@
 
 <script>
 import {provide, onMounted} from 'vue';
-import {getTabelleGIS, getGIS, leggiDBMarkerSM, leggiDBMarkerCapp} from './js/richieste';
+import {getTabelleGIS, getGIS, leggiDBMarkerLoc, leggiDBMarkerEdif} from './js/richieste';
 import store from '@/store';
 import Tab1 from './components/TabBIM.vue';
 import Tab2 from './components/TabGIS.vue';
@@ -71,10 +71,10 @@ export default {
     primoLoad();
 
     onMounted(async () => {
-      const sacriMontiJson = await leggiDBMarkerSM();
-      const cappelleJson = await leggiDBMarkerCapp();
-      store.methods.setMarkerSM(sacriMontiJson);
-      store.methods.setMarkerCapp(cappelleJson);
+      const localitàJson = await leggiDBMarkerLoc();
+      const edificiJson = await leggiDBMarkerEdif();
+      store.methods.setMarkerLoc(localitàJson);
+      store.methods.setMarkerEdif(edificiJson);
     });
 
     function primoLoad() {

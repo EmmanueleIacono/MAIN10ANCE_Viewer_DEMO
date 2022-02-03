@@ -10,26 +10,26 @@ export async function getTabelleGIS() {
     return resp_tabelleGIS;
 }
 
-export async function leggiDBMarkerSM() {
+export async function leggiDBMarkerLoc() {
     try {
-        const risultato = await fetch(`/t/DB_Servizio/MarkerSM`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/t/DB_Servizio/MarkerLoc`, {method: "GET", headers: {"content-type": "application/json"}});
         const sacriMontiJson = await risultato.json();
         return sacriMontiJson;
     }
     catch(e) {
-        console.log('Errore nella lettura dei marker dei Sacri Monti');
+        console.log('Errore nella lettura dei marker delle località');
         console.log(e);
     }
 }
 
-export async function leggiDBMarkerCapp() {
+export async function leggiDBMarkerEdif() {
     try {
-        const risultato = await fetch(`/t/DB_Servizio/MarkerCapp`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/t/DB_Servizio/MarkerEdif`, {method: "GET", headers: {"content-type": "application/json"}});
         const cappelleJson = await risultato.json();
         return cappelleJson;
     }
     catch(e) {
-        console.log('Errore nella lettura dei marker delle cappelle');
+        console.log('Errore nella lettura dei marker degli edifici');
         console.log(e);
     }
 }
@@ -83,8 +83,9 @@ export async function prendiSchedeRestauro() {
     return risTradotto;
 }
 
-export async function prendiSigleSacriMonti() {
-    const risultato = await fetch('/t/DB_Servizio/MarkerSM', {method: "GET", headers: {"content-type": "application/json"}});
+/////           ATTENZIONE: QUESTA UGUALE A FUNZIONE "leggiDBMarkerLoc" ------> DA RISOLVERE
+export async function prendiSigleLocalità() {
+    const risultato = await fetch('/t/DB_Servizio/MarkerLoc', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }

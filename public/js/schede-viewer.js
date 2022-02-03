@@ -354,7 +354,7 @@ async function prendiUrn(jsonReq) {
 }
 
 async function prendiSigleNumericheCappelle() {
-    const risultato = await fetch('/t/DB_Servizio/MarkerCapp', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/t/DB_Servizio/MarkerEdif', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }

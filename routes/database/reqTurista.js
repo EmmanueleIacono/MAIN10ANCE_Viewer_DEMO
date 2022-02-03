@@ -17,17 +17,17 @@ appT.get('/Main10ance_DB/GIS', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/t/DB_Servizio/MarkerSM", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appT.get('/DB_Servizio/MarkerSM', async (req, res) => {
-    const markerSacriMonti = await leggiMarkerSM();
+// fetch("/t/DB_Servizio/MarkerLoc", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appT.get('/DB_Servizio/MarkerLoc', async (req, res) => {
+    const markerSacriMonti = await leggiMarkerLoc();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(markerSacriMonti));
 });
 
 // per testare la richiesta:
-// fetch("/t/DB_Servizio/MarkerCapp", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appT.get('/DB_Servizio/MarkerCapp', async (req, res) => {
-    const markerCappelle = await leggiMarkerCapp();
+// fetch("/t/DB_Servizio/MarkerEdif", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+appT.get('/DB_Servizio/MarkerEdif', async (req, res) => {
+    const markerCappelle = await leggiMarkerEdif();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(markerCappelle));
 });
@@ -52,7 +52,7 @@ async function leggiGIS(tabella, geometria, colonneUtili) {
     }
 }
 
-async function leggiMarkerSM() {
+async function leggiMarkerLoc() {
     try {
         const results = await clientServ.query(`SELECT * FROM "dati_sm" ORDER BY "nome";`);
         return results.rows;
@@ -62,7 +62,7 @@ async function leggiMarkerSM() {
     }
 }
 
-async function leggiMarkerCapp() {
+async function leggiMarkerEdif() {
     try {
         const results = await clientServ.query(`SELECT * FROM "dati_cappelle" ORDER BY CAST("numero" AS INTEGER);`);
         return results.rows;

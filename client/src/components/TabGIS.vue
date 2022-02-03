@@ -8,7 +8,7 @@
       <button @click="chiamaResetMappa" class="selettoreSM-dropdown">
         <span class="glyphicon glyphicon-home" style="margin-right: 10px;"></span>HOME
       </button>
-      <button v-for="(sm, ind) in store.stateGIS.markerSM" :key="ind" @click="setVistaMappa(sm.coord)" class="selettoreSM-dropdown">Sacro Monte di {{sm.nome}}</button>
+      <button v-for="(sm, ind) in store.stateGIS.markerLoc" :key="ind" @click="setVistaMappa(sm.coord)" class="selettoreSM-dropdown">{{sm.nome}}</button>
     </Details>
     <br />
     <Details summary="LIVELLI GIS" @click="emettiLoadLivelli">

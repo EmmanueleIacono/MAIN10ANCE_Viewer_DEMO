@@ -257,7 +257,7 @@ async function prendiSchedeRestauro() {
 }
 
 async function prendiSigleSacriMonti() {
-    const risultato = await fetch('/t/DB_Servizio/MarkerSM', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/t/DB_Servizio/MarkerLoc', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }

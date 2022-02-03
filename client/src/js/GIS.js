@@ -66,56 +66,36 @@ export function creaLivelloGIS(livello) {
     return livelloTabella;
 }
 
-export function creaMarkerSM(sm) {
-    const iconaSacriMonti = L.icon({
-        iconUrl: require('/src/assets/img/logo_b.png'),
-        shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
-        shadowSize: [36, 36],
-        shadowAnchor: [18, 15]
-    });
+export const iconaSM = L.icon({
+    iconUrl: require('/src/assets/img/logo_b.png'),
+    shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    shadowSize: [36, 36],
+    shadowAnchor: [18, 15]
+});
 
-    const marker = L.marker(sm.coord, {icon: iconaSacriMonti}).bindPopup();
+export const iconaCappelle = L.icon({
+    iconUrl: require('/src/assets/img/icona_capp_blue_small.png'),
+    shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    shadowSize: [36, 36],
+    shadowAnchor: [18, 15]
+});
 
-    const contenitorePopup = document.createElement('div');
-    contenitorePopup.innerHTML = `<b>Sacro Monte di ${sm.nome}</b><br>`;
-    const selettoreSM = document.createElement('button');
-    selettoreSM.id = `selettore_${sm.sigla}`;
-    selettoreSM.innerText = 'MODELLO';
-    contenitorePopup.appendChild(selettoreSM);
-    selettoreSM.addEventListener('click', () => {
-        getModel(sm.urn);
-        mappaGlb.closePopup();
-    });
-
-    marker.on('popupopen', () => {
-        marker._popup.setContent(contenitorePopup);
-    });
-
-    return marker;
-}
-
-export function creaMarkerCapp(capp) {
-    const iconaCappelle = L.icon({
-        iconUrl: require('/src/assets/img/icona_capp_blue_small.png'),
-        shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
-        shadowSize: [36, 36],
-        shadowAnchor: [18, 15]
-    });
-
-    const marker = L.marker(capp.coord, {icon: iconaCappelle}).bindPopup();
+export function creaMarker(edif, icona) {
+    const marker = L.marker(edif.coord, {icon: icona}).bindPopup();
 
     const contenitorePopup = document.createElement('div');
-    contenitorePopup.innerHTML = `<b>${capp.nome}</b><br>${capp.descrizione}<br>`;
-    const selettoreCapp = document.createElement('button');
-    selettoreCapp.id = `selettore_${capp.sigla}`;
-    selettoreCapp.innerText = 'MODELLO';
-    contenitorePopup.appendChild(selettoreCapp);
-    selettoreCapp.addEventListener('click', () => {
-        getModel(capp.urn);
+    const descrizione = edif.descrizione ? `<br>${edif.descrizione}` : '';
+    contenitorePopup.innerHTML = `<b>${edif.nome}</b>${descrizione}<br>`;
+    const selettore = document.createElement('button');
+    selettore.id = `selettore_${edif.sigla}`;
+    selettore.innerText = 'MODELLO';
+    contenitorePopup.appendChild(selettore);
+    selettore.addEventListener('click', () => {
+        getModel(edif.urn);
         mappaGlb.closePopup();
     });
     

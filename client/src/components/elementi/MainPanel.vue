@@ -1,5 +1,5 @@
 <template>
-<div :class="colonna" class="panel panel-default fill">
+<div :class="colonna" class="panel panel-default fill ovf">
   <slot>MainPanel default content</slot>
 </div>
 </template>
@@ -14,4 +14,7 @@ export default {
 </script>
 
 <style scoped>
+.ovf {
+  overflow: auto;
+}
 </style>

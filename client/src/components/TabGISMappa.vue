@@ -8,7 +8,7 @@
 
 <script>
 import {onMounted, inject, watch, onActivated} from 'vue';
-import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarkerSM, creaMarkerCapp} from '../js/GIS';
+import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaSM, iconaCappelle} from '../js/GIS';
 import L from 'leaflet';
 
 export default {
@@ -21,42 +21,42 @@ export default {
     onMounted(() => {
       creaMappa('mappa', posOrigine);
 
+      const gruppoMarkerLocalità = L.layerGroup();
+      const gruppoMarkerEdifici = L.layerGroup();
+
       mappaGlb.on('zoomend', () => {
         const zoomComune = 17;
         if (mappaGlb.getZoom() <= 5) {
-          rimuoviLayer(gruppoMarkerSacriMonti, mappaGlb);
-          rimuoviLayer(gruppoMarkerCappelle, mappaGlb);
+          rimuoviLayer(gruppoMarkerLocalità, mappaGlb);
+          rimuoviLayer(gruppoMarkerEdifici, mappaGlb);
         }
         else if (mappaGlb.getZoom() < zoomComune && mappaGlb.getZoom() > 5) {
-          aggiungiLayer(gruppoMarkerSacriMonti, mappaGlb);
-          rimuoviLayer(gruppoMarkerCappelle, mappaGlb);
+          aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
+          rimuoviLayer(gruppoMarkerEdifici, mappaGlb);
         }
         else if (mappaGlb.getZoom() > zoomComune) {
-          aggiungiLayer(gruppoMarkerCappelle, mappaGlb);
-          rimuoviLayer(gruppoMarkerSacriMonti, mappaGlb);
+          aggiungiLayer(gruppoMarkerEdifici, mappaGlb);
+          rimuoviLayer(gruppoMarkerLocalità, mappaGlb);
         }
         else {
-          aggiungiLayer(gruppoMarkerSacriMonti, mappaGlb);
-          aggiungiLayer(gruppoMarkerCappelle, mappaGlb);
+          aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
+          aggiungiLayer(gruppoMarkerEdifici, mappaGlb);
         }
       });
 
-      const gruppoMarkerCappelle = L.layerGroup();
-      const gruppoMarkerSacriMonti = L.layerGroup();
+      aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
 
-      aggiungiLayer(gruppoMarkerSacriMonti, mappaGlb);
-
-      watch(() => [store.stateGIS.markerSM, store.stateGIS.markerCapp], () => {
-        if (store.stateGIS.markerSM) {
-          store.stateGIS.markerSM.forEach(sm => {
-            const markerSM = creaMarkerSM(sm);
-            markerSM.addTo(gruppoMarkerSacriMonti);
+      watch(() => [store.stateGIS.markerLoc, store.stateGIS.markerEdif], () => {
+        if (store.stateGIS.markerLoc) {
+          store.stateGIS.markerLoc.forEach(loc => {
+            const markerSM = creaMarker(loc, iconaSM);
+            markerSM.addTo(gruppoMarkerLocalità);
           });
         }
-        if (store.stateGIS.markerCapp) {
-          store.stateGIS.markerCapp.forEach(capp => {
-            const markerCapp = creaMarkerCapp(capp);
-            markerCapp.addTo(gruppoMarkerCappelle);
+        if (store.stateGIS.markerEdif) {
+          store.stateGIS.markerEdif.forEach(edif => {
+            const markerCapp = creaMarker(edif, iconaCappelle);
+            markerCapp.addTo(gruppoMarkerEdifici);
           });
         }
       });

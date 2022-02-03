@@ -2,14 +2,14 @@
 <div v-if="store.getters.getUsrVwList().includes('apriTabSchede')">
   <MainPanel :colonna="'col-sm-7'">
     <br />
-    <Pianificazione @aggiornaCalendario="popolaCalendario" />
-    <Integrazione />
+    <Pianificazione @pianificazioneAggiornata="aggiornaEventi" />
+    <Integrazione ref="IntegrazioneRef" />
     <h4>
       <span id="refreshSchede" class="glyphicon glyphicon-refresh"></span>
       <b>SCHEDE</b>
     </h4>
     <div id="contenitore-schede">
-      QUI SCHEDE
+      QUI SCHEDE (questo chiamarlo "ESECUZIONE" come fase)
     </div>
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
@@ -45,6 +45,7 @@ export default {
   setup() {
     const store = inject('store');
     const fullCalendarPlanner = ref(null);
+    const IntegrazioneRef = ref(null);
     const calendarOptions = reactive({
       plugins: [DayGridPlugin],
       initialView: 'dayGridMonth',
@@ -57,14 +58,7 @@ export default {
       },
       defaultAllDay: true,
       dayMaxEvents: true,
-      events: [
-        { title: 'event 1', date: '2022-02-01' },
-        { title: 'event 2', date: '2022-02-01' },
-        { title: 'event 3', date: '2022-02-01' },
-        { title: 'event 4', date: '2022-02-01' },
-        { title: 'event 5', date: '2022-02-01' },
-        { title: 'event 6', date: '2022-02-02' },
-      ],
+      events: [],
       eventMouseEnter: (info) => {
         info.el.style.cursor = 'pointer';
         info.el.title = info.event.title;
@@ -76,6 +70,11 @@ export default {
     });
 
     popolaCalendario();
+
+    async function aggiornaEventi() {
+      await popolaCalendario();
+      await IntegrazioneRef.value.popolaAttività();
+    }
 
     async function popolaCalendario() {
       const listaEventiProg = await aggiungiEventiProg();
@@ -98,6 +97,7 @@ export default {
           attività_previste: evento.tipo_attività,
           elementi_interessati: evento.id_main10ance,
           data_inserimento: evento.data_ins,
+          da_integrare: evento.da_integrare,
         },
         backgroundColor: evento.da_integrare ? '#bbb' : '#a8c956',
         borderColor: '#c74646',
@@ -109,8 +109,9 @@ export default {
     return {
       store,
       fullCalendarPlanner,
+      IntegrazioneRef,
       calendarOptions,
-      popolaCalendario,
+      aggiornaEventi,
     }
   }
 }

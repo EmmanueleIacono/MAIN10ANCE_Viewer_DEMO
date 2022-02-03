@@ -15,8 +15,8 @@ const state = reactive({
 const stateGIS = reactive({
     tabelleGIS: null,
     entitàGIS: {},
-    markerSM: null,
-    markerCapp: null,
+    markerLoc: null,
+    markerEdif: null,
 });
 
 const stateBIM = reactive({
@@ -90,12 +90,12 @@ const methods = {
         stateGIS.entitàGIS[tabella].geometria = livello;
     },
 
-    setMarkerSM(listaMarker) {
-        stateGIS.markerSM = listaMarker;
+    setMarkerLoc(listaMarker) {
+        stateGIS.markerLoc = listaMarker;
     },
 
-    setMarkerCapp(listaCapp) {
-        stateGIS.markerCapp = listaCapp;
+    setMarkerEdif(listaEdif) {
+        stateGIS.markerEdif = listaEdif;
     }
 }
 
