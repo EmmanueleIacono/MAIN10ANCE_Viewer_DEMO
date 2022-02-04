@@ -3,14 +3,8 @@
   <MainPanel :colonna="'col-sm-7'">
     <br />
     <Pianificazione @pianificazioneAggiornata="aggiornaEventi" />
-    <Integrazione ref="IntegrazioneRef" />
-    <h4>
-      <span id="refreshSchede" class="glyphicon glyphicon-refresh"></span>
-      <b>SCHEDE</b>
-    </h4>
-    <div id="contenitore-schede">
-      QUI SCHEDE (questo chiamarlo "ESECUZIONE" come fase)
-    </div>
+    <Integrazione @integrazioneAggiornata="aggiornaEventi" ref="IntegrazioneRef" />
+    <Esecuzione />
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
     <FullCalendar ref="fullCalendarPlanner" :options="calendarOptions" />
@@ -31,6 +25,7 @@ import Explorer from './elementi/Explorer.vue';
 import Filtri from './TabPlannerFiltri.vue';
 import Pianificazione from './TabPlannerPianificazione.vue';
 import Integrazione from './TabPlannerIntegrazione.vue';
+import Esecuzione from './TabPlannerEsecuzione.vue';
 
 export default {
   name: 'TabPlanner',
@@ -41,6 +36,7 @@ export default {
     Filtri,
     Pianificazione,
     Integrazione,
+    Esecuzione,
   },
   setup() {
     const store = inject('store');
@@ -118,8 +114,4 @@ export default {
 </script>
 
 <style scoped>
-#refreshSchede {
-  cursor: pointer;
-  margin-right: 5px;
-}
 </style>

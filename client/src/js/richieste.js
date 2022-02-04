@@ -193,3 +193,9 @@ export async function leggiAttProgPerIntegrazione(bool) {
     const resJson = await res.json();
     return resJson;
 }
+
+export async function integraAttività(jsonAtt) {
+    const res = await fetch('/g/Main10ance_DB/integrazione/integrazione-attivita', {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonAtt)});
+    const resJson = await res.json();
+    return resJson;
+}

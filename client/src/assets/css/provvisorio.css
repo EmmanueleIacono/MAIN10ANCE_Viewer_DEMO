@@ -1,7 +1,7 @@
 /* ELIMINARE DI VOLTA IN VOLTA DA QUESTO FILE GLI STILI USATI SUI COMPONENT, COME FORMA DI CONTROLLO */
 
 #scheda-anagrafica {
-  background-color: var(--gialloAnagraficaTrasparenza);
+  background-color: var(--gialloInterventoTrasparenza);
   font-size: 13px;
   padding: 30px 14px;
 }
@@ -74,13 +74,6 @@ div[id^="div-form-"] {
 }
 
 /* TABELLE SCHEDE CONTROLLO-INTERVENTO */
-
-#contenitore-schede {
-  height: 90%;
-  overflow: auto;
-  padding-left: 5px;
-  padding-right: 15px;
-}
 
 .caption-schede {
   color: var(--bluInterreg);

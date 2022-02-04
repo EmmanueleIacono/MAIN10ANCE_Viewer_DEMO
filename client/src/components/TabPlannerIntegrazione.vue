@@ -1,10 +1,10 @@
 <template>
 <Card>
-  <Details summary="INTEGRAZIONE" :open="true" class="loading-wrapper">
+  <Details summary="INTEGRAZIONE" :open="false" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
     <div class="contenitore-scelta-attività">
       <button @click="tabIntegrazioneAttivo = 'AttPianificate'" class="verde">ATTIVITÀ PIANIFICATE</button>
-      <button @click="tabIntegrazioneAttivo = 'AttSegnalate'" class="blu">ATTIVITÀ SEGNALATE</button>
+      <button @click="tabIntegrazioneAttivo = 'AttSegnalate'" class="giallo">ATTIVITÀ SEGNALATE</button>
     </div>
     <div class="contenitore-ordinaper">
       <p><b>Ordina per: </b></p>
@@ -17,8 +17,8 @@
         <label for="data-ins">Data di inserimento</label>
       </div>
     </div>
-    <AttPianificate v-show="tabIntegrazioneAttivo === 'AttPianificate'" :attività="attPianificate" />
-    <AttSegnalate v-show="tabIntegrazioneAttivo === 'AttSegnalate'" :attività="attSegnalate" />
+    <AttPianificate @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttPianificate'" :att="attPianificate" />
+    <AttSegnalate v-show="tabIntegrazioneAttivo === 'AttSegnalate'" :att="attSegnalate" />
   </Details>
 </Card>
 </template>
@@ -41,7 +41,7 @@ export default {
     AttSegnalate,
     LoadingScreen,
   },
-  setup() {
+  setup(props, {emit}) {
     const state = reactive({
       caricamento: false,
       tabIntegrazioneAttivo: 'AttPianificate',
@@ -74,9 +74,14 @@ export default {
       state.attSegnalate.sort((a, b) => a[param].localeCompare(b[param]));
     }
 
+    function emettiRefresh() {
+      emit('integrazioneAggiornata');
+    }
+
     return {
       ...toRefs(state),
       popolaAttività,
+      emettiRefresh,
     }
   }
 }
@@ -101,16 +106,17 @@ button.verde {
 button.verde:hover {
   background-color: var(--verdeMain10anceTrasparenza);
 }
-button.blu {
-  background-color: var(--bluInterreg);
+button.giallo {
+  background-color: var(--gialloIntervento);
 }
-button.blu:hover {
-  background-color: var(--bluInterregTrasparenza);
+button.giallo:hover {
+  background-color: var(--gialloInterventoTrasparenza);
 }
 .contenitore-ordinaper {
   display: flex;
-  justify-content: space-between;
-  width: 60%;
+}
+.contenitore-ordinaper div {
+  margin-left: 20px;
 }
 .mr {
   margin-right: 5px;

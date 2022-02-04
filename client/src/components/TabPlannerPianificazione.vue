@@ -1,6 +1,6 @@
 <template>
 <Card>
-  <Details class="loading-wrapper" summary="PIANIFICAZIONE" :open="true">
+  <Details summary="PIANIFICAZIONE" :open="false" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
     <button @click="programmaControlli" class="bottone-prog">Programma</button>
       <br />

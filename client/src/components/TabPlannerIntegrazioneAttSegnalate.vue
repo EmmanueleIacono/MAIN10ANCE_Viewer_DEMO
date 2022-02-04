@@ -1,14 +1,13 @@
 <template>
-  <div class="sfondo-blu">
-    <div v-if="attività.length">
-      <SchedaInt v-for="(att, ind) in attività" :key="ind" :pianificate="false" :attività="att" />
+  <div class="sfondo-giallo">
+    <div v-if="att.length">
+      <SchedaInt v-for="a in att" :key="a.id_att_prog" :pianificate="false" :att="a" />
     </div>
     <div v-else>Nessuna attività da integrare</div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue';
 import SchedaInt from './elementi/SchedaIntegrazioneAttività.vue';
 
 export default {
@@ -17,20 +16,13 @@ export default {
     SchedaInt,
   },
   props: {
-    attività: Array,
+    att: Array,
   },
-  setup() {
-    const state = reactive({});
-
-    return {
-      ...toRefs(state),
-    }
-  }
 }
 </script>
 
 <style scoped>
-.sfondo-blu {
-  background-color: var(--bluInterregTrasparenza2);
+.sfondo-giallo {
+  background-color: var(--gialloInterventoTrasparenza2);
 }
 </style>

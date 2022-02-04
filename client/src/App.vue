@@ -117,8 +117,13 @@ export default {
   --white: #fff;
   --grigio: #dddddd;
   --grigioScuro: #bbbbbb;
-  --gialloAnagrafica: #ceba4c;
-  --gialloAnagraficaTrasparenza: #ceba4c60;
+  --gialloIntervento: #ceba4c;
+  --gialloInterventoTrasparenza: #ceba4c60;
+  --gialloInterventoTrasparenza2: #ceba4c30;
+  --arancioneIntervento: #ce964c;
+  --arancioneInterventoTrasparenza: #ce964c60;
+  --rossoIntervento: #ce624c;
+  --rossoInterventoTrasparenza: #ce624c60;
   --grigioMoltoScuro: #3d3d3d;
   --verdeMain10ance: #a8c956;
   --bluInterreg: #1a4f9c;

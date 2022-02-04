@@ -34,6 +34,6 @@ export default {
   background: var(--bluInterreg);
 }
 .giallo {
-  background: var(--gialloAnagrafica);
+  background: var(--gialloIntervento);
 }
 </style>

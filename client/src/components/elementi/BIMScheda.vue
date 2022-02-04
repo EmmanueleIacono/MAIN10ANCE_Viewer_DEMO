@@ -33,7 +33,7 @@ p {
   padding-left: 20px;
 }
 .anagrafica {
-  background-color: var(--gialloAnagraficaTrasparenza);
+  background-color: var(--bluInterregTrasparenza);
 }
 .controllo {
   background-color: var(--verdeMain10anceTrasparenza);

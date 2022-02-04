@@ -1,27 +1,27 @@
 <template>
-  <div :class="pianificate ? 'verde' : 'blu'" class="wrapper-scheda">
+  <div :class="pianificate ? 'verde' : 'giallo'" class="wrapper-scheda">
     <div class="contenitore-colonne mt20">
       <div class="colonna">
         <p><b>Attività: </b>{{stringAtt}}</p>
-        <p><b>Classe oggetti: </b>{{attività.cl_ogg_fr}}</p>
-        <p><b>Località: </b>{{attività.località_estesa}}</p>
+        <p><b>Classe oggetti: </b>{{att.cl_ogg_fr}}</p>
+        <p><b>Località: </b>{{att.località_estesa}}</p>
         <p><b>Edificio: </b>{{edificio}}</p>
       </div>
       <div class="colonna">
         <p>
           <b>Descrizione: </b>
-          <span v-for="att in attività.tipo_attività" :key="att">
+          <span v-for="ta in att.tipo_attività" :key="ta">
             <p>
-              <i>{{att}}: </i>
-              {{attività[att]}}
+              <i>{{ta}}: </i>
+              {{att[ta]}}
             </p>
           </span>
         </p>
       </div>
     </div>
-    <p class="id">{{attività.data_prog}}</p>
+    <p class="id">{{att.data_prog}}</p>
     <div class="dx">
-      <button @click="integra" :class="[integrazioneAttiva ? 'glyphicon-minus' : 'glyphicon-plus', pianificate ? 'verde' : 'blu']" class="glyphicon integra"></button>
+      <button @click="integra" :class="[integrazioneAttiva ? 'glyphicon-minus' : 'glyphicon-plus', pianificate ? 'verde' : 'giallo']" class="glyphicon integra"></button>
     </div>
     <div v-if="integrazioneAttiva">
       <div class="contenitore-colonne">
@@ -60,34 +60,35 @@
 </template>
 
 <script>
-import {reactive, toRefs, computed} from 'vue';
+import {reactive, toRefs, computed, inject} from 'vue';
+import {dataCorta} from '../../js/shared';
+// import { integraAttività } from '../../js/richieste';
 
 export default {
   name: 'SchedaIntegrazioneAttività',
   props: {
     pianificate: Boolean,
-    attività: Object,
+    att: Object,
   },
-  setup(props) {
+  setup(props, {emit}) {
+    const store = inject('store');
     const state = reactive({
-      id_record: props.attività.id_att_prog,
+      id_record: props.att.id_att_prog,
       integrazioneAttiva: false,
       esecutori: '',
       strumentazione: '',
       note: '',
       costoPrevisto: null,
       orePreviste: null,
-      dataProgrammata: props.attività.data_prog,
+      dataProgrammata: props.att.data_prog,
     });
 
     const stringAtt = computed(() => {
-      return props.attività.tipo_attività.join(', ');
+      return props.att.tipo_attività.join(', ');
     });
     const edificio = computed(() => {
-      return props.attività.id_main10ance[0].split('|')[1];
+      return props.att.id_main10ance[0].split('|')[1];
     });
-
-    // console.log(props.attività);
 
     function integra() {
       state.integrazioneAttiva = !state.integrazioneAttiva;
@@ -100,11 +101,34 @@ export default {
       state.note = '';
       state.costoPrevisto = null;
       state.orePreviste = null;
-      state.dataProgrammata = props.attività.data_prog;
+      state.dataProgrammata = props.att.data_prog;
     }
 
-    function salvaIntegrazione() {
-      console.log(state);
+    async function salvaIntegrazione() {
+      if ([state.esecutori, state.strumentazione, state.costoPrevisto, state.orePreviste].every(elem => !!elem)) {
+        const jsonAtt = {};
+        jsonAtt['id_att_prog'] = parseInt(state.id_record);
+        jsonAtt['data_ultima_mod'] = dataCorta();
+        if (state.dataProgrammata !== props.att.data_prog) jsonAtt['data_prog'] = state.dataProgrammata;
+        if (state.esecutori) jsonAtt['esecutori'] = state.esecutori;
+        if (state.strumentazione) jsonAtt['strumentaz'] = state.strumentazione;
+        if (state.costoPrevisto) jsonAtt['costo'] = state.costoPrevisto;
+        if (state.orePreviste) jsonAtt['ore'] = state.orePreviste;
+        if (state.note) jsonAtt['commenti'] = state.note;
+        console.log(jsonAtt);
+        ///////                 IMPORTANTE! ------> SERVE FARE PRIMO SALVATAGGIO ANCHE SU TABELLE ATTIVITA' EFFETTIVE, DA FARE
+        // const res = await integraAttività(jsonAtt);
+        // if (res.success) {
+        //   store.methods.setAlert("Salvataggio avvenuto con successo");
+          emit('integrazioneCompletata');
+        // }
+        // else {
+        //   store.methods.setAlert("ATTENZIONE: Si è verificato un errore durante la registrazione dei dati");
+        // }
+      }
+      else {
+        store.methods.setAlert('ATTENZIONE: I campi "Esecutori", "Strumentazione", "Costo previsto" e "Ore previste" sono obbligatori');
+      }
     }
 
     return {
@@ -142,6 +166,9 @@ input {
 .blu {
   background-color: var(--bluInterregTrasparenza);
 }
+.giallo {
+  background-color: var(--gialloInterventoTrasparenza);
+}
 .dx {
   position: absolute;
   top: 0;
@@ -154,7 +181,6 @@ input {
 }
 .integra {
   border: none;
-  /* background-color: var(--verdeMain10anceTrasparenza); */
   color: var(--blackOlive);
   padding: 5px;
   margin: 5px;
@@ -183,5 +209,6 @@ input {
 }
 .mt20 {
   margin-top: 20px;
+  margin-bottom: 20px;
 }
 </style>

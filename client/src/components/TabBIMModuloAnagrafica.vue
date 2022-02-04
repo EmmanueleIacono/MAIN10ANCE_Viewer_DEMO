@@ -3,9 +3,9 @@
   <div class="scheda-anagrafica">
     <div class="div-titolo-bottoni">
       <div class="float-dx div-bottoni">
-        <BtnBIM @click="salvaScheda" icona="glyphicon-floppy-disk" nome="salvaScAnag" title="Salva" colore="giallo" />
-        <BtnBIM @click="resetState" icona="glyphicon-erase" nome="annullaDB" title="Cancella tutti i campi" colore="giallo" />
-        <BtnBIM @click="chiudiScheda" icona="glyphicon-remove" nome="chiudiScAnag" title="Salva" colore="giallo" />
+        <BtnBIM @click="salvaScheda" icona="glyphicon-floppy-disk" nome="salvaScAnag" title="Salva" colore="blu" />
+        <BtnBIM @click="resetState" icona="glyphicon-erase" nome="annullaDB" title="Cancella tutti i campi" colore="blu" />
+        <BtnBIM @click="chiudiScheda" icona="glyphicon-remove" nome="chiudiScAnag" title="Salva" colore="blu" />
       </div>
       <h4><b>SCHEDA ANAGRAFICA</b></h4>
     </div>
@@ -184,7 +184,7 @@ input, textarea {
   border: 0;
 }
 .scheda-anagrafica {
-  background-color: var(--gialloAnagraficaTrasparenza);
+  background-color: var(--bluInterregTrasparenza);
   font-size: 13px;
   padding: 30px 14px;
 }
