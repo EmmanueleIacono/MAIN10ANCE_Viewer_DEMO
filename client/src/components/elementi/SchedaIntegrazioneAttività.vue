@@ -31,11 +31,11 @@
             <input v-model="esecutori" id="esecutori" class="colonna">
           </div>
           <div class="contenitore-colonne centra">
-            <label for="strumentazione" class="colonna">Strumentazione: </label>
+            <label for="strumentazione" class="colonna">Strumentazione:</label>
             <input v-model="strumentazione" id="strumentazione" class="colonna">
           </div>
           <div class="contenitore-colonne centra">
-            <label for="note" class="colonna">Note: </label>
+            <label for="note" class="colonna">Note:</label>
             <input v-model="note" id="note" class="colonna">
           </div>
         </div>
@@ -61,8 +61,8 @@
 
 <script>
 import {reactive, toRefs, computed, inject} from 'vue';
-import {dataCorta} from '../../js/shared';
-// import { integraAttività } from '../../js/richieste';
+import {dataCorta, dataInteger} from '../../js/shared';
+import { integraAttività } from '../../js/richieste';
 
 export default {
   name: 'SchedaIntegrazioneAttività',
@@ -107,8 +107,17 @@ export default {
     async function salvaIntegrazione() {
       if ([state.esecutori, state.strumentazione, state.costoPrevisto, state.orePreviste].every(elem => !!elem)) {
         const jsonAtt = {};
+        const datiIns = {};
         jsonAtt['id_att_prog'] = parseInt(state.id_record);
         jsonAtt['data_ultima_mod'] = dataCorta();
+        jsonAtt['dati_inserimento'] = datiIns;
+        datiIns['tabelle'] = props.att.tipo_attività.map(t => store.statePlanner.attività[t].tabella);
+        datiIns['id_att'] = dataInteger();
+        datiIns['cl_ogg_fr'] = props.att.cl_ogg_fr;
+        datiIns['descrizione'] = props.att.tipo_attività.map(t => props.att[t]);
+        datiIns['id_main10ance'] = props.att.id_main10ance;
+        datiIns['rid_fr_risc'] = props.att.rid_fr_risc;
+        datiIns['data_azione'] = state.dataProgrammata;
         if (state.dataProgrammata !== props.att.data_prog) jsonAtt['data_prog'] = state.dataProgrammata;
         if (state.esecutori) jsonAtt['esecutori'] = state.esecutori;
         if (state.strumentazione) jsonAtt['strumentaz'] = state.strumentazione;
@@ -117,14 +126,14 @@ export default {
         if (state.note) jsonAtt['commenti'] = state.note;
         console.log(jsonAtt);
         ///////                 IMPORTANTE! ------> SERVE FARE PRIMO SALVATAGGIO ANCHE SU TABELLE ATTIVITA' EFFETTIVE, DA FARE
-        // const res = await integraAttività(jsonAtt);
-        // if (res.success) {
-        //   store.methods.setAlert("Salvataggio avvenuto con successo");
+        const res = await integraAttività(jsonAtt);
+        if (res.success) {
+          store.methods.setAlert("Salvataggio avvenuto con successo");
           emit('integrazioneCompletata');
-        // }
-        // else {
-        //   store.methods.setAlert("ATTENZIONE: Si è verificato un errore durante la registrazione dei dati");
-        // }
+        }
+        else {
+          store.methods.setAlert("ATTENZIONE: Si è verificato un errore durante la registrazione dei dati");
+        }
       }
       else {
         store.methods.setAlert('ATTENZIONE: I campi "Esecutori", "Strumentazione", "Costo previsto" e "Ore previste" sono obbligatori');

@@ -2,7 +2,7 @@
 <Card>
   <Details summary="PIANIFICAZIONE" :open="false" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
-    <button @click="programmaControlli" class="bottone-prog">Programma</button>
+    <button @click="programmaControlli" class="bottone-main10ance bottone-prog">Salva</button>
       <br />
     <div class="main-container">
       <label for="select-località-prog">Località</label>
@@ -28,7 +28,7 @@
       <br />
       <br />
       <table v-if="selectClOgg" class="tabella-prog-controlli">
-        <caption class="caption-prog-controlli"><b>Valutazione dei rischi</b></caption>
+        <caption class="caption-prog-controlli"><b>Pianificazione attività cicliche</b></caption>
         <tr>
           <th><b>Frase di rischio</b></th>
           <th><b>Controllo</b></th>
@@ -254,14 +254,15 @@ tr:nth-child(odd) {
   margin-top: 10px;
 }
 .bottone-prog {
-  background-color: var(--bluInterreg);
+  /* background-color: var(--bluInterreg);
   color: white;
   border: none;
-  margin-left: 10px;
+  margin-left: 10px; */
   float: right;
 }
 .bottone-prog:hover {
-  background-color: var(--grigioScuro);
+  /* background-color: var(--grigioScuro); */
+  background-color: var(--verdeMain10anceTrasparenza);
 }
 .tabella-prog-controlli {
   table-layout: fixed;

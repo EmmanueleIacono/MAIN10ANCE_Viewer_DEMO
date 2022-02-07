@@ -1,16 +1,16 @@
 <template>
 <Card>
-  <Details summary="INTEGRAZIONE" :open="false" class="loading-wrapper">
+  <Details summary="PROGRAMMAZIONE" :open="false" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
     <div class="contenitore-scelta-attività">
-      <button @click="tabIntegrazioneAttivo = 'AttPianificate'" class="verde">ATTIVITÀ PIANIFICATE</button>
-      <button @click="tabIntegrazioneAttivo = 'AttSegnalate'" class="giallo">ATTIVITÀ SEGNALATE</button>
+      <button @click="tabIntegrazioneAttivo = 'AttPianificate'" class="verde">ATTIVITÀ CICLICHE</button>
+      <button @click="tabIntegrazioneAttivo = 'AttSegnalate'" class="giallo">ATTIVITÀ DI RIALLINEAMENTO</button>
     </div>
     <div class="contenitore-ordinaper">
       <p><b>Ordina per: </b></p>
       <div>
         <input v-model="ordinaPer" type="radio" name="ordina" id="data-prog" class="mr" value="data_prog">
-        <label for="data-prog">Data programmata</label>
+        <label for="data-prog">Data pianificata</label>
       </div>
       <div>
         <input v-model="ordinaPer" type="radio" name="ordina" id="data-ins" class="mr" value="id_att_prog">

@@ -27,6 +27,29 @@ const stateBIM = reactive({
     schedeModuliVisibile: false,
 });
 
+const statePlanner = reactive({
+    attività: {
+        'controllo': {
+            tabella: 'controllo_stato_di_conservazione_livello_di_urgenza',
+        },
+        'manutenzione regolare': {
+            tabella: 'manutenzione_regolare',
+        },
+        'manutenzione correttiva': {
+            tabella: 'manutenzione_correttiva_o_a_guasto',
+        },
+        'manutenzione straordinaria': {
+            tabella: 'manutenzione_straordinaria',
+        },
+        'restauro': {
+            tabella: 'restauri',
+        },
+        'diagnosi': {
+            tabella: 'danno_alterazione_degrado',
+        },
+    }
+});
+
 const methods = {
     setTabAttivo(nomeTab) {
         state.tabAttivo = nomeTab;
@@ -112,6 +135,7 @@ export default {
     state: readonly(state),
     stateGIS,
     stateBIM,
+    statePlanner,
     methods,
     getters,
 }

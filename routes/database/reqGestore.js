@@ -380,9 +380,9 @@ async function leggiAttProgPerIntegrazione(bool) {
 
 async function integraAtt(jsonAtt) {
     // QUI SERVE FARE ANCHE INSERT INTO NELLE TABELLE DELLE ATTIVITA' EFFETTIVE
-    const nums = Object.keys(jsonAtt).map((e, i) => `($${i+1})`);
+    const nums = Object.keys(jsonAtt).filter(e => e !== 'dati_inserimento').map((e, i) => `($${i+1})`);
     const ultimoNum = nums.pop();
-    const entriesFiltr = Object.entries(jsonAtt).filter(e => e[0] !== 'id_att_prog');
+    const entriesFiltr = Object.entries(jsonAtt).filter(e => e[0] !== 'dati_inserimento').filter(e => e[0] !== 'id_att_prog');
     const values = entriesFiltr.map(e => `${e[1]}`);
     values.push(jsonAtt['id_att_prog']);
     const strSet = entriesFiltr.map((e, i) => `"${e[0]}" = ($${i+1})`).join(', ');
@@ -390,6 +390,25 @@ async function integraAtt(jsonAtt) {
         await clientM10a.query('BEGIN;');
         try {
             await clientM10a.query(`UPDATE main10ance_sacrimonti."attività_prog" SET ${strSet}, "da_integrare" = FALSE WHERE "id_att_prog" = ${ultimoNum};`, values);
+            const datiInsert = jsonAtt.dati_inserimento;
+            const stringaContr = 'controllo_stato_di_conservazione_livello_di_urgenza';
+            const stringaManReg = 'manutenzione_regolare';
+            for (const tab of datiInsert.tabelle) {
+                switch (tab) {
+                    case stringaContr:
+                        const arrayInsertContr = [datiInsert.id_att, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaContr)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, datiInsert.rid_fr_risc, jsonAtt.id_att_prog, false];
+                        await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "eseguito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, arrayInsertContr);
+                        break;
+
+                    case stringaManReg:
+                        const arrayInsertManReg = [datiInsert.id_att, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaManReg)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, jsonAtt.id_att_prog, false];
+                        await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaManReg}" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_att_prog", "eseguito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10));`, arrayInsertManReg);
+                        break;
+                
+                    default:
+                        break;
+                }
+            }
         }
         catch(err) {
             throw err;
