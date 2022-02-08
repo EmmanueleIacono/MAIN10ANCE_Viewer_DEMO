@@ -11,7 +11,7 @@
 import SchedaInt from './elementi/SchedaIntegrazioneAttività.vue';
 
 export default {
-  name: 'TabPlannerIntergazioneAttPianificate',
+  name: 'TabPlannerIntergazioneAttCicliche',
   components: {
     SchedaInt,
   },

@@ -75,16 +75,6 @@ div[id^="div-form-"] {
 
 /* TABELLE SCHEDE CONTROLLO-INTERVENTO */
 
-.caption-schede {
-  color: var(--bluInterreg);
-}
-
-.caption-schede:hover {
-  cursor: pointer;
-  text-decoration-line: underline;
-  text-decoration-thickness: 3px;
-}
-
 .td-schede-mr-mc-r {
   border: none;
   background-color: var(--bluInterregTrasparenza2);
@@ -93,16 +83,6 @@ div[id^="div-form-"] {
 
 .tr-schede-mr-mc-r:nth-child(even) {
   background-color: var(--bluInterregTrasparenza3);
-}
-
-.td-schede-c {
-  border: none;
-  background-color: var(--verdeMain10anceTrasparenza);
-  max-width: 500px;
-}
-
-.tr-schede-c:nth-child(even) {
-  background-color: var(--verdeMain10anceTrasparenza2);
 }
 
 #pannello-lat-schede-inner {

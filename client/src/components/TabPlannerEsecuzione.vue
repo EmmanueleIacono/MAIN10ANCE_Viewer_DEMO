@@ -2,12 +2,12 @@
 <Card>
   <Details summary="ESECUZIONE" :open="true" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
-    <div class="contenitore-scelta-attività">
-      <button @click="tabEsecuzioneAttivo = 'AttProgrammate'" class="blu">ATTIVITÀ PROGRAMMATE</button>
-      <button @click="tabEsecuzioneAttivo = 'AttEseguite'" class="blu">ATTIVITÀ ESEGUITE</button>
+    <div v-if="attIntegrateContr.length">
+      <SchedaEsecuzione v-for="att in attIntegrateContr" :key="att.id_att_prog" :dati="att" :caption="'Attività di controllo'" />
     </div>
-    <AttProgrammate v-show="tabEsecuzioneAttivo === 'AttProgrammate'" :att="attProgrammate" />
-    <AttEseguite v-show="tabEsecuzioneAttivo === 'AttEseguite'" :att="attEseguite" />
+    <div v-else>
+      Nessuna attività da eseguire
+    </div>
   </Details>
   <!-- <h4>
     <span id="refreshSchede" class="glyphicon glyphicon-refresh"></span>
@@ -21,12 +21,12 @@
 
 <script>
 import {reactive, toRefs, onMounted} from 'vue';
-import {leggiAttProgPerIntegrazione} from '../js/richieste';
+// import {leggiAttProgPerIntegrazione} from '../js/richieste';
+import {prendiSchedeControllo} from '../js/richieste';
 import Card from './elementi/Card.vue';
 import Details from './elementi/Details.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
-import AttProgrammate from './TabPlannerEsecuzioneAttProgrammate.vue';
-import AttEseguite from './TabPlannerEsecuzioneAttEseguite.vue';
+import SchedaEsecuzione from './elementi/SchedaEsecuzione.vue';
 
 export default {
   name: 'TabPlannerEsecuzione',
@@ -34,16 +34,12 @@ export default {
     Card,
     Details,
     LoadingScreen,
-    AttProgrammate,
-    AttEseguite,
+    SchedaEsecuzione,
   },
   setup() {
     const state = reactive({
       caricamento: false,
-      tabEsecuzioneAttivo: 'AttProgrammate',
-      // ordinaPer: 'data_prog',
-      attProgrammate: [],
-      attEseguite: [],
+      attIntegrateContr: [],
     });
 
     onMounted(async () => {
@@ -52,8 +48,9 @@ export default {
 
     async function popolaSchede() {
       state.caricamento = true;
-      const attIntegrate = await leggiAttProgPerIntegrazione(false);
-      console.log(attIntegrate);
+      // const attIntegrateContr = await leggiAttProgPerIntegrazione(false);
+      const attIntegrateContr = await prendiSchedeControllo();
+      state.attIntegrateContr = attIntegrateContr;
       state.caricamento = false;
     }
 
@@ -75,28 +72,4 @@ export default {
   padding-left: 5px;
   padding-right: 15px;
 } */
-.contenitore-scelta-attività {
-  display: flex;
-  justify-content: space-between;
-}
-.contenitore-scelta-attività button {
-  border: none;
-  color: var(--ghostWhite);
-  padding: 5px;
-  font-weight: bold;
-  flex: 0 0 49.3%;
-  margin: 10px 0;
-}
-button.verde {
-  background-color: var(--verdeMain10ance);
-}
-button.verde:hover {
-  background-color: var(--verdeMain10anceTrasparenza);
-}
-button.blu {
-  background-color: var(--bluInterreg);
-}
-button.blu:hover {
-  background-color: var(--bluInterregTrasparenza);
-}
 </style>

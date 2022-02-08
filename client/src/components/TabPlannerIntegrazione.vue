@@ -17,8 +17,8 @@
         <label for="data-ins">Data di inserimento</label>
       </div>
     </div>
-    <AttPianificate @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttPianificate'" :att="attPianificate" />
-    <AttSegnalate v-show="tabIntegrazioneAttivo === 'AttSegnalate'" :att="attSegnalate" />
+    <AttCicliche @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttPianificate'" :att="attCicliche" />
+    <AttRiallineamento v-show="tabIntegrazioneAttivo === 'AttSegnalate'" :att="attRiallineamento" />
   </Details>
 </Card>
 </template>
@@ -28,8 +28,8 @@ import {onMounted, reactive, toRefs, watch} from 'vue';
 import {leggiAttProgPerIntegrazione} from '../js/richieste';
 import Card from './elementi/Card.vue';
 import Details from './elementi/Details.vue';
-import AttPianificate from './TabPlannerIntegrazioneAttPianificate.vue';
-import AttSegnalate from './TabPlannerIntegrazioneAttSegnalate.vue';
+import AttCicliche from './TabPlannerIntegrazioneAttCicliche.vue';
+import AttRiallineamento from './TabPlannerIntegrazioneAttRiallineamento.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 
 export default {
@@ -37,8 +37,8 @@ export default {
   components: {
     Card,
     Details,
-    AttPianificate,
-    AttSegnalate,
+    AttCicliche,
+    AttRiallineamento,
     LoadingScreen,
   },
   setup(props, {emit}) {
@@ -46,8 +46,8 @@ export default {
       caricamento: false,
       tabIntegrazioneAttivo: 'AttPianificate',
       ordinaPer: 'data_prog',
-      attPianificate: [],
-      attSegnalate: [],
+      attCicliche: [],
+      attRiallineamento: [],
     });
 
     watch(() => state.ordinaPer, newVal => {
@@ -61,17 +61,17 @@ export default {
     async function popolaAttività() {
       state.caricamento = true;
       const attDaIntegrare = await leggiAttProgPerIntegrazione(true);
-      const attPianificate = attDaIntegrare.filter(att => att.tipo_attività.includes('controllo') || att.tipo_attività.includes('manutenzione regolare'));
-      const attSegnalate = attDaIntegrare.filter(att => !att.tipo_attività.includes('controllo') && !att.tipo_attività.includes('manutenzione regolare'));
-      state.attPianificate = attPianificate;
-      state.attSegnalate = attSegnalate;
+      const attCicliche = attDaIntegrare.filter(att => att.tipo_attività.includes('controllo') || att.tipo_attività.includes('manutenzione regolare'));
+      const attRiallineamento = attDaIntegrare.filter(att => !att.tipo_attività.includes('controllo') && !att.tipo_attività.includes('manutenzione regolare'));
+      state.attCicliche = attCicliche;
+      state.attRiallineamento = attRiallineamento;
       ordinaAttività(state.ordinaPer);
       state.caricamento = false;
     }
 
     function ordinaAttività(param) {
-      state.attPianificate.sort((a, b) => a[param].localeCompare(b[param]));
-      state.attSegnalate.sort((a, b) => a[param].localeCompare(b[param]));
+      state.attCicliche.sort((a, b) => a[param].localeCompare(b[param]));
+      state.attRiallineamento.sort((a, b) => a[param].localeCompare(b[param]));
     }
 
     function emettiRefresh() {

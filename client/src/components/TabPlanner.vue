@@ -5,6 +5,7 @@
     <Pianificazione @pianificazioneAggiornata="aggiornaEventi" />
     <Integrazione @integrazioneAggiornata="aggiornaEventi" ref="IntegrazioneRef" />
     <Esecuzione />
+    <Storico />
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
     <FullCalendar ref="fullCalendarPlanner" :options="calendarOptions" />
@@ -26,6 +27,7 @@ import Filtri from './TabPlannerFiltri.vue';
 import Pianificazione from './TabPlannerPianificazione.vue';
 import Integrazione from './TabPlannerIntegrazione.vue';
 import Esecuzione from './TabPlannerEsecuzione.vue';
+import Storico from './TabPlannerStorico.vue';
 
 export default {
   name: 'TabPlanner',
@@ -37,6 +39,7 @@ export default {
     Pianificazione,
     Integrazione,
     Esecuzione,
+    Storico,
   },
   setup() {
     const store = inject('store');

@@ -11,7 +11,7 @@
 import SchedaInt from './elementi/SchedaIntegrazioneAttività.vue';
 
 export default {
-  name: 'TabPlannerIntergazioneAttSegnalate',
+  name: 'TabPlannerIntergazioneAttRiallineamento',
   components: {
     SchedaInt,
   },
