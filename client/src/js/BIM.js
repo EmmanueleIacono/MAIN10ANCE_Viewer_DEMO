@@ -4,14 +4,15 @@ import store from '../store/index';
 
 export let viewer;
 
-export function getModel(urn) {
+export function getModel(urn, opzioni) {
     if ((urn !== null) && (urn !== '')) {
         store.methods.setTabAttivo('Tab1');
         if (urn !== store.stateBIM.urnModelloCorrente) {
-            launchViewer(urn);
+            launchViewer(urn, opzioni);
         }
         else {
             store.methods.setAlert('ATTENZIONE: Il modello selezionato è già visibile');
+            if (opzioni) opzioni();
         }
         console.log(urn);
     }
@@ -86,6 +87,18 @@ export function cercaSelezionaId(id) {
     }, ['id_main10ance']);
 }
 
+// VIEWER.SEARCH MA CHE RITORNA PROMISE CON DBID DELL'ELEMENTO CERCATO
+export async function ricercaIdM10A(id) {
+    const el = await promiseCercaId(id);
+    return el[0];
+
+    function promiseCercaId(id) {
+        return new Promise((resolve, reject) => {
+            viewer.search(id, resolve, reject, ['id_main10ance']);
+        });
+    }
+}
+
 // GET PROPERTIES MA CHE RITORNA PROMISE CON QUELLO CHE INTERESSA
 function getProps(model, dbids, options) {
     return new Promise((resolve, reject) => {
@@ -123,6 +136,14 @@ export function getElementiSelezionati() {
     return selezione;
 }
 
+export async function cercaElementiDaScheda(arrayElementi) {
+    const listaElems = await Promise.all(arrayElementi.map(async id => (await ricercaIdM10A(id))));
+    viewer.isolate(listaElems);
+    // viewer.select(listaElems);
+    viewer.fitToView();
+    return listaElems;
+}
+
 export function focusVista(selezione) {
     if (viewer) {
         viewer.isolate(selezione);
@@ -136,4 +157,11 @@ export function fitToViewImmediato() {
         viewer.select();
         viewer.fitToView(null, null, true);
     }
+}
+
+export function cambiaColore(listaId, r = 1, g = 0, b = 0) {
+    viewer.clearThemingColors();
+    listaId.forEach(id => {
+        viewer.setThemingColor(id, new THREE.Vector4(r, g, b, 0.5));
+    });
 }

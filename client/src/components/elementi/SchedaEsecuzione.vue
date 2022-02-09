@@ -1,21 +1,23 @@
 <template>
   <div>
     <table>
-      <caption @click="apriModello" class="caption-schede"><b>{{`${caption} n. ${dati['Codice scheda controllo']}`}}</b></caption>
-      <tr v-for="(valore, chiave) in dati" :key="valore" class="tr-schede">
-        <td class="td-schede f40"><b>{{chiave}}</b></td>
-        <td v-if="chiave.startsWith('Elementi')" class="td-schede f60">
+      <caption @click="confirmApriModello" class="caption-schede"><b>{{`Attività di ${tipo} n. ${dati[`Codice scheda ${tipo}`]}`}}</b></caption>
+      <tr v-for="(valore, chiave) in dati" :key="valore" :class="tipoClass" class="tr-schede">
+        <td :class="tipoClass" class="td-schede f40"><b>{{chiave}}</b></td>
+        <td v-if="chiave.startsWith('Elementi')" :class="tipoClass" class="td-schede f60">
           <Details summary="Vedi elementi" :open="false">{{valore.join(', ')}}</Details>
         </td>
-        <td v-else-if="valore" class="td-schede f60">{{valore}}</td>
-        <td v-else class="td-schede f60"><i>Nessun valore</i></td>
+        <td v-else-if="valore" :class="tipoClass" class="td-schede f60">{{valore}}</td>
+        <td v-else :class="tipoClass" class="td-schede f60"><i>Nessun valore</i></td>
       </tr>
     </table>
   </div>
 </template>
 
 <script>
-import {ref} from 'vue';
+import {ref, computed, inject} from 'vue';
+import {prendiUrn} from '../../js/richieste';
+import {getModel, cercaElementiDaScheda, cambiaColore} from '../../js/BIM';
 import Details from './Details.vue';
 
 export default {
@@ -25,20 +27,39 @@ export default {
   },
   props: {
     dati: Object,
-    caption: String,
+    tipo: String,
   },
   setup(props) {
+    const store = inject('store');
     const detailsOpen = ref(false);
+    const tipoClass = computed(() => props.tipo.replaceAll(' ', '-'));
 
-    console.log(props.dati);
+    async function confirmApriModello() {
+      const conferma = await store.methods.setConfirm('Visualizzare gli elementi nel BIM Viewer?');
+      if (conferma) apriModello();
+      return;
+    }
 
-    function apriModello() {
-      console.log('sto aprendo il modello');
+    async function apriModello() {
+      const listaIdM10a = Object.entries(props.dati).filter(e => e[0].startsWith('Elementi'))[0][1];
+      const idArray = listaIdM10a[0].split('|');
+      const loc = idArray[0];
+      const edif = idArray[1].split('-')[0];
+      const urnJson = await prendiUrn({sm: loc, capp: edif});
+      const urn = await urnJson.urn;
+      getModel(urn, async () => {
+        const idElementi = await cercaElementiDaScheda(listaIdM10a);
+        cambiaColore(idElementi);
+        store.stateBIM.elementiDaSchedare = listaIdM10a;
+        store.stateBIM.schedeAttivitàTipo = props.tipo;
+        store.stateBIM.schedeAttivitàVisibile = true;
+      });
     }
 
     return {
       detailsOpen,
-      apriModello,
+      tipoClass,
+      confirmApriModello,
     }
   }
 }
@@ -54,6 +75,7 @@ tr {
 }
 td {
   padding: 5px 15px;
+  border: none;
 }
 td.f40 {
   flex: .4;
@@ -69,11 +91,10 @@ td.f60 {
   text-decoration-line: underline;
   text-decoration-thickness: 3px;
 }
-.tr-schede:nth-child(even) {
+.tr-schede:nth-child(even).controllo, .tr-schede:nth-child(even).manutenzione-regolare {
   background-color: var(--verdeMain10anceTrasparenza2);
 }
-.td-schede {
-  border: none;
+.td-schede.controllo, .td-schede.manutenzione-regolare {
   background-color: var(--verdeMain10anceTrasparenza);
 }
 </style>

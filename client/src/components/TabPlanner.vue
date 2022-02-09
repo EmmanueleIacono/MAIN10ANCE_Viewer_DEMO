@@ -4,8 +4,15 @@
     <br />
     <Pianificazione @pianificazioneAggiornata="aggiornaEventi" />
     <Integrazione @integrazioneAggiornata="aggiornaEventi" ref="IntegrazioneRef" />
-    <Esecuzione />
+    <Esecuzione ref="EsecuzioneRef" />
     <Storico />
+    <!-- <h4>
+      <span id="refreshSchede" class="glyphicon glyphicon-refresh"></span>
+      <b>SCHEDE</b>
+    </h4> -->
+    <!-- <div id="contenitore-schede">
+      QUI SCHEDE
+    </div> -->
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
     <FullCalendar ref="fullCalendarPlanner" :options="calendarOptions" />
@@ -45,6 +52,7 @@ export default {
     const store = inject('store');
     const fullCalendarPlanner = ref(null);
     const IntegrazioneRef = ref(null);
+    const EsecuzioneRef = ref(null);
     const calendarOptions = reactive({
       plugins: [DayGridPlugin],
       initialView: 'dayGridMonth',
@@ -73,6 +81,7 @@ export default {
     async function aggiornaEventi() {
       await popolaCalendario();
       await IntegrazioneRef.value.popolaAttività();
+      await EsecuzioneRef.value.popolaSchede();
     }
 
     async function popolaCalendario() {
@@ -109,6 +118,7 @@ export default {
       store,
       fullCalendarPlanner,
       IntegrazioneRef,
+      EsecuzioneRef,
       calendarOptions,
       aggiornaEventi,
     }
@@ -117,4 +127,14 @@ export default {
 </script>
 
 <style scoped>
+/* #refreshSchede {
+  cursor: pointer;
+  margin-right: 5px;
+} */
+/* #contenitore-schede {
+  height: 90%;
+  overflow: auto;
+  padding-left: 5px;
+  padding-right: 15px;
+} */
 </style>

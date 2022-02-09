@@ -12,6 +12,7 @@
       <h5 v-for="idSel in store.stateBIM.elementiSelezionati" :key="idSel"><b>{{idSel}}</b></h5>
     </Details>
     <br />
+    <SchedeAttivita v-if="store.stateBIM.schedeAttivitàVisibile" />
     <SchedeDB ref="SchedeDBRef" />
     <SchedeModuli />
   </div>
@@ -24,6 +25,7 @@ import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 import Details from './elementi/Details.vue';
 import SchedeDB from './TabBIMSchedeRisultati.vue';
 import SchedeModuli from './TabBIMSchedeModuli.vue';
+import SchedeAttivita from './TabBIMSchedeAttività.vue';
 
 export default {
   name: 'TabBIMPannelloDB',
@@ -32,6 +34,7 @@ export default {
     Details,
     SchedeDB,
     SchedeModuli,
+    SchedeAttivita,
   },
   setup() {
     const store = inject('store');

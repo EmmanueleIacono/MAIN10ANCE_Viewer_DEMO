@@ -124,8 +124,6 @@ export default {
         if (state.costoPrevisto) jsonAtt['costo'] = state.costoPrevisto;
         if (state.orePreviste) jsonAtt['ore'] = state.orePreviste;
         if (state.note) jsonAtt['commenti'] = state.note;
-        console.log(jsonAtt);
-        ///////                 IMPORTANTE! ------> SERVE FARE PRIMO SALVATAGGIO ANCHE SU TABELLE ATTIVITA' EFFETTIVE, DA FARE
         const res = await integraAttività(jsonAtt);
         if (res.success) {
           store.methods.setAlert("Salvataggio avvenuto con successo");

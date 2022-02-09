@@ -10,6 +10,10 @@ const state = reactive({
     },
     alertVisibile: false,
     alertMessaggio: '',
+    confirmVisibile: false,
+    confirmMessaggio: '',
+    confirmResolvePromise: undefined,
+    confirmRejectPromise: undefined,
 });
 
 const stateGIS = reactive({
@@ -25,6 +29,9 @@ const stateBIM = reactive({
     elementiSelezionati: null,
     schedeRisultatiVisibile: false,
     schedeModuliVisibile: false,
+    schedeAttivitàVisibile: false,
+    schedeAttivitàTipo: '',
+    elementiDaSchedare: [],
 });
 
 const statePlanner = reactive({
@@ -85,6 +92,21 @@ const methods = {
     resetAlert() {
         state.alertVisibile = false;
         state.alertMessaggio = '';
+    },
+
+    setConfirm(messaggio) {
+        state.confirmMessaggio = messaggio;
+        state.confirmVisibile = true;
+        return new Promise((resolve, reject) => {
+            state.confirmResolvePromise = resolve;
+            state.confirmRejectPromise = reject;
+        });
+    },
+
+    resetConfirm(bool = false) {
+        state.confirmResolvePromise(bool);
+        state.confirmVisibile = false;
+        state.confirmMessaggio = '';
     },
 
     setTabelleGIS(tabelle) {

@@ -41,6 +41,7 @@
     </div>
   </div>
   <Alert />
+  <Confirm />
 </div>
 </template>
 
@@ -54,6 +55,7 @@ import Tab3 from './components/TabPlanner.vue';
 import Tab4 from './components/TabDashboard.vue';
 import TabAuth from './components/TabAuth.vue';
 import Alert from './components/Alert.vue';
+import Confirm from './components/Confirm.vue';
 
 export default {
   name: 'App',
@@ -64,6 +66,7 @@ export default {
     Tab4,
     TabAuth,
     Alert,
+    Confirm,
   },
   setup() {
     provide('store', store);

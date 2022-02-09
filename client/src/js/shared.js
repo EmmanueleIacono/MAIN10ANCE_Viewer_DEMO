@@ -2,8 +2,6 @@
 
 // const formDB = document.getElementById('formDB');
 
-import {viewer} from './BIM';
-
 ////////// FUNZIONI UTILI E/O CONDIVISE TRA PIU' FILE JS //////////
 
 // GENERAZIONE DI PALETTE DI COLORI
@@ -50,18 +48,6 @@ export function generaColoreRandom() {
 //         domElem.removeChild(domElem.firstChild);
 //     }
 // }
-
-// VIEWER.SEARCH MA CHE RITORNA PROMISE CON DBID DELL'ELEMENTO CERCATO
-export async function ricercaIdM10A(id) {
-    const el = await promiseCercaId(id);
-    return el[0];
-
-    function promiseCercaId(id) {
-        return new Promise((resolve, reject) => {
-            viewer.search(id, resolve, reject, ['id_main10ance']);
-        });
-    }
-}
 
 // RITORNA BOOL IN BASE A QUALE DATA VIENE PRIMA
 export function confrontaDate(data1, data2) {

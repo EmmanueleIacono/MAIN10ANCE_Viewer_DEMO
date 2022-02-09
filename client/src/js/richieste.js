@@ -199,3 +199,9 @@ export async function integraAttività(jsonAtt) {
     const resJson = await res.json();
     return resJson;
 }
+
+export async function prendiUrn(jsonReq) {
+    const risultato = await fetch('/o/DB_Servizio/LOD/UrnCappelle', {method: "GET", headers: {"content-type": "application/json", "sm": jsonReq.sm, "capp": jsonReq.capp}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
