@@ -25,11 +25,9 @@ export default {
   padding-left: 15px;
   padding-right: 0px;
 }
-
 .pannello-explorer-child {
   overflow: auto;
 }
-
 .pannello-explorer-header {
   color: var(--verdeMain10ance);
   background-color: var(--blackOlive);

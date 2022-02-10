@@ -36,11 +36,6 @@
   background-color: #aaa;
 }
 
-input[id^="form-"] {
-  float: right;
-  line-height: 80%
-}
-
 input[id^="mod-sc-cont-"],
 select[id^="mod-sc-cont-"],
 input[id^="scheda-controllo-"],
@@ -63,10 +58,6 @@ p[id^="mod-sc-cont-"] {
   text-align: right;
 }
 
-div[id^="div-form-"] {
-  float: right;
-}
-
 /* INTERFACCIA DATABASE */
 
 #tabDashboard {
@@ -87,18 +78,6 @@ div[id^="div-form-"] {
 
 #pannello-lat-schede-inner {
   overflow: auto;
-}
-
-/* TABELLA SCHEDA CONTROLLO PROGRAMMATO EFFETTUATO */
-
-#mod-sc-cont-tabella td {
-  border: none;
-  background-color: var(--verdeMain10anceTrasparenza);
-  word-break: normal;
-}
-
-#mod-sc-cont-tabella tr:nth-child(even) {
-  background-color: var(--verdeMain10anceTrasparenza2);
 }
 
 /* DASHBOARD */

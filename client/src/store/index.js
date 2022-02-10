@@ -54,7 +54,13 @@ const statePlanner = reactive({
         'diagnosi': {
             tabella: 'danno_alterazione_degrado',
         },
-    }
+    },
+    enumUNI: {
+        enumStCons: [],
+        enumLivUrg: [],
+        enumClRacc: [],
+    },
+    datiSchedaInCompilazione: {},
 });
 
 const methods = {

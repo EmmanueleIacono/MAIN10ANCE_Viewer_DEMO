@@ -177,6 +177,9 @@ export default {
 </script>
 
 <style scoped>
+textarea {
+  resize: vertical;
+}
 input, textarea {
   float: right;
   line-height: 100%;

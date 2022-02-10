@@ -47,13 +47,18 @@ export default {
       const edif = idArray[1].split('-')[0];
       const urnJson = await prendiUrn({sm: loc, capp: edif});
       const urn = await urnJson.urn;
+      aggiornaStateAttività(listaIdM10a);
       getModel(urn, async () => {
         const idElementi = await cercaElementiDaScheda(listaIdM10a);
         cambiaColore(idElementi);
-        store.stateBIM.elementiDaSchedare = listaIdM10a;
-        store.stateBIM.schedeAttivitàTipo = props.tipo;
-        store.stateBIM.schedeAttivitàVisibile = true;
       });
+    }
+
+    function aggiornaStateAttività(listaIdM10a) {
+      store.stateBIM.elementiDaSchedare = listaIdM10a;
+      store.stateBIM.schedeAttivitàTipo = props.tipo;
+      store.stateBIM.schedeAttivitàVisibile = true;
+      store.statePlanner.datiSchedaInCompilazione = props.dati;
     }
 
     return {
@@ -76,6 +81,8 @@ tr {
 td {
   padding: 5px 15px;
   border: none;
+  text-align: justify;
+  text-justify: inter-word;
 }
 td.f40 {
   flex: .4;
