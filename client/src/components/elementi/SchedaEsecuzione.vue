@@ -50,6 +50,7 @@ export default {
       aggiornaStateAttività(listaIdM10a);
       getModel(urn, async () => {
         const idElementi = await cercaElementiDaScheda(listaIdM10a);
+        store.stateBIM.elementiSelezionati = listaIdM10a;
         cambiaColore(idElementi);
       });
     }

@@ -11,11 +11,12 @@
     <label for="check-tipo-scheda">Scheda</label>
     <select v-model="selectTipoScheda">
       <option value="scheda anagrafica">Scheda anagrafica</option>
-      <option value="scheda controllo">Scheda controllo</option>
-      <option value="scheda manutenzione ordinaria">Scheda manutenzione ordinaria</option>
-      <option value="scheda manutenzione correttiva">Scheda manutenzione correttiva</option>
-      <option value="scheda manutenzione straordinaria">Scheda manutenzione straordinaria</option>
-      <option value="scheda restauro">Scheda restauro</option>
+      <option value="scheda controllo">Scheda di controllo</option>
+      <option value="scheda manutenzione ordinaria">Scheda di manutenzione ordinaria</option>
+      <option value="scheda manutenzione correttiva">Scheda di manutenzione correttiva</option>
+      <option value="scheda manutenzione straordinaria">Scheda di manutenzione straordinaria</option>
+      <option value="scheda restauro">Scheda di restauro</option>
+      <option value="scheda diagnosi">Scheda di di diagnosi</option>
     </select>
     <br>
     <input v-model="cbxLocalità" :disabled="!vediSchedeAttivi" type="checkbox" id="check-località">

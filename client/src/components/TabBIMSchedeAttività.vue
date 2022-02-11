@@ -20,10 +20,6 @@
           <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Strumentazione']"></td>
         </tr>
         <tr>
-          <td class="fLeft"><label><b>DOCUMENTI</b></label></td>
-          <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Documenti']"></td>
-        </tr>
-        <tr>
           <td class="fLeft"><label><b>CLASSE DI RACCOMANDAZIONE</b></label></td>
           <td class="fRight"><select v-model="selectClRacc">
             <option v-for="(en, ind) in store.statePlanner.enumUNI.enumClRacc" :key="ind" :value="ind">{{en}}</option>
@@ -59,6 +55,10 @@
         <td class="fLeft"><label><b>NOTE</b></label></td>
         <td class="fRight"><textarea v-model="store.statePlanner.datiSchedaInCompilazione['Note']"></textarea></td>
       </tr>
+      <tr>
+        <td class="fLeft"><label><b>DOCUMENTI</b></label></td>
+        <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Documenti']"></td>
+      </tr>
     </table>
     <button @click="salvaAttività" class="bottone-main10ance">SALVA</button>
   </div>
@@ -67,6 +67,7 @@
 <script>
 import {inject, onMounted, reactive, computed, toRefs, watch} from 'vue';
 import {leggiEnum} from '../js/richieste';
+import {dataCorta} from '../js/shared';
 
 export default {
   name: 'TabBIMSchedeAttività',
@@ -111,10 +112,45 @@ export default {
       const dati = raccogliDati();
       console.log(dati);
       console.log(store.statePlanner.datiSchedaInCompilazione);
+      // se CR0: tutto ok, registro attività fatta, registro prossima attività prog
+      // se CR1: tutto ok, registro attività ma segnalare da rivedere programmazione, registro prossima attività prog
+      // se CR2: necessario riallineamento, registro attività prog CORRETTIVA
+      // se CR3: necessario riallineamento, registro attività prog DIAGNOSI
+
+      // se lista id_main10ance è diversa da quella di tutti gli elementi da controllare, filtrare lista, avvisare e riselezionare elementi rimasti
+      // lato backend registrare campo "eseguito" come TRUE
     }
 
     function raccogliDati() {
-      return 'ciccio';
+      const datiSpec = datiSpecifici();
+      const tabella = store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella;
+      const doc = store.statePlanner.datiSchedaInCompilazione['Documenti'];
+      const costo = store.statePlanner.datiSchedaInCompilazione['Costo previsto (€)'];
+      const ore = store.statePlanner.datiSchedaInCompilazione['Ore previste'];
+      const commenti = store.statePlanner.datiSchedaInCompilazione['Note'];
+      const autore_ultima_mod = store.state.userSettings.user_id;
+      const data_ultima_mod = dataCorta();
+      // id_main10ance: prendi solo elementi selezionati
+      return {...datiSpec, tabella, doc, costo, ore, commenti, autore_ultima_mod, data_ultima_mod};
+    }
+
+    function datiSpecifici() {
+      const tabella = store.stateBIM.schedeAttivitàTipo;
+      switch (tabella) {
+        case 'controllo': {
+          const data_con = store.statePlanner.datiSchedaInCompilazione['Data controllo'];
+          const strumentaz = store.statePlanner.datiSchedaInCompilazione['Strumentazione'];
+          const cl_racc = store.statePlanner.enumUNI.enumClRacc[state.selectClRacc];
+          const st_cons = store.statePlanner.enumUNI.enumStCons[state.selectStCons-2];
+          const liv_urg = store.statePlanner.enumUNI.enumLivUrg[state.selectLivUrg-1];
+          const id_contr = store.statePlanner.datiSchedaInCompilazione['Codice scheda controllo']
+          return {strumentaz, data_con, cl_racc, st_cons, liv_urg, id_contr};
+        }
+        case 'manutenzione regolare': {
+          console.log('questa è una manutenzione regolare');
+          return 'qui ancora niente';
+        }
+      }
     }
 
     return {

@@ -1,5 +1,6 @@
 <template>
   <div :class="pianificate ? 'verde' : 'giallo'" class="wrapper-scheda">
+    <h5 v-if="att.necessaria_revisione" class="avviso-revisione">ATTENZIONE: Attività da revisionare</h5>
     <div class="contenitore-colonne mt20">
       <div class="colonna">
         <p><b>Attività: </b>{{stringAtt}}</p>
@@ -153,6 +154,10 @@ export default {
 input {
   margin: 5px;
   z-index: 100;
+}
+.avviso-revisione {
+  color: red;
+  font-weight: bold;
 }
 .bottone-main10ance {
   margin-left: 0;

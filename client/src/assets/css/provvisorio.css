@@ -36,8 +36,6 @@
   background-color: #aaa;
 }
 
-input[id^="mod-sc-cont-"],
-select[id^="mod-sc-cont-"],
 input[id^="scheda-controllo-"],
 select[id^="scheda-controllo-"],
 textarea[id^="scheda-controllo-"],
@@ -49,13 +47,6 @@ textarea[id^="scheda-intervento-"] {
   line-height: 100%;
   padding: 1px;
   border: 0;
-}
-
-p[id^="mod-sc-cont-"] {
-  float: right;
-  line-height: 100%;
-  padding: 0px;
-  text-align: right;
 }
 
 /* INTERFACCIA DATABASE */
