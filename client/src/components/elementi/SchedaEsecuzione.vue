@@ -48,10 +48,12 @@ export default {
       const urnJson = await prendiUrn({sm: loc, capp: edif});
       const urn = await urnJson.urn;
       aggiornaStateAttività(listaIdM10a);
+      store.methods.toggleLoaderGlobale();
       getModel(urn, async () => {
         const idElementi = await cercaElementiDaScheda(listaIdM10a);
         store.stateBIM.elementiSelezionati = listaIdM10a;
         cambiaColore(idElementi);
+        store.methods.toggleLoaderGlobale();
       });
     }
 

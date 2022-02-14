@@ -14,6 +14,7 @@ const state = reactive({
     confirmMessaggio: '',
     confirmResolvePromise: undefined,
     confirmRejectPromise: undefined,
+    loaderGlobaleVisibile: false,
 });
 
 const stateGIS = reactive({
@@ -114,6 +115,10 @@ const methods = {
         state.confirmResolvePromise(bool);
         state.confirmVisibile = false;
         state.confirmMessaggio = '';
+    },
+
+    toggleLoaderGlobale() {
+        state.loaderGlobaleVisibile = !state.loaderGlobaleVisibile;
     },
 
     setTabelleGIS(tabelle) {

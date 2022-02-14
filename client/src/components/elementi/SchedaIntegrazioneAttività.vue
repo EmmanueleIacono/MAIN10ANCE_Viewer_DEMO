@@ -119,6 +119,7 @@ export default {
         datiIns['id_main10ance'] = props.att.id_main10ance;
         datiIns['rid_fr_risc'] = props.att.rid_fr_risc;
         datiIns['data_azione'] = state.dataProgrammata;
+        datiIns['id_group'] = props.att.id_group;
         if (state.dataProgrammata !== props.att.data_prog) jsonAtt['data_prog'] = state.dataProgrammata;
         if (state.esecutori) jsonAtt['esecutori'] = state.esecutori;
         if (state.strumentazione) jsonAtt['strumentaz'] = state.strumentazione;

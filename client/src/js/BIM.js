@@ -11,7 +11,7 @@ export function getModel(urn, opzioni) {
             launchViewer(urn, opzioni);
         }
         else {
-            store.methods.setAlert('ATTENZIONE: Il modello selezionato è già visibile');
+            store.methods.setAlert('Il modello selezionato è già visibile');
             if (opzioni) opzioni();
         }
         console.log(urn);
@@ -164,4 +164,8 @@ export function cambiaColore(listaId, r = 1, g = 0, b = 0) {
     listaId.forEach(id => {
         viewer.setThemingColor(id, new THREE.Vector4(r, g, b, 0.5));
     });
+}
+
+export function resetColori() {
+    viewer.clearThemingColors();
 }

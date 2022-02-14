@@ -205,3 +205,9 @@ export async function prendiUrn(jsonReq) {
     const risTradotto = await risultato.json();
     return risTradotto;
 }
+
+export async function registraAttivitàEseguita(jsonAtt) {
+    const res = await fetch('/o/Main10ance_DB/esecuzione/nuova-attivita', {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonAtt)});
+    const resJson = await res.json();
+    return resJson;
+}

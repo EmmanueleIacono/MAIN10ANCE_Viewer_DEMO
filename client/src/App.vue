@@ -33,7 +33,8 @@
   <!-- End of navbar -->
   <div class="container-fluid fill">
     <div class="row fill">
-      <div class="fill">
+      <div class="fill loading-wrapper">
+        <LoadingScreen :caricamento="store.state.loaderGlobaleVisibile" />
         <keep-alive>
           <component :is="store.state.tabAttivo" @loadLivelli="loadLayers" />
         </keep-alive>
@@ -56,6 +57,7 @@ import Tab4 from './components/TabDashboard.vue';
 import TabAuth from './components/TabAuth.vue';
 import Alert from './components/Alert.vue';
 import Confirm from './components/Confirm.vue';
+import LoadingScreen from './components/elementi/LoadingScreen.vue';
 
 export default {
   name: 'App',
@@ -67,6 +69,7 @@ export default {
     TabAuth,
     Alert,
     Confirm,
+    LoadingScreen,
   },
   setup() {
     provide('store', store);

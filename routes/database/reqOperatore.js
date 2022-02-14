@@ -176,6 +176,22 @@ appO.get('/Main10ance_DB/attivita-programmate', async (req, res) => {
     res.send(JSON.stringify(resp));
 });
 
+appO.patch('/Main10ance_DB/esecuzione/nuova-attivita', async (req, res) => {
+    const result = {};
+    try {
+        const reqJson = req.body;
+        const resp = await registraAttivitàEsecuzione(reqJson);
+        result.success = resp;
+    }
+    catch(e) {
+        result.success = false;
+    }
+    finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
+});
+
 //////////          QUERY          //////////
 
 async function leggiColonneTabella(nomeTab) {
@@ -382,6 +398,101 @@ async function leggiAttivitàProg() {
     }
     catch(e) {
         return [];
+    }
+}
+
+async function registraAttivitàEsecuzione(dati) {
+    const stringaContr = 'controllo_stato_di_conservazione_livello_di_urgenza';
+    const stringaManReg = 'manutenzione_regolare';
+    const stringaManCorr = 'manutenzione_correttiva_o_a_guasto';
+    const stringaManStr = 'manutenzione_straordinaria';
+    const stringaRestauro = 'restauri';
+    const stringaDiagnosi = 'danno_alterazione_degrado';
+    try {
+        await clientM10a.query('BEGIN;');
+        switch (dati.tabella) {
+            case stringaContr: {
+                console.log(dati);
+                if (dati.nuovo_record) {
+                    // - NUOVO id_contr, stessa cl_ogg_fr, stesso controllo, stessi esecutori, data_ins+data_ultima_mod, stesso rid_fr_risc, stesso rid_att_prog
+                    console.log('DA FARE INSERT');
+                    const arrayInsertContr = [dati.nuovo_id, dati.data_con, dati.data_ultima_mod, dati.data_ultima_mod, dati.strumentaz, dati.id_main10ance, dati.cl_racc, dati.st_cons, dati.liv_urg, dati.commenti, dati.doc, dati.autore_ultima_mod, true];
+                    // qui NON registro costo effettivo e ore effettive
+                    const stringaSelect = `SELECT "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group" WHERE "id_contr" = ${dati.id_contr}`;
+                    await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_con", "data_ins", "data_ultima_mod", "strumentaz", "id_main10ance", "cl_racc", "st_cons", "liv_urg", "commenti", "doc", "autore_ultima_mod", "eseguito") VALUES (($1), (${stringaSelect}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertContr);
+                    // copiare dati tabella da record con id_contr = dati[id_contr], quindi INSERT INTO con campi nuovi presi da "dati", e campi uguali presi da record di riferimento
+                }
+                else {
+                    console.log('DA FARE UPDATE');
+                    // qui registro costo effettivo e ore effettive
+                    // registrare campo "eseguito" come TRUE
+                    const arrayUpdateContr = [dati.id_contr, dati.cl_racc, dati.st_cons, dati.liv_urg, dati.strumentaz, dati.commenti, dati.doc, dati.costo, dati.ore, dati.data_con, dati.data_ultima_mod, dati.autore_ultima_mod, dati.id_main10ance, true];
+                    await clientM10a.query(`UPDATE main10ance_sacrimonti."${stringaContr}" SET "cl_racc" = ($2), "st_cons" = ($3), "liv_urg" = ($4), "strumentaz" = ($5), "commenti" = ($6), "doc" = ($7), "costo" = ($8), "ore" = ($9), "data_con" = ($10), "data_ultima_mod" = ($11), "autore_ultima_mod" = ($12), "id_main10ance" = ($13), "eseguito" = ($14) WHERE "id_contr" = ($1);`, arrayUpdateContr);
+                }
+
+                switch (dati.cl_racc) {
+                    case 'cr 0 - nessuna misura': {
+                        console.log('prossima attività prog, semplice');
+                        const valuesArray = [/* DA COMPILARE BENE!!!!! */];
+                        // await clientM10a.query(`INSERT INTO main10ance_sacrimonti."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins", "data_ultima_mod", "località_estesa", "da_integrare") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
+                        break;
+                    }
+                    case 'cr 1 - conservazione preventiva': {
+                        console.log('prossima attività prog, ma con "necessaria_revisione" = TRUE');
+                        break;
+                    }
+                    case 'cr 2 - riparazioni di media entità': {
+                        console.log('prossima attività prog, ma CORRETTIVA');
+                        break;
+                    }
+                    case 'cr 3 - interventi rilevanti dipendenti dalla diagnosi': {
+                        console.log('prossima attività prog, ma DIAGNOSI');
+                        break;
+                    }
+                    default: throw new Error('ERRORE: La richiesta non è andata a buon fine.');
+                }
+
+                // NOTE:
+                // se CR0: registro attività fatta, registro prossima attività prog
+                // se CR1: registro attività fatta, registro prossima attività prog con "necessaria_revisione" = TRUE
+                // se CR2: registro attività fatta, registro attività prog CORRETTIVA
+                // se CR3: registro attività fatta, registro attività prog DIAGNOSI
+                break;
+            }
+            case stringaManReg: {
+                // NOTE:
+                // registrare campo "eseguito" come TRUE
+                break;
+            }
+            case stringaManCorr: {
+                // NOTE:
+                // registrare campo "eseguito" come TRUE
+                break;
+            }
+            case stringaManStr: {
+                // NOTE:
+                // registrare campo "eseguito" come TRUE
+                break;
+            }
+            case stringaRestauro: {
+                // NOTE:
+                // registrare campo "eseguito" come TRUE
+                break;
+            }
+            case stringaDiagnosi: {
+                // NOTE:
+                // registrare campo "eseguito" come TRUE
+                break;
+            }
+            default: throw new Error('ERRORE: La richiesta non è andata a buon fine.');
+        }
+        await clientM10a.query('COMMIT;');
+        return true;
+    }
+    catch(e) {
+        console.log(`Errore: ${e}`);
+        await clientM10a.query("ROLLBACK;");
+        return false;
     }
 }
 
