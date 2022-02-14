@@ -68,6 +68,7 @@
 import {inject, onMounted, reactive, computed, toRefs, watch} from 'vue';
 import {leggiEnum} from '../js/richieste';
 import {dataCorta} from '../js/shared';
+import { cambiaColore, cercaElementiDaScheda, getElementiSelezionati, getIdM10AFromSelezione } from '../js/BIM';
 
 export default {
   name: 'TabBIMSchedeAttività',
@@ -109,7 +110,16 @@ export default {
     }
 
     async function salvaAttività() {
-      const dati = raccogliDati();
+      // - controllare se compilazioneParziale = true
+        // + se sì, verificare quale CR è stato impostato
+          // * se CR <= 1: lanciare un INSERT INTO e creare scheletro scheda controllo con:
+            // - NUOVO id_contr, stessa cl_ogg_fr, stesso controllo, stessi esecutori, data_ins+data_ultima_mod, stesso rid_fr_risc, stesso rid_att_prog
+          // * se CR > 1: proseguire normalmente
+      const selezione = await verificaSelezione(); // da fare due volte, indipendente da verifica compilazioneParziale, ma dopo di essa
+      if (!selezione) return;
+      const dati = await raccogliDati();
+      // verifica store.statePlanner.compilazioneParziale = true
+      // INSERT INTO oppure UPDATE semplice
       console.log(dati);
       console.log(store.statePlanner.datiSchedaInCompilazione);
       // se CR0: tutto ok, registro attività fatta, registro prossima attività prog
@@ -119,9 +129,14 @@ export default {
 
       // se lista id_main10ance è diversa da quella di tutti gli elementi da controllare, filtrare lista, avvisare e riselezionare elementi rimasti
       // lato backend registrare campo "eseguito" come TRUE
+
+      // QUANDO TUTTO E' FINITO E REGISTRATO:
+      // store.stateBIM.schedeAttivitàVisibile = false;
+      // store.statePlanner.datiSchedaInCompilazione = {};
+      // store.stateBIM.elementiSelezionati = null;
     }
 
-    function raccogliDati() {
+    async function raccogliDati() {
       const datiSpec = datiSpecifici();
       const tabella = store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella;
       const doc = store.statePlanner.datiSchedaInCompilazione['Documenti'];
@@ -130,7 +145,6 @@ export default {
       const commenti = store.statePlanner.datiSchedaInCompilazione['Note'];
       const autore_ultima_mod = store.state.userSettings.user_id;
       const data_ultima_mod = dataCorta();
-      // id_main10ance: prendi solo elementi selezionati
       return {...datiSpec, tabella, doc, costo, ore, commenti, autore_ultima_mod, data_ultima_mod};
     }
 
@@ -143,7 +157,7 @@ export default {
           const cl_racc = store.statePlanner.enumUNI.enumClRacc[state.selectClRacc];
           const st_cons = store.statePlanner.enumUNI.enumStCons[state.selectStCons-2];
           const liv_urg = store.statePlanner.enumUNI.enumLivUrg[state.selectLivUrg-1];
-          const id_contr = store.statePlanner.datiSchedaInCompilazione['Codice scheda controllo']
+          const id_contr = store.statePlanner.datiSchedaInCompilazione['Codice scheda controllo'];
           return {strumentaz, data_con, cl_racc, st_cons, liv_urg, id_contr};
         }
         case 'manutenzione regolare': {
@@ -151,6 +165,45 @@ export default {
           return 'qui ancora niente';
         }
       }
+    }
+
+    async function verificaSelezione() {
+      // verifica 0: ci DEVONO essere elementi selezionati o isolati, se lista selezionati è vuota, errore
+      const elSelezionati = getElementiSelezionati();
+      if (!elSelezionati) return false;
+      // verifica 1: non ci devono essere in selezione elementi esterni alla lista "Elementi da controllare"
+      const id_main10anceSelezionati = await getIdM10AFromSelezione(elSelezionati);
+      const elEstranei = id_main10anceSelezionati.some(idSel => !store.stateBIM.elementiDaSchedare.includes(idSel));
+      if (elEstranei) {
+        store.methods.setAlert("ATTENZIONE: Alcuni degli elementi selezionati non fanno parte dell'operazione corrente.");
+        const idElementi = await cercaElementiDaScheda(store.stateBIM.elementiDaSchedare);
+        store.stateBIM.elementiSelezionati = store.stateBIM.elementiDaSchedare;
+        cambiaColore(idElementi);
+        return false;
+      }
+      // verifica 2: togliere elementi selezionati da lista "Elementi da controllare", riproporre scheda con elementi rimasti
+      const elRimanenti = store.stateBIM.elementiDaSchedare.filter(el => !id_main10anceSelezionati.includes(el));
+      // se NON CI SONO elementi rimasti dopo verifica 2
+      if (!elRimanenti.length) {
+        store.statePlanner.compilazioneParziale = false;
+      }
+      // se CI SONO elementi rimasti:
+      else {
+        const frase = elRimanenti.length === 1 ? 'elemento è stato escluso' : 'elementi sono stati esclusi';
+        const fraseIntera = `${elRimanenti.length} ${frase} dalla selezione corrente. Sarà necessario registrare un'ulteriore scheda per completare la procedura. Si desidera continuare?`;
+        const confermaProcedere = await store.methods.setConfirm(fraseIntera);
+        if (confermaProcedere) {
+          store.statePlanner.compilazioneParziale = true;
+          store.stateBIM.elementiDaSchedare = elRimanenti;
+        }
+        else {
+          const idElementi = await cercaElementiDaScheda(store.stateBIM.elementiDaSchedare);
+          store.stateBIM.elementiSelezionati = store.stateBIM.elementiDaSchedare;
+          cambiaColore(idElementi);
+          return false;
+        }
+      }
+      return id_main10anceSelezionati;
     }
 
     return {

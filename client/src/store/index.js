@@ -61,6 +61,7 @@ const statePlanner = reactive({
         enumClRacc: [],
     },
     datiSchedaInCompilazione: {},
+    compilazioneParziale: false,
 });
 
 const methods = {
