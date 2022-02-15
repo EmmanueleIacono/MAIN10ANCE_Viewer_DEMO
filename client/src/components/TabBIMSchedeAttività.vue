@@ -66,8 +66,8 @@
 
 <script>
 import {inject, onMounted, reactive, computed, toRefs, watch} from 'vue';
-import {leggiEnum, registraAttivitàEseguita} from '../js/richieste';
-import {dataCorta, dataInteger} from '../js/shared';
+import {leggiEnum, prendiFrequenzaAttProg, registraAttivitàEseguita} from '../js/richieste';
+import {aggiornaPlanner, aggiungiMesi, dataCorta, dataInteger} from '../js/shared';
 import { cambiaColore, cercaElementiDaScheda, getElementiSelezionati, getIdM10AFromSelezione, resetColori, resetVista } from '../js/BIM';
 
 export default {
@@ -110,6 +110,7 @@ export default {
     }
 
     async function salvaAttività() {
+      console.log(store.statePlanner.datiSchedaInCompilazione);
       const {selezione, parziale, rimanenti} = await verificaSelezione();
       if (!selezione.length) return;
       console.log('parziale: ', parziale);
@@ -138,7 +139,7 @@ export default {
           store.statePlanner.datiSchedaInCompilazione = {};
           store.stateBIM.elementiSelezionati = null;
           resetVista();
-          // POI EMETTI EVENTO AGGIORNAMENTO PLANNER
+          aggiornaPlanner();
         }
       }
       else {
@@ -147,7 +148,7 @@ export default {
     }
 
     async function raccogliDati(selezione) {
-      const datiSpec = datiSpecifici();
+      const datiSpec = await datiSpecifici();
       if (state.selectClRacc > 1) datiSpec['liv_priorità'] = livPriorità.value;
       const tabella = store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella;
       const doc = store.statePlanner.datiSchedaInCompilazione['Documenti'];
@@ -157,10 +158,13 @@ export default {
       const id_main10ance = selezione;
       const autore_ultima_mod = store.state.userSettings.user_id;
       const data_ultima_mod = dataCorta();
-      return {...datiSpec, tabella, doc, costo, ore, commenti, id_main10ance, autore_ultima_mod, data_ultima_mod};
+      const id_att_prog = dataInteger();
+      const edificio = store.statePlanner.datiSchedaInCompilazione['Edificio'];
+      const esecutori = store.statePlanner.datiSchedaInCompilazione['Operatore'];
+      return {...datiSpec, tabella, doc, costo, ore, commenti, id_main10ance, autore_ultima_mod, data_ultima_mod, id_att_prog, edificio, esecutori};
     }
 
-    function datiSpecifici() {
+    async function datiSpecifici() {
       const tabella = store.stateBIM.schedeAttivitàTipo;
       switch (tabella) {
         case 'controllo': {
@@ -170,7 +174,11 @@ export default {
           const st_cons = store.statePlanner.enumUNI.enumStCons[state.selectStCons-2];
           const liv_urg = store.statePlanner.enumUNI.enumLivUrg[state.selectLivUrg-1];
           const id_contr = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda controllo']);
-          return {strumentaz, data_con, cl_racc, st_cons, liv_urg, id_contr};
+          const frequenzaJson = await prendiFrequenzaAttProg({id: id_contr, tabella: store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella});
+          const frequenza = frequenzaJson.frequenza;
+          console.log(frequenza);
+          const data_next = aggiungiMesi(data_con, frequenza);
+          return {strumentaz, data_con, cl_racc, st_cons, liv_urg, id_contr, data_next};
         }
         case 'manutenzione regolare': {
           console.log('questa è una manutenzione regolare');

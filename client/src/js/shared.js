@@ -1,6 +1,6 @@
 "use strict";
 
-// const formDB = document.getElementById('formDB');
+import store from '../store/index';
 
 ////////// FUNZIONI UTILI E/O CONDIVISE TRA PIU' FILE JS //////////
 
@@ -40,13 +40,6 @@ export function generaColoreRandom() {
 // GENERAZIONE DI UN NUMERO RANDOM TRA DUE ESTREMI
 // function randomNum(min, max) {
 //     return Math.floor(Math.random() * (max - min + 1)) + min;
-// }
-
-// SVUOTA UN ELEMENTO DEL DOM
-// function svuotaContenitore(domElem) {
-//     while (domElem.firstChild) {
-//         domElem.removeChild(domElem.firstChild);
-//     }
 // }
 
 // RITORNA BOOL IN BASE A QUALE DATA VIENE PRIMA
@@ -149,18 +142,6 @@ export function dataCorta() {
     return dataCorta;
 }
 
-// CREA UNA LISTA DI OPTION PER UN SELECT, E LO AGGIUNGE AD ESSO
-// function creaListaOpzioni(listaOpzioni, targetSelect, parametroValue, parametroTesto, opzVuota) {
-//     if (opzVuota) {
-//         const opzioneVuota = document.createElement('option');
-//         opzioneVuota.setAttribute('value', null);
-//         opzioneVuota.innerHTML = '';
-//         targetSelect.appendChild(opzioneVuota);
-//     }
-//     listaOpzioni.forEach(op => {
-//         const opzioneSel = document.createElement('option');
-//         opzioneSel.setAttribute('value', `${op[parametroValue]}`);
-//         opzioneSel.innerHTML = `${op[parametroTesto]}`;
-//         targetSelect.appendChild(opzioneSel);
-//     });
-// }
+export function aggiornaPlanner() {
+    store.statePlanner.refreshPlanner = !store.statePlanner.refreshPlanner;
+  }

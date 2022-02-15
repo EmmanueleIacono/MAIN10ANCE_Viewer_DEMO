@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import {inject, reactive, ref} from 'vue';
+import {inject, reactive, ref, watch} from 'vue';
 import {leggiAttivitàProg} from '../js/richieste';
 import FullCalendar from '@fullcalendar/vue3';
 import DayGridPlugin from '@fullcalendar/daygrid';
@@ -78,6 +78,18 @@ export default {
 
     popolaCalendario();
 
+    watch(() => store.statePlanner.refreshPlanner, () => {
+      aggiornaEventi();
+    });
+
+    watch(() => store.state.tabAttivo, tab => {
+      if (tab === 'Tab3') {
+        setTimeout(() => {
+          resizeCal();
+        }, 100);
+      }
+    }, {immediate: true});
+
     async function aggiornaEventi() {
       await popolaCalendario();
       await IntegrazioneRef.value.popolaAttività();
@@ -93,6 +105,7 @@ export default {
 
     async function aggiungiEventiProg() {
       const eventi = await leggiAttivitàProg();
+      console.log(eventi);
       const nuoviEventiProg = eventi.map(evento => ({
         id: `PROG-C-${evento.id_att_prog}`,
         title: `Controllo programmato`,
@@ -114,6 +127,11 @@ export default {
       return nuoviEventiProg;
     }
 
+    function resizeCal() {
+      const calAPI = fullCalendarPlanner.value.getApi();
+      calAPI.updateSize();
+    }
+
     return {
       store,
       fullCalendarPlanner,
@@ -121,6 +139,7 @@ export default {
       EsecuzioneRef,
       calendarOptions,
       aggiornaEventi,
+      resizeCal,
     }
   }
 }

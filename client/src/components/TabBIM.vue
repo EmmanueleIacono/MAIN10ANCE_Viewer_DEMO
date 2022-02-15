@@ -8,7 +8,6 @@
     </div>
   </div>
   <Explorer :colonna="`col-sm-${store.getters.getBimVwSets()[1]}`">
-    <!-- <button @click="stampastate">stampa state</button> -->
     <Details summary="SELEZIONE MODELLI">
       <Tree />
     </Details>
@@ -35,13 +34,9 @@ export default {
   setup() {
     const store = inject('store');
 
-    function stampastate() {
-      console.log(store);
-    }
 
     return {
       store,
-      stampastate,
     }
   }
 }

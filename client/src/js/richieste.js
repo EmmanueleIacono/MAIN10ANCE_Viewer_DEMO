@@ -211,3 +211,9 @@ export async function registraAttivitàEseguita(jsonAtt) {
     const resJson = await res.json();
     return resJson;
 }
+
+export async function prendiFrequenzaAttProg(jsonAtt) {
+    const res = await fetch('/o/Main10ance_DB/esecuzione/frequenza', {method: "GET", headers: {"content-type": "application/json", "id": jsonAtt.id, "tabella": jsonAtt.tabella}});
+    const resJson = await res.json();
+    return resJson;
+}

@@ -76,11 +76,11 @@ export default {
     const state = reactive({
       id_record: props.att.id_att_prog,
       integrazioneAttiva: false,
-      esecutori: '',
-      strumentazione: '',
-      note: '',
-      costoPrevisto: null,
-      orePreviste: null,
+      esecutori: props.att.esecutori,
+      strumentazione: props.att.strumentazione,
+      note: props.att.commenti,
+      costoPrevisto: props.att.costo,
+      orePreviste: props.att.ore,
       dataProgrammata: props.att.data_prog,
     });
 
@@ -97,11 +97,11 @@ export default {
     }
 
     function resetDati() {
-      state.esecutori = '';
-      state.strumentazione = '';
-      state.note = '';
-      state.costoPrevisto = null;
-      state.orePreviste = null;
+      state.esecutori = props.att.esecutori;
+      state.strumentazione = props.att.strumentazione;
+      state.note = props.att.commenti;
+      state.costoPrevisto = props.att.costo;
+      state.orePreviste = props.att.ore;
       state.dataProgrammata = props.att.data_prog;
     }
 

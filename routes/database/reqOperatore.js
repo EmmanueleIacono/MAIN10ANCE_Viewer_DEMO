@@ -192,6 +192,13 @@ appO.patch('/Main10ance_DB/esecuzione/nuova-attivita', async (req, res) => {
     }
 });
 
+appO.get('/Main10ance_DB/esecuzione/frequenza', async (req, res) => {
+    const reqJson = req.headers;
+    const resp = await recuperaFrequenzaAttProg(reqJson.id, reqJson.tabella);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(resp[0]));
+});
+
 //////////          QUERY          //////////
 
 async function leggiColonneTabella(nomeTab) {
@@ -390,10 +397,18 @@ async function leggiTabelleLOD3e4() {
 //     }
 // }
 
-async function leggiAttivitàProg() {
+async function leggiAttivitàProg() { // COSì PERò MI RITORNANO SOLO LE ATTIVITà GIà INTEGRATE. COME PRENDERE ANCHE QUELLE DA INTEGRARE?
     try {
-        // const results = await clientM10a.query('SELECT * FROM main10ance_sacrimonti."attività_prog" ORDER BY "id_att_prog";');
-        const results = await clientM10a.query('SELECT "id_att_prog", "rid_fr_risc", "data_prog", "costo", "ore", "esecutori", "strumentaz", "commenti", to_json("id_main10ance") AS "id_main10ance", "id_group", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM main10ance_sacrimonti."attività_prog" ORDER BY "id_att_prog";');
+        const withString = `WITH totale AS (
+            (SELECT rid_att_prog FROM main10ance_sacrimonti."controllo_stato_di_conservazione_livello_di_urgenza" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM main10ance_sacrimonti."manutenzione_regolare" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM main10ance_sacrimonti."manutenzione_correttiva_o_a_guasto" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM main10ance_sacrimonti."manutenzione_straordinaria" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM main10ance_sacrimonti."restauri" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM main10ance_sacrimonti."danno_alterazione_degrado" WHERE eseguito = FALSE)
+            )`;
+        const subQueryString = `SELECT ("rid_att_prog") AS "lista_id" FROM totale`;
+        const results = await clientM10a.query(`${withString} SELECT "id_att_prog", "rid_fr_risc", "data_prog", "costo", "ore", "esecutori", "strumentaz", "commenti", to_json("id_main10ance") AS "id_main10ance", "id_group", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM main10ance_sacrimonti."attività_prog" WHERE "id_att_prog" = ANY(${subQueryString}) OR "da_integrare" = TRUE ORDER BY "id_att_prog";`);
         return results.rows;
     }
     catch(e) {
@@ -418,27 +433,46 @@ async function registraAttivitàEsecuzione(dati) {
                     console.log('DA FARE INSERT');
                     const arrayInsertContr = [dati.nuovo_id, dati.data_con, dati.data_ultima_mod, dati.data_ultima_mod, dati.strumentaz, dati.id_main10ance, dati.cl_racc, dati.st_cons, dati.liv_urg, dati.commenti, dati.doc, dati.autore_ultima_mod, true];
                     // qui NON registro costo effettivo e ore effettive
-                    const stringaSelect = `SELECT "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group" WHERE "id_contr" = ${dati.id_contr}`;
-                    await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_con", "data_ins", "data_ultima_mod", "strumentaz", "id_main10ance", "cl_racc", "st_cons", "liv_urg", "commenti", "doc", "autore_ultima_mod", "eseguito") VALUES (($1), (${stringaSelect}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertContr);
+                    const stringaSelectClOgg = `SELECT "cl_ogg_fr" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
+                    const stringaSelectContr = `SELECT "controllo" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
+                    const stringaSelectEsec = `SELECT "esecutori" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
+                    const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
+                    const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
+                    const stringaSelectIdGroup = `SELECT "id_group" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
+                    await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_con", "data_ins", "data_ultima_mod", "strumentaz", "id_main10ance", "cl_racc", "st_cons", "liv_urg", "commenti", "doc", "autore_ultima_mod", "eseguito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectContr}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertContr);
                     // copiare dati tabella da record con id_contr = dati[id_contr], quindi INSERT INTO con campi nuovi presi da "dati", e campi uguali presi da record di riferimento
                 }
                 else {
                     console.log('DA FARE UPDATE');
-                    // qui registro costo effettivo e ore effettive
-                    // registrare campo "eseguito" come TRUE
                     const arrayUpdateContr = [dati.id_contr, dati.cl_racc, dati.st_cons, dati.liv_urg, dati.strumentaz, dati.commenti, dati.doc, dati.costo, dati.ore, dati.data_con, dati.data_ultima_mod, dati.autore_ultima_mod, dati.id_main10ance, true];
                     await clientM10a.query(`UPDATE main10ance_sacrimonti."${stringaContr}" SET "cl_racc" = ($2), "st_cons" = ($3), "liv_urg" = ($4), "strumentaz" = ($5), "commenti" = ($6), "doc" = ($7), "costo" = ($8), "ore" = ($9), "data_con" = ($10), "data_ultima_mod" = ($11), "autore_ultima_mod" = ($12), "id_main10ance" = ($13), "eseguito" = ($14) WHERE "id_contr" = ($1);`, arrayUpdateContr);
                 }
 
+                const stringaSelectIdGroup = `SELECT "id_group" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
+                const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
                 switch (dati.cl_racc) {
                     case 'cr 0 - nessuna misura': {
                         console.log('prossima attività prog, semplice');
-                        const valuesArray = [/* DA COMPILARE BENE!!!!! */];
-                        // await clientM10a.query(`INSERT INTO main10ance_sacrimonti."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins", "data_ultima_mod", "località_estesa", "da_integrare") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
+                        const valuesArray = [parseInt(dati.id_att_prog), dati.data_next, dati.id_main10ance, dati.data_ultima_mod, dati.data_ultima_mod, dati.costo, dati.ore, dati.strumentaz, dati.esecutori, true];
+                        const stringaSelectAttProgTipoAtt = `SELECT "tipo_attività" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        const stringaSelectAttProgClOgg = `SELECT "cl_ogg_fr" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        const stringaSelectAttProgRidFrRisc = `SELECT "rid_fr_risc" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        const stringaSelectAttProgFreq = `SELECT "frequenza" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        const stringaSelectAttProgIdGroup = `SELECT "id_group" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        const stringaSelectAttProgLoc = `SELECT "località_estesa" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        await clientM10a.query(`INSERT INTO main10ance_sacrimonti."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "id_group", "località_estesa", "data_prog", "id_main10ance", "data_ins", "data_ultima_mod", "costo", "ore", "strumentaz", "esecutori", "da_integrare") VALUES (($1), (${stringaSelectAttProgTipoAtt}), (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10));`, valuesArray);
                         break;
                     }
                     case 'cr 1 - conservazione preventiva': {
                         console.log('prossima attività prog, ma con "necessaria_revisione" = TRUE');
+                        const valuesArray = [parseInt(dati.id_att_prog), dati.data_next, dati.id_main10ance, dati.data_ultima_mod, dati.data_ultima_mod, dati.costo, dati.ore, dati.strumentaz, dati.esecutori, true, true];
+                        const stringaSelectAttProgTipoAtt = `SELECT "tipo_attività" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        const stringaSelectAttProgClOgg = `SELECT "cl_ogg_fr" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        const stringaSelectAttProgRidFrRisc = `SELECT "rid_fr_risc" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        const stringaSelectAttProgFreq = `SELECT "frequenza" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        const stringaSelectAttProgIdGroup = `SELECT "id_group" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        const stringaSelectAttProgLoc = `SELECT "località_estesa" FROM main10ance_sacrimonti.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                        await clientM10a.query(`INSERT INTO main10ance_sacrimonti."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "id_group", "località_estesa", "data_prog", "id_main10ance", "data_ins", "data_ultima_mod", "costo", "ore", "strumentaz", "esecutori", "da_integrare", "necessaria_revisione") VALUES (($1), (${stringaSelectAttProgTipoAtt}), (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, valuesArray);
                         break;
                     }
                     case 'cr 2 - riparazioni di media entità': {
@@ -493,6 +527,18 @@ async function registraAttivitàEsecuzione(dati) {
         console.log(`Errore: ${e}`);
         await clientM10a.query("ROLLBACK;");
         return false;
+    }
+}
+
+async function recuperaFrequenzaAttProg(id, tabella) {
+    const stringaSelectIdGroup = `SELECT "id_group" FROM main10ance_sacrimonti.${tabella} WHERE "id_contr" = ${id}`;
+    const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM main10ance_sacrimonti.${tabella} WHERE "id_contr" = ${id}`;
+    try {
+        const results = await clientM10a.query(`SELECT "frequenza" FROM main10ance_sacrimonti.attività_prog WHERE id_att_prog = (${stringaSelectRidAttProg}) AND id_group = (${stringaSelectIdGroup});`);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
     }
 }
 
