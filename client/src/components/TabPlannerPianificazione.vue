@@ -50,13 +50,12 @@
             <span v-if="fr.mn_reg" class="tooltip-prog-text">{{fr.mn_reg}}</span>
           </td>
           <td>
-            <input v-model="datiFrasiDiRischioFiltrate[ind].freq" type="number" min="1">
-            <!-- FORSE CAMBIARE E METTERE QUESTA COSA, MA DA RIVEDERE BENE -->
-            <!-- <button class="glyphicon glyphicon-link" title="Vincola"></button>
-            <input v-model="datiFrasiDiRischioFiltrate[ind].freq_mr" type="number" min="1"> -->
+            <input v-model="datiFrasiDiRischioFiltrate[ind].freq_c" type="number" min="1" placeholder="Controllo">
+            <input v-if="fr.mn_reg" v-model="datiFrasiDiRischioFiltrate[ind].freq_mr" type="number" min="1" placeholder="Manutenzione">
           </td>
           <td>
-            <input v-model="datiFrasiDiRischioFiltrate[ind].data" type="date">
+            <input v-model="datiFrasiDiRischioFiltrate[ind].data_c" type="date">
+            <input v-if="fr.mn_reg" v-model="datiFrasiDiRischioFiltrate[ind].data_mr" type="date">
           </td>
         </tr>
       </table>
@@ -137,7 +136,6 @@ export default {
           if (res.success) {
             store.methods.setAlert('Programmazione andata a buon fine');
             emit('pianificazioneAggiornata');
-            // se res true aggiungere eventi calendario, refresh schede, ecc.
           }
           else {
             store.methods.setAlert('ATTENZIONE: Si è verificato un errore durante la registrazione dei dati');
@@ -160,7 +158,7 @@ export default {
     }
 
     function controllaCampiCompilati() {
-      return state.datiFrasiDiRischioFiltrate && !!state.datiFrasiDiRischioFiltrate.length && state.datiFrasiDiRischioFiltrate.every(dato => dato.freq && dato.data);
+      return state.datiFrasiDiRischioFiltrate && !!state.datiFrasiDiRischioFiltrate.length && state.datiFrasiDiRischioFiltrate.every(dato => dato.freq_c && dato.data_c && (dato.man_reg ? dato.freq_mr && dato.data_mr : true));
     }
 
     async function raccogliDati() {
@@ -177,12 +175,24 @@ export default {
           oggAtt['cl_ogg'] = state.selectClOgg;
           oggAtt['rid_fr_risc'] = dato.id_fr_risc;
           oggAtt['man_reg'] = dato.man_reg;
-          oggAtt['freq'] = dato.freq;
-          oggAtt['data_prog'] = dato.data;
+          oggAtt['freq_c'] = dato.freq_c;
+          oggAtt['data_prog_c'] = dato.data_c;
           oggAtt['edificio'] = id.edificio;
           oggAtt['elementi'] = id.elementi;
           oggAtt['loc_estesa'] = nomeLocalità.value;
           listaAttività.push(oggAtt);
+          if (dato.freq_mr) {
+            const oggAttMr = {};
+            oggAttMr['cl_ogg'] = state.selectClOgg;
+            oggAttMr['rid_fr_risc'] = dato.id_fr_risc;
+            oggAttMr['man_reg'] = dato.man_reg;
+            oggAttMr['freq_mr'] = dato.freq_mr;
+            oggAttMr['data_prog_mr'] = dato.data_mr;
+            oggAttMr['edificio'] = id.edificio;
+            oggAttMr['elementi'] = id.elementi;
+            oggAttMr['loc_estesa'] = nomeLocalità.value;
+            listaAttività.push(oggAttMr);
+          }
         });
       });
       const metadati = creaMetadati();
@@ -323,5 +333,17 @@ tr:nth-child(odd) {
   color: unset;
   text-align: center;
   background-color: var(--verdeMain10anceTrasparenza);
+}
+.vincola-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.vincola {
+  margin: 3px 0;
+  display: inline;
+}
+p.vincola {
+  margin-left: 5px;
 }
 </style>

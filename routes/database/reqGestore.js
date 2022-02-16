@@ -349,8 +349,10 @@ async function creaAttProgControllo(listaAtt) {
         await clientM10a.query("BEGIN;");
         try {
             for (const att of listaAtt) {
-                const tipo_att = att.man_reg ? ['controllo', 'manutenzione regolare'] : ['controllo'];
-                const valuesArray = [att.id_att_prog, tipo_att, att.cl_ogg, att.rid_fr_risc, att.freq, att.data_prog, att.id_group, att.elementi, att.data_ins, att.data_ins, att.loc_estesa, true];
+                const tipo_att = att.data_prog_mr && att.freq_mr ? ['manutenzione regolare'] : ['controllo'];
+                const data_prog = att.data_prog_mr ? att.data_prog_mr : att.data_prog_c;
+                const freq = att.freq_mr ? att.freq_mr : att.freq_c;
+                const valuesArray = [att.id_att_prog, tipo_att, att.cl_ogg, att.rid_fr_risc, freq, data_prog, att.id_group, att.elementi, att.data_ins, att.data_ins, att.loc_estesa, true];
                 await clientM10a.query(`INSERT INTO main10ance_sacrimonti."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins", "data_ultima_mod", "località_estesa", "da_integrare") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
             }
         }
@@ -370,7 +372,7 @@ async function creaAttProgControllo(listaAtt) {
 async function leggiAttProgPerIntegrazione(bool) {
     try {
         // const resp = await clientM10a.query('SELECT "id_att_prog", "rid_fr_risc", "data_prog", to_json("id_main10ance") AS "id_main10ance", "id_group", "località_estesa", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM main10ance_sacrimonti."attività_prog" WHERE "da_integrare" = ($1) ORDER BY "id_att_prog";', [bool]);
-        const resp = await clientM10a.query('SELECT a."id_att_prog", a."rid_fr_risc", a."data_prog", to_json(a."id_main10ance") AS "id_main10ance", a."id_group", a."località_estesa", a."cl_ogg_fr", to_json(a."tipo_attività") AS "tipo_attività", a."data_ins", a."data_ultima_mod", a."frequenza", a."da_integrare", a."necessaria_revisione", a."costo", a."ore", a."esecutori", a."strumentaz" AS "strumentazione", a."commenti", f."fr_risc", f."controllo", f."mn_reg" AS "manutenzione regolare", f."mn_nec" AS "manutenzione correttiva" FROM main10ance_sacrimonti."attività_prog" AS "a" JOIN main10ance_sacrimonti."frase_di_rischio" AS "f" ON a."rid_fr_risc" = f."id_fr_risc" WHERE a."da_integrare" = ($1) ORDER BY "id_att_prog";', [bool]);
+        const resp = await clientM10a.query('SELECT a."id_att_prog", a."rid_fr_risc", a."data_prog", to_json(a."id_main10ance") AS "id_main10ance", a."id_group", a."località_estesa", a."cl_ogg_fr", to_json(a."tipo_attività") AS "tipo_attività", a."data_ins", a."data_ultima_mod", a."frequenza", a."da_integrare", a."necessaria_revisione", a."costo", a."ore", a."esecutori", a."strumentaz" AS "strumentazione", a."commenti", a."liv_priorità", f."fr_risc", f."controllo", f."mn_reg" AS "manutenzione regolare", f."mn_nec" AS "manutenzione correttiva" FROM main10ance_sacrimonti."attività_prog" AS "a" JOIN main10ance_sacrimonti."frase_di_rischio" AS "f" ON a."rid_fr_risc" = f."id_fr_risc" WHERE a."da_integrare" = ($1) ORDER BY "id_att_prog";', [bool]);
         return resp.rows;
     }
     catch(e) {

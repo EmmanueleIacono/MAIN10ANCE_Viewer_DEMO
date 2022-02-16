@@ -105,7 +105,6 @@ export default {
 
     async function aggiungiEventiProg() {
       const eventi = await leggiAttivitàProg();
-      console.log(eventi);
       const nuoviEventiProg = eventi.map(evento => ({
         id: `PROG-C-${evento.id_att_prog}`,
         title: `Controllo programmato`,

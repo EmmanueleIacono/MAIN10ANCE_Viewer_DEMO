@@ -80,7 +80,7 @@ export default {
       selectClRacc: 0,
       selectMatriceDisabled: true,
     });
-    const livPriorità = computed(() => state.selectStCons * state.selectLivUrg);
+    const livPriorità = computed(() => state.selectStCons * state.selectLivUrg + state.selectClRacc);
     const tipoClass = computed(() => store.stateBIM.schedeAttivitàTipo.replaceAll(' ', '-'));
 
     watch(() => livPriorità.value, newVal => {
@@ -176,7 +176,6 @@ export default {
           const id_contr = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda controllo']);
           const frequenzaJson = await prendiFrequenzaAttProg({id: id_contr, tabella: store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella});
           const frequenza = frequenzaJson.frequenza;
-          console.log(frequenza);
           const data_next = aggiungiMesi(data_con, frequenza);
           return {strumentaz, data_con, cl_racc, st_cons, liv_urg, id_contr, data_next};
         }
