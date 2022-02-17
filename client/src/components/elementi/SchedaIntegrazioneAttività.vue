@@ -7,6 +7,7 @@
         <p><b>Classe oggetti: </b>{{att.cl_ogg_fr}}</p>
         <p><b>Località: </b>{{att.località_estesa}}</p>
         <p><b>Edificio: </b>{{edificio}}</p>
+        <p v-if="att.frequenza"><b :class="att.necessaria_revisione ? 'avviso-revisione' : ''">Frequenza: </b>{{att.frequenza}} {{parseInt(att.frequenza) === 1 ? 'mese' : 'mesi'}}</p>
       </div>
       <div class="colonna">
         <p>
@@ -27,6 +28,10 @@
     <div v-if="integrazioneAttiva">
       <div class="contenitore-colonne">
         <div class="colonna">
+          <div v-if="['manutenzione straordinaria', 'restauro'].includes(att.tipo_attività[0])" class="contenitore-colonne centra">
+            <label for="progettista" class="colonna">Progettista:</label>
+            <input v-model="progettista" id="progettista" class="colonna">
+          </div>
           <div class="contenitore-colonne centra">
             <label for="esecutori" class="colonna">Esecutori:</label>
             <input v-model="esecutori" id="esecutori" class="colonna">
@@ -53,15 +58,19 @@
             <label for="data" class="colonna">Data programmata:</label>
             <input v-model="dataProgrammata" type="date" id="data" class="colonna">
           </div>
+          <div v-if="att.necessaria_revisione" class="contenitore-colonne centra">
+            <label for="nuova-freq" class="colonna">Nuova frequenza:</label>
+            <input v-model="frequenza" type="number" min="1" step="1" id="nuova-freq" class="colonna">
+          </div>
         </div>
       </div>
-      <button @click="salvaIntegrazione" class="bottone-main10ance">Salva</button>
+      <button @click="salvaIntegrazione" :class="pianificate ? 'verde' : 'giallo'" class="bottone-main10ance">Salva</button>
     </div>
   </div>
 </template>
 
 <script>
-import {reactive, toRefs, computed, inject} from 'vue';
+import {reactive, toRefs, computed, inject, onMounted} from 'vue';
 import {dataCorta, dataInteger} from '../../js/shared';
 import { integraAttività } from '../../js/richieste';
 
@@ -82,6 +91,8 @@ export default {
       costoPrevisto: props.att.costo,
       orePreviste: props.att.ore,
       dataProgrammata: props.att.data_prog,
+      frequenza: props.att.frequenza,
+      progettista: '',
     });
 
     const stringAtt = computed(() => {
@@ -90,6 +101,8 @@ export default {
     const edificio = computed(() => {
       return props.att.id_main10ance[0].split('|')[1];
     });
+
+    onMounted(() => console.log(props.att));
 
     function integra() {
       state.integrazioneAttiva = !state.integrazioneAttiva;
@@ -103,10 +116,12 @@ export default {
       state.costoPrevisto = props.att.costo;
       state.orePreviste = props.att.ore;
       state.dataProgrammata = props.att.data_prog;
+      if (props.att.frequenza) state.frequenza = props.att.frequenza;
+      state.progettista = '';
     }
 
     async function salvaIntegrazione() {
-      if ([state.esecutori, state.strumentazione, state.costoPrevisto, state.orePreviste].every(elem => !!elem)) {
+      if ([state.esecutori, state.strumentazione, state.costoPrevisto, state.orePreviste, state.dataProgrammata].every(elem => !!elem) && (props.att.necessaria_revisione ? state.frequenza : true)) {
         const jsonAtt = {};
         const datiIns = {};
         jsonAtt['id_att_prog'] = parseInt(state.id_record);
@@ -120,12 +135,17 @@ export default {
         datiIns['rid_fr_risc'] = props.att.rid_fr_risc;
         datiIns['data_azione'] = state.dataProgrammata;
         datiIns['id_group'] = props.att.id_group;
+        datiIns['rid_contr'] = parseInt(props.att.rid_contr);
+        datiIns['rid_dad'] = parseInt(props.att.rid_dad);
+        datiIns['progettista'] = state.progettista;
         if (state.dataProgrammata !== props.att.data_prog) jsonAtt['data_prog'] = state.dataProgrammata;
         if (state.esecutori) jsonAtt['esecutori'] = state.esecutori;
         if (state.strumentazione) jsonAtt['strumentaz'] = state.strumentazione;
         if (state.costoPrevisto) jsonAtt['costo'] = state.costoPrevisto;
         if (state.orePreviste) jsonAtt['ore'] = state.orePreviste;
         if (state.note) jsonAtt['commenti'] = state.note;
+        if (state.frequenza) jsonAtt['frequenza'] = state.frequenza;
+        if (props.att.necessaria_revisione) jsonAtt['necessaria_revisione'] = false;
         const res = await integraAttività(jsonAtt);
         if (res.success) {
           store.methods.setAlert("Salvataggio avvenuto con successo");
@@ -136,7 +156,7 @@ export default {
         }
       }
       else {
-        store.methods.setAlert('ATTENZIONE: I campi "Esecutori", "Strumentazione", "Costo previsto" e "Ore previste" sono obbligatori');
+        store.methods.setAlert('I campi "Esecutori", "Strumentazione", "Costo previsto", "Ore previste" e "Data programmata" sono obbligatori');
       }
     }
 
@@ -164,8 +184,17 @@ input {
   margin-left: 0;
   margin-bottom: 0;
 }
-.bottone-main10ance:hover {
+.bottone-main10ance.verde {
+  background-color: var(--verdeMain10ance);
+}
+.bottone-main10ance.giallo {
+  background-color: var(--gialloIntervento);
+}
+.bottone-main10ance.verde:hover {
   background-color: var(--verdeMain10anceTrasparenza);
+}
+.bottone-main10ance.giallo:hover {
+  background-color: var(--gialloInterventoTrasparenza);
 }
 .wrapper-scheda {
   padding: 5px;
@@ -204,6 +233,9 @@ input {
 }
 .integra.blu:hover {
   background-color: var(--bluInterreg);
+}
+.integra.giallo:hover {
+  background-color: var(--gialloIntervento);
 }
 .id {
   position: absolute;

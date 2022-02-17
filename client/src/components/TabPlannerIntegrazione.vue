@@ -10,7 +10,7 @@
       <p><b>Ordina per: </b></p>
       <div v-if="tabIntegrazioneAttivo === 'AttPianificate'">
         <input v-model="ordinaPer" type="radio" name="ordina" id="data-prog" class="mr" value="data_prog">
-        <label for="data-prog">Data pianificata</label>
+        <label for="data-prog">Urgenza</label>
       </div>
       <div v-if="tabIntegrazioneAttivo === 'AttSegnalate'">
         <input v-model="ordinaPer" type="radio" name="ordina" id="liv-priorit" class="mr" value="liv_priorità">
@@ -22,7 +22,7 @@
       </div>
     </div>
     <AttCicliche @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttPianificate'" :att="attCicliche" />
-    <AttRiallineamento v-show="tabIntegrazioneAttivo === 'AttSegnalate'" :att="attRiallineamento" />
+    <AttRiallineamento @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttSegnalate'" :att="attRiallineamento" />
   </Details>
 </Card>
 </template>
@@ -75,25 +75,19 @@ export default {
       const attRiallineamento = attDaIntegrare.filter(att => !att.tipo_attività.includes('controllo') && !att.tipo_attività.includes('manutenzione regolare'));
       state.attCicliche = attCicliche;
       state.attRiallineamento = attRiallineamento;
-      ordinaAttivitàCicliche(state.ordinaPer);
+      if (state.tabIntegrazioneAttivo === 'AttPianificate') ordinaAttivitàCicliche(state.ordinaPer);
+      else ordinaAttivitàRiallineamento(state.ordinaPer);
       state.caricamento = false;
     }
 
-    ///////////////////// IMPORTANTE: DA RIVEDERE BENE IL MODO IN CUI FUNZIONANO QUESTI SORT PER LE ATTIVITA' /////////////////
     function ordinaAttivitàCicliche(param) {
-      // if (param === 'data_prog') {
-      //   state.attRiallineamento.sort((a, b) => Date.parse(a[param]) - Date.parse(b[param]));
-      // }
-      // else state.attCicliche.sort((a, b) => a[param].localeCompare(b[param]));
-      state.attCicliche.sort((a, b) => a[param].localeCompare(b[param]));
+      if (param === 'data_prog') state.attCicliche.sort((a, b) => a[param].localeCompare(b[param]));
+      else state.attCicliche.sort((a, b) => b[param].localeCompare(a[param]));
     }
 
     function ordinaAttivitàRiallineamento(param) {
-      if (param === 'liv_priorità') {
-        state.attRiallineamento.sort((a, b) => parseInt(b[param]) - parseInt(a[param]));
-      }
-      else state.attRiallineamento.sort((a, b) => a[param].localeCompare(b[param]));
-      // else state.attRiallineamento.sort((a, b) => Date.parse(a[param]) - Date.parse(b[param]));
+      if (param === 'liv_priorità') state.attRiallineamento.sort((a, b) => parseInt(b[param]) - parseInt(a[param]));
+      else state.attRiallineamento.sort((a, b) => b[param].localeCompare(a[param]));
     }
 
     function emettiRefresh() {

@@ -38,7 +38,24 @@
           </select></td>
         </tr>
       </div>
-      <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione regolare'">modulo per manutenzione regolare</div>
+      <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione regolare'">
+        <tr>
+          <td class="fLeft"><label><b>MANUTENZIONE</b></label></td>
+          <td class="fRight"><p>{{store.statePlanner.datiSchedaInCompilazione['Tipo di intervento']}}</p></td>
+        </tr>
+        <tr>
+          <td class="fLeft"><label><b>DATA</b></label></td>
+          <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Data intervento']" type="date"></td>
+        </tr>
+        <tr>
+          <td class="fLeft"><label><b>STRUMENTAZIONE</b></label></td>
+          <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Strumentazione']"></td>
+        </tr>
+        <tr>
+          <td class="fLeft"><label><b>MATERIALE</b></label></td>
+          <td class="fRight"><input v-model="materialeMan"></td>
+        </tr>
+      </div>
       <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione correttiva'">modulo per manutenzione correttiva</div>
       <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione straordinaria'">modulo per manutenzione straordinaria</div>
       <div v-if="store.stateBIM.schedeAttivitàTipo === 'restauro'">modulo per restauro</div>
@@ -79,6 +96,7 @@ export default {
       selectLivUrg: 1,
       selectClRacc: 0,
       selectMatriceDisabled: true,
+      materialeMan: '',
     });
     const livPriorità = computed(() => state.selectStCons * state.selectLivUrg + state.selectClRacc);
     const tipoClass = computed(() => store.stateBIM.schedeAttivitàTipo.replaceAll(' ', '-'));
@@ -98,6 +116,7 @@ export default {
 
     onMounted(async () => {
       await recuperaEnumUNI();
+      console.log(store.statePlanner.datiSchedaInCompilazione);
     });
 
     async function recuperaEnumUNI() {
@@ -113,7 +132,6 @@ export default {
       console.log(store.statePlanner.datiSchedaInCompilazione);
       const {selezione, parziale, rimanenti} = await verificaSelezione();
       if (!selezione.length) return;
-      console.log('parziale: ', parziale);
       let datiAttività = {};
       const dati = await raccogliDati(selezione);
       datiAttività = dati;
@@ -177,11 +195,17 @@ export default {
           const frequenzaJson = await prendiFrequenzaAttProg({id: id_contr, tabella: store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella});
           const frequenza = frequenzaJson.frequenza;
           const data_next = aggiungiMesi(data_con, frequenza);
-          return {strumentaz, data_con, cl_racc, st_cons, liv_urg, id_contr, data_next};
+          return {data_con, strumentaz, cl_racc, st_cons, liv_urg, id_contr, data_next};
         }
         case 'manutenzione regolare': {
-          console.log('questa è una manutenzione regolare');
-          return 'qui ancora niente';
+          const data_ese = store.statePlanner.datiSchedaInCompilazione['Data intervento'];
+          const strumentaz = store.statePlanner.datiSchedaInCompilazione['Strumentazione'];
+          const materiale = state.materialeMan ? state.materialeMan : null;
+          const id_mn_reg = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda manutenzione regolare']);
+          const frequenzaJson = await prendiFrequenzaAttProg({id: id_mn_reg, tabella: store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella});
+          const frequenza = frequenzaJson.frequenza;
+          const data_next = aggiungiMesi(data_ese, frequenza);
+          return {data_ese, strumentaz, materiale, id_mn_reg, data_next};
         }
       }
     }

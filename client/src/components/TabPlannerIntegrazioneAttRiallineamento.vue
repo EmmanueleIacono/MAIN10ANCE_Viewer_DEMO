@@ -1,7 +1,7 @@
 <template>
   <div class="sfondo-giallo">
     <div v-if="att.length">
-      <SchedaInt v-for="a in att" :key="a.id_att_prog" :pianificate="false" :att="a" />
+      <SchedaInt @integrazioneCompletata="emettiOkInt" v-for="a in att" :key="a.id_att_prog" :pianificate="false" :att="a" />
     </div>
     <div v-else>Nessuna attività da integrare</div>
   </div>
@@ -18,6 +18,15 @@ export default {
   props: {
     att: Array,
   },
+  setup(props, {emit}) {
+    function emettiOkInt() {
+      emit('IntegrazioneOK');
+    }
+
+    return {
+      emettiOkInt,
+    }
+  }
 }
 </script>
 
