@@ -40,7 +40,6 @@ export default {
 
     onMounted(async () => {
       await popolaSchede();
-      console.log(state.attIntegrateManCorr);
     });
 
     async function popolaSchede() {

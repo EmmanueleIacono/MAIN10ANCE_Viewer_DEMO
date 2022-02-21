@@ -107,4 +107,10 @@ td.f60 {
 .td-schede.controllo, .td-schede.manutenzione-regolare {
   background-color: var(--verdeMain10anceTrasparenza);
 }
+.tr-schede:nth-child(even).manutenzione-correttiva, .tr-schede:nth-child(even).manutenzione-straordinaria, .tr-schede:nth-child(even).restauro {
+  background-color: var(--gialloInterventoTrasparenza2);
+}
+.td-schede.manutenzione-correttiva, .td-schede.manutenzione-straordinaria, .td-schede.restauro {
+  background-color: var(--gialloInterventoTrasparenza);
+}
 </style>

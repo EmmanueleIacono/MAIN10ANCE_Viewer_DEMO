@@ -318,7 +318,8 @@ async function leggiSchedeManReg() {
 
 async function leggiSchedeManCorr() {
     try {
-        const result = await clientM10a.query(`SELECT esecutori AS "Operatore", data_ese AS "Data intervento", progettist AS "Progettista/i", azione AS "Azione", strumentaz AS "Strumentazione", materiale AS "Materiali utilizzati", costo AS "Costo (€)", causa AS "Causa", commenti AS "Commenti", doc AS "Documenti", id_mn_gu AS "Codice scheda manutenzione correttiva", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM main10ance_sacrimonti.manutenzione_correttiva_o_a_guasto ORDER BY data_ese;`);
+        // const result = await clientM10a.query(`SELECT esecutori AS "Operatore", data_ese AS "Data intervento", progettist AS "Progettista/i", azione AS "Azione", strumentaz AS "Strumentazione", materiale AS "Materiali utilizzati", costo AS "Costo (€)", causa AS "Causa", commenti AS "Commenti", doc AS "Documenti", id_mn_gu AS "Codice scheda manutenzione correttiva", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM main10ance_sacrimonti.manutenzione_correttiva_o_a_guasto ORDER BY data_ese;`);
+        const result = await clientM10a.query(`SELECT mc.esecutori AS "Operatore", mc.data_ese AS "Data intervento", mc.azione AS "Tipo di intervento", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Ore previste", ap.commenti AS "Note", mc.doc AS "Documenti", mc.id_mn_gu AS "Codice scheda manutenzione correttiva", ap.cl_ogg_fr AS "Classe oggetti", ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", mc.id_main10ance AS "Elementi interessati", mc.data_ins AS "Data programmazione attività" FROM main10ance_sacrimonti.manutenzione_correttiva_o_a_guasto AS mc JOIN main10ance_sacrimonti.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE ORDER BY mc.data_ins;`);
         return result.rows;
     }
     catch(e) {
@@ -497,7 +498,9 @@ async function registraAttivitàEsecuzione(dati) {
                 console.log(dati);
                 // NOTE:
                 // registrare campo "eseguito" come TRUE
+                // registrare riallineamento attività
                 console.log('MANUTENZIONE CORRETTIVA');
+                await clientM10a.query("ROLLBACK;");
                 break;
             }
             case stringaManStr: {

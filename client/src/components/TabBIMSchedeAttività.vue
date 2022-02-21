@@ -38,7 +38,7 @@
           </select></td>
         </tr>
       </div>
-      <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione regolare'">
+      <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione regolare' || store.stateBIM.schedeAttivitàTipo === 'manutenzione correttiva'">
         <tr>
           <td class="fLeft"><label><b>MANUTENZIONE</b></label></td>
           <td class="fRight"><p>{{store.statePlanner.datiSchedaInCompilazione['Tipo di intervento']}}</p></td>
@@ -56,7 +56,7 @@
           <td class="fRight"><input v-model="materialeMan"></td>
         </tr>
       </div>
-      <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione correttiva'">modulo per manutenzione correttiva</div>
+      <!-- <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione correttiva'"></div> -->
       <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione straordinaria'">modulo per manutenzione straordinaria</div>
       <div v-if="store.stateBIM.schedeAttivitàTipo === 'restauro'">modulo per restauro</div>
       <div v-if="store.stateBIM.schedeAttivitàTipo === 'diagnosi'">modulo per diagnostica</div>
@@ -77,7 +77,7 @@
         <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Documenti']"></td>
       </tr>
     </table>
-    <button @click="salvaAttività" class="bottone-main10ance">SALVA</button>
+    <button @click="salvaAttività" :class="tipoClass" class="bottone-main10ance">SALVA</button>
   </div>
 </template>
 
@@ -116,7 +116,6 @@ export default {
 
     onMounted(async () => {
       await recuperaEnumUNI();
-      console.log(store.statePlanner.datiSchedaInCompilazione);
     });
 
     async function recuperaEnumUNI() {
@@ -207,6 +206,13 @@ export default {
           const data_next = aggiungiMesi(data_ese, frequenza);
           return {data_ese, strumentaz, materiale, id_mn_reg, data_next};
         }
+        case 'manutenzione correttiva': {
+          const data_ese = store.statePlanner.datiSchedaInCompilazione['Data intervento'];
+          const strumentaz = store.statePlanner.datiSchedaInCompilazione['Strumentazione'];
+          const materiale = state.materialeMan ? state.materialeMan : null;
+          const id_mn_gu = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda manutenzione correttiva']);
+          return {data_ese, strumentaz, materiale, id_mn_gu};
+        }
       }
     }
 
@@ -265,12 +271,24 @@ export default {
 </script>
 
 <style scoped>
+table {
+  width: 100%;
+}
 button {
   float: right;
   margin-right: 0;
 }
-button:hover {
+button.controllo, button.manutenzione-regolare {
+  background-color: var(--verdeMain10ance);
+}
+button.manutenzione-correttiva, button.manutenzione-straordinaria, button.restauro {
+  background-color: var(--gialloIntervento);
+}
+button.controllo:hover, button.manutenzione-regolare:hover {
   background-color: var(--verdeMain10anceTrasparenza);
+}
+button.manutenzione-correttiva:hover, button.manutenzione-straordinaria:hover, button.restauro:hover {
+  background-color: var(--gialloInterventoTrasparenza);
 }
 p {
   text-align: justify;
@@ -302,5 +320,8 @@ td.fRight {
 }
 table.controllo, table.manutenzione-regolare {
   background-color: var(--verdeMain10anceTrasparenza);
+}
+table.manutenzione-correttiva, table.manutenzione-straordinaria, table.restauro {
+  background-color: var(--gialloInterventoTrasparenza);
 }
 </style>
