@@ -63,6 +63,7 @@ const statePlanner = reactive({
     },
     datiSchedaInCompilazione: {},
     compilazioneParziale: false,
+    listaCRregistrati: [],
     refreshPlanner: false,
 });
 

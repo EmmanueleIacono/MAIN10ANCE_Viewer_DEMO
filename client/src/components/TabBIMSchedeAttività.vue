@@ -132,12 +132,18 @@ export default {
       const {selezione, parziale, rimanenti} = await verificaSelezione();
       if (!selezione.length) return;
       let datiAttività = {};
+      store.statePlanner.listaCRregistrati.push(state.selectClRacc);
       const dati = await raccogliDati(selezione);
       datiAttività = dati;
       if (store.statePlanner.compilazioneParziale) { // se "true" -> INSERT INTO, se "false" -> UPDATE
         const datiAggiuntivi = raccogliDatiAggiuntivi();
         datiAttività = {...datiAttività, ...datiAggiuntivi};
       }
+      if (!rimanenti.length) {
+        datiAttività['listaCRregistrati'] = store.statePlanner.listaCRregistrati;
+        datiAttività['idDiEmergenza'] = dataInteger()+100; // necessario per evitare conflitto con "id_att_prog", creato nello stesso processo
+      }
+      console.log(datiAttività);
 
       const resp = await registraAttivitàEseguita(datiAttività);
       if (resp.success) {
@@ -155,6 +161,7 @@ export default {
           store.stateBIM.schedeAttivitàVisibile = false;
           store.statePlanner.datiSchedaInCompilazione = {};
           store.stateBIM.elementiSelezionati = null;
+          store.statePlanner.listaCRregistrati = [];
           resetVista();
           aggiornaPlanner();
         }

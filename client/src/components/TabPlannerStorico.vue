@@ -1,6 +1,6 @@
 <template>
 <Card>
-  <Details summary="STORICO" :open="true" class="loading-wrapper">
+  <Details summary="STORICO" :open="false" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
     qui dentro storico
   </Details>

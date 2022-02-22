@@ -71,7 +71,7 @@ export default {
     async function popolaAttività() {
       state.caricamento = true;
       const attDaIntegrare = await leggiAttProgPerIntegrazione(true);
-      const attCicliche = attDaIntegrare.filter(att => att.tipo_attività.includes('controllo') || att.tipo_attività.includes('manutenzione regolare'));
+      const attCicliche = attDaIntegrare.filter(att => att.tipo_attività.includes('controllo') || att.tipo_attività.includes('manutenzione regolare')).filter(att => !!att.id_main10ance.length);
       const attRiallineamento = attDaIntegrare.filter(att => !att.tipo_attività.includes('controllo') && !att.tipo_attività.includes('manutenzione regolare'));
       state.attCicliche = attCicliche;
       state.attRiallineamento = attRiallineamento;

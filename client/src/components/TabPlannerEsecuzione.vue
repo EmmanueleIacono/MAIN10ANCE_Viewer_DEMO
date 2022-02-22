@@ -1,6 +1,6 @@
 <template>
 <Card>
-  <Details summary="ESECUZIONE" :open="true" class="loading-wrapper">
+  <Details summary="ESECUZIONE" :open="false" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
     <div v-if="attIntegrateContr.length || attIntegrateManReg.length">
       <SchedaEsecuzione v-for="att in attIntegrateContr" :key="att['Codice scheda controllo']" :dati="att" :tipo="'controllo'" />

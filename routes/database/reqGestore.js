@@ -417,7 +417,7 @@ async function integraAtt(jsonAtt) {
                         await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaManCorr}" ("id_mn_gu", "rid_contr", "cl_ogg_fr", "azione", "data_ese", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "eseguito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertManCorr);
                         break;
                     }
-                
+
                     default: throw new Error('ERRORE: La richiesta non è andata a buon fine.');
                 }
             }
