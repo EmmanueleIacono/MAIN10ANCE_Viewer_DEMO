@@ -2,7 +2,7 @@
 <Card>
   <Details summary="ESECUZIONE" :open="false" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
-    <div v-if="attIntegrateContr.length || attIntegrateManReg.length">
+    <div v-if="attIntegrateContr.length || attIntegrateManReg.length || attIntegrateManCorr.length">
       <SchedaEsecuzione v-for="att in attIntegrateContr" :key="att['Codice scheda controllo']" :dati="att" :tipo="'controllo'" />
       <SchedaEsecuzione v-for="att in attIntegrateManReg" :key="att['Codice scheda manutenzione regolare']" :dati="att" :tipo="'manutenzione regolare'" />
       <SchedaEsecuzione v-for="att in attIntegrateManCorr" :key="att['Codice scheda manutenzione correttiva']" :dati="att" :tipo="'manutenzione correttiva'" />

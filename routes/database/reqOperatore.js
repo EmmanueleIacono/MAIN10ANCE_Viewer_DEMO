@@ -430,14 +430,14 @@ async function registraAttivitàEsecuzione(dati) {
         switch (dati.tabella) {
             case stringaContr: {
                 if (dati.nuovo_record) {
-                    const arrayInsertContr = [dati.nuovo_id, dati.data_con, dati.data_ultima_mod, dati.data_ultima_mod, dati.strumentaz, dati.id_main10ance, dati.cl_racc, dati.st_cons, dati.liv_urg, dati.commenti, dati.doc, dati.autore_ultima_mod, true];
+                    const arrayInsertContr = [dati.nuovo_id, dati.data_con, dati.data_ultima_mod, dati.data_ultima_mod, dati.strumentaz, dati.id_main10ance, dati.cl_racc, dati.st_cons, dati.liv_urg, dati.commenti, dati.doc, dati.autore_ultima_mod, dati.id_contr, true];
                     const stringaSelectClOgg = `SELECT "cl_ogg_fr" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
                     const stringaSelectContr = `SELECT "controllo" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
                     const stringaSelectEsec = `SELECT "esecutori" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
                     const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
                     const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
                     const stringaSelectIdGroup = `SELECT "id_group" FROM main10ance_sacrimonti.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
-                    await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_con", "data_ins", "data_ultima_mod", "strumentaz", "id_main10ance", "cl_racc", "st_cons", "liv_urg", "commenti", "doc", "autore_ultima_mod", "eseguito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectContr}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertContr);
+                    await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_con", "data_ins", "data_ultima_mod", "strumentaz", "id_main10ance", "cl_racc", "st_cons", "liv_urg", "commenti", "doc", "autore_ultima_mod", "id_att_ciclica", "eseguito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectContr}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));`, arrayInsertContr);
                 }
                 else {
                     const arrayUpdateContr = [dati.id_contr, dati.cl_racc, dati.st_cons, dati.liv_urg, dati.strumentaz, dati.commenti, dati.doc, dati.costo, dati.ore, dati.data_con, dati.data_ultima_mod, dati.autore_ultima_mod, dati.id_main10ance, true];
@@ -484,14 +484,14 @@ async function registraAttivitàEsecuzione(dati) {
             }
             case stringaManReg: {
                 if (dati.nuovo_record) {
-                    const arrayInsertManReg = [dati.nuovo_id, dati.data_ese, dati.data_ultima_mod, dati.data_ultima_mod, dati.materiale, dati.strumentaz, dati.id_main10ance, dati.commenti, dati.doc, dati.autore_ultima_mod, true];
+                    const arrayInsertManReg = [dati.nuovo_id, dati.data_ese, dati.data_ultima_mod, dati.data_ultima_mod, dati.materiale, dati.strumentaz, dati.id_main10ance, dati.commenti, dati.doc, dati.autore_ultima_mod, dati.id_mn_reg, true];
                     const stringaSelectClOgg = `SELECT "cl_ogg_fr" FROM main10ance_sacrimonti.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
                     const stringaSelectAzione = `SELECT "azione" FROM main10ance_sacrimonti.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
                     const stringaSelectEsec = `SELECT "esecutori" FROM main10ance_sacrimonti.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
                     const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM main10ance_sacrimonti.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
                     const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM main10ance_sacrimonti.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
                     const stringaSelectIdGroup = `SELECT "id_group" FROM main10ance_sacrimonti.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
-                    await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaManReg}" ("id_mn_reg", "cl_ogg_fr", "azione", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_ese", "data_ins", "data_ultima_mod", "materiale", "strumentaz", "id_main10ance", "commenti", "doc", "autore_ultima_mod", "eseguito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectAzione}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, arrayInsertManReg);
+                    await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaManReg}" ("id_mn_reg", "cl_ogg_fr", "azione", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_ese", "data_ins", "data_ultima_mod", "materiale", "strumentaz", "id_main10ance", "commenti", "doc", "autore_ultima_mod", "id_att_ciclica", "eseguito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectAzione}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, arrayInsertManReg);
                 }
                 else {
                     const arrayUpdateManReg = [dati.id_mn_reg, dati.materiale, dati.strumentaz, dati.commenti, dati.doc, dati.costo, dati.ore, dati.data_ese, dati.data_ultima_mod, dati.autore_ultima_mod, dati.id_main10ance, true];
@@ -511,35 +511,55 @@ async function registraAttivitàEsecuzione(dati) {
                 break;
             }
             case stringaManCorr: {
-                console.log(dati);
-                // NOTE:
-                // registrare campo "eseguito" come TRUE
-                // registrare riallineamento attività
-                console.log('MANUTENZIONE CORRETTIVA');
-                await clientM10a.query("ROLLBACK;");
+                if (dati.nuovo_record) {
+                    const arrayInsertManCorr = [dati.nuovo_id, dati.data_ese, dati.data_ultima_mod, dati.data_ultima_mod, dati.materiale, dati.strumentaz, dati.id_main10ance, dati.commenti, dati.doc, dati.autore_ultima_mod, true];
+                    const stringaSelectClOgg = `SELECT "cl_ogg_fr" FROM main10ance_sacrimonti.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
+                    const stringaSelectAzione = `SELECT "azione" FROM main10ance_sacrimonti.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
+                    const stringaSelectEsec = `SELECT "esecutori" FROM main10ance_sacrimonti.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
+                    const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM main10ance_sacrimonti.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
+                    const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM main10ance_sacrimonti.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
+                    const stringaSelectIdGroup = `SELECT "id_group" FROM main10ance_sacrimonti.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
+                    await clientM10a.query(`INSERT INTO main10ance_sacrimonti."${stringaManCorr}" ("id_mn_gu", "cl_ogg_fr", "azione", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_ese", "data_ins", "data_ultima_mod", "materiale", "strumentaz", "id_main10ance", "commenti", "doc", "autore_ultima_mod", "eseguito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectAzione}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, arrayInsertManCorr);
+                }
+                else {
+                    const arrayUpdateManCorr = [dati.id_mn_gu, dati.materiale, dati.strumentaz, dati.commenti, dati.doc, dati.costo, dati.ore, dati.data_ese, dati.data_ultima_mod, dati.autore_ultima_mod, dati.id_main10ance, true];
+                    await clientM10a.query(`UPDATE main10ance_sacrimonti."${stringaManCorr}" SET "materiale" = ($2), "strumentaz" = ($3), "commenti" = ($4), "doc" = ($5), "costo" = ($6), "ore" = ($7), "data_ese" = ($8), "data_ultima_mod" = ($9), "autore_ultima_mod" = ($10), "id_main10ance" = ($11), "eseguito" = ($12) WHERE "id_mn_gu" = ($1);`, arrayUpdateManCorr);
+                }
+
+                const attRiall = await cercaAttProgPerRiallineamento(dati.id_mn_gu, 'id_mn_gu', stringaManCorr);
+                const id_att_prog_riall = parseInt(attRiall.id_att_prog);
+                await clientM10a.query(`UPDATE main10ance_sacrimonti.attività_prog SET "id_main10ance" = array_cat("id_main10ance", ($1)) WHERE "id_att_prog" = ($2);`, [dati.id_main10ance, id_att_prog_riall]);
+                if (!attRiall.da_integrare) {
+                    const attEsec = await cercaAttEsecPerRiallineamento(attRiall.id_att_prog, 'id_contr', stringaContr);
+                    await clientM10a.query(`UPDATE main10ance_sacrimonti.${stringaContr} SET "id_main10ance" = array_cat("id_main10ance", ($1)) WHERE "id_contr" = ($2);`, [dati.id_main10ance, parseInt(attEsec.id_contr)]);
+                }
                 break;
             }
             case stringaManStr: {
                 // NOTE:
                 // registrare campo "eseguito" come TRUE
                 console.log('MANUTENZIONE STRAORDINARIA');
+                await clientM10a.query('ROLLBACK;');
                 break;
             }
             case stringaRestauro: {
                 // NOTE:
                 // registrare campo "eseguito" come TRUE
                 console.log('RESTAURO');
+                await clientM10a.query('ROLLBACK;');
                 break;
             }
             case stringaDiagnosi: {
                 // NOTE:
                 // registrare campo "eseguito" come TRUE
                 console.log('DIAGNOSI');
+                await clientM10a.query('ROLLBACK;');
                 break;
             }
             default: throw new Error('ERRORE: La richiesta non è andata a buon fine.');
         }
         await clientM10a.query('COMMIT;');
+        // await clientM10a.query('ROLLBACK;');
         return true;
     }
     catch(e) {
@@ -558,6 +578,32 @@ async function recuperaFrequenzaAttProg(id, tabella) {
         return results.rows;
     }
     catch(e) {
+        return [];
+    }
+}
+
+async function cercaAttProgPerRiallineamento(id, nomeId, nomeTabella) {
+    const stringaSelectRidContr = `SELECT "rid_contr" FROM main10ance_sacrimonti.${nomeTabella} WHERE "${nomeId}" = ${id}`;
+    const stringaSelectIdAttCiclica = `SELECT id_att_ciclica FROM main10ance_sacrimonti.controllo_stato_di_conservazione_livello_di_urgenza WHERE id_contr = (${stringaSelectRidContr})`;
+    try {
+        const res = await clientM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "id_main10ance", "id_group", "tipo_attività", "da_integrare", "necessaria_revisione", "rid_att_ciclica_prec" FROM main10ance_sacrimonti.attività_prog WHERE "rid_att_ciclica_prec" = (${stringaSelectIdAttCiclica}) AND 'controllo' = ANY("tipo_attività") AND ("necessaria_revisione" IS NULL OR "necessaria_revisione" = FALSE) ORDER BY "id_att_prog" ASC LIMIT 1;`);
+        if (res.rowCount) return res.rows[0];
+        const resTrue = await clientM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "id_main10ance", "id_group", "tipo_attività", "da_integrare", "necessaria_revisione", "rid_att_ciclica_prec" FROM main10ance_sacrimonti.attività_prog WHERE "rid_att_ciclica_prec" = (${stringaSelectIdAttCiclica}) AND 'controllo' = ANY("tipo_attività") AND ("necessaria_revisione" IS NULL OR "necessaria_revisione" = TRUE) ORDER BY "id_att_prog" ASC LIMIT 1;`);
+        return resTrue.rows[0];
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function cercaAttEsecPerRiallineamento(id, nomeId, nomeTabella) {
+    try {
+        const res = await clientM10a.query(`SELECT "${nomeId}" FROM main10ance_sacrimonti.${nomeTabella} WHERE "rid_att_prog" = ${id} LIMIT 1;`);
+        return res.rows[0];
+    }
+    catch(e) {
+        console.log(e);
         return [];
     }
 }
