@@ -217,3 +217,21 @@ export async function prendiFrequenzaAttProg(jsonAtt) {
     const resJson = await res.json();
     return resJson;
 }
+
+export async function prendiSchedeStoricoControllo() {
+    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-storico-controllo');
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+export async function prendiSchedeStoricoManReg() {
+    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-storico-manutenzione-regolare');
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+export async function prendiSchedeStoricoManCorr() {
+    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-storico-manutenzione-correttiva');
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
