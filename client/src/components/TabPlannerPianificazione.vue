@@ -33,7 +33,7 @@
           <th><b>Frase di rischio</b></th>
           <th><b>Controllo</b></th>
           <th><b>Manutenzione ordinaria</b></th>
-          <th><b>Frequenza</b></th>
+          <th><b>Frequenza (mesi)</b></th>
           <th><b>Inizio ciclo</b></th>
         </tr>
         <tr v-for="(fr, ind) in listaFrasiDiRischioFiltrate" :key="fr.id_fr_risc">
