@@ -48,16 +48,16 @@ const calendarProg = new FullCalendar.Calendar(calendarElProg, {
 
 apriTabSchede.addEventListener('click', async () => {
     renderizzaCalendario(calendar);
-    const datiControllo = await recuperaDatiControlliProg();
-    creaEventiControlloProg(datiControllo, calendar);
-    aggiungiEventiDaSessionStorage(calendar);
+    // const datiControllo = await recuperaDatiControlliProg();
+    // creaEventiControlloProg(datiControllo, calendar);
+    // aggiungiEventiDaSessionStorage(calendar);
 });
 apriTabDashboard.addEventListener('click', async () => {
     // popolaCalendario(calendarProg);
     renderizzaCalendario(calendarProg);
-    const datiControllo = await recuperaDatiControlliProg();
-    creaEventiControlloProg(datiControllo, calendarProg);
-    aggiungiEventiDaSessionStorage(calendarProg);
+    // const datiControllo = await recuperaDatiControlliProg();
+    // creaEventiControlloProg(datiControllo, calendarProg);
+    // aggiungiEventiDaSessionStorage(calendarProg);
 
 });
 

@@ -15,7 +15,8 @@
     "leaflet": "^1.7.1",
     "proj4": "^2.7.5",
     "proj4leaflet": "^1.0.2",
-    "vue": "^3.0.0"
+    "vue": "^3.0.0",
+    "vue-chart-3": "^3.1.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

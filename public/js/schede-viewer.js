@@ -46,7 +46,7 @@ function visualizzaSchedeStart() {
     // compilaTabelleManReg();
     // compilaTabelleManCorr();
     // compilaTabelleRestauro();
-    compilaTabelleControlloProg();
+    // compilaTabelleControlloProg();
 
     if (checkGenerale.checked) {
         checkGenerale.click();
