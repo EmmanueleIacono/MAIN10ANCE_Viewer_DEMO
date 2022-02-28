@@ -2,11 +2,11 @@
 <div class="col-sm-6 col-lg-3">
   <div :class="gradiente" class="overview-item">
     <div class="overview-box clearfix">
-      <div class="row-md-6 m-b-20">
+      <div class="m-b-20">
         <div class="icon"><i :class="icona" class="zmdi"></i></div>
         <div class="text"><h2>{{numContenuto}}</h2><span>{{infoContenuto}}</span></div>
       </div>
-      <div class="row-md-6 m-b-20">
+      <div class="m-b-20">
         <div class="overview-chart">
           <div class="canvas">
             <DoughnutChart :chartData="testData" :options="options" />
@@ -53,7 +53,7 @@ export default {
     };
     const options = {
       cutout: '70%',
-      maintainAspectRatio: false,
+      // maintainAspectRatio: false,
       plugins: {
         legend: {display: false}
       },
@@ -192,14 +192,20 @@ h6 {font-size: 13px;}
 }
 
 .overview-chart {
-  height: 115px;
+  /* height: 115px; */
   position: relative;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .overview-chart .canvas {
-  max-width: 90%;
+  /* max-width: 90%;
+  max-height: 90%;
+  min-width: 90%;
+  min-height: 90%; */
+  width: 90%;
+  height: 90%;
 }
 
 .m-b-20 {margin-bottom: 20px;}

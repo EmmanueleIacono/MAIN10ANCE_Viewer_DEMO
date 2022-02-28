@@ -3,34 +3,34 @@
   <div id="Controllo">
     <div class="col-sm-12 col-lg-12 no-pdg">
       <Card>
-        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Bar chart</h3><canvas id="barChart1"></canvas></div>
+        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Controllo</h3><canvas id="barChart1"></canvas></div>
       </Card>
     </div>
     <div class="col-sm-12 col-lg-6 no-pdg">
       <Card>
-        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Polar Chart</h3><canvas id="polarChart1"></canvas></div>
+        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Controllo</h3><canvas id="polarChart1"></canvas></div>
       </Card>
     </div>
     <div class="col-sm-12 col-lg-6 no-pdg">
       <Card>
-        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Radar chart</h3><canvas id="radarChart1"></canvas></div>
+        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Controllo</h3><canvas id="radarChart1"></canvas></div>
       </Card>
     </div>
   </div>
   <div id="Intervento">
     <div class="col-sm-12 col-lg-12 no-pdg">
       <Card>
-        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Bar chart</h3><canvas id="barChart2"></canvas></div>
+        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Intervento</h3><canvas id="barChart2"></canvas></div>
       </Card>
     </div>
     <div class="col-sm-12 col-lg-6 no-pdg">
       <Card>
-        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Polar Chart</h3><canvas id="polarChart2"></canvas></div>
+        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Intervento</h3><canvas id="polarChart2"></canvas></div>
       </Card>
     </div>
     <div class="col-sm-12 col-lg-6 no-pdg">
       <Card>
-        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Radar chart</h3><canvas id="radarChart2"></canvas></div>
+        <div class="au-card-inner"><h3 class="h3-db title-2 m-b-40">Intervento</h3><canvas id="radarChart2"></canvas></div>
       </Card>
     </div>
   </div>

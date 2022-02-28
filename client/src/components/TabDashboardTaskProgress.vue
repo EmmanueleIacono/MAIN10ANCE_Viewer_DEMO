@@ -2,7 +2,7 @@
 <Card>
   <div>
     <div class="col-sm-10 col-lg-11">
-      <h3 class="title-2">Task Progress</h3>
+      <h3 class="title-2">Progresso attività</h3>
     </div>
     <div class="col-sm-2 col-lg-1">
       <select name="anni" id="anni">
@@ -13,7 +13,8 @@
         <option value="anno">2018</option>
       </select>
     </div>
-    <div class="col-sm-12 col-lg-8">
+    <!-- <div class="col-sm-12 col-lg-8"> -->
+    <div class="col-sm-12 col-lg-12">
       <div class="recent-report">
         <div>
           <div class="recent-report__chart">
@@ -22,7 +23,7 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-12 col-lg-4">
+    <!-- <div class="col-sm-12 col-lg-4"> -->
       <!-- <div class="task-progress">
         <div class="au-skill-container">
           <div class="au-progress">
@@ -59,7 +60,7 @@
           </div>
         </div>
       </div> -->
-    </div>
+    <!-- </div> -->
   </div>
 </Card>
 </template>
@@ -92,6 +93,7 @@ export default {
         {
           label: 'attività',
           type: 'line',
+          borderColor: 'orange',
           backgroundColor: 'orange',
           pointBorderColor: 'orange',
           borderRadius: 5,
@@ -116,10 +118,11 @@ export default {
     }
 
     const options = {
+      maintainAspectRation: true,
       plugins: {
         legend: {display: true, position: 'top',
           font: {size: 12, family: 'Poppins'}},
-        responsive: true,
+        // responsive: true,
         scales: [{
           x: {display: true, color: 'grey'},
           y: {display: true, color: 'grey'}
@@ -131,7 +134,7 @@ export default {
         },
       animations: {
         animation: true,
-        tension: {duration: 1000, easing: 'linear', from: 1, to: 0, loop: true}
+        // tension: {duration: 1000, easing: 'linear', from: 1, to: 0, loop: true}
       }
     }
 
@@ -145,7 +148,7 @@ export default {
 
 <style scoped>
 .title-2 {
-  text-transform: capitalize;
+  /* text-transform: capitalize; */
   font-weight: 400;
   font-size: 24px;
   line-height: 1;
