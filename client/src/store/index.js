@@ -1,5 +1,6 @@
 import {reactive, readonly} from 'vue';
 import {generaColoreRandom} from '../js/shared';
+import {prendiSigleLocalità, prendiSigleEdifici, leggiEnum, prendiFrasiDiRischio, leggiDBMarkerEdif, prendiLOD3e4, leggiGlossDegradi} from '../js/richieste';
 
 const state = reactive({
     tabAttivo: 'Tab2',
@@ -36,6 +37,15 @@ const stateBIM = reactive({
 });
 
 const statePlanner = reactive({
+    datiPlannerLoaded: false,
+    listaSigleLoc: [],
+    listaSigleEdifici: [],
+    listaClOgg: [],
+    listaFrasiDiRischio: [],
+    listaEdif: [],
+    listaElementi: [],
+    listaStCons: [],
+    listaFenomeni: [],
     attività: {
         'controllo': {
             tabella: 'controllo_stato_di_conservazione_livello_di_urgenza',
@@ -65,6 +75,7 @@ const statePlanner = reactive({
     compilazioneParziale: false,
     listaCRregistrati: [],
     refreshPlanner: false,
+    urnModelloCorrente: null,
 });
 
 const methods = {
@@ -132,8 +143,6 @@ const methods = {
                     alias: tab.alias,
                     gis: [],
                     colore: generaColoreRandom(),
-                    geometria: {}, // eliminabile
-                    presente: false, // eliminabile
                 }
                 stateGIS.entitàGIS[tab.tabella] = oggEntità;
             }
@@ -155,6 +164,28 @@ const methods = {
 
     setMarkerEdif(listaEdif) {
         stateGIS.markerEdif = listaEdif;
+    },
+
+    async recuperaDatiPlanner() {
+        this.toggleLoaderGlobale();
+        const listaSigleLoc = await prendiSigleLocalità();
+        const listaSigleEdifici = await prendiSigleEdifici();
+        const listaClOgg = await leggiEnum('cl_ogg_fr');
+        const listaFrasiDiRischio = await prendiFrasiDiRischio();
+        const listaEdif = await leggiDBMarkerEdif();
+        const listaElementi = await prendiLOD3e4();
+        const listaStCons = await leggiEnum('st_cons');
+        const listaFenomeni = await leggiGlossDegradi();
+        statePlanner.listaSigleLoc = listaSigleLoc;
+        statePlanner.listaSigleEdifici = listaSigleEdifici;
+        statePlanner.listaClOgg = listaClOgg;
+        statePlanner.listaFrasiDiRischio = listaFrasiDiRischio;
+        statePlanner.listaEdif = listaEdif;
+        statePlanner.listaElementi = listaElementi;
+        statePlanner.listaStCons = listaStCons;
+        statePlanner.listaFenomeni = listaFenomeni;
+        statePlanner.datiPlannerLoaded = true;
+        this.toggleLoaderGlobale();
     }
 }
 

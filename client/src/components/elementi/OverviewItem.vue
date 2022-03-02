@@ -96,6 +96,7 @@ h6 {font-size: 13px;}
   padding-bottom: 0;
   box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
   margin-bottom: 40px;
+  min-height: 200px;
 }
 
 @media (min-width: 992px) and (max-width: 1519px) {

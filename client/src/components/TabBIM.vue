@@ -34,7 +34,6 @@ export default {
   setup() {
     const store = inject('store');
 
-
     return {
       store,
     }

@@ -8,7 +8,7 @@
       <label for="select-località-prog">Località</label>
       <select v-model="selectLocalità" id="select-località-prog">
         <option value=""></option>
-        <option v-for="loc in listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
+        <option v-for="loc in store.statePlanner.listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
       </select>
       <br />
       <br />
@@ -23,7 +23,7 @@
       <label for="select-cl-ogg">Classe oggetti</label>
       <select v-model="selectClOgg" id="select-cl-ogg">
         <option value=""></option>
-        <option v-for="cl in listaClOgg" :key="cl.unnest" :value="cl.unnest">{{cl.unnest}}</option>
+        <option v-for="cl in store.statePlanner.listaClOgg" :key="cl.unnest" :value="cl.unnest">{{cl.unnest}}</option>
       </select>
       <br />
       <br />
@@ -67,7 +67,7 @@
 
 <script>
 import {reactive, onMounted, toRefs, watch, inject, computed} from 'vue';
-import {prendiSigleEdifici, prendiSigleLocalità, leggiEnum, prendiFrasiDiRischio, getEntitàDaClOgg, getElementiDaEntità, creaAttProgControllo} from '../js/richieste';
+import {/*prendiSigleEdifici, prendiSigleLocalità, leggiEnum, prendiFrasiDiRischio, */getEntitàDaClOgg, getElementiDaEntità, creaAttProgControllo} from '../js/richieste';
 import {dataInteger, dataCorta} from '../js/shared';
 import Details from './elementi/Details.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
@@ -83,48 +83,48 @@ export default {
   setup(props, {emit}) {
     const store = inject('store');
     const state = reactive({
-      caricamento: true,
+      caricamento: false,
       selectLocalità: '',
       selectClOgg: '',
-      listaSigleLoc: [],
-      listaSigleEdifici: [],
+      // listaSigleLoc: [],
+      // listaSigleEdifici: [],
       listaSigleEdificiFiltrata: [],
       listaSigleEdificiSelezionati: [],
-      listaClOgg: [],
-      listaFrasiDiRischio: [],
+      // listaClOgg: [],
+      // listaFrasiDiRischio: [],
       listaFrasiDiRischioFiltrate: [],
       datiFrasiDiRischioFiltrate: [],
     });
 
     const nomeLocalità = computed(() => {
-      if (state.selectLocalità) return state.listaSigleLoc.filter(loc => loc.sigla === state.selectLocalità)[0].nome;
+      if (state.selectLocalità) return store.statePlanner.listaSigleLoc.filter(loc => loc.sigla === state.selectLocalità)[0].nome;
       return '';
     });
 
     watch(() => state.selectLocalità, newVal => {
-      const listaSigleEdificiFiltrata = state.listaSigleEdifici.filter(s => s.sacro_monte === newVal);
+      const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.sacro_monte === newVal);
       state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
       state.listaSigleEdificiSelezionati = [];
     });
 
     watch(() => state.selectClOgg, newVal => {
-      const listaFrasiDiRischioFiltrate = state.listaFrasiDiRischio.filter(fr => fr.cl_ogg_fr === newVal);
+      const listaFrasiDiRischioFiltrate = store.statePlanner.listaFrasiDiRischio.filter(fr => fr.cl_ogg_fr === newVal);
       state.listaFrasiDiRischioFiltrate = listaFrasiDiRischioFiltrate;
       const listaIdFrRiscFiltrati = listaFrasiDiRischioFiltrate.map(fr => ({id_fr_risc: fr.id_fr_risc, freq: null, data: null, man_reg: !!fr.mn_reg}));
       state.datiFrasiDiRischioFiltrate = listaIdFrRiscFiltrati;
     });
 
     onMounted(async () => {
-      state.caricamento = true;
-      const listaSigleLoc = await prendiSigleLocalità();
-      const listaSigleEdifici = await prendiSigleEdifici();
-      const listaClOgg = await leggiEnum('cl_ogg_fr');
-      const listaFrasiDiRischio = await prendiFrasiDiRischio();
-      state.listaSigleLoc = listaSigleLoc;
-      state.listaSigleEdifici = listaSigleEdifici;
-      state.listaClOgg = listaClOgg;
-      state.listaFrasiDiRischio = listaFrasiDiRischio;
-      state.caricamento = false;
+      // state.caricamento = true;
+      // const listaSigleLoc = await prendiSigleLocalità();
+      // const listaSigleEdifici = await prendiSigleEdifici();
+      // const listaClOgg = await leggiEnum('cl_ogg_fr');
+      // const listaFrasiDiRischio = await prendiFrasiDiRischio();
+      // state.listaSigleLoc = listaSigleLoc;
+      // state.listaSigleEdifici = listaSigleEdifici;
+      // state.listaClOgg = listaClOgg;
+      // state.listaFrasiDiRischio = listaFrasiDiRischio;
+      // state.caricamento = false;
     });
 
     async function programmaControlli() {
@@ -236,6 +236,7 @@ export default {
     }
 
     return {
+      store,
       ...toRefs(state),
       programmaControlli,
     }

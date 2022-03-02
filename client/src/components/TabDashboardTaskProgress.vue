@@ -118,6 +118,7 @@ export default {
     }
 
     const options = {
+      aspectRatio: 2,
       maintainAspectRation: true,
       plugins: {
         legend: {display: true, position: 'top',
@@ -157,6 +158,7 @@ export default {
 .recent-report {
   padding-bottom: 20px;
   margin-bottom: 20px;
+  max-height: 400px;
 }
 .recent-report__chart canvas {
   height: 80%;

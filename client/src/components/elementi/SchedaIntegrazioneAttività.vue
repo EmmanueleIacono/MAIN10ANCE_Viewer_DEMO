@@ -47,7 +47,7 @@
         </div>
         <div class="colonna">
           <div class="contenitore-colonne centra">
-            <label for="costo" class="colonna">Costo previsto:</label>
+            <label for="costo" class="colonna">Costo previsto (€):</label>
             <input v-model="costoPrevisto" type="number" min="0" step=".01" id="costo" class="colonna">
           </div>
           <div class="contenitore-colonne centra">
@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import {reactive, toRefs, computed, inject, onMounted} from 'vue';
+import {reactive, toRefs, computed, inject/*, onMounted*/} from 'vue';
 import {dataCorta, dataInteger} from '../../js/shared';
 import { integraAttività } from '../../js/richieste';
 
@@ -102,7 +102,7 @@ export default {
       return props.att.id_main10ance[0].split('|')[1];
     });
 
-    onMounted(() => console.log(props.att));
+    // onMounted(() => console.log(props.att));
 
     function integra() {
       state.integrazioneAttiva = !state.integrazioneAttiva;

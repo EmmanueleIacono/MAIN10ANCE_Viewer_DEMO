@@ -49,12 +49,6 @@ textarea[id^="scheda-intervento-"] {
   border: 0;
 }
 
-/* INTERFACCIA DATABASE */
-
-#tabDashboard {
-  padding: 10px;
-}
-
 /* TABELLE SCHEDE CONTROLLO-INTERVENTO */
 
 .td-schede-mr-mc-r {
@@ -155,12 +149,4 @@ textarea[id^="scheda-intervento-"] {
     background: var(--col);
     box-shadow: 0 0 20px var(--col);
   }
-}
-
-[data-card] {
-  display: none;
-}
-
-.active[data-card] {
-  display: block;
 }

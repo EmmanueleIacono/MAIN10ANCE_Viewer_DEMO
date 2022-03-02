@@ -6,8 +6,7 @@ let viewer;
 
 export function getModel(urn, opzioni) {
     if ((urn !== null) && (urn !== '')) {
-        store.methods.setTabAttivo('Tab1');
-        if (urn !== store.stateBIM.urnModelloCorrente) {
+        if (urn !== store.statePlanner.urnModelloCorrente) {
             launchViewer(urn, opzioni);
         }
         else {
@@ -30,10 +29,10 @@ function launchViewer(urn, opzioniPostLoading) {
         opz: opzioniPost
     }
 
-    if (urn !== store.stateBIM.urnModelloCorrente) {
-        store.stateBIM.modelPlaceholder = false;
+    if (urn !== store.statePlanner.urnModelloCorrente) {
+        // store.statePlanner.modelPlaceholder = false;
         Autodesk.Viewing.Initializer(options, () => {
-            viewer = new Autodesk.Viewing.GuiViewer3D(document.getElementById('forgeViewer'), { extensions: ['Autodesk.DocumentBrowser', 'Autodesk.VisualClusters'] });
+            viewer = new Autodesk.Viewing.Viewer3D(document.getElementById('forgeViewerPlanner'));
             if (options.opz) {
                 viewer.addEventListener(Autodesk.Viewing.GEOMETRY_LOADED_EVENT, () => {
                     options.opz();
@@ -55,7 +54,7 @@ function onDocumentLoadSuccess(doc, urn) {
     const viewables = doc.getRoot().getDefaultGeometry();
     viewer.loadDocumentNode(doc, viewables).then(i => {
         // documented loaded, any action?
-        store.stateBIM.urnModelloCorrente = urn;
+        store.statePlanner.urnModelloCorrente = urn;
     });
 }
 

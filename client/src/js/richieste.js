@@ -207,6 +207,12 @@ export async function prendiUrn(jsonReq) {
     return risTradotto;
 }
 
+export async function prendiUrnLocalità(jsonReq) {
+    const risultato = await fetch('/o/DB_Servizio/LOD/UrnLoc', {method: "GET", headers: {"content-type": "application/json", "loc": jsonReq.loc}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
 export async function registraAttivitàEseguita(jsonAtt) {
     const res = await fetch('/o/Main10ance_DB/esecuzione/nuova-attivita', {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonAtt)});
     const resJson = await res.json();

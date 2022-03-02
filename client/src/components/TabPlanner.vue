@@ -2,17 +2,15 @@
 <div v-if="store.getters.getUsrVwList().includes('apriTabSchede')">
   <MainPanel :colonna="'col-sm-7'">
     <br />
+    <ViewerPlanner />
+    <br />
+    <br />
+    <br />
     <Pianificazione @pianificazioneAggiornata="aggiornaEventi" />
     <Integrazione @integrazioneAggiornata="aggiornaEventi" ref="IntegrazioneRef" />
+    <ExTempore />
     <Esecuzione ref="EsecuzioneRef" />
     <Storico />
-    <!-- <h4>
-      <span id="refreshSchede" class="glyphicon glyphicon-refresh"></span>
-      <b>SCHEDE</b>
-    </h4> -->
-    <!-- <div id="contenitore-schede">
-      QUI SCHEDE
-    </div> -->
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
     <FullCalendar ref="fullCalendarPlanner" :options="calendarOptions" />
@@ -23,7 +21,7 @@
 </template>
 
 <script>
-import {inject, reactive, ref, watch} from 'vue';
+import {inject, onMounted, reactive, ref, watch} from 'vue';
 import {leggiAttivitàProg} from '../js/richieste';
 import FullCalendar from '@fullcalendar/vue3';
 import DayGridPlugin from '@fullcalendar/daygrid';
@@ -35,6 +33,8 @@ import Pianificazione from './TabPlannerPianificazione.vue';
 import Integrazione from './TabPlannerIntegrazione.vue';
 import Esecuzione from './TabPlannerEsecuzione.vue';
 import Storico from './TabPlannerStorico.vue';
+import ExTempore from './TabPlannerExTempore.vue';
+import ViewerPlanner from './TabPlannerBIMViewer.vue';
 
 export default {
   name: 'TabPlanner',
@@ -47,6 +47,8 @@ export default {
     Integrazione,
     Esecuzione,
     Storico,
+    ExTempore,
+    ViewerPlanner,
   },
   setup() {
     const store = inject('store');
@@ -89,6 +91,10 @@ export default {
         }, 100);
       }
     }, {immediate: true});
+
+    onMounted(async () => {
+      await store.methods.recuperaDatiPlanner();
+    });
 
     async function aggiornaEventi() {
       await popolaCalendario();
@@ -145,14 +151,4 @@ export default {
 </script>
 
 <style scoped>
-/* #refreshSchede {
-  cursor: pointer;
-  margin-right: 5px;
-} */
-/* #contenitore-schede {
-  height: 90%;
-  overflow: auto;
-  padding-left: 5px;
-  padding-right: 15px;
-} */
 </style>

@@ -155,6 +155,15 @@ appO.get('/DB_Servizio/LOD/UrnCappelle', async (req, res) => {
 });
 
 // per testare la richiesta:
+// fetch("/o/DB_Servizio/LOD/UrnLoc", {method: "GET", headers: {"content-type": "application/json", sm: 'SMV', capp: '38'} }).then(a => a.json()).then(console.log)
+appO.get('/DB_Servizio/LOD/UrnLoc', async (req, res) => {
+    const reqJson = req.headers;
+    const urn = await recuperaUrnLOD2(reqJson.loc);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(urn[0]));
+});
+
+// per testare la richiesta:
 // fetch("/o/DB_Servizio/LOD/3e4", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 appO.get('/DB_Servizio/LOD/3e4', async (req, res) => {
     const lod = await leggiTabelleLOD3e4();
@@ -398,6 +407,17 @@ async function recuperaUrnLOD3(sm, capp) {
         return results.rows;
     }
     catch(e) {
+        return [];
+    }
+}
+
+async function recuperaUrnLOD2(loc) {
+    try {
+        const results = await clientServ.query(`SELECT "urn" FROM "dati_sm" WHERE "sigla" = ($1);`, [loc]);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
         return [];
     }
 }
