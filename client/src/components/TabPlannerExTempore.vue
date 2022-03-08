@@ -1,8 +1,10 @@
 <template>
   <Card>
     <Details summary="PROGRAMMAZIONE EX-TEMPORE" :open="false">
-      <button @click="moduloVisibile = 'contr'">Programma controllo straordinario</button>
-      <button @click="moduloVisibile = 'int'">Programma pronto intervento</button>
+      <div class="contenitore-bottoni-scelta">
+        <button @click="moduloVisibile = 'contr'">Programma controllo straordinario</button>
+        <button @click="moduloVisibile = 'int'">Programma pronto intervento</button>
+      </div>
       <div v-if="moduloVisibile">
         <h4>{{moduloVisibile === 'contr' ? 'Controllo straordinario' : 'Pronto intervento'}}</h4>
       </div>
@@ -27,12 +29,12 @@
           </div>
         </div>
         <br />
+      </div>
+      <div v-if="moduloVisibile === 'contr'">
         <div class="label-descrizione"><b>Descrizione attività:</b></div>
         <div id="div-descrizione">
           <textarea v-model="datiContrStr.descrizioneContr"></textarea>
         </div>
-      </div>
-      <div v-if="moduloVisibile === 'contr'">
         <div class="contenitore-colonne">
           <label for="esecutori" class="colonna">Esecutori:</label>
           <input v-model="datiContrStr.esecutori" id="esecutori" class="colonna">
@@ -53,6 +55,10 @@
         </div>
       </div>
       <div v-if="moduloVisibile === 'int'">
+        <div class="label-descrizione"><b>Descrizione attività:</b></div>
+        <div id="div-descrizione">
+          <textarea v-model="datiProntoInt.descrizioneProntoInt"></textarea>
+        </div>
         <div class="contenitore-colonne">
           <label for="esecutori" class="colonna">Esecutori:</label>
           <input v-model="datiProntoInt.esecutori" id="esecutori" class="colonna">
@@ -72,9 +78,9 @@
           <input v-model="datiProntoInt.dataProgrammata" type="date" id="data" class="colonna">
         </div>
       </div>
-      <div v-if="moduloVisibile">
-        <button @click="chiudi">Annulla</button>
-        <button @click="salva">Salva</button>
+      <div v-if="moduloVisibile" class="contenitore-bottoni-salva">
+        <button @click="chiudi" class="bottone-main10ance">Annulla</button>
+        <button @click="salva" class="bottone-main10ance">Salva</button>
       </div>
     </Details>
   </Card>
@@ -182,6 +188,29 @@ export default {
 </script>
 
 <style scoped>
+button {
+  background-color: var(--bluInterreg);
+}
+button:hover {
+  background-color: var(--bluInterregTrasparenza);
+}
+.contenitore-bottoni-scelta {
+  display: flex;
+  justify-content: space-between;
+}
+.contenitore-bottoni-scelta button {
+  border: none;
+  color: var(--ghostWhite);
+  padding: 5px;
+  font-weight: bold;
+  margin-right: 10px;
+  flex: 0 0 49.3%;
+  margin: 10px 0;
+}
+.contenitore-bottoni-salva {
+  float: right;
+  margin-right: -10px;
+}
 textarea {
   width: 100%;
   resize: vertical;
