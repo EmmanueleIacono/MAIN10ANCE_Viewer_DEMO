@@ -137,17 +137,8 @@ app.get('/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva', async (req, r
 });
 
 // per testare la richiesta:
-// fetch("/o/DB_Servizio/LOD/TabelleLOD", {method: "GET", headers: {"content-type": "application/json", lod: 5} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/LOD/TabelleLOD', async (req, res) => {
-    const reqJson = req.headers;
-    const tabelleLOD = await leggiListaTabelleLOD(reqJson.lod);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(tabelleLOD));
-});
-
-// per testare la richiesta:
-// fetch("/o/DB_Servizio/LOD/UrnCappelle", {method: "GET", headers: {"content-type": "application/json", sm: 'SMV', capp: '38'} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/LOD/UrnCappelle', async (req, res) => {
+// fetch("/o/DB_Servizio/LOD/UrnEdifici", {method: "GET", headers: {"content-type": "application/json", sm: 'SMV', capp: '38'} }).then(a => a.json()).then(console.log)
+app.get('/DB_Servizio/LOD/UrnEdifici', async (req, res) => {
     const reqJson = req.headers;
     const urn = await recuperaUrnLOD3(reqJson.sm, reqJson.capp);
     res.setHeader('content-type', 'application/json');
@@ -385,16 +376,6 @@ async function leggiEventiManutenzioneCorrettiva() {
     try {
         const result = await clientM10a.query(`SELECT "id_mn_gu", "id_contr", "id_main10ance", "rid_gloss", "data_ese", "azione" FROM main10ance_sacrimonti."manutenzione_correttiva_o_a_guasto" ORDER BY "id_mn_gu";`);
         return result.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
-
-async function leggiListaTabelleLOD(LOD) {
-    try {
-        const results = await clientServ.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM "lod" WHERE "LOD" = ($1) ORDER BY "alias";`, [LOD]);
-        return results.rows;
     }
     catch(e) {
         return [];

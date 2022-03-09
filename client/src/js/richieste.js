@@ -1,5 +1,5 @@
 export async function prendiLOD(lod) {
-    const risultato = await fetch('/o/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
+    const risultato = await fetch('/t/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
@@ -202,7 +202,7 @@ export async function integraAttività(jsonAtt) {
 }
 
 export async function prendiUrn(jsonReq) {
-    const risultato = await fetch('/o/DB_Servizio/LOD/UrnCappelle', {method: "GET", headers: {"content-type": "application/json", "sm": jsonReq.sm, "capp": jsonReq.capp}});
+    const risultato = await fetch('/o/DB_Servizio/LOD/UrnEdifici', {method: "GET", headers: {"content-type": "application/json", "sm": jsonReq.sm, "capp": jsonReq.capp}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
@@ -241,4 +241,25 @@ export async function prendiSchedeStoricoManCorr() {
     const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-storico-manutenzione-correttiva');
     const risTradotto = await risultato.json();
     return risTradotto;
+}
+
+export async function getListaImmagini(percorso) {
+    const res = await fetch('/t/storage/img-list', {method: "GET", headers: {"content-type": "application/json", "path": percorso}});
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function downloadImmagini(listaPercorsi) {
+    const res = await fetch('/t/storage/img-download', {method: "GET", headers: {"content-type": "application/json", "lista": JSON.stringify(listaPercorsi)}});
+    // const resJson = await res.json();
+    // return resJson;
+    const resBlob = await res.blob();
+    return resBlob;
+}
+
+export async function creaRecordLOD4(id_main10ance) {
+    return;
+    // const res = await fetch('/g/Main10ance_DB/LOD4/aggiungi', {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(id_main10ance)});
+    // const resJson = await res.json();
+    // return resJson;
 }

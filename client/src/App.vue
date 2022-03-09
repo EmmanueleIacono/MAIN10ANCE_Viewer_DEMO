@@ -17,6 +17,7 @@
         <ul class="nav navbar-nav left tabs">
           <li @click="store.methods.setTabAttivo('Tab2')" :class="{active: store.state.tabAttivo==='Tab2'}" class="tab" id="apriTabGIS">GIS VIEWER</li>
           <li @click="store.methods.setTabAttivo('Tab1')" :class="{active: store.state.tabAttivo==='Tab1'}" class="tab" id="apriTabBIM">BIM VIEWER</li>
+          <li @click="store.methods.setTabAttivo('Tab5')" :class="{active: store.state.tabAttivo==='Tab5'}" class="tab" id="apriTabCollection">DETAIL VIEWER</li>
           <li @click="store.methods.setTabAttivo('Tab3')" :class="{active: store.state.tabAttivo==='Tab3'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabSchede">PLANNER</li>
           <li @click="store.methods.setTabAttivo('Tab4')" :class="{active: store.state.tabAttivo==='Tab4'}" v-if="store.getters.getUsrVwList().includes('apriTabDashboard')" class="tab" id="apriTabDashboard">DASHBOARD</li>
         </ul>
@@ -54,6 +55,7 @@ import Tab1 from './components/TabBIM.vue';
 import Tab2 from './components/TabGIS.vue';
 import Tab3 from './components/TabPlanner.vue';
 import Tab4 from './components/TabDashboard.vue';
+import Tab5 from './components/TabCollection.vue';
 import TabAuth from './components/TabAuth.vue';
 import Alert from './components/Alert.vue';
 import Confirm from './components/Confirm.vue';
@@ -66,6 +68,7 @@ export default {
     Tab2,
     Tab3,
     Tab4,
+    Tab5,
     TabAuth,
     Alert,
     Confirm,
