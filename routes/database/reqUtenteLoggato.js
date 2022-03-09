@@ -1,7 +1,7 @@
 const express = require('express');
-const appU = express.Router();
-appU.use(express.json());
-appU.use(express.static("public"));
+const app = express.Router();
+app.use(express.json());
+app.use(express.static("public"));
 
 const {clientServ} = require('./connessioni');
 
@@ -9,7 +9,7 @@ const {clientServ} = require('./connessioni');
 
 // per testare la richiesta:
 // fetch("l//utenti/mario", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appU.get(`/utenti/:username`, async (req, res) => {
+app.get(`/utenti/:username`, async (req, res) => {
     const username = req.params.username;
     const risp = await getInfoUtenteByNome(username);
     res.setHeader('content-type', 'application/json');
@@ -28,4 +28,4 @@ async function getInfoUtenteByNome(nome) {
     }
 }
 
-module.exports = appU;
+module.exports = app;

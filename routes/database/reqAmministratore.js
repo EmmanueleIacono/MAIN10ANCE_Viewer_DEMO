@@ -1,7 +1,7 @@
 const express = require('express');
-const appA = express.Router();
-appA.use(express.json());
-appA.use(express.static("public"));
+const app = express.Router();
+app.use(express.json());
+app.use(express.static("public"));
 
 const {clientM10a, clientServ} = require('./connessioni');
 
@@ -9,7 +9,7 @@ const {clientM10a, clientServ} = require('./connessioni');
 
 // per testare la richiesta:
 // fetch("/a/utenti", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appA.get('/utenti', async (req, res) => {
+app.get('/utenti', async (req, res) => {
     const users = await getUtenti();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(users));
@@ -17,13 +17,13 @@ appA.get('/utenti', async (req, res) => {
 
 // per testare la richiesta
 // fetch("/a/ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appA.get('/ruoli', async (req, res) => {
+app.get('/ruoli', async (req, res) => {
     const ruoli = await getListaRuoli();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(ruoli));
 });
 
-appA.patch('/ruoli/nuovo-ruolo', async (req, res) => {
+app.patch('/ruoli/nuovo-ruolo', async (req, res) => {
     let result = {}
     try {
         const reqJson = req.body;
@@ -41,7 +41,7 @@ appA.patch('/ruoli/nuovo-ruolo', async (req, res) => {
 
 // per testare la richiesta
 // fetch("/a/conteggio-ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appA.get('/conteggio-ruoli', async (req, res) => {
+app.get('/conteggio-ruoli', async (req, res) => {
     const ruoli = await conteggioRuoli();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(ruoli));
@@ -88,4 +88,4 @@ async function conteggioRuoli() {
     }
 }
 
-module.exports = appA;
+module.exports = app;

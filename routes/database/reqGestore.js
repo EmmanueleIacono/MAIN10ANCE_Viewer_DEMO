@@ -1,7 +1,7 @@
 const express = require('express');
-const appG = express.Router();
-appG.use(express.json());
-appG.use(express.static("public"));
+const app = express.Router();
+app.use(express.json());
+app.use(express.static("public"));
 
 const {clientM10a, clientServ} = require('./connessioni');
 
@@ -9,7 +9,7 @@ const {clientM10a, clientServ} = require('./connessioni');
 
 // per testare la richiesta:
 // fetch("/g/utenti/smv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/utenti/:progetto', async (req, res) => {
+app.get('/utenti/:progetto', async (req, res) => {
     const users = await getUtentiProgetto();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(users));
@@ -17,13 +17,13 @@ appG.get('/utenti/:progetto', async (req, res) => {
 
 // per testare la richiesta
 // fetch("/g/ruoli/smv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/ruoli/:progetto', async (req, res) => {
+app.get('/ruoli/:progetto', async (req, res) => {
     const ruoli = await getListaRuoliProgetto();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(ruoli));
 });
 
-appG.patch('/ruoli/nuovo-ruolo/:progetto', async (req, res) => {
+app.patch('/ruoli/nuovo-ruolo/:progetto', async (req, res) => {
     let result = {}
     try {
         const reqJson = req.body;
@@ -43,7 +43,7 @@ appG.patch('/ruoli/nuovo-ruolo/:progetto', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/g/Main10ance_DB/dashboard/numero-oggetti", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/Main10ance_DB/dashboard/numero-oggetti', async (req, res) => {
+app.get('/Main10ance_DB/dashboard/numero-oggetti', async (req, res) => {
     const reqJson = req.headers;
     const listaTabelle = reqJson.tabelle;
     const risposta = await leggiNumeroOggetti(listaTabelle);
@@ -53,7 +53,7 @@ appG.get('/Main10ance_DB/dashboard/numero-oggetti', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/g/Main10ance_DB/dashboard/conteggio-elementi", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/Main10ance_DB/dashboard/conteggio-elementi', async (req, res) => {
+app.get('/Main10ance_DB/dashboard/conteggio-elementi', async (req, res) => {
     const reqJson = req.headers;
     const listaTabelle = reqJson.tabelle;
     const listaAlias = reqJson.alias;
@@ -64,7 +64,7 @@ appG.get('/Main10ance_DB/dashboard/conteggio-elementi', async (req, res) => {
 
 // per testare la richiesta
 // fetch("/g/Main10ance_DB/dashboard/conteggio-ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/Main10ance_DB/dashboard/conteggio-ruoli', async (req, res) => {
+app.get('/Main10ance_DB/dashboard/conteggio-ruoli', async (req, res) => {
     const ruoli = await conteggioRuoliAmbito();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(ruoli));
@@ -72,7 +72,7 @@ appG.get('/Main10ance_DB/dashboard/conteggio-ruoli', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/g/DB_Servizio/LOD/TabelleBIM", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/DB_Servizio/LOD/TabelleBIM', async (req, res) => {
+app.get('/DB_Servizio/LOD/TabelleBIM', async (req, res) => {
     const tabelleBIM = await leggiListaTabelleBIM();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(tabelleBIM));
@@ -80,7 +80,7 @@ appG.get('/DB_Servizio/LOD/TabelleBIM', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/g/DB_Servizio/lista-localita", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/DB_Servizio/lista-localita', async (req, res) => {
+app.get('/DB_Servizio/lista-localita', async (req, res) => {
     const località = await getSigleSacriMonti();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(località));
@@ -88,7 +88,7 @@ appG.get('/DB_Servizio/lista-localita', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/g/Main10ance_DB/dashboard/conteggio-modelli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/Main10ance_DB/dashboard/conteggio-modelli', async (req, res) => {
+app.get('/Main10ance_DB/dashboard/conteggio-modelli', async (req, res) => {
     const reqJson = req.headers;
     const listaLocalità = reqJson.nomi;
     const listaSigle = reqJson.sigle;
@@ -99,7 +99,7 @@ appG.get('/Main10ance_DB/dashboard/conteggio-modelli', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/g/DB_Servizio/sigle-edifici", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/DB_Servizio/sigle-edifici', async (req, res) => {
+app.get('/DB_Servizio/sigle-edifici', async (req, res) => {
     const edifici = await getSigleEdifici();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(edifici));
@@ -107,7 +107,7 @@ appG.get('/DB_Servizio/sigle-edifici', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/g/Main10ance_DB/frasi-rischio", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/Main10ance_DB/frasi-rischio', async (req, res) => {
+app.get('/Main10ance_DB/frasi-rischio', async (req, res) => {
     const frasi = await getFrasiDiRischio();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(frasi));
@@ -115,7 +115,7 @@ appG.get('/Main10ance_DB/frasi-rischio', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/g/DB_Servizio/entita-oggetti", {method: "GET", headers: {"content-type": "application/json", "cl_ogg": "3.1 superfici interne"} }).then(a => a.json()).then(console.log)
-appG.get('/DB_Servizio/entita-oggetti', async (req, res) => {
+app.get('/DB_Servizio/entita-oggetti', async (req, res) => {
     const reqJson = req.headers;
     const cl_ogg = reqJson.cl_ogg;
     const entità = await getEntitàDaClOgg(cl_ogg);
@@ -125,7 +125,7 @@ appG.get('/DB_Servizio/entita-oggetti', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/g/Main10ance_DB/lista-identificativi", {method: "GET", headers: {"content-type": "application/json", "entità": "tetto", "id_parziale": "SMV|16-24|tetto|"} }).then(a => a.json()).then(console.log)
-appG.get('/Main10ance_DB/lista-identificativi', async (req, res) => {
+app.get('/Main10ance_DB/lista-identificativi', async (req, res) => {
     const reqJson = req.headers;
     const ent = reqJson.entita;
     const id = reqJson.id_parziale;
@@ -134,7 +134,7 @@ appG.get('/Main10ance_DB/lista-identificativi', async (req, res) => {
     res.send(JSON.stringify(frasi));
 });
 
-appG.post('/Main10ance_DB/pianificazione/rischi', async (req, res) => {
+app.post('/Main10ance_DB/pianificazione/rischi', async (req, res) => {
     const result = {};
     try {
         const reqJson = req.body;
@@ -150,7 +150,7 @@ appG.post('/Main10ance_DB/pianificazione/rischi', async (req, res) => {
     }
 });
 
-appG.post('/Main10ance_DB/programmazione/nuovi-controlli', async (req, res) => {
+app.post('/Main10ance_DB/programmazione/nuovi-controlli', async (req, res) => {
     let result = {}
     try {
         const reqJson = req.body;
@@ -166,7 +166,7 @@ appG.post('/Main10ance_DB/programmazione/nuovi-controlli', async (req, res) => {
     }
 });
 
-appG.get('/Main10ance_DB/integrazione/attivita-per-integrazione', async (req, res) => {
+app.get('/Main10ance_DB/integrazione/attivita-per-integrazione', async (req, res) => {
     const reqJson = req.headers;
     const bool = JSON.parse(reqJson.bool);
     const resp = await leggiAttProgPerIntegrazione(bool);
@@ -174,7 +174,7 @@ appG.get('/Main10ance_DB/integrazione/attivita-per-integrazione', async (req, re
     res.send(JSON.stringify(resp));
 });
 
-appG.patch('/Main10ance_DB/integrazione/integrazione-attivita', async (req, res) => {
+app.patch('/Main10ance_DB/integrazione/integrazione-attivita', async (req, res) => {
     const result = {};
     try {
         const reqJson = req.body;
@@ -465,7 +465,7 @@ async function registraNuoviControlli(listaReqJson) {
 
 // per testare la richiesta:
 // fetch("/g/utenti-provv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appG.get('/utenti-provv', async (req, res) => {
+app.get('/utenti-provv', async (req, res) => {
     const users = await getUtentiProvv();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(users));
@@ -482,4 +482,4 @@ async function getUtentiProvv() {
     }
 }
 
-module.exports = appG;
+module.exports = app;

@@ -2,13 +2,15 @@
 <div v-if="store.getters.getUsrVwList().includes('apriTabSchede')">
   <MainPanel :colonna="'col-sm-7'">
     <br />
-    <ViewerPlanner />
-    <br />
-    <br />
-    <br />
-    <Pianificazione @pianificazioneAggiornata="aggiornaEventi" />
-    <Integrazione @integrazioneAggiornata="aggiornaEventi" ref="IntegrazioneRef" />
-    <ExTempore />
+    <div v-if="store.getters.getUsrVwList().includes('pianificazione')">
+      <ViewerPlanner />
+      <br />
+      <br />
+      <br />
+      <Pianificazione @pianificazioneAggiornata="aggiornaEventi" />
+      <Integrazione @integrazioneAggiornata="aggiornaEventi" ref="IntegrazioneRef" />
+      <ExTempore />
+    </div>
     <Esecuzione ref="EsecuzioneRef" />
     <Storico />
   </MainPanel>

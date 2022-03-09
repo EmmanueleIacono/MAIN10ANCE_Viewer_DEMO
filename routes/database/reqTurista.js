@@ -1,7 +1,7 @@
 const express = require('express');
-const appT = express.Router();
-appT.use(express.json());
-appT.use(express.static("public"));
+const app = express.Router();
+app.use(express.json());
+app.use(express.static("public"));
 
 const {clientM10a, clientServ} = require('./connessioni');
 
@@ -9,7 +9,7 @@ const {clientM10a, clientServ} = require('./connessioni');
 
 // per testare la richiesta:
 // fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "geometria": "geom_pol", "colonneUtili": ["bosco_gov", "bosco_ty"]} }).then(a => a.json()).then(console.log)
-appT.get('/Main10ance_DB/GIS', async (req, res) => {
+app.get('/Main10ance_DB/GIS', async (req, res) => {
     const reqJson = req.headers;
     const rispostaGIS = await leggiGIS(reqJson.tabella, reqJson.geometria, reqJson.colonneutili); //N.B.: scrivo "colonneutili" tutto minuscolo perché arriva così dagli headers della richiesta
     res.setHeader('content-type', 'application/json');
@@ -18,7 +18,7 @@ appT.get('/Main10ance_DB/GIS', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/t/DB_Servizio/MarkerLoc", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appT.get('/DB_Servizio/MarkerLoc', async (req, res) => {
+app.get('/DB_Servizio/MarkerLoc', async (req, res) => {
     const markerSacriMonti = await leggiMarkerLoc();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(markerSacriMonti));
@@ -26,7 +26,7 @@ appT.get('/DB_Servizio/MarkerLoc', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/t/DB_Servizio/MarkerEdif", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appT.get('/DB_Servizio/MarkerEdif', async (req, res) => {
+app.get('/DB_Servizio/MarkerEdif', async (req, res) => {
     const markerCappelle = await leggiMarkerEdif();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(markerCappelle));
@@ -34,7 +34,7 @@ appT.get('/DB_Servizio/MarkerEdif', async (req, res) => {
 
 // per testare la richiesta:
 // fetch("/t/DB_Servizio/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appT.get('/DB_Servizio/LOD/TabelleGIS', async (req, res) => {
+app.get('/DB_Servizio/LOD/TabelleGIS', async (req, res) => {
     const tabelleGIS = await leggiListaTabelleGIS();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(tabelleGIS));
@@ -82,4 +82,4 @@ async function leggiListaTabelleGIS() {
     }
 }
 
-module.exports = appT;
+module.exports = app;
