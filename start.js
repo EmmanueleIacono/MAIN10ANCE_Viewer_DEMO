@@ -25,9 +25,9 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 if (process.env.NODE_ENV === 'production') {
     // app.use(cors());
     app.use(express.static('client/dist'));
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
-    });
+    // app.get('*', (req, res) => {
+    //     res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
+    // });
 }
 else {
     app.use(express.static(path.join(__dirname, 'public')));
