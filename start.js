@@ -23,6 +23,7 @@ let app = express();
 app.use(cookieParser(process.env.COOKIE_SECRET));
 // per deploy
 if (process.env.NODE_ENV === 'production') {
+    app.use(cors());
     app.use(express.static('client/dist'));
     app.get('*', (req, res) => {
         res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
