@@ -3,10 +3,10 @@
   <MainPanel :colonna="'col-sm-7'">
     <br />
     <div v-if="store.getters.getUsrVwList().includes('pianificazione')">
-      <ViewerPlanner />
+      <ViewerPlanner v-if="false" />
+      <!-- <br />
       <br />
-      <br />
-      <br />
+      <br /> -->
       <Pianificazione @pianificazioneAggiornata="aggiornaEventi" />
       <Integrazione @integrazioneAggiornata="aggiornaEventi" ref="IntegrazioneRef" />
       <ExTempore />
