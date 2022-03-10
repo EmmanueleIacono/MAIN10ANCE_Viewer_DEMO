@@ -21,7 +21,16 @@ const {controllaLoggedIn, consentiAccesso, controllaRuoli} = require('./routes/a
 let app = express();
 // app.use(cors());
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(express.static(path.join(__dirname, 'public')));
+// per deploy
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static('client/dist'));
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
+    });
+}
+else {
+    app.use(express.static(path.join(__dirname, 'public')));
+}
 app.use(express.json({ limit: '50mb' }));
 app.use('/api/forge/oauth', require('./routes/oauth'));
 app.use('/api/forge/oss', require('./routes/oss'));
@@ -36,12 +45,5 @@ app.use((err, req, res, next) => {
     console.error(err);
     res.status(err.statusCode).json(err);
 });
-// per deploy
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static('client/dist'));
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
-    });
-}
 
 app.listen(PORT, () => { console.log(`Server in ascolto sulla porta ${PORT}`); });
