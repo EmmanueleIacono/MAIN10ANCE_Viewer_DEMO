@@ -17,7 +17,7 @@
         <ul class="nav navbar-nav left tabs">
           <li @click="store.methods.setTabAttivo('Tab2')" :class="{active: store.state.tabAttivo==='Tab2'}" class="tab" id="apriTabGIS">GIS VIEWER</li>
           <li @click="store.methods.setTabAttivo('Tab1')" :class="{active: store.state.tabAttivo==='Tab1'}" class="tab" id="apriTabBIM">BIM VIEWER</li>
-          <li @click="store.methods.setTabAttivo('Tab5')" :class="{active: store.state.tabAttivo==='Tab5'}" class="tab" id="apriTabCollection">DETAIL VIEWER</li>
+          <li @click="store.methods.setTabAttivo('Tab5')" :class="{active: store.state.tabAttivo==='Tab5'}" v-if="false" class="tab" id="apriTabCollection">DETAIL VIEWER</li>
           <li @click="store.methods.setTabAttivo('Tab3')" :class="{active: store.state.tabAttivo==='Tab3'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabSchede">PLANNER</li>
           <li @click="store.methods.setTabAttivo('Tab4')" :class="{active: store.state.tabAttivo==='Tab4'}" v-if="store.getters.getUsrVwList().includes('apriTabDashboard')" class="tab" id="apriTabDashboard">DASHBOARD</li>
         </ul>

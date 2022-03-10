@@ -11,7 +11,7 @@
     </div>
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
-    fare qualcosa qui, magari filtri o altro
+    Work In Progress
   </Explorer>
 </div>
 </template>

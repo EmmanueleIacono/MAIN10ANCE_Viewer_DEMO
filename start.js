@@ -35,10 +35,13 @@ app.use('/a', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_4), reqAmmin
 app.use((err, req, res, next) => {
     console.error(err);
     res.status(err.statusCode).json(err);
-    // LA PARTE SOTTO ARRIVA DAL TUTORIAL, NON SO SE USARLA -> ALTERNATIVA A RIGA SOPRA, CHE INVECE ARRIVA DA TUTORIAL FORGE
-    // res.status(err.statusCode || res.statusCode || 500);
-    // res.json({
-    //         message: err.message,
-    //     });
 });
+// per deploy
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static('client/dist'));
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
+    });
+}
+
 app.listen(PORT, () => { console.log(`Server in ascolto sulla porta ${PORT}`); });
