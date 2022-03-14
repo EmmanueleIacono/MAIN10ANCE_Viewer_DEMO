@@ -62,6 +62,7 @@ app.get('/storage/img-download', async (req, res) => {
     const lista = JSON.parse(reqJson.lista);
     const listaImmagini = await downloadImmagini(lista);
     // res.setHeader('content-type', 'application/json');
+    res.setHeader('content-type', 'application/octet-stream');
     res.send(listaImmagini);
 });
 
