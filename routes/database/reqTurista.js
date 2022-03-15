@@ -3,7 +3,8 @@ const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
 
-const {clientM10a, clientServ} = require('./connessioni');
+const {clientM10a} = require('./connessioni');
+const {ambito} = require('./ambito');
 const {supabase} = require('../../supabase_config');
 
 //////////          RICHIESTE          //////////
@@ -61,8 +62,11 @@ app.get('/storage/img-download', async (req, res) => {
     const reqJson = req.headers;
     const lista = JSON.parse(reqJson.lista);
     const listaImmagini = await downloadImmagini(lista);
+    const type = listaImmagini.type;
+    console.log(listaImmagini.type);
     // res.setHeader('content-type', 'application/json');
-    res.setHeader('content-type', 'application/octet-stream');
+    // res.setHeader('content-type', 'application/octet-stream');
+    res.setHeader('content-type', type);
     res.send(listaImmagini);
 });
 
@@ -70,7 +74,7 @@ app.get('/storage/img-download', async (req, res) => {
 
 async function leggiGIS(tabella, geometria, colonneUtili) {
     try {
-        const result = await clientM10a.query(`SELECT ST_AsGeoJSON(${geometria}) AS "geom", CONCAT_WS(', ', ${colonneUtili}) AS "info" FROM main10ance_sacrimonti.${tabella};`);
+        const result = await clientM10a.query(`SELECT ST_AsGeoJSON(${geometria}) AS "geom", CONCAT_WS(', ', ${colonneUtili}) AS "info" FROM ${ambito}.${tabella};`);
         return result.rows;
     }
     catch(e) {
@@ -80,7 +84,7 @@ async function leggiGIS(tabella, geometria, colonneUtili) {
 
 async function leggiMarkerLoc() {
     try {
-        const results = await clientServ.query(`SELECT * FROM "dati_sm" ORDER BY "nome";`);
+        const results = await clientM10a.query(`SELECT * FROM servizio."dati_sm" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {
@@ -90,7 +94,7 @@ async function leggiMarkerLoc() {
 
 async function leggiMarkerEdif() {
     try {
-        const results = await clientServ.query(`SELECT * FROM "dati_cappelle" ORDER BY CAST("numero" AS INTEGER);`);
+        const results = await clientM10a.query(`SELECT * FROM servizio."dati_cappelle" ORDER BY CAST("numero" AS INTEGER);`);
         return results.rows;
     }
     catch(e) {
@@ -100,7 +104,7 @@ async function leggiMarkerEdif() {
 
 async function leggiListaTabelleGIS() {
     try {
-        const results = await clientServ.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias", "geometria", "colonne_utili" AS "colonneUtili" FROM "lod" WHERE "BIM-GIS" = 'GIS' ORDER BY "alias";`);
+        const results = await clientM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias", "geometria", "colonne_utili" AS "colonneUtili" FROM servizio."lod" WHERE "BIM-GIS" = 'GIS' ORDER BY "alias";`);
         return results.rows;
     }
     catch(e) {
@@ -110,7 +114,7 @@ async function leggiListaTabelleGIS() {
 
 async function leggiListaTabelleLOD(LOD) {
     try {
-        const results = await clientServ.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM "lod" WHERE "LOD" = ($1) ORDER BY "alias";`, [LOD]);
+        const results = await clientM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM servizio."lod" WHERE "LOD" = ($1) ORDER BY "alias";`, [LOD]);
         return results.rows;
     }
     catch(e) {

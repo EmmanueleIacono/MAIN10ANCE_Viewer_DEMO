@@ -1,32 +1,32 @@
 const { Client } = require('pg');
 
 const clientM10a = new Client({
-    connectionString: process.env.MAIN10ANCE_DB_LOCALE,
+    connectionString: process.env.MAIN10ANCE_DB,
     // ssl: { rejectUnauthorized: false }
 });
 
-const clientServ = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-});
+// const clientServ = new Client({
+//     connectionString: process.env.DATABASE_URL,
+//     ssl: { rejectUnauthorized: false }
+// });
 
 //////////          AVVIO SERVER          //////////
 
 start();
 
 async function start() {
-    await connect(clientM10a, 'Connessione al database Main10ance');
-    await connect(clientServ, 'Connessione al database di servizio');
+    await connect(clientM10a, 'Main10ance');
+    // await connect(clientServ, 'di servizio');
 }
 
-async function connect(client, msg) {
+async function connect(client, nomeDb) {
     try {
         await client.connect();
-        console.log(`${msg} riuscita`);
+        console.log(`Connessione al database ${nomeDb} riuscita`);
     }
     catch(e) {
-        console.error(`${msg} fallita: ${e}`);
+        console.error(`Connessione al database ${nomeDb} fallita: ${e}`);
     }
 }
 
-module.exports = {clientM10a, clientServ}
+module.exports = {clientM10a}

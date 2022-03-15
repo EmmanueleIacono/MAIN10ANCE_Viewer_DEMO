@@ -3,7 +3,7 @@ const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
 
-const {clientServ} = require('./connessioni');
+const {clientM10a} = require('./connessioni');
 
 //////////          RICHIESTE          //////////
 
@@ -20,7 +20,7 @@ app.get(`/utenti/:username`, async (req, res) => {
 
 async function getInfoUtenteByNome(nome) {
     try {
-        const results = await clientServ.query(`SELECT "user" AS "username", "ruolo" AS "role" FROM "utenti" WHERE "user" = ($1);`, [nome]);
+        const results = await clientM10a.query(`SELECT "user" AS "username", "ruolo" AS "role" FROM servizio."utenti" WHERE "user" = ($1);`, [nome]);
         return results.rows[0];
     }
     catch(e) {

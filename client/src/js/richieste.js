@@ -250,10 +250,12 @@ export async function getListaImmagini(percorso) {
 }
 
 export async function downloadImmagini(listaPercorsi) {
-    const res = await fetch('/t/storage/img-download', {method: "GET", headers: {"content-type": "application/json", "lista": JSON.stringify(listaPercorsi)}});
+    const res = await fetch('/t/storage/img-download', {method: "GET", headers: {"lista": JSON.stringify(listaPercorsi)}});
     // const resJson = await res.json();
     // return resJson;
+    console.log(res);
     const resBlob = await res.blob();
+    console.log(resBlob);
     return resBlob;
 }
 
