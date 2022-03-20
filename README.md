@@ -24,5 +24,5 @@ Deployed: <https://main10ance-app-demo-v1.herokuapp.com/>
 
 ### DEMO 2
 Seconda versione dell'app.  
-Branch: **main10ance-app-v2**  
-Deployed: N/A  
+Branch: **main10ance-vue-conversion**  
+Deployed: <https://main10ance-app-demo-v2.herokuapp.com/>  
