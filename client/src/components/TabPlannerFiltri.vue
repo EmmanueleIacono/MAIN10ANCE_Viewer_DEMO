@@ -103,7 +103,7 @@ export default {
     });
 
     watch(() => state.selectLocalità, async newVal => {
-      const listaEdifFiltrata = store.statePlanner.listaEdif.filter(ed => ed.sacro_monte === newVal);
+      const listaEdifFiltrata = store.statePlanner.listaEdif.filter(ed => ed.località === newVal);
       state.listaEdifFiltrata = listaEdifFiltrata;
       if (listaEdifFiltrata[0]) state.selectEdificio = listaEdifFiltrata[0].numero;
     });
@@ -128,10 +128,10 @@ export default {
     });
 
     function inizializzaSelect() {
-      state.selectLocalità = store.statePlanner.listaSigleLoc[0].sigla;
-      state.selectElemento = store.statePlanner.listaElementi[0].tabella;
-      state.selectStCons = store.statePlanner.listaStCons[0].unnest;
-      state.selectFenomeno = store.statePlanner.listaFenomeni[0].id_gloss;
+      if (store.statePlanner.listaSigleLoc.length) state.selectLocalità = store.statePlanner.listaSigleLoc[0].sigla;
+      if (store.statePlanner.listaElementi.length) state.selectElemento = store.statePlanner.listaElementi[0].tabella;
+      if (store.statePlanner.listaStCons.length) state.selectStCons = store.statePlanner.listaStCons[0].unnest;
+      if (store.statePlanner.listaFenomeni.length) state.selectFenomeno = store.statePlanner.listaFenomeni[0].id_gloss;
     }
 
     function attivaTutto(tutto) {

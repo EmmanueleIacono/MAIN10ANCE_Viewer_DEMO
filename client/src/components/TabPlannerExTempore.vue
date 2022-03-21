@@ -126,7 +126,7 @@ export default {
     });
 
     watch(() => state.selectLocalità, newVal => {
-      const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.sacro_monte === newVal);
+      const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.località === newVal);
       state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
       state.listaSigleEdificiSelezionati = [];
     });

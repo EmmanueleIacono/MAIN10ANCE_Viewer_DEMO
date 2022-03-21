@@ -278,7 +278,7 @@ async function leggiListaTabelleBIM() {
 
 async function getSigleSacriMonti() {
     try {
-        const results = await clientM10a.query(`SELECT "nome", "sigla" FROM servizio."dati_sm" ORDER BY "nome";`);
+        const results = await clientM10a.query(`SELECT "nome", "sigla" FROM servizio."dati_località" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {
@@ -291,7 +291,7 @@ async function conteggioModelli(listaLocalità, listaSigle) {
     const listaSigs = JSON.parse(listaSigle);
     let listaStringhe = [];
     for (let i=0; i<listaLocs.length; i++) {
-        const stringa = `SELECT COUNT(DISTINCT "urn"), '${listaLocs[i]}' AS nome_tabella FROM servizio."dati_cappelle" WHERE "sacro_monte" = '${listaSigs[i]}'`;
+        const stringa = `SELECT COUNT(DISTINCT "urn"), '${listaLocs[i]}' AS nome_tabella FROM servizio."dati_edifici" WHERE "località" = '${listaSigs[i]}'`;
         listaStringhe.push(stringa);
     }
     const stringheJoin = listaStringhe.join(' UNION ');
@@ -306,7 +306,7 @@ async function conteggioModelli(listaLocalità, listaSigle) {
 
 async function getSigleEdifici() {
     try {
-        const results = await clientM10a.query(`SELECT DISTINCT "edificio", "sacro_monte" FROM servizio."dati_cappelle" WHERE "urn" IS NOT null ORDER BY "edificio";`);
+        const results = await clientM10a.query(`SELECT DISTINCT "edificio", "località" FROM servizio."dati_edifici" WHERE "urn" IS NOT null ORDER BY "edificio";`);
         return results.rows;
     }
     catch(e) {

@@ -84,7 +84,7 @@ async function leggiGIS(tabella, geometria, colonneUtili) {
 
 async function leggiMarkerLoc() {
     try {
-        const results = await clientM10a.query(`SELECT * FROM servizio."dati_sm" ORDER BY "nome";`);
+        const results = await clientM10a.query(`SELECT * FROM servizio."dati_località" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {
@@ -94,7 +94,7 @@ async function leggiMarkerLoc() {
 
 async function leggiMarkerEdif() {
     try {
-        const results = await clientM10a.query(`SELECT * FROM servizio."dati_cappelle" ORDER BY CAST("numero" AS INTEGER);`);
+        const results = await clientM10a.query(`SELECT * FROM servizio."dati_edifici" ORDER BY CAST("numero" AS INTEGER);`);
         return results.rows;
     }
     catch(e) {

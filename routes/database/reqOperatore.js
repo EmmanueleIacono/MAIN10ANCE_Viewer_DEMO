@@ -385,7 +385,7 @@ async function leggiEventiManutenzioneCorrettiva() {
 
 async function recuperaUrnLOD3(sm, capp) {
     try {
-        const results = await clientM10a.query(`SELECT "urn" FROM servizio."dati_cappelle" WHERE "sacro_monte" = ($1) AND "numero" = ($2);`, [sm, capp]);
+        const results = await clientM10a.query(`SELECT "urn" FROM servizio."dati_edifici" WHERE "località" = ($1) AND "numero" = ($2);`, [sm, capp]);
         return results.rows;
     }
     catch(e) {
@@ -395,7 +395,7 @@ async function recuperaUrnLOD3(sm, capp) {
 
 async function recuperaUrnLOD2(loc) {
     try {
-        const results = await clientM10a.query(`SELECT "urn" FROM servizio."dati_sm" WHERE "sigla" = ($1);`, [loc]);
+        const results = await clientM10a.query(`SELECT "urn" FROM servizio."dati_località" WHERE "sigla" = ($1);`, [loc]);
         return results.rows;
     }
     catch(e) {

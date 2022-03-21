@@ -31,7 +31,7 @@ export default {
     const stateDownload = inject(props.stateUD);
 
     watch(() => stateDownload.selectLocalità, async newVal => {
-      const listaEdifFiltrata = stateDownload.listaEdif.filter(ed => ed.sacro_monte === newVal);
+      const listaEdifFiltrata = stateDownload.listaEdif.filter(ed => ed.località === newVal);
       stateDownload.listaEdifFiltrata = listaEdifFiltrata;
       if (listaEdifFiltrata[0]) stateDownload.selectEdificio = listaEdifFiltrata[0].numero;
       else stateDownload.selectEdificio = '';

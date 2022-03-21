@@ -24,7 +24,7 @@ let listaFrasiDiRischio;
 selectSMProg.addEventListener('change', () => {
     divEdifProg.innerHTML = '';
     listaSigleEdifici.forEach(s => {
-        if (s.sacro_monte === selectSMProg.value) {
+        if (s.località === selectSMProg.value) {
             creaCheckbox(divEdifProg, s.edificio, s.edificio);
             divEdifProg.appendChild(document.createElement('br'));
         }

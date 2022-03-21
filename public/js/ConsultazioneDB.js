@@ -236,7 +236,8 @@ async function prendiSacriMonti() {
 
         sacriMontiJson.forEach((smjson) => {
             const opzioneSM = document.createElement('option');
-            opzioneSM.setAttribute('value', `${smjson.sigla}-${smjson.n_cappelle}`);
+            // opzioneSM.setAttribute('value', `${smjson.sigla}-${smjson.n_cappelle}`);
+            opzioneSM.setAttribute('value', `${smjson.sigla}-${smjson.n_edifici}`);
             opzioneSM.innerHTML = smjson.nome;
             selectSM.appendChild(opzioneSM);
         });

@@ -166,7 +166,7 @@ inputDataA.addEventListener('change', () => {
 selectSacroMonte.addEventListener('change', () => {
     selectCappella.innerHTML = '';
     listaSigleNumericheCappelle.forEach(s => {
-        if (s.sacro_monte === selectSacroMonte.value) {
+        if (s.località === selectSacroMonte.value) {
             const opz = document.createElement('option');
             opz.setAttribute('value', s.numero);
             opz.innerHTML = s.nome;
