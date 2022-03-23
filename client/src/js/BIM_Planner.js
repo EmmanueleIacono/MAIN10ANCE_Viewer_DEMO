@@ -39,6 +39,7 @@ function launchViewer(urn, opzioniPostLoading) {
                 });
             }
             viewer.start();
+            Autodesk.Viewing.endpoint.HTTP_REQUEST_HEADERS['If-Modified-Since'] = 'Sat, 29 Oct 1994 19:43:31 GMT'; // fix bug vecchi MANIFEST con stesso nome modello
             const documentId = 'urn:' + urn;
             Autodesk.Viewing.Document.load(documentId, doc => {onDocumentLoadSuccess(doc, urn)}, onDocumentLoadFailure);
         });
