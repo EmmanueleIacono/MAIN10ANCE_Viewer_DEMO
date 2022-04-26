@@ -56,7 +56,7 @@
         </div>
         <br>
         <div class="flt-dx">
-          <button @click="cancel" title="Annulla inserimento" class="btn"><i class="zmdi zmdi-close-circle"></i></button>
+          <button @click="cancel" title="Annulla inserimento" class="btn"><i class="zmdi zmdi-close"></i></button>
           <button v-if="ImagesUrl" @click="uploadImage" title="Salva un file in questa cartella" id="single" class="btn"><i class="zmdi zmdi-floppy" style="margin-right:10px;"></i>
             <label htmlFor="single"><span>Salva file</span></label>
           </button>

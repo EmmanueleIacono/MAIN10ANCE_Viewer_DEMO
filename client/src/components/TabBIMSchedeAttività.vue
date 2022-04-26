@@ -77,18 +77,26 @@
         <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Documenti']"></td>
       </tr>
     </table>
-    <button @click="salvaAttività" :class="tipoClass" class="bottone-main10ance">SALVA</button>
+    <div class="div-bottoni">
+      <!-- <button @click="salvaAttività" :class="tipoClass" class="bottone-main10ance">SALVA</button> -->
+      <BtnBIM @click="chiudiAttReset" class="btn-bim" icona="glyphicon-floppy-remove" nome="chiudiSchedaAtt" title="Chiudi" colore="verde" />
+      <BtnBIM @click="salvaAttività" class="btn-bim" icona="glyphicon-floppy-saved" nome="salvaSchedaAtt" title="Salva" colore="verde" />
+    </div>
   </div>
 </template>
 
 <script>
 import {inject, onMounted, reactive, computed, toRefs, watch} from 'vue';
 import {leggiEnum, prendiFrequenzaAttProg, registraAttivitàEseguita} from '../js/richieste';
-import {aggiornaPlanner, aggiungiMesi, dataCorta, dataInteger} from '../js/shared';
+import {aggiornaPlanner, aggiungiMesi, dataCorta, dataInteger, chiudiAttività} from '../js/shared';
 import { cambiaColore, cercaElementiDaScheda, getElementiSelezionati, getIdM10AFromSelezione, resetColori, resetVista } from '../js/BIM';
+import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 
 export default {
   name: 'TabBIMSchedeAttività',
+  components: {
+    BtnBIM,
+  },
   setup() {
     const store = inject('store');
     const state = reactive({
@@ -169,6 +177,20 @@ export default {
       else {
         store.methods.setAlert("ATTENZIONE: L'operazione non è andata a buon fine. Riprovare");
       }
+    }
+
+    // function chiudiAttività() {
+    //   store.stateBIM.schedeAttivitàVisibile = false;
+    //   store.stateBIM.elementiDaSchedare = [];
+    //   store.stateBIM.schedeAttivitàTipo = '';
+    //   store.statePlanner.datiSchedaInCompilazione = {};
+    //   resetColori();
+    //   resetVista();
+    // }
+    function chiudiAttReset() {
+      chiudiAttività();
+      resetVista();
+      store.stateBIM.elementiSelezionati = null;
     }
 
     async function raccogliDati(selezione) {
@@ -272,6 +294,7 @@ export default {
       ...toRefs(state),
       tipoClass,
       salvaAttività,
+      chiudiAttReset,
     }
   }
 }
@@ -281,7 +304,13 @@ export default {
 table {
   width: 100%;
 }
-button {
+
+/* button {
+  float: right;
+  margin-right: 0;
+} */
+
+.div-bottoni {
   float: right;
   margin-right: 0;
 }
@@ -330,5 +359,13 @@ table.controllo, table.manutenzione-regolare {
 }
 table.manutenzione-correttiva, table.manutenzione-straordinaria, table.restauro {
   background-color: var(--gialloInterventoTrasparenza);
+}
+
+.btn-bim {
+  margin-top: 10px;
+}
+
+.btn-bim ~ .btn-bim {
+  margin-left: .9rem;
 }
 </style>

@@ -61,7 +61,7 @@ export default {
       store.stateBIM.elementiDaSchedare = listaIdM10a;
       store.stateBIM.schedeAttivitàTipo = props.tipo;
       store.stateBIM.schedeAttivitàVisibile = true;
-      store.statePlanner.datiSchedaInCompilazione = props.dati;
+      store.statePlanner.datiSchedaInCompilazione = JSON.parse(JSON.stringify(props.dati));
     }
 
     return {

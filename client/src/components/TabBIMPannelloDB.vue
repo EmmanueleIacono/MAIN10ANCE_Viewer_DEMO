@@ -21,6 +21,7 @@
 <script>
 import {inject, reactive, watch, ref} from 'vue';
 import {resetVista, cercaSelezionaId, getElementiSelezionati, getIdM10AFromSelezione, focusVista} from '../js/BIM';
+import {chiudiAttività} from '../js/shared';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 import Details from './elementi/Details.vue';
 import SchedeDB from './TabBIMSchedeRisultati.vue';
@@ -90,6 +91,7 @@ export default {
 
     async function aggiungi() {
       store.stateBIM.schedeRisultatiVisibile = false;
+      chiudiAttività();
       const elementiPronti = await preparaElementi();
       if (elementiPronti) {
         store.stateBIM.schedeModuliVisibile = true;
