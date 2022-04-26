@@ -4,9 +4,10 @@
     <Details summary="GALLERY" :open="true">
       <br>
       <div class="col-lg-12 loading-wrapper">
+        <button @click="downloadImmagini('SMV/1/arredo/220217110100856.jpg')">test richiesta</button>
         <CreaPercorso :stateUD="'stateDownload'"/>
         <LoadingScreen :caricamento="caricamento" />
-        <div v-if="urls.length" class="image-grid">
+        <div v-if="/*urls.length*/true" class="image-grid">
           <img :src="url.object" @click="isSelected(url.percorso)" v-for="(url) in urls" :key="url.percorso" :class="percorsiSelezionati.includes(url.percorso) ? 'bordo-verde' : ''">
         </div>
         <br>
@@ -119,7 +120,7 @@ export default {
 
     watch(() => state.ImagesUrl, async newImgUrl => {
       state.urls = [];
-      state.caricamento = true;
+      // state.caricamento = true;
       console.log(newImgUrl);
       const fileImmagine = await downloadImmagini(newImgUrl[0]);
       console.log(fileImmagine);
@@ -209,6 +210,7 @@ export default {
       deselectImage,
       // deleteImage,
       cancel,
+      downloadImmagini,
     }
   }
 }
