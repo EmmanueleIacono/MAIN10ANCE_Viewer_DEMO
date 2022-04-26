@@ -61,6 +61,12 @@ router.post('/login', async (req, res, next) => {
                     signed: true,
                     expires: scadenza
                 });
+                res.cookie('ambito', datiUtente.ambito, {
+                    httpOnly: true,
+                    secure: (!process.env.DEV_PLACEHOLDER),
+                    signed: true,
+                    expires: scadenza
+                });
                 res.json({
                     message: 'Login completato',
                     id: datiUtente.username,
@@ -84,6 +90,7 @@ router.post('/login', async (req, res, next) => {
 router.get('/logout', (req, res) => {
     res.clearCookie('user_id');
     res.clearCookie('role');
+    res.clearCookie('ambito');
     res.json({
         message: 'Logout avvenuto con successo'
     });
@@ -102,7 +109,7 @@ function validazioneUsers(user) {
 
 async function getUtenteByNome(nome) {
     try {
-        const results = await clientM10a.query(`SELECT "user" AS "username", "pw", "ruolo" AS "role" FROM servizio."utenti" WHERE "user" = ($1);`, [nome]);
+        const results = await clientM10a.query(`SELECT "user" AS "username", "pw", "ruolo" AS "role", "ambito" FROM servizio."utenti" WHERE "user" = ($1);`, [nome]);
         return results.rows[0];
     }
     catch(e) {
