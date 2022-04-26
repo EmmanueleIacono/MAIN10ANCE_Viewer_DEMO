@@ -179,14 +179,6 @@ export default {
       }
     }
 
-    // function chiudiAttività() {
-    //   store.stateBIM.schedeAttivitàVisibile = false;
-    //   store.stateBIM.elementiDaSchedare = [];
-    //   store.stateBIM.schedeAttivitàTipo = '';
-    //   store.statePlanner.datiSchedaInCompilazione = {};
-    //   resetColori();
-    //   resetVista();
-    // }
     function chiudiAttReset() {
       chiudiAttività();
       resetVista();

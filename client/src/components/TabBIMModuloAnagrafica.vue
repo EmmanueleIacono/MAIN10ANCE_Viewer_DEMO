@@ -38,13 +38,13 @@
     <input v-model="fonti" :disabled="schedaRegistrata">
     <br />
   </div>
-  <button @click="preparaPDF" v-if="schedaRegistrata" id="apriPDF" class="float-dx"><b>VISUALIZZA REPORT</b></button>
+  <!-- <button @click="preparaPDF" v-if="schedaRegistrata" id="apriPDF" class="float-dx"><b>VISUALIZZA REPORT</b></button> -->
 </div>
 </template>
 
 <script>
 import { inject, reactive, toRefs, computed, ref } from 'vue';
-import {fitToViewImmediato} from '../js/BIM';
+// import {fitToViewImmediato} from '../js/BIM';
 import {dataCorta, dataInteger} from '../js/shared';
 import {compilaScheda} from '../js/richieste';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
@@ -87,8 +87,9 @@ export default {
         const jsonReq = impostaOggetti(Object.entries(state), store.stateBIM.elementiSelezionati);
         const resp = await compilaScheda(jsonReq);
         if (resp.success) {
-          schedaRegistrata.value = true;
+          // schedaRegistrata.value = true;
           store.methods.setAlert('Operazione andata a buon fine');
+          chiudiScheda();
         }
         else {
           store.methods.setAlert('Operazione non riuscita');
@@ -153,15 +154,15 @@ export default {
       return listaOgg;
     }
 
-    function preparaPDF() { // DA FINIRE
-      fitToViewImmediato();
-      console.log('preparo un pdf');
-      // bottonePDF.addEventListener('click', () => {
-      //   setTimeout(() => {
-      //     creaPDF2(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-ANAGRAFICA');
-      //   }, 500);
-      // });
-    }
+    // function preparaPDF() { // DA FINIRE
+    //   fitToViewImmediato();
+    //   console.log('preparo un pdf');
+    //   // bottonePDF.addEventListener('click', () => {
+    //   //   setTimeout(() => {
+    //   //     creaPDF2(listaIdMain10ance, listaDatiNascosti, 'SCHEDA-ANAGRAFICA');
+    //   //   }, 500);
+    //   // });
+    // }
 
     return {
       store,
@@ -170,7 +171,7 @@ export default {
       salvaScheda,
       resetState,
       chiudiScheda,
-      preparaPDF,
+      // preparaPDF,
     }
   }
 }
