@@ -96,6 +96,9 @@ export default {
       const resRaw = await fetch("/auth/logout", {method: "GET", headers: {"content-type": "application/json"} });
       const res = await resRaw.json();
       store.methods.setLogoutUserSettings();
+      store.methods.resetStateBIM();
+      store.methods.resetStateGIS();
+      store.methods.resetStatePlanner();
       store.methods.setAlert(res.message);
       store.methods.setTabAttivo('Tab2');
     }

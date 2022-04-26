@@ -186,7 +186,67 @@ const methods = {
         statePlanner.listaFenomeni = listaFenomeni;
         statePlanner.datiPlannerLoaded = true;
         this.toggleLoaderGlobale();
-    }
+    },
+
+    resetStateBIM() {
+        stateBIM.modelPlaceholder = true;
+        stateBIM.urnModelloCorrente = null;
+        stateBIM.elementiSelezionati = null;
+        stateBIM.schedeRisultatiVisibile = false;
+        stateBIM.schedeModuliVisibile = false;
+        stateBIM.schedeAttivitàVisibile = false;
+        stateBIM.schedeAttivitàTipo = '';
+        stateBIM.elementiDaSchedare = [];
+    },
+
+    resetStateGIS() {
+        stateGIS.tabelleGIS = null;
+        stateGIS.entitàGIS = {};
+        stateGIS.markerLoc = null;
+        stateGIS.markerEdif = null;
+    },
+
+    resetStatePlanner() {
+        statePlanner.datiPlannerLoaded = false;
+        statePlanner.listaSigleLoc = [];
+        statePlanner.listaSigleEdifici = [];
+        statePlanner.listaClOgg = [];
+        statePlanner.listaFrasiDiRischio = [];
+        statePlanner.listaEdif = [];
+        statePlanner.listaElementi = [];
+        statePlanner.listaStCons = [];
+        statePlanner.listaFenomeni = [];
+        statePlanner.attività = {
+            'controllo': {
+                tabella: 'controllo_stato_di_conservazione_livello_di_urgenza',
+            },
+            'manutenzione regolare': {
+                tabella: 'manutenzione_regolare',
+            },
+            'manutenzione correttiva': {
+                tabella: 'manutenzione_correttiva_o_a_guasto',
+            },
+            'manutenzione straordinaria': {
+                tabella: 'manutenzione_straordinaria',
+            },
+            'restauro': {
+                tabella: 'restauri',
+            },
+            'diagnosi': {
+                tabella: 'danno_alterazione_degrado',
+            },
+        };
+        statePlanner.enumUNI = {
+            enumStCons: [],
+            enumLivUrg: [],
+            enumClRacc: [],
+        };
+        statePlanner.datiSchedaInCompilazione = {};
+        statePlanner.compilazioneParziale = false;
+        statePlanner.listaCRregistrati = [];
+        statePlanner.refreshPlanner = false;
+        statePlanner.urnModelloCorrente = null;
+    },
 }
 
 const getters = {
@@ -195,7 +255,7 @@ const getters = {
     },
     getBimVwSets() {
         return state.userSettings.bim_vw_sets.split('-');
-    }
+    },
 }
 
 export default {

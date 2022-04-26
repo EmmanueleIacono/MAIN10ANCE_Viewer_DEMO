@@ -197,8 +197,8 @@ input {
   background-color: var(--gialloInterventoTrasparenza);
 }
 .wrapper-scheda {
-  padding: 5px;
-  margin: 10px;
+  padding: 15px;
+  margin: 10px 0;
   border-radius: 10px;
   position: relative;
 }

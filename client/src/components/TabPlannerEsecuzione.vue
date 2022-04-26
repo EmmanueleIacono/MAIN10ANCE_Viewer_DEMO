@@ -1,6 +1,6 @@
 <template>
 <Card>
-  <Details summary="ESECUZIONE" :open="false" class="loading-wrapper">
+  <Details summary="ESECUZIONE" :open="aperto" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
     <div v-if="attIntegrateContr.length || attIntegrateManReg.length || attIntegrateManCorr.length">
       <SchedaEsecuzione v-for="att in attIntegrateContr" :key="att['Codice scheda controllo']" :dati="att" :tipo="'controllo'" />
@@ -32,6 +32,7 @@ export default {
   },
   setup() {
     const state = reactive({
+      aperto: false,
       caricamento: false,
       attIntegrateContr: [],
       attIntegrateManReg: [],

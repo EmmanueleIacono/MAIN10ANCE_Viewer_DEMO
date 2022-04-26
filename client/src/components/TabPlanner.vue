@@ -8,7 +8,7 @@
       <br v-if="store.getters.getUsrVwList().includes('pianificazione')" />
       <br v-if="store.getters.getUsrVwList().includes('pianificazione')" />
       <Pianificazione @pianificazioneAggiornata="aggiornaEventi" v-if="store.getters.getUsrVwList().includes('pianificazione')" />
-      <Integrazione @integrazioneAggiornata="aggiornaEventi" v-if="store.getters.getUsrVwList().includes('pianificazione')" ref="IntegrazioneRef" />
+      <Programmazione @integrazioneAggiornata="aggiornaEventi" v-if="store.getters.getUsrVwList().includes('pianificazione')" ref="IntegrazioneRef" />
       <ExTempore v-if="store.getters.getUsrVwList().includes('pianificazione')" />
     <!-- </div> -->
     <Esecuzione ref="EsecuzioneRef" />
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import {inject, onMounted, reactive, ref, watch} from 'vue';
+import {inject, onActivated, onMounted, reactive, ref, watch} from 'vue';
 import {leggiAttivitàProg} from '../js/richieste';
 import FullCalendar from '@fullcalendar/vue3';
 import DayGridPlugin from '@fullcalendar/daygrid';
@@ -32,7 +32,7 @@ import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
 import Filtri from './TabPlannerFiltri.vue';
 import Pianificazione from './TabPlannerPianificazione.vue';
-import Integrazione from './TabPlannerIntegrazione.vue';
+import Programmazione from './TabPlannerIntegrazione.vue';
 import Esecuzione from './TabPlannerEsecuzione.vue';
 import Storico from './TabPlannerStorico.vue';
 import ExTempore from './TabPlannerExTempore.vue';
@@ -46,7 +46,7 @@ export default {
     FullCalendar,
     Filtri,
     Pianificazione,
-    Integrazione,
+    Programmazione,
     Esecuzione,
     Storico,
     ExTempore,
@@ -77,10 +77,11 @@ export default {
       eventClick: (info) => {
         console.log(info.event.id);
         console.log(info.event.extendedProps);
+        isolaScheda(info.event.extendedProps);
       },
     });
 
-    popolaCalendario();
+    // popolaCalendario();
 
     watch(() => store.statePlanner.refreshPlanner, () => {
       aggiornaEventi();
@@ -95,7 +96,15 @@ export default {
     }, {immediate: true});
 
     onMounted(async () => {
+      popolaCalendario();
       await store.methods.recuperaDatiPlanner();
+    });
+
+    onActivated(async () => {
+      if (!store.statePlanner.datiPlannerLoaded) {
+        popolaCalendario();
+        await store.methods.recuperaDatiPlanner();
+      }
     });
 
     async function aggiornaEventi() {
@@ -114,8 +123,8 @@ export default {
     async function aggiungiEventiProg() {
       const eventi = await leggiAttivitàProg();
       const nuoviEventiProg = eventi.map(evento => ({
-        id: `PROG-C-${evento.id_att_prog}`,
-        title: `Controllo programmato`,
+        id: `PROG-${evento.id_att_prog}`,
+        title: `${evento.tipo_attività[0][0].toUpperCase()}${evento.tipo_attività[0].slice(1)}`,
         start: evento.data_prog,
         extendedProps: {
           classe: evento.cl_ogg_fr,
@@ -123,13 +132,14 @@ export default {
           frase_di_rischio: evento.rid_fr_risc,
           frequenza_prevista: evento.frequenza,
           attività_previste: evento.tipo_attività,
+          ciclica: ['controllo', 'manutenzione regolare'].includes(evento.tipo_attività[0]),
           elementi_interessati: evento.id_main10ance,
           data_inserimento: evento.data_ins,
           da_integrare: evento.da_integrare,
         },
-        backgroundColor: evento.da_integrare ? '#bbb' : '#a8c956',
-        borderColor: '#c74646',
-        texcColor: '#fff'
+        backgroundColor: evento.da_integrare ? '#bbb' : (['controllo', 'manutenzione regolare'].includes(evento.tipo_attività[0]) ? '#a8c956' : '#ceba4c'),
+        borderColor: evento.da_integrare ? '#bbb' : (['controllo', 'manutenzione regolare'].includes(evento.tipo_attività[0]) ? '#a8c956' : '#ceba4c'),
+        textColor: '#fff'
       }));
       return nuoviEventiProg;
     }
@@ -137,6 +147,17 @@ export default {
     function resizeCal() {
       const calAPI = fullCalendarPlanner.value.getApi();
       calAPI.updateSize();
+    }
+
+    function isolaScheda(props) {
+      if (props.da_integrare) {
+        EsecuzioneRef.value.aperto = false;
+        IntegrazioneRef.value.aperto = true;
+      }
+      else {
+        IntegrazioneRef.value.aperto = false;
+        EsecuzioneRef.value.aperto = true;
+      }
     }
 
     return {

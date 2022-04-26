@@ -1,6 +1,6 @@
 <template>
 <Card>
-  <Details summary="PROGRAMMAZIONE" :open="false" class="loading-wrapper">
+  <Details summary="PROGRAMMAZIONE" :open="aperto" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
     <div class="contenitore-scelta-attività">
       <button @click="tabIntegrazioneAttivo = 'AttPianificate'" class="verde">ATTIVITÀ CICLICHE</button>
@@ -47,6 +47,7 @@ export default {
   },
   setup(props, {emit}) {
     const state = reactive({
+      aperto: false,
       caricamento: false,
       tabIntegrazioneAttivo: 'AttPianificate',
       ordinaPer: 'data_prog',

@@ -172,7 +172,14 @@ app.get('/Main10ance_DB/controlli-programmati', async (req, res) => {
 });
 
 app.get('/Main10ance_DB/attivita-programmate', async (req, res) => {
-    const resp = await leggiAttivitàProg();
+    const cookies = req.signedCookies;
+    let resp;
+    if (cookies.role === 'operatore') {
+        resp = await leggiAttivitàProgOperatore();
+    }
+    else {
+        resp = await leggiAttivitàProg();
+    }
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(resp));
 });
@@ -441,6 +448,26 @@ async function leggiAttivitàProg() {
     }
     catch(e) {
         return [];
+    }
+}
+
+async function leggiAttivitàProgOperatore() {
+    try {
+        const withString = `WITH totale AS (
+            (SELECT rid_att_prog FROM ${ambito}."controllo_stato_di_conservazione_livello_di_urgenza" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${ambito}."manutenzione_regolare" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${ambito}."manutenzione_correttiva_o_a_guasto" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${ambito}."manutenzione_straordinaria" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${ambito}."restauri" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${ambito}."danno_alterazione_degrado" WHERE eseguito = FALSE)
+            )`;
+        const subQueryString = `SELECT ("rid_att_prog") AS "lista_id" FROM totale`;
+        const results = await clientM10a.query(`${withString} SELECT "id_att_prog", "rid_fr_risc", "data_prog", "costo", "ore", "esecutori", "strumentaz", "commenti", to_json("id_main10ance") AS "id_main10ance", "id_group", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM ${ambito}."attività_prog" WHERE "id_att_prog" = ANY(${subQueryString}) AND "da_integrare" = FALSE ORDER BY "id_att_prog";`);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return []
     }
 }
 
