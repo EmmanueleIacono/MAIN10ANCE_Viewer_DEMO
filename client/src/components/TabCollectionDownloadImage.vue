@@ -1,17 +1,16 @@
 <template>
 <div>
   <Card>
-    <Details summary="GALLERY" :open="true">
+    <Details summary="GALLERIA" :open="true">
       <br>
       <div class="col-lg-12 loading-wrapper">
-        <button @click="downloadImmagini('SMV/1/arredo/220217110100856.jpg')">test richiesta</button>
         <CreaPercorso :stateUD="'stateDownload'"/>
         <LoadingScreen :caricamento="caricamento" />
-        <div v-if="/*urls.length*/true" class="image-grid">
+        <div v-if="urls.length" class="image-grid">
           <img :src="url.object" @click="isSelected(url.percorso)" v-for="(url) in urls" :key="url.percorso" :class="percorsiSelezionati.includes(url.percorso) ? 'bordo-verde' : ''">
         </div>
         <br>
-        <div v-if="dataCompleted" class="flt-dx">
+        <!-- <div v-if="dataCompleted" class="flt-dx">
           <button @click="deselectImage" title="Deseleziona tutto" class="btn"><i class="zmdi zmdi-close"></i></button>
           <button @click="deleteImage" title="Elimina gli elementi selezionati" class="btn"><i class="zmdi zmdi-delete"></i></button>
           <button title="Aggiungi file in questa cartella" class="btn"><i class="zmdi zmdi-camera" style="margin-right:10px;"></i>
@@ -19,12 +18,12 @@
           </button>
           <br>
           <input @change="showPreview" style="visibility: hidden; position: fixed" type="file" id="singleUp" accept="image/*" />
-        </div>
+        </div> -->
       </div>
     </Details>
   </Card>
   <Card v-if="previewImage">
-    <Details summary="INSERT MEDIA" :open="true">
+    <Details summary="NUOVA IMMAGINE" :open="true">
       <br>
       <div class="col-lg-6" >
         <img v-if="previewImage" :src="previewImage" alt="anteprima" class="anteprima">
@@ -71,7 +70,6 @@
 import {reactive, provide, computed, watch, toRefs} from 'vue';
 import { dataInteger } from '../js/shared';
 import { getListaImmagini, downloadImmagini/*creaRecordLOD4*/ } from '../js/richieste';
-// import { supabase } from "../supabase";
 import LoadingScreen from './elementi/LoadingScreen.vue';
 import CreaPercorso from './TabCollectionPercorso.vue';
 import Details from './elementi/Details.vue';
@@ -118,31 +116,25 @@ export default {
       state.previewImage = null;
     });
 
-    watch(() => state.ImagesUrl, async newImgUrl => {
+    watch(() => state.ImagesUrl, async newImgUrls => {
+      state.urls.forEach(url => URL.revokeObjectURL(url));
       state.urls = [];
-      // state.caricamento = true;
-      console.log(newImgUrl);
-      const fileImmagine = await downloadImmagini(newImgUrl[0]);
-      console.log(fileImmagine);
-      state.urls.push({ object: URL.createObjectURL(fileImmagine), percorso: newImgUrl[0]});
-      // const listaImmagini = await downloadImmagini(newImgUrl);
-      // listaImmagini.forEach(img => {
-      //   console.log(img.file);
-      //   const file = new Blob(img.file.data, {type: img.filetype});
-      //   console.log(file);
-      //   state.urls.push({ object: URL.createObjectURL(file), percorso: img.path });
-      //   // URL.revokeObjectURL(/*qui dentro url creato con createObjectURL*/); // DA USARE PER LIBERARE MEMORIA, NON SI LIBERA DA SOLA PER QUESTI OBJECT URL
-      // });
-      console.log(state.urls);
-      // await Promise.all(newImgUrl.map(async img => {
-      //   const {data, error} = await supabase.storage.from("sacri-monti").download(img);
-      //   state.urls.push({ object: URL.createObjectURL(data), percorso: img});
+      state.caricamento = true;
 
-      //   if (error) {
-      //     console.log(error);
-      //     throw error;
-      //   }
-      // }));
+      await Promise.all(newImgUrls.map(async url => {
+        const fileImmagine = await downloadImmagini(url);
+
+        if (fileImmagine.errMsg) {
+          console.log(fileImmagine.errMsg);
+          state.caricamento = false;
+          return;
+        }
+
+        state.urls.push({ object: URL.createObjectURL(fileImmagine), percorso: url });
+      }));
+
+      console.log(state.urls);
+
       state.caricamento = false;
     });
 
@@ -154,7 +146,6 @@ export default {
         const filePath = `${folderPath.value}/${fileName}`;
 
         state.previewImage = URL.createObjectURL(file);
-        // URL.revokeObjectURL(/*qui dentro url creato con createObjectURL*/); // DA USARE PER LIBERARE MEMORIA, NON SI LIBERA DA SOLA PER QUESTI OBJECT URL
 
         state.file = file;
         state.filePath = filePath;
@@ -178,6 +169,7 @@ export default {
     // }
 
     function isSelected(percorsoFile) {
+      console.log(percorsoFile);
       if (!state.percorsiSelezionati.includes(percorsoFile)) state.percorsiSelezionati.push(percorsoFile);
       else state.percorsiSelezionati.splice(state.percorsiSelezionati.indexOf(percorsoFile), 1);
     }

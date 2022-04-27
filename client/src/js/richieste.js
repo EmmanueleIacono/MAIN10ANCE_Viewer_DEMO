@@ -249,13 +249,14 @@ export async function getListaImmagini(percorso) {
     return resJson;
 }
 
-export async function downloadImmagini(listaPercorsi) {
-    const res = await fetch('/t/storage/img-download', {method: "GET", headers: {"lista": JSON.stringify(listaPercorsi)}});
-    // const resJson = await res.json();
-    // return resJson;
-    console.log(res);
+export async function downloadImmagini(percorsoFile) {
+    const res = await fetch('/t/storage/img-download', {method: "GET", headers: {"percorso": JSON.stringify(percorsoFile)}});
+    const resType = res.headers.get('content-type');
+    if (resType && resType.indexOf("application/json") !== -1) {
+        const resJson = await res.json();
+        return resJson;
+    }
     const resBlob = await res.blob();
-    console.log(resBlob);
     return resBlob;
 }
 

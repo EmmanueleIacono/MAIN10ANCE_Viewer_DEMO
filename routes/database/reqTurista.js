@@ -59,15 +59,23 @@ app.get('/storage/img-list', async (req, res) => {
 });
 
 app.get('/storage/img-download', async (req, res) => {
-    const reqJson = req.headers;
-    const lista = JSON.parse(reqJson.lista);
-    const listaImmagini = await downloadImmagini(lista);
-    const type = listaImmagini.type;
-    console.log(listaImmagini.type);
-    // res.setHeader('content-type', 'application/json');
-    // res.setHeader('content-type', 'application/octet-stream');
-    res.setHeader('content-type', type);
-    res.send(listaImmagini);
+    try {
+        const reqJson = req.headers;
+        const percorsoFile = JSON.parse(reqJson.percorso);
+        const immagine = await downloadImmagini(percorsoFile);
+        if (!immagine.length) throw new Error('Nessun file presente');
+        const type = immagine[0].type;
+        if (type) {
+            res.type(type);
+            const buffer = await immagine[0].arrayBuffer();
+            res.send(Buffer.from(buffer));
+        }
+    }
+    catch(e) {
+        console.log(e);
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify({errMsg: 'Nessun file presente'}));
+    }
 });
 
 //////////          QUERY          //////////
@@ -138,29 +146,15 @@ async function leggiListaImmagini(percorso) {
     }
 }
 
-// async function downloadImmagini(listaPercorsi) {
 async function downloadImmagini(percorsoFile) {
     try {
-        // const listaFiles = await Promise.all(listaPercorsi.map(async img => {
-        //     const {data, error} = await supabase.storage.from("sacri-monti").download(img);
-        //     console.log(data);
-
-        //     if (error) throw error;
-
-        //     const dataBuffer = await data.arrayBuffer();
-        //     const buffer = Buffer.from(dataBuffer);
-
-        //     return {file: buffer, filetype: data.type, path: img};
-        // }));
-
-        // console.log(listaFiles);
-        // return listaFiles;
         const {data, error} = await supabase.storage.from("sacri-monti").download(percorsoFile);
 
         if (error) throw error;
 
-        console.log(data);
-        return data;
+        if (!data.size) return [];
+
+        return [data];
     }
     catch(e) {
         console.log(e);

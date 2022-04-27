@@ -31,7 +31,6 @@ function main() {
         app.use(express.static(path.join(__dirname, 'public')));
     }
     app.use(express.json({ limit: '50mb' }));
-    app.use(express.raw({limit: '50mb'}));
     app.use('/api/forge/oauth', require('./routes/oauth'));
     app.use('/api/forge/oss', require('./routes/oss'));
     app.use('/auth', auth);

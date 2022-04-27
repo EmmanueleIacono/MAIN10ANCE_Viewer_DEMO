@@ -79,8 +79,8 @@
     </table>
     <div class="div-bottoni">
       <!-- <button @click="salvaAttività" :class="tipoClass" class="bottone-main10ance">SALVA</button> -->
-      <BtnBIM @click="chiudiAttReset" class="btn-bim" icona="glyphicon-floppy-remove" nome="chiudiSchedaAtt" title="Chiudi" colore="verde" />
-      <BtnBIM @click="salvaAttività" class="btn-bim" icona="glyphicon-floppy-saved" nome="salvaSchedaAtt" title="Salva" colore="verde" />
+      <BtnBIM @click="chiudiAttReset" class="btn-bim" icona="glyphicon-remove" nome="chiudiSchedaAtt" title="Chiudi" colore="verde" />
+      <BtnBIM @click="salvaAttività" class="btn-bim" icona="glyphicon-floppy-disk" nome="salvaSchedaAtt" title="Salva" colore="verde" />
     </div>
   </div>
 </template>
