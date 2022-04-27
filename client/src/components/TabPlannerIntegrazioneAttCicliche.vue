@@ -2,7 +2,9 @@
   <!-- <div class="sfondo-verde"> -->
   <div>
     <div v-if="att.length">
-      <SchedaInt @integrazioneCompletata="emettiOkInt" v-for="a in att" :key="a.id_att_prog" :pianificate="true" :att="a" />
+      <div v-for="a in att" :key="a.id_att_prog">
+        <SchedaInt @integrazioneCompletata="emettiOkInt" v-if="a.visibile" :pianificate="true" :att="a" />
+      </div>
     </div>
     <div v-else>Nessuna attività da integrare</div>
   </div>

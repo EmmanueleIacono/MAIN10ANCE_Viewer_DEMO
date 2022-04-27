@@ -76,6 +76,10 @@ const statePlanner = reactive({
     listaCRregistrati: [],
     refreshPlanner: false,
     urnModelloCorrente: null,
+    datiProgrammazione: {
+        attCicliche: [],
+        attRiallineamento: [],
+    }
 });
 
 const methods = {

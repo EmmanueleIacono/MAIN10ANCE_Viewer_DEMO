@@ -75,9 +75,7 @@ export default {
         info.el.title = info.event.title;
       },
       eventClick: (info) => {
-        console.log(info.event.id);
-        console.log(info.event.extendedProps);
-        isolaScheda(info.event.extendedProps);
+        isolaScheda(info.event.id, info.event.extendedProps);
       },
     });
 
@@ -149,10 +147,20 @@ export default {
       calAPI.updateSize();
     }
 
-    function isolaScheda(props) {
+    function isolaScheda(id, props) {
       if (props.da_integrare) {
         EsecuzioneRef.value.aperto = false;
         IntegrazioneRef.value.aperto = true;
+        const attCicliche = store.statePlanner.datiProgrammazione.attCicliche;
+        console.log(id);
+        const idSchedaProg = id.split('-')[1];
+        console.log(idSchedaProg);
+        console.log(attCicliche);
+        attCicliche.forEach(att => {
+          if (att.id_att_prog !== idSchedaProg) att.visibile = false;
+          else att.visibile = true;
+        });
+
       }
       else {
         IntegrazioneRef.value.aperto = false;

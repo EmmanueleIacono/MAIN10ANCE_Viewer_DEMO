@@ -20,15 +20,21 @@
         <input v-model="ordinaPer" type="radio" name="ordina" id="data-ins" class="mr" value="id_att_prog">
         <label for="data-ins">Data di inserimento</label>
       </div>
+      <div class="contenitore-bottone">
+        <button @click="mostraTutteAttProg" v-if="store.statePlanner.datiProgrammazione.attCicliche.some(att => !att.visibile)" class="glyphicon glyphicon-list" title="Mostra tutto"></button>
+      </div>
     </div>
-    <AttCicliche @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttPianificate'" :att="attCicliche" />
-    <AttRiallineamento @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttSegnalate'" :att="attRiallineamento" />
+    <!-- <div class="contenitore-bottone">
+      <button @click="mostraTutteAttProg" v-if="store.statePlanner.datiProgrammazione.attCicliche.some(att => !att.visibile)" class="glyphicon glyphicon-list" title="Mostra tutto"></button>
+    </div> -->
+    <AttCicliche @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttPianificate'" :att="store.statePlanner.datiProgrammazione.attCicliche" />
+    <AttRiallineamento @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttSegnalate'" :att="store.statePlanner.datiProgrammazione.attRiallineamento" />
   </Details>
 </Card>
 </template>
 
 <script>
-import {onMounted, reactive, toRefs, watch} from 'vue';
+import {onMounted, reactive, toRefs, watch, inject} from 'vue';
 import {leggiAttProgPerIntegrazione} from '../js/richieste';
 import Card from './elementi/Card.vue';
 import Details from './elementi/Details.vue';
@@ -46,13 +52,14 @@ export default {
     LoadingScreen,
   },
   setup(props, {emit}) {
+    const store = inject('store');
     const state = reactive({
       aperto: false,
       caricamento: false,
       tabIntegrazioneAttivo: 'AttPianificate',
       ordinaPer: 'data_prog',
-      attCicliche: [],
-      attRiallineamento: [],
+      // attCicliche: [],
+      // attRiallineamento: [],
     });
 
     watch(() => state.tabIntegrazioneAttivo, newVal => {
@@ -74,31 +81,38 @@ export default {
       const attDaIntegrare = await leggiAttProgPerIntegrazione(true);
       const attCicliche = attDaIntegrare.filter(att => att.tipo_attività.includes('controllo') || att.tipo_attività.includes('manutenzione regolare')).filter(att => !!att.id_main10ance.length);
       const attRiallineamento = attDaIntegrare.filter(att => !att.tipo_attività.includes('controllo') && !att.tipo_attività.includes('manutenzione regolare'));
-      state.attCicliche = attCicliche;
-      state.attRiallineamento = attRiallineamento;
+      store.statePlanner.datiProgrammazione.attCicliche = attCicliche;
+      store.statePlanner.datiProgrammazione.attCicliche.forEach(att => att.visibile = true);
+      store.statePlanner.datiProgrammazione.attRiallineamento = attRiallineamento;
       if (state.tabIntegrazioneAttivo === 'AttPianificate') ordinaAttivitàCicliche(state.ordinaPer);
       else ordinaAttivitàRiallineamento(state.ordinaPer);
       state.caricamento = false;
     }
 
     function ordinaAttivitàCicliche(param) {
-      if (param === 'data_prog') state.attCicliche.sort((a, b) => a[param].localeCompare(b[param]));
-      else state.attCicliche.sort((a, b) => b[param].localeCompare(a[param]));
+      if (param === 'data_prog') store.statePlanner.datiProgrammazione.attCicliche.sort((a, b) => a[param].localeCompare(b[param]));
+      else store.statePlanner.datiProgrammazione.attCicliche.sort((a, b) => b[param].localeCompare(a[param]));
     }
 
     function ordinaAttivitàRiallineamento(param) {
-      if (param === 'liv_priorità') state.attRiallineamento.sort((a, b) => parseInt(b[param]) - parseInt(a[param]));
-      else state.attRiallineamento.sort((a, b) => b[param].localeCompare(a[param]));
+      if (param === 'liv_priorità') store.statePlanner.datiProgrammazione.attRiallineamento.sort((a, b) => parseInt(b[param]) - parseInt(a[param]));
+      else store.statePlanner.datiProgrammazione.attRiallineamento.sort((a, b) => b[param].localeCompare(a[param]));
     }
 
     function emettiRefresh() {
       emit('integrazioneAggiornata');
     }
 
+    function mostraTutteAttProg() {
+      store.statePlanner.datiProgrammazione.attCicliche.forEach(att => att.visibile = true);
+    }
+
     return {
+      store,
       ...toRefs(state),
       popolaAttività,
       emettiRefresh,
+      mostraTutteAttProg,
     }
   }
 }
@@ -134,6 +148,18 @@ button.giallo:hover {
 }
 .contenitore-ordinaper div {
   margin-left: 20px;
+}
+.contenitore-ordinaper button {
+  float: right;
+}
+.contenitore-bottone {
+  display: flex;
+  margin-left: auto;
+}
+.contenitore-bottone button {
+  border: none;
+  background-color: transparent;
+  font-size: large;
 }
 .mr {
   margin-right: 5px;
