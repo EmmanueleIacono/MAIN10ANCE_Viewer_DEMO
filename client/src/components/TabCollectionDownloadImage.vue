@@ -10,7 +10,7 @@
           <img :src="url.object" @click="isSelected(url.percorso)" v-for="(url) in urls" :key="url.percorso" :class="percorsiSelezionati.includes(url.percorso) ? 'bordo-verde' : ''">
         </div>
         <br>
-        <!-- <div v-if="dataCompleted" class="flt-dx">
+        <div v-if="dataCompleted" class="flt-dx">
           <button @click="deselectImage" title="Deseleziona tutto" class="btn"><i class="zmdi zmdi-close"></i></button>
           <button @click="deleteImage" title="Elimina gli elementi selezionati" class="btn"><i class="zmdi zmdi-delete"></i></button>
           <button title="Aggiungi file in questa cartella" class="btn"><i class="zmdi zmdi-camera" style="margin-right:10px;"></i>
@@ -18,7 +18,7 @@
           </button>
           <br>
           <input @change="showPreview" style="visibility: hidden; position: fixed" type="file" id="singleUp" accept="image/*" />
-        </div> -->
+        </div>
       </div>
     </Details>
   </Card>
