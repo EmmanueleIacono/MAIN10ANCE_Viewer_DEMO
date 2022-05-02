@@ -11,7 +11,7 @@
     </div>
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
-    Work In Progress
+    Dashboard Explorer - WIP
   </Explorer>
 </div>
 </template>

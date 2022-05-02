@@ -192,23 +192,23 @@ const methods = {
         this.toggleLoaderGlobale();
     },
 
-    resetStateBIM() {
-        stateBIM.modelPlaceholder = true;
-        stateBIM.urnModelloCorrente = null;
-        stateBIM.elementiSelezionati = null;
-        stateBIM.schedeRisultatiVisibile = false;
-        stateBIM.schedeModuliVisibile = false;
-        stateBIM.schedeAttivitàVisibile = false;
-        stateBIM.schedeAttivitàTipo = '';
-        stateBIM.elementiDaSchedare = [];
-    },
+    // resetStateBIM() {
+    //     stateBIM.modelPlaceholder = true;
+    //     stateBIM.urnModelloCorrente = null;
+    //     stateBIM.elementiSelezionati = null;
+    //     stateBIM.schedeRisultatiVisibile = false;
+    //     stateBIM.schedeModuliVisibile = false;
+    //     stateBIM.schedeAttivitàVisibile = false;
+    //     stateBIM.schedeAttivitàTipo = '';
+    //     stateBIM.elementiDaSchedare = [];
+    // },
 
-    resetStateGIS() {
-        stateGIS.tabelleGIS = null;
-        stateGIS.entitàGIS = {};
-        stateGIS.markerLoc = null;
-        stateGIS.markerEdif = null;
-    },
+    // resetStateGIS() {
+    //     stateGIS.tabelleGIS = null;
+    //     stateGIS.entitàGIS = {};
+    //     stateGIS.markerLoc = null;
+    //     stateGIS.markerEdif = null;
+    // },
 
     resetStatePlanner() {
         statePlanner.datiPlannerLoaded = false;

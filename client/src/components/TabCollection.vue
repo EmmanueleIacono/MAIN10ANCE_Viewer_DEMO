@@ -4,6 +4,7 @@
     <DownloadImage />
   </MainPanel>
   <Explorer :colonna="`col-sm-${store.getters.getBimVwSets()[1]}`">
+    Artifact Viewer Explorer - WIP
   </Explorer>
 </div>
 </template>
