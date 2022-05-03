@@ -1,9 +1,9 @@
 <template>
-  <div class="pannelloDB" v-if="verificaDisplay()">
+  <div class="pannelloDB">
     <BtnBIM @click="homeFunc" class="btn-bim" icona="glyphicon-home" nome="refreshParams" title="Home" colore="verde" />
     <BtnBIM @click="toggleInputCerca" class="btn-bim" icona="glyphicon-search" nome="cercaID" title="Trova" colore="verde" />
     <BtnBIM @click="interroga" class="btn-bim" icona="glyphicon-list-alt" nome="queryDB" title="Interroga" colore="verde" />
-    <BtnBIM @click="aggiungi" class="btn-bim" icona="glyphicon-plus" nome="aggiungiDB" title="Aggiungi o modifica" colore="verde" />
+    <BtnBIM @click="aggiungi" class="btn-bim" icona="glyphicon-plus" nome="aggiungiDB" title="Aggiungi o modifica dati" colore="verde" />
     <br />
     <div id="contenitore-campo-ricerca">
       <input v-if="state.campoRicercaVisibile" v-model="state.valoreInputRicerca" placeholder="id_main10ance" />
@@ -50,10 +50,6 @@ export default {
       cercaSelezionaId(newVal);
     });
 
-    function verificaDisplay() {
-      return store.getters.getUsrVwList().includes('idPannelloDB');
-    }
-
     function homeFunc() {
       state.valoreInputRicerca = '';
       state.campoRicercaVisibile = false;
@@ -91,10 +87,10 @@ export default {
 
     async function aggiungi() {
       store.stateBIM.schedeRisultatiVisibile = false;
-      chiudiAttività();
       const elementiPronti = await preparaElementi();
       if (elementiPronti) {
         store.stateBIM.schedeModuliVisibile = true;
+        chiudiAttività();
       }
       else {
         store.stateBIM.schedeModuliVisibile = false;
@@ -126,7 +122,6 @@ export default {
       store,
       SchedeDBRef,
       state,
-      verificaDisplay,
       homeFunc,
       toggleInputCerca,
       interroga,

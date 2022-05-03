@@ -11,7 +11,7 @@
     <Details summary="SELEZIONE MODELLI">
       <Tree />
     </Details>
-    <PannelloDB />
+    <PannelloDB v-if="verificaDisplay()" />
   </Explorer>
 </div>
 </template>
@@ -34,8 +34,13 @@ export default {
   setup() {
     const store = inject('store');
 
+    function verificaDisplay() {
+      return store.getters.getUsrVwList().includes('idPannelloDB');
+    }
+
     return {
       store,
+      verificaDisplay,
     }
   }
 }

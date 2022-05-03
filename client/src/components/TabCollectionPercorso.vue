@@ -1,5 +1,6 @@
 <template>
-<div>
+<div class="loading-wrapper">
+  <LoadingScreen :caricamento="caricamento" />
   <label class="nome" for="check-località">Località</label>
   <select class="valore" v-model="selectLocalità">
     <option v-for="loc in listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
@@ -21,9 +22,13 @@
 <script>
 import { onMounted, toRefs, watch, inject} from 'vue';
 import {prendiSigleLocalità, leggiDBMarkerEdif, prendiLOD} from '../js/richieste';
+import LoadingScreen from './elementi/LoadingScreen.vue';
 
 export default {
   name: 'TabCollectionPercorso',
+  components: {
+    LoadingScreen,
+  },
   props: {
     stateUD: String
   },
@@ -60,16 +65,6 @@ export default {
 <style scoped>
 button ~ button {
   margin-left: .4rem;
-}
-input[type=checkbox] {
-  margin-right: .4rem;
-}
-input[type=date], select {
-  margin-left: 4rem;
-}
-label[for=input-data-da], label[for=input-data-a] {
-  margin-left: .4rem;
-  font-weight: normal;
 }
 .valore {
   float: right;
