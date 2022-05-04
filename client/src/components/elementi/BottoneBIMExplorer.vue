@@ -36,4 +36,13 @@ export default {
 .giallo {
   background: var(--gialloIntervento);
 }
+.verde:hover {
+  background: var(--verdeMain10anceTrasparenza);
+}
+.blu:hover {
+  background: var(--bluInterregTrasparenza);
+}
+.giallo:hover {
+  background: var(--gialloInterventoTrasparenza);
+}
 </style>

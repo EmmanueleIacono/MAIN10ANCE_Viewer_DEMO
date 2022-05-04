@@ -29,34 +29,31 @@ export default {
   components: {
     LoadingScreen,
   },
-  props: {
-    stateUD: String
-  },
-  setup(props) {
-    const stateDownload = inject(props.stateUD);
+  setup() {
+    const statePercorso = inject('stateArtifact');
 
-    watch(() => stateDownload.selectLocalità, async newVal => {
-      const listaEdifFiltrata = stateDownload.listaEdif.filter(ed => ed.località === newVal);
-      stateDownload.listaEdifFiltrata = listaEdifFiltrata;
-      if (listaEdifFiltrata[0]) stateDownload.selectEdificio = listaEdifFiltrata[0].numero;
-      else stateDownload.selectEdificio = '';
+    watch(() => statePercorso.selectLocalità, async newVal => {
+      const listaEdifFiltrata = statePercorso.listaEdif.filter(ed => ed.località === newVal);
+      statePercorso.listaEdifFiltrata = listaEdifFiltrata;
+      if (listaEdifFiltrata[0]) statePercorso.selectEdificio = listaEdifFiltrata[0].numero;
+      else statePercorso.selectEdificio = '';
     });
 
     onMounted(async () => {
-      stateDownload.caricamento = true;
+      statePercorso.caricamento = true;
       const listaSigleLoc = await prendiSigleLocalità();
       const listaEdif = await leggiDBMarkerEdif();
       const listaElementi = await prendiLOD(4);
-      stateDownload.listaSigleLoc = listaSigleLoc;
-      stateDownload.listaEdif = listaEdif;
-      stateDownload.listaElementi = listaElementi;
-      stateDownload.selectLocalità = listaSigleLoc[0].sigla;
-      stateDownload.selectElemento = listaElementi[0].tabella;
-      stateDownload.caricamento = false;
+      statePercorso.listaSigleLoc = listaSigleLoc;
+      statePercorso.listaEdif = listaEdif;
+      statePercorso.listaElementi = listaElementi;
+      statePercorso.selectLocalità = listaSigleLoc[0].sigla;
+      statePercorso.selectElemento = listaElementi[0].tabella;
+      statePercorso.caricamento = false;
     });
 
     return {
-      ...toRefs(stateDownload),
+      ...toRefs(statePercorso),
     }
   }
 }

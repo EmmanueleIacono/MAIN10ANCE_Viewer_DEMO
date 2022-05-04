@@ -260,9 +260,8 @@ export async function downloadImmagini(percorsoFile) {
     return resBlob;
 }
 
-export async function creaRecordLOD4(id_main10ance) {
-    return;
-    // const res = await fetch('/g/Main10ance_DB/LOD4/aggiungi', {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(id_main10ance)});
-    // const resJson = await res.json();
-    // return resJson;
+export async function creaRecordLOD4(datiBody) {
+    const res = await fetch('/g/Main10ance_DB/LOD4/nuovo', {method: "POST", headers: {"content-type": "multipart/form-data"}, body: JSON.stringify(datiBody)});
+    const resJson = await res.json();
+    return resJson;
 }

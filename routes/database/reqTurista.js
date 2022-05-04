@@ -72,7 +72,7 @@ app.get('/storage/img-download', async (req, res) => {
         }
     }
     catch(e) {
-        console.log(e);
+        // console.log(e);
         res.setHeader('content-type', 'application/json');
         res.send(JSON.stringify({errMsg: 'Nessun file presente'}));
     }

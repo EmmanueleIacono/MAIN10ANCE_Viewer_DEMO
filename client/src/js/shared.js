@@ -154,3 +154,8 @@ export function chiudiAttività() {
     store.statePlanner.datiSchedaInCompilazione = {};
     resetColori();
 }
+
+export function verificaPercorso(percorso) {
+    const listaSezioni = percorso.split('/');
+    return !listaSezioni.some(sez => !sez);
+}

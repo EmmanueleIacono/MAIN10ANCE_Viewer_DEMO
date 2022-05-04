@@ -191,36 +191,53 @@ app.patch('/Main10ance_DB/integrazione/integrazione-attivita', async (req, res) 
     }
 });
 
+app.post('/Main10ance_DB/LOD4/nuovo', async (req, res) => {
+    const result = {};
+    try {
+        console.log(req);
+        const reqJson = req.body;
+        const res = await uploadImmagine(reqJson);
+        result.success = res;
+    }
+    catch(e) {
+        result.success = false;
+    }
+    finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
+});
+
 //////////          QUERY          //////////
 
-async function getUtentiProgetto() {
-    try {
-        const results = await clientM10a.query(``);
-        return results.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
+// async function getUtentiProgetto() {
+//     try {
+//         const results = await clientM10a.query(``);
+//         return results.rows;
+//     }
+//     catch(e) {
+//         return [];
+//     }
+// }
 
-async function getListaRuoliProgetto() {
-    try {
-        const result = await clientM10a.query(``);
-        return result.rows[0].roles;
-    }
-    catch(e) {
-        return [];
-    }
-}
+// async function getListaRuoliProgetto() {
+//     try {
+//         const result = await clientM10a.query(``);
+//         return result.rows[0].roles;
+//     }
+//     catch(e) {
+//         return [];
+//     }
+// }
 
-async function updateRuoloUtenteProgetto(userJson) {
-    try {
-        await clientM10a.query(``, []);
-    }
-    catch(e) {
-        throw(e);
-    }
-}
+// async function updateRuoloUtenteProgetto(userJson) {
+//     try {
+//         await clientM10a.query(``, []);
+//     }
+//     catch(e) {
+//         throw(e);
+//     }
+// }
 
 //////////          QUERY DASHBOARD          //////////
 
@@ -432,6 +449,30 @@ async function integraAtt(jsonAtt) {
     catch(e) {
         console.log(`Errore: ${e}`);
         await clientM10a.query("ROLLBACK;");
+        return false;
+    }
+}
+
+async function uploadImmagine(reqJson) {
+    try {
+        // await clientM10a.query('BEGIN;');
+        try {
+            // const listaReq = [...reqJson];
+            // console.log(listaReq);
+            console.log(typeof reqJson);
+            console.log(Object.entries(reqJson));
+            // caricamento immagine supabase
+            // query con dati
+        }
+        catch(err) {
+            throw err;
+        }
+        // await clientM10a.query('COMMIT;');
+        return true;
+    }
+    catch(e) {
+        console.log(e);
+        // await clientM10a.query("ROLLBACK;");
         return false;
     }
 }

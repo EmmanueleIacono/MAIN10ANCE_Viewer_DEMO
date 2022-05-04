@@ -4,78 +4,81 @@
   <br />
   <div class="wrapper-info">
     <div class="contenitore">
+      <label for="percorso" class="colonna1">Percorso di destinazione:</label>
+      <p id="percorso" class="colonna2">
+        <b v-if="verificaPercorso(percorso)">{{percorso}}</b>
+        <i v-else>Percorso non valido</i>
+      </p>
+    </div>
+    <div class="contenitore">
       <label for="id_main10ance" class="colonna1">id_main10ance:</label>
       <p id="id_main10ance" class="colonna2"><b>{{id_main10ance}}</b></p>
     </div>
     <div class="contenitore">
       <label for="nome" class="colonna1">Nome</label>
-      <input id="nome" class="colonna2">
+      <input v-model="nome" id="nome" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="artista" class="colonna1">Artista</label>
-      <input id="artista" class="colonna2">
+      <input v-model="artista" id="artista" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="datazione" class="colonna1">Datazione</label>
-      <input id="datazione" class="colonna2">
+      <input v-model="datazione" id="datazione" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="dimensioni" class="colonna1">Dimensioni</label>
-      <input id="dimensioni" class="colonna2"> 
+      <input v-model="dimensioni" id="dimensioni" class="colonna2">
     </div>
     <div class="contenitore">
-      <label for="note" class="colonna1">Note</label>
-      <textarea id="commenti" class="colonna2"></textarea>
+      <label for="commenti" class="colonna1">Note</label>
+      <textarea v-model="commenti" id="commenti" class="colonna2"></textarea>
     </div>
+  </div>
+  <div class="wrapper-bottoni flt-dx">
+    <BtnBIM @click="annulla" icona="glyphicon-remove" nome="img-remove" title="Annulla" colore="verde" class="btn-img" />
+    <BtnBIM @click="salva" icona="glyphicon-floppy-disk" nome="img-save" title="Salva" colore="verde" class="btn-img last" />
   </div>
 </div>
 </template>
 
 <script>
-import {computed, inject} from 'vue';
-import {dataInteger} from '../js/shared';
+import {reactive, toRefs} from 'vue';
+import {verificaPercorso} from '../js/shared';
+import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 
 export default {
   name: 'TabCollectionUploadImage',
+  components: {
+    BtnBIM,
+  },
   props: {
     source: String,
-    stateUD: String,
+    percorso: String,
+    id_main10ance: String,
   },
-  setup(props) {
-    const stateUpload = inject(props.stateUD);
+  setup(props, {emit}) {
+    const state = reactive({
+      nome: '',
+      artista: '',
+      datazione: '',
+      dimensioni: '',
+      commenti: '',
+    });
 
-    const id_main10ance = computed(() => `${stateUpload.selectLocalità}|${stateUpload.selectEdificio}|${stateUpload.selectElemento}|${dataInteger()}`);
-    /////////////       TENERE!       //////////////////
+    function annulla() {
+      emit('annullaCaricamentoImmagine');
+    }
 
-    // async function uploadImage() {
-    //   if(!state.previewImage) return;
-    //   try {
-    //     const {error} = await supabase.storage.from("sacri-monti").upload(state.filePath, state.file);
-    //     if (error) throw error;
-    //     else {
-    //       await listImage(folderPath.value);
-    //       state.previewImage = null;
-    //     }
-    //   }
-    //   catch (error) {
-    //     alert(error.message);
-    //   }
-    // }
-
-    // creaRecordLOD4([id_main10ance.value]);
-
-    ///////// QUESTA NON DA USARE QUA, POI LA SPOSTO
-    // async function deleteImage() {
-    //   const {error} = await supabase.storage.from('sacri-monti').remove(state.percorsiSelezionati);
-    //   if (error) throw error;
-    //   else {
-    //     await listImage(folderPath.value);
-    //   }
-    // }
+    function salva() {
+      emit('salvaCaricamentoImmagine', state);
+    }
 
     return {
-      id_main10ance,
-      // uploadImage,
+      ...toRefs(state),
+      verificaPercorso,
+      annulla,
+      salva,
     }
   }
 }
@@ -87,6 +90,9 @@ img {
 }
 label {
   margin-bottom: 0;
+}
+p {
+  margin: 0;
 }
 textarea {
   resize: vertical;
@@ -108,20 +114,16 @@ textarea {
   flex: .5;
   line-height: 100%;
 }
-/* .flt-dx {
+.flt-dx {
   float: right;
-} */
-/* .btn {
-  margin-left: 1rem;
-  background-color: gray;
-  border: none;
-  color: white;
-  cursor: pointer;
 }
-.btn:hover {
-  background-color: var(--verdeMain10ance);
+.btn-img {
+  margin-top: 10px;
 }
-.btn label {
-  cursor: pointer;
-} */
+.btn-img ~ .btn-img {
+  margin-left: .9rem;
+}
+.btn-img.last {
+  margin-right: 0;
+}
 </style>
