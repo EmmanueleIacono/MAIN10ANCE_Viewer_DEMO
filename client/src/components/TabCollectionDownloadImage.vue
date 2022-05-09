@@ -44,10 +44,10 @@ export default {
     watch(() => props.percorsoCartella, async newpath => {
       if (verificaPercorso(props.percorsoCartella)) {
         const filePaths = await getListaImmagini(newpath);
-        state.filePaths = filePaths;
+        aggiornaFilePaths(filePaths);
       }
       else {
-        state.filePaths = [];
+        aggiornaFilePaths([]);
       }
     });
 
@@ -82,12 +82,23 @@ export default {
       state.percorsiSelezionati = [];
     }
 
+    function aggiornaFilePaths(listaFilePaths) {
+      deselectImage();
+      state.filePaths = listaFilePaths;
+    }
+
+    function getPercorsiSelezionati() {
+      return state.percorsiSelezionati;
+    }
+
     return {
       ...toRefs(state),
       stateGalleria,
       isSelected,
       deselectImage,
       downloadImmagini,
+      aggiornaFilePaths,
+      getPercorsiSelezionati,
     }
   }
 }

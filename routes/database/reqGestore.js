@@ -1,10 +1,13 @@
 const express = require('express');
+const fileupload = require('express-fileupload');
 const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
+app.use(fileupload());
 
 const {clientM10a} = require('./connessioni');
 const {ambito} = require('./ambito');
+const {supabase} = require('../../supabase_config');
 
 //////////          RICHIESTE          //////////
 
@@ -194,9 +197,25 @@ app.patch('/Main10ance_DB/integrazione/integrazione-attivita', async (req, res) 
 app.post('/Main10ance_DB/LOD4/nuovo', async (req, res) => {
     const result = {};
     try {
-        console.log(req);
         const reqJson = req.body;
-        const res = await uploadImmagine(reqJson);
+        const reqFiles = req.files;
+        const res = await uploadImmagine(reqFiles, reqJson);
+        result.success = res;
+    }
+    catch(e) {
+        result.success = false;
+    }
+    finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
+});
+
+app.delete('/Main10ance_DB/LOD4/elimina', async (req, res) => {
+    const result = {};
+    try {
+        const reqJson = req.body;
+        const res = await eliminaImmagini(reqJson);
         result.success = res;
     }
     catch(e) {
@@ -453,16 +472,50 @@ async function integraAtt(jsonAtt) {
     }
 }
 
-async function uploadImmagine(reqJson) {
+async function uploadImmagine(files, dati) {
+    const file = files.file;
+    const datiJson = JSON.parse(dati.dati);
+    console.log(file);
+    console.log(datiJson);
     try {
         // await clientM10a.query('BEGIN;');
         try {
-            // const listaReq = [...reqJson];
-            // console.log(listaReq);
-            console.log(typeof reqJson);
-            console.log(Object.entries(reqJson));
-            // caricamento immagine supabase
             // query con dati
+            // await clientM10a.query('...;');
+
+            // caricamento immagine supabase
+            const percorso = datiJson.percorso;
+            const fileOptions = {contentType: file.mimetype};
+            const {error} = await supabase.storage.from("sacri-monti").upload(`${percorso}/${file.name}`, file.data, fileOptions);
+            if (error) throw error;
+        }
+        catch(err) {
+            throw err;
+        }
+        // await clientM10a.query('COMMIT;');
+        return true;
+    }
+    catch(e) {
+        console.log(e);
+        // await clientM10a.query("ROLLBACK;");
+        return false;
+    }
+}
+
+async function eliminaImmagini(jsonDati) {
+    console.log(jsonDati);
+    const listaImmagini = jsonDati.immagini;
+    try {
+        // await clientM10a.query('BEGIN;');
+        try {
+            // query elimina record
+            // await clientM10a.query('...;');
+            // N.B: per eliminare il record nel db, è necessario avere un attributo "percorso_file"
+            // su cui salvare il path dell'immagine quando si fa l'upload
+
+            // eliminazione immagine supabase
+            const {data, error} = await supabase.storage.from("sacri-monti").remove(listaImmagini);
+            if (error) throw error;
         }
         catch(err) {
             throw err;

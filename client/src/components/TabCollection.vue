@@ -15,19 +15,19 @@
         <BtnBIM @click="mostraGalleria" icona="glyphicon-picture" nome="img-galleria" title="Galleria" colore="verde" />
         <BtnBIM @click="deseleziona" class="btn-img-plus" icona="glyphicon-remove" nome="img-deleseziona" title="Deseleziona tutto" colore="verde" />
       </div>
-      <div v-if="verificaDisplay()" class="pannello-upload btn-img">
+      <div v-if="verificaDisplay('galleryMod')" class="pannello-upload btn-img">
         <div class="input-wrapper">
           <BtnBIM @click="cliccaLabel" icona="glyphicon-camera" nome="img-upload" title="Carica immagine" colore="verde" />
           <label ref="labelRef" htmlFor="imgUp" title="Carica immagine"></label>
           <input @change="mostraAnteprima" ref="inputRef" type="file" id="imgUp" accept="image/*" />
         </div>
       </div>
-      <BtnBIM @click="eliminaImmagine" v-if="verificaDisplay()" class="btn-img-plus" icona="glyphicon-trash" nome="img-elimina" title="Elimina selezionati" colore="verde" />
-      <BtnBIM @click="interrogaImmagine" v-if="verificaDisplay()" class="btn-img-plus" icona="glyphicon-list-alt" nome="img-interroga" title="Interroga" colore="verde" />
-      <BtnBIM @click="anagraficaImmagine" v-if="verificaDisplay()" class="btn-img-plus" icona="glyphicon-plus" nome="img-anagrafica" title="Aggiungi o modifica dati" colore="verde" />
+      <BtnBIM @click="eliminaImmagine" v-if="verificaDisplay('galleryMod')" class="btn-img-plus" icona="glyphicon-trash" nome="img-elimina" title="Elimina selezionati" colore="verde" />
+      <BtnBIM @click="interrogaImmagine" v-if="verificaDisplay('galleryDati')" class="btn-img-plus" icona="glyphicon-list-alt" nome="img-interroga" title="Interroga" colore="verde" />
+      <BtnBIM @click="anagraficaImmagine" v-if="verificaDisplay('galleryDati')" class="btn-img-plus" icona="glyphicon-plus" nome="img-anagrafica" title="Aggiungi o modifica dati" colore="verde" />
     </div>
     <div class="explorer-body">
-      <button @click="stampadatiul">stampa dati upload</button>
+      <!-- <button @click="stampadatiul">stampa dati upload</button> -->
       <UploadImage @annullaCaricamentoImmagine="cancellaAnteprima" @salvaCaricamentoImmagine="salvaImmagine" v-if="datiCaricamento.anteprimaImg" :source="datiCaricamento.anteprimaImg" :percorso="percorsoCartella" :id_main10ance="id_main10ance" />
     </div>
   </Explorer>
@@ -37,7 +37,8 @@
 <script>
 import {inject, reactive, toRefs, provide, computed, ref} from 'vue';
 import {dataInteger, verificaPercorso} from '../js/shared';
-import {creaRecordLOD4} from '../js/richieste';
+import {getListaImmagini} from '../js/richieste';
+import {creaRecordLOD4, eliminaRecordLOD4} from '../js/richieste';
 import Explorer from './elementi/Explorer.vue';
 import Details from './elementi/Details.vue';
 import MainPanel from './elementi/MainPanel.vue';
@@ -126,8 +127,8 @@ export default {
       state.datiCaricamento.idImmagine = '';
     }
 
-    function verificaDisplay() {
-      return store.getters.getUsrVwList().includes('galleryMod');
+    function verificaDisplay(sezione) {
+      return store.getters.getUsrVwList().includes(sezione);
     }
 
     function deseleziona() {
@@ -135,17 +136,32 @@ export default {
     }
 
     async function eliminaImmagine() {
-      alert('elimina immagine');
-      // const {error} = await supabase.storage.from('sacri-monti').remove(state.percorsiSelezionati);
-      // if (error) throw error;
-      // else {
-      //   await listImage(percorsoCartella.value);
-      // }
+      const daEliminare = downloadRef.value.getPercorsiSelezionati();
+      if (!daEliminare.length) {
+        store.methods.setAlert('Nessun elemento selezionato');
+        return;
+      }
+      const confermaProcedere = await store.methods.setConfirm("Sei sicuro di voler eliminare gli elementi selezionati? L'operazione non può essere annullata.");
+      if (!confermaProcedere) return;
+      const jsonReq = {};
+      jsonReq.immagini = [...daEliminare];
+      console.log(jsonReq);
+      store.methods.toggleLoaderGlobale();
+      const risultato = await eliminaRecordLOD4(jsonReq);
+      console.log(risultato);
+      if (risultato.success) {
+        store.methods.setAlert('Operazione andata a buon fine');
+        const filePaths = await getListaImmagini(percorsoCartella.value);
+        downloadRef.value.aggiornaFilePaths(filePaths);
+      }
+      else {
+        store.methods.setAlert('Operazione fallita, riprovare');
+      }
+      store.methods.toggleLoaderGlobale();
     }
 
     async function salvaImmagine(dati) {
       if (verificaPercorso(percorsoCartella.value)) {
-        console.log('si può salvare');
         console.log(dati);
         console.log(percorsoCartella.value);
         console.log(state.datiCaricamento);
@@ -155,38 +171,23 @@ export default {
         fd.append('file', state.datiCaricamento.file);
         fd.append('dati', JSON.stringify(datiCompleti));
 
+        store.methods.toggleLoaderGlobale();
         const risultato = await creaRecordLOD4(fd);
         console.log(risultato);
-        /*
-        METODO DA USARE:
-        let photo = document.getElementById("image-file").files[0];
-        let user = { name:'john', age:34 };
-        let formData = new FormData();
-
-        formData.append("photo", photo);
-        formData.append("user", JSON.stringify(user));
-
-        fetch('/upload/image', {method: "POST", body: formData});
-        */
+        if (risultato.success) {
+          store.methods.setAlert('Operazione andata a buon fine');
+          const filePaths = await getListaImmagini(percorsoCartella.value);
+          downloadRef.value.aggiornaFilePaths(filePaths);
+        }
+        else {
+          store.methods.setAlert('Operazione fallita, riprovare');
+        }
       }
       else {
         store.methods.setAlert('Percorso non valido, impossibile continuare');
       }
-      // if(!state.previewImage) return;
-      // try {
-      //   const {error} = await supabase.storage.from("sacri-monti").upload(state.filePath, state.file);
-      //   if (error) throw error;
-      //   else {
-      //     await listImage(percorsoCartella.value);
-      //     state.previewImage = null;
-      //   }
-      // }
-      // catch (error) {
-      //   alert(error.message);
-      // }
+      store.methods.toggleLoaderGlobale();
     }
-
-    // creaRecordLOD4([id_main10ance.value]);
 
     async function interrogaImmagine() {
       alert('interroga immagine');
@@ -196,11 +197,9 @@ export default {
       alert('anagrafica immagine');
     }
 
-    function stampadatiul() {
-      console.log(state.datiCaricamento);
-      console.log('percorso cartella: ', percorsoCartella.value);
-      // console.log('nuovo nome file: ', nuovoNomeImmagine.value);
-    }
+    // function stampadatiul() {
+    //   console.log(state.datiCaricamento);
+    // }
 
     return {
       store,
@@ -220,7 +219,7 @@ export default {
       salvaImmagine,
       interrogaImmagine,
       anagraficaImmagine,
-      stampadatiul,
+      // stampadatiul,
     }
   }
 }
