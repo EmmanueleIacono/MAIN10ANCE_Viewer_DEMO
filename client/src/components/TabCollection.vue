@@ -190,11 +190,23 @@ export default {
     }
 
     async function interrogaImmagine() {
+      // const daInterrogare = downloadRef.value.getPercorsiSelezionati();
       alert('interroga immagine');
     }
 
     async function anagraficaImmagine() {
-      alert('anagrafica immagine');
+      const immaginiSelezionate = downloadRef.value.getPercorsiSelezionati();
+      if (!immaginiSelezionate.length) {
+        store.methods.setAlert('Nessun elemento selezionato');
+        return;
+      }
+      else if (immaginiSelezionate.length !== 1) {
+        store.methods.setAlert('Selezionare un solo elemento per volta');
+        return;
+      }
+      else {
+        alert('anagrafica immagine');
+      }
     }
 
     // function stampadatiul() {
