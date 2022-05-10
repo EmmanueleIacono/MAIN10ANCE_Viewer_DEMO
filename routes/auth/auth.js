@@ -49,6 +49,7 @@ router.post('/login', async (req, res, next) => {
             const comp = await bcrypt.compare(req.body.pw, datiUtente.pw);
             if (comp) {
                 const roleSettings = await getSettingsByRuolo(datiUtente.role);
+                const ambitoSettings = await getSettingsByAmbito(datiUtente.ambito);
                 res.cookie('user_id', datiUtente.username, {
                     httpOnly: true,
                     secure: (!process.env.DEV_PLACEHOLDER),
@@ -71,7 +72,8 @@ router.post('/login', async (req, res, next) => {
                     message: 'Login completato',
                     id: datiUtente.username,
                     bim_vw_sets: roleSettings.bim_vw_sets,
-                    usr_vw: roleSettings.usr_vw
+                    usr_vw: roleSettings.usr_vw,
+                    buckets: ambitoSettings.buckets
                 });
             }
             else {
@@ -131,6 +133,16 @@ async function insertNuovoUtente(user) {
 async function getSettingsByRuolo(ruolo) {
     try {
         const results = await clientM10a.query(`SELECT "bim_vw_sets", "elementi_visibili" AS "usr_vw" FROM servizio."ruoli" WHERE "ruolo" = ($1);`, [ruolo]);
+        return results.rows[0];
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function getSettingsByAmbito(ambito) {
+    try {
+        const results = await clientM10a.query(`SELECT "buckets", "schema", "storage" FROM servizio."ambiti" WHERE "ambito" = ($1);`, [ambito]);
         return results.rows[0];
     }
     catch(e) {

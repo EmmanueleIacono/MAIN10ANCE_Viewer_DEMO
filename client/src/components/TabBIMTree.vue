@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import {reactive, onMounted, provide, ref} from 'vue';
+import {reactive, onMounted, provide, ref, inject, watch} from 'vue';
 import {getObjects} from '../js/richieste';
 import TreeNode from './elementi/TreeNode.vue';
 
@@ -15,18 +15,30 @@ export default {
     TreeNode,
   },
   setup() {
+    const store = inject('store');
     const idCliccato = ref(null);
     provide('idCliccato', idCliccato);
     const state = reactive({
       nodi: [],
     });
 
+    watch(() => store.state.userSettings.user_id, async () => await impostaNodi());
+
     onMounted( async () => {
-      state.nodi = await getObjects();
+      impostaNodi();
     });
 
     function cambiaId(id) {
       idCliccato.value = id;
+    }
+
+    async function impostaNodi() {
+      const bkts = store.getters.getBkts();
+      const nodi = await getObjects();
+      const nodiFiltrati = nodi.filter(nodo => bkts.includes(nodo.id));
+      state.nodi = store.state.userSettings.user_id ? nodiFiltrati : nodi;
+      console.log(state.nodi);
+      state.nodi.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
     }
 
     return {

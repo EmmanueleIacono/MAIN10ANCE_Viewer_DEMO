@@ -7,7 +7,8 @@ const state = reactive({
     userSettings: {
         user_id: '',
         bim_vw_sets: '9-3',
-        usr_vw: ''
+        usr_vw: '',
+        bkts: '',
     },
     alertVisibile: false,
     alertMessaggio: '',
@@ -91,6 +92,7 @@ const methods = {
         localStorage.user_id = settingsJson.id;
         localStorage.bim_vw_sets = settingsJson.bim_vw_sets;
         localStorage.usr_vw = settingsJson.usr_vw;
+        localStorage.bkts = settingsJson.buckets;
         this.setUserSettings();
     },
 
@@ -98,15 +100,18 @@ const methods = {
         state.userSettings.user_id = localStorage.user_id;
         state.userSettings.bim_vw_sets = localStorage.bim_vw_sets;
         state.userSettings.usr_vw = localStorage.usr_vw;
+        state.userSettings.bkts = localStorage.bkts;
     },
 
     setLogoutUserSettings() {
         localStorage.removeItem('user_id');
         localStorage.removeItem('bim_vw_sets');
         localStorage.removeItem('usr_vw');
+        localStorage.removeItem('bkts');
         state.userSettings.user_id = '';
         state.userSettings.bim_vw_sets = '9-3';
         state.userSettings.usr_vw = '';
+        state.userSettings.bkts = '';
     },
 
     setAlert(messaggio) {
@@ -260,6 +265,9 @@ const getters = {
     getBimVwSets() {
         return state.userSettings.bim_vw_sets.split('-');
     },
+    getBkts() {
+        return state.userSettings.bkts.split(',');
+    }
 }
 
 export default {

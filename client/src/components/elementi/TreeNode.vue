@@ -51,6 +51,7 @@ export default {
         state.childLoad = true;
         const childObjects = await getObjects(props.node.id);
         state.childNodes = childObjects;
+        state.childNodes.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
       }
     }
     function apriModello(id) {
