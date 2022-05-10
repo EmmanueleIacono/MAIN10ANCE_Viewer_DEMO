@@ -27,7 +27,6 @@
       <BtnBIM @click="anagraficaImmagine" v-if="verificaDisplay('galleryDati')" class="btn-img-plus" icona="glyphicon-plus" nome="img-anagrafica" title="Aggiungi o modifica dati" colore="verde" />
     </div>
     <div class="explorer-body">
-      <button @click="stampadatiul">stampa dati upload</button>
       <UploadImage @annullaCaricamentoImmagine="cancellaAnteprima" @salvaCaricamentoImmagine="salvaImmagine" v-if="datiCaricamento.anteprimaImg" :source="datiCaricamento.anteprimaImg" :percorso="percorsoCartella" :id_main10ance="id_main10ance" />
       <ModuloAnagrafica ref="anagraficaRef" v-if="datiAnagrafica.moduloAnagraficaVisibile" />
     </div>
@@ -37,7 +36,7 @@
 
 <script>
 import {inject, reactive, toRefs, provide, computed, ref} from 'vue';
-import {dataInteger, verificaPercorso} from '../js/shared';
+import {dataInteger, verificaPercorso, dataCorta} from '../js/shared';
 import {getListaImmagini} from '../js/richieste';
 import {creaRecordLOD4, eliminaRecordLOD4} from '../js/richieste';
 import Explorer from './elementi/Explorer.vue';
@@ -154,10 +153,9 @@ export default {
       if (!confermaProcedere) return;
       const jsonReq = {};
       jsonReq.immagini = [...daEliminare];
-      console.log(jsonReq);
+      jsonReq.entità = state.datiNavigazione.selectElemento;
       store.methods.toggleLoaderGlobale();
       const risultato = await eliminaRecordLOD4(jsonReq);
-      console.log(risultato);
       if (risultato.success) {
         store.methods.setAlert('Operazione andata a buon fine');
         const filePaths = await getListaImmagini(percorsoCartella.value);
@@ -177,17 +175,17 @@ export default {
           id_main10ance: id_main10ance.value,
           percorso: percorsoCartella.value,
           entità: state.datiNavigazione.selectElemento,
+          data_ins: dataCorta(),
         };
-        console.log(datiCompleti);
         const fd = new FormData();
         fd.append('file', state.datiCaricamento.file);
         fd.append('dati', JSON.stringify(datiCompleti));
 
         store.methods.toggleLoaderGlobale();
         const risultato = await creaRecordLOD4(fd);
-        console.log(risultato);
         if (risultato.success) {
           store.methods.setAlert('Operazione andata a buon fine');
+          cancellaAnteprima();
           const filePaths = await getListaImmagini(percorsoCartella.value);
           downloadRef.value.aggiornaFilePaths(filePaths);
         }
@@ -231,10 +229,6 @@ export default {
       }
     }
 
-    function stampadatiul() {
-      console.log(state.datiCaricamento);
-    }
-
     return {
       store,
       downloadRef,
@@ -254,7 +248,6 @@ export default {
       salvaImmagine,
       interrogaImmagine,
       anagraficaImmagine,
-      stampadatiul,
     }
   }
 }

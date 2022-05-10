@@ -475,25 +475,30 @@ async function integraAtt(jsonAtt) {
 async function uploadImmagine(files, dati) {
     const file = files.file;
     const datiJson = JSON.parse(dati.dati);
-    console.log(datiJson);
+    const percorso = datiJson.percorso;
     try {
         await clientM10a.query('BEGIN;');
         try {
             // query con dati
-            const arrayDatiImg = [];
-            // await clientM10a.query(`INSERT INTO ${ambito}."${datiJson.entità}" ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_con", "data_ins", "data_ultima_mod", "strumentaz", "id_main10ance", "cl_racc", "st_cons", "liv_urg", "commenti", "doc", "autore_ultima_mod", "id_att_ciclica", "eseguito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectContr}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));`, arrayDatiImg);
+            const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.artista, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, `${percorso}/${file.name}`];
+            const idMap = {
+                arredo: 'id_arr',
+                dipinto_murale: 'id_dipmur',
+                pavimento_decorativo: 'id_pd',
+                quadro: 'id_quadro',
+                statua: 'id_statua',
+            };
+            await clientM10a.query(`INSERT INTO ${ambito}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9));`, arrayDatiImg);
 
             // caricamento immagine supabase
-            const percorso = datiJson.percorso;
             const fileOptions = {contentType: file.mimetype};
-            // const {error} = await supabase.storage.from("sacri-monti").upload(`${percorso}/${file.name}`, file.data, fileOptions);
-            // if (error) throw error;
+            const {error} = await supabase.storage.from("sacri-monti").upload(`${percorso}/${file.name}`, file.data, fileOptions);
+            if (error) throw error;
         }
         catch(err) {
             throw err;
         }
-        // await clientM10a.query('COMMIT;');
-        await clientM10a.query("ROLLBACK;");
+        await clientM10a.query('COMMIT;');
         return true;
     }
     catch(e) {
@@ -504,29 +509,28 @@ async function uploadImmagine(files, dati) {
 }
 
 async function eliminaImmagini(jsonDati) {
-    console.log(jsonDati);
     const listaImmagini = jsonDati.immagini;
     try {
-        // await clientM10a.query('BEGIN;');
+        await clientM10a.query('BEGIN;');
         try {
             // query elimina record
-            // await clientM10a.query('...;');
-            // N.B: per eliminare il record nel db, è necessario avere un attributo "percorso_file"
-            // su cui salvare il path dell'immagine quando si fa l'upload
+            for await (const img of listaImmagini) {
+                await clientM10a.query(`DELETE FROM ${ambito}.${jsonDati.entità} WHERE "immagine" IN (($1));`, [img]);
+            }
 
             // eliminazione immagine supabase
-            const {data, error} = await supabase.storage.from("sacri-monti").remove(listaImmagini);
+            const {error} = await supabase.storage.from("sacri-monti").remove(listaImmagini);
             if (error) throw error;
         }
         catch(err) {
             throw err;
         }
-        // await clientM10a.query('COMMIT;');
+        await clientM10a.query('COMMIT;');
         return true;
     }
     catch(e) {
         console.log(e);
-        // await clientM10a.query("ROLLBACK;");
+        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
