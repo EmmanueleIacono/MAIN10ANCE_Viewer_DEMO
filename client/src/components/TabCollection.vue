@@ -27,8 +27,9 @@
       <BtnBIM @click="anagraficaImmagine" v-if="verificaDisplay('galleryDati')" class="btn-img-plus" icona="glyphicon-plus" nome="img-anagrafica" title="Aggiungi o modifica dati" colore="verde" />
     </div>
     <div class="explorer-body">
-      <!-- <button @click="stampadatiul">stampa dati upload</button> -->
+      <button @click="stampadatiul">stampa dati upload</button>
       <UploadImage @annullaCaricamentoImmagine="cancellaAnteprima" @salvaCaricamentoImmagine="salvaImmagine" v-if="datiCaricamento.anteprimaImg" :source="datiCaricamento.anteprimaImg" :percorso="percorsoCartella" :id_main10ance="id_main10ance" />
+      <ModuloAnagrafica ref="anagraficaRef" v-if="datiAnagrafica.moduloAnagraficaVisibile" />
     </div>
   </Explorer>
 </div>
@@ -47,6 +48,7 @@ import DownloadImage from './TabCollectionDownloadImage.vue';
 import UploadImage from './TabCollectionUploadImage.vue';
 import CreaPercorso from './TabCollectionPercorso.vue';
 import Galleria from './TabCollectionGallery.vue';
+import ModuloAnagrafica from './TabCollectionModuloAnagrafica.vue';
 
 export default {
   name: 'TabCollection',
@@ -59,12 +61,14 @@ export default {
     UploadImage,
     CreaPercorso,
     Galleria,
+    ModuloAnagrafica,
   },
   setup() {
     const store = inject('store');
     const downloadRef = ref(null);
     const inputRef = ref(null);
     const labelRef = ref(null);
+    const anagraficaRef = ref(null);
     const state = reactive({
       datiGalleria: {
         galleriaVisibile: false,
@@ -84,10 +88,14 @@ export default {
         anteprimaImg: null,
         file: null,
         idImmagine: '',
+      },
+      datiAnagrafica: {
+        moduloAnagraficaVisibile: false,
       }
     });
     provide('stateArtifact', state.datiNavigazione);
     provide('stateGalleria', state.datiGalleria);
+    provide('stateAnagrafica', state.datiAnagrafica);
 
     const percorsoCartella = computed(() => `${state.datiNavigazione.selectLocalità}/${state.datiNavigazione.selectEdificio}/${state.datiNavigazione.selectElemento}`);
     const id_main10ance = computed(() => `${state.datiNavigazione.selectLocalità}|${state.datiNavigazione.selectEdificio}|${state.datiNavigazione.selectElemento}|${state.datiCaricamento.idImmagine}`);
@@ -133,6 +141,7 @@ export default {
 
     function deseleziona() {
       downloadRef.value.deselectImage();
+      if (anagraficaRef.value) anagraficaRef.value.chiudiScheda();
     }
 
     async function eliminaImmagine() {
@@ -141,7 +150,7 @@ export default {
         store.methods.setAlert('Nessun elemento selezionato');
         return;
       }
-      const confermaProcedere = await store.methods.setConfirm("Sei sicuro di voler eliminare gli elementi selezionati? L'operazione non può essere annullata.");
+      const confermaProcedere = await store.methods.setConfirm("Sei sicuro di voler eliminare gli elementi selezionati? L'operazione è irreversibile.");
       if (!confermaProcedere) return;
       const jsonReq = {};
       jsonReq.immagini = [...daEliminare];
@@ -162,10 +171,13 @@ export default {
 
     async function salvaImmagine(dati) {
       if (verificaPercorso(percorsoCartella.value)) {
-        console.log(dati);
-        console.log(percorsoCartella.value);
-        console.log(state.datiCaricamento);
-        const datiCompleti = {...dati, id_immagine: state.datiCaricamento.idImmagine, id_main10ance: id_main10ance.value, percorso: percorsoCartella.value};
+        const datiCompleti = {
+          ...dati,
+          id_immagine: state.datiCaricamento.idImmagine,
+          id_main10ance: id_main10ance.value,
+          percorso: percorsoCartella.value,
+          entità: state.datiNavigazione.selectElemento,
+        };
         console.log(datiCompleti);
         const fd = new FormData();
         fd.append('file', state.datiCaricamento.file);
@@ -190,8 +202,18 @@ export default {
     }
 
     async function interrogaImmagine() {
-      // const daInterrogare = downloadRef.value.getPercorsiSelezionati();
-      alert('interroga immagine');
+      const daInterrogare = downloadRef.value.getPercorsiSelezionati();
+      if (!daInterrogare.length) {
+        store.methods.setAlert('Nessun elemento selezionato');
+        return;
+      }
+      else if (daInterrogare.length !== 1) {
+        store.methods.setAlert('Selezionare un solo elemento per volta');
+        return;
+      }
+      else {
+        store.methods.setAlert('Interroga - WIP');
+      }
     }
 
     async function anagraficaImmagine() {
@@ -205,19 +227,20 @@ export default {
         return;
       }
       else {
-        alert('anagrafica immagine');
+        state.datiAnagrafica.moduloAnagraficaVisibile = true;
       }
     }
 
-    // function stampadatiul() {
-    //   console.log(state.datiCaricamento);
-    // }
+    function stampadatiul() {
+      console.log(state.datiCaricamento);
+    }
 
     return {
       store,
       downloadRef,
       inputRef,
       labelRef,
+      anagraficaRef,
       ...toRefs(state),
       percorsoCartella,
       id_main10ance,
@@ -231,7 +254,7 @@ export default {
       salvaImmagine,
       interrogaImmagine,
       anagraficaImmagine,
-      // stampadatiul,
+      stampadatiul,
     }
   }
 }

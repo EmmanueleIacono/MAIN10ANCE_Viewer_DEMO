@@ -40,6 +40,7 @@ export default {
       percorsiSelezionati: [],
     });
     const stateGalleria = inject('stateGalleria');
+    const stateAnagrafica = inject('stateAnagrafica');
 
     watch(() => props.percorsoCartella, async newpath => {
       if (verificaPercorso(props.percorsoCartella)) {
@@ -76,6 +77,8 @@ export default {
     function isSelected(percorsoFile) {
       if (!state.percorsiSelezionati.includes(percorsoFile)) state.percorsiSelezionati.push(percorsoFile);
       else state.percorsiSelezionati.splice(state.percorsiSelezionati.indexOf(percorsoFile), 1);
+
+      if (stateAnagrafica.moduloAnagraficaVisibile && state.percorsiSelezionati.length !== 1) stateAnagrafica.moduloAnagraficaVisibile = false;
     }
 
     function deselectImage() {

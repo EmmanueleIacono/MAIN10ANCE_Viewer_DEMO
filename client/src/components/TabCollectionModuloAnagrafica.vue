@@ -54,6 +54,7 @@ export default {
   },
   setup() {
     const store = inject('store');
+    const stateAnagrafica = inject('stateAnagrafica');
     const schedaRegistrata = ref(false);
     const state = reactive({
       descrizione_sistema: '',
@@ -100,8 +101,7 @@ export default {
     }
 
     function chiudiScheda() {
-      alert('chiudi scheda');
-      // store.stateBIM.schedeModuliVisibile = false;
+      stateAnagrafica.moduloAnagraficaVisibile = false;
       resetState();
     }
 

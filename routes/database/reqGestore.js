@@ -475,29 +475,30 @@ async function integraAtt(jsonAtt) {
 async function uploadImmagine(files, dati) {
     const file = files.file;
     const datiJson = JSON.parse(dati.dati);
-    console.log(file);
     console.log(datiJson);
     try {
-        // await clientM10a.query('BEGIN;');
+        await clientM10a.query('BEGIN;');
         try {
             // query con dati
-            // await clientM10a.query('...;');
+            const arrayDatiImg = [];
+            // await clientM10a.query(`INSERT INTO ${ambito}."${datiJson.entità}" ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_con", "data_ins", "data_ultima_mod", "strumentaz", "id_main10ance", "cl_racc", "st_cons", "liv_urg", "commenti", "doc", "autore_ultima_mod", "id_att_ciclica", "eseguito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectContr}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));`, arrayDatiImg);
 
             // caricamento immagine supabase
             const percorso = datiJson.percorso;
             const fileOptions = {contentType: file.mimetype};
-            const {error} = await supabase.storage.from("sacri-monti").upload(`${percorso}/${file.name}`, file.data, fileOptions);
-            if (error) throw error;
+            // const {error} = await supabase.storage.from("sacri-monti").upload(`${percorso}/${file.name}`, file.data, fileOptions);
+            // if (error) throw error;
         }
         catch(err) {
             throw err;
         }
         // await clientM10a.query('COMMIT;');
+        await clientM10a.query("ROLLBACK;");
         return true;
     }
     catch(e) {
         console.log(e);
-        // await clientM10a.query("ROLLBACK;");
+        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
