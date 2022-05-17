@@ -17,7 +17,7 @@
 
 <script>
 import {reactive, watch, toRefs, inject} from 'vue';
-import { getListaImmagini, downloadImmagini } from '../js/richieste';
+import { getListaImmagini, downloadImmagini, getInfoImmagine } from '../js/richieste';
 import {verificaPercorso} from '../js/shared';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 import Details from './elementi/Details.vue';
@@ -41,6 +41,7 @@ export default {
     });
     const stateGalleria = inject('stateGalleria');
     const stateAnagrafica = inject('stateAnagrafica');
+    const stateArtifact = inject('stateArtifact');
 
     watch(() => props.percorsoCartella, async newpath => {
       if (verificaPercorso(props.percorsoCartella)) {
@@ -60,6 +61,7 @@ export default {
 
         await Promise.all(newFilePaths.map(async path => {
           const fileImmagine = await downloadImmagini(path);
+          const infoImmagine = await getInfoImmagine(path, stateArtifact.selectElemento);
 
           if (fileImmagine.errMsg) {
             console.log(fileImmagine.errMsg);
@@ -67,7 +69,7 @@ export default {
             return;
           }
 
-          stateGalleria.listaImmagini.push({ object: URL.createObjectURL(fileImmagine), percorso: path });
+          stateGalleria.listaImmagini.push({ object: URL.createObjectURL(fileImmagine), percorso: path, info: infoImmagine[0] });
         }));
   
         state.caricamento = false;

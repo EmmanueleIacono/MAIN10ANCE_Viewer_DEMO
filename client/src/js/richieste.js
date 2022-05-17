@@ -260,6 +260,12 @@ export async function downloadImmagini(percorsoFile) {
     return resBlob;
 }
 
+export async function getInfoImmagine(percorsoFile, tabella) {
+    const res = await fetch('/t/Main10ance_DB/LOD4/info', {method: "GET", headers: {"percorso": JSON.stringify(percorsoFile), "tabella": JSON.stringify(tabella)}});
+    const resJson = await res.json();
+    return resJson;
+}
+
 export async function creaRecordLOD4(datiBody) {
     const res = await fetch('/g/Main10ance_DB/LOD4/nuovo', {method: "POST", body: datiBody});
     const resJson = await res.json();
