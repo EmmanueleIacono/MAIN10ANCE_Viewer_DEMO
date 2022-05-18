@@ -296,16 +296,15 @@ async function creaGraficiDashboard($) {
           datasets: [{
             data: dataBIM,
             backgroundColor: colorBIM,
-        }],
-      labels: tableBIM,
-    },
-    
-      options: {
-        plugins: {
-          legend: {display: true, position: 'left'},
-        }
-      },
-      responsive: true
+          }],
+          labels: tableBIM,
+        },
+        options: {
+          plugins: {
+            legend: {display: true, position: 'left'},
+          },
+          responsive: true
+        },
       });
     }
   }

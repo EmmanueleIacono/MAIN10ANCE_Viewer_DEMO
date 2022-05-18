@@ -215,7 +215,7 @@ function creaListaOpzioni(listaOpzioni, targetSelect, parametroValue, parametroT
 // RICHIESTE
 
 async function prendiLOD(lod) {
-    const risultato = await fetch('/o/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
+    const risultato = await fetch('/t/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }

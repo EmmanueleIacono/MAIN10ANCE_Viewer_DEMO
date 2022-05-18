@@ -13,7 +13,6 @@
         <option value="anno">2018</option>
       </select>
     </div>
-    <!-- <div class="col-sm-12 col-lg-8"> -->
     <div class="col-sm-12 col-lg-12">
       <div class="recent-report">
         <div>
@@ -23,44 +22,6 @@
         </div>
       </div>
     </div>
-    <!-- <div class="col-sm-12 col-lg-4"> -->
-      <!-- <div class="task-progress">
-        <div class="au-skill-container">
-          <div class="au-progress">
-            <span class="au-progress__title">Controllo</span>
-            <div class="au-progress__bar">
-              <div class="au-progress__inner js-progressbar-simple" role="progressbar" data-transitiongoal="90">
-                <span class="au-progress__value js-value"></span>
-              </div>
-            </div>
-          </div>
-          <div class="au-progress">
-            <span class="au-progress__title">Manutenzione ordinaria</span>
-            <div class="au-progress__bar">
-              <div class="au-progress__inner js-progressbar-simple" role="progressbar" data-transitiongoal="65">
-                <span class="au-progress__value js-value"></span>
-              </div>
-            </div>
-          </div>
-          <div class="au-progress">
-            <span class="au-progress__title">Manutenzione correttiva</span>
-            <div class="au-progress__bar">
-              <div class="au-progress__inner js-progressbar-simple" role="progressbar" data-transitiongoal="85">
-                <span class="au-progress__value js-value"></span>
-              </div>
-            </div>
-          </div>
-          <div class="au-progress">
-            <span class="au-progress__title">Restauro</span>
-            <div class="au-progress__bar">
-              <div class="au-progress__inner js-progressbar-simple" role="progressbar" data-transitiongoal="95">
-                <span class="au-progress__value js-value"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
-    <!-- </div> -->
   </div>
 </Card>
 </template>
@@ -123,7 +84,6 @@ export default {
       plugins: {
         legend: {display: true, position: 'top',
           font: {size: 12, family: 'Poppins'}},
-        // responsive: true,
         scales: [{
           x: {display: true, color: 'grey'},
           y: {display: true, color: 'grey'}
@@ -135,7 +95,6 @@ export default {
         },
       animations: {
         animation: true,
-        // tension: {duration: 1000, easing: 'linear', from: 1, to: 0, loop: true}
       }
     }
 
@@ -149,7 +108,6 @@ export default {
 
 <style scoped>
 .title-2 {
-  /* text-transform: capitalize; */
   font-weight: 400;
   font-size: 24px;
   line-height: 1;
