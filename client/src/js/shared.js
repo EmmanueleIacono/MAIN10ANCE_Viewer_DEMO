@@ -6,7 +6,7 @@ import {resetColori} from './BIM';
 ////////// FUNZIONI UTILI E/O CONDIVISE TRA PIU' FILE JS //////////
 
 // GENERAZIONE DI PALETTE DI COLORI
-export function creaColori(nColori, hueStart, hueEnd, sat, lum) {
+export function creaColori(nColori, hueStart = 0, hueEnd = 300, sat = 80, lum = 50) {
     const listaHue = intervalliHue(nColori, hueStart, hueEnd);
     const listaHex = listaHue.map((hue) => (hslToHex(hue, sat, lum)));
     return listaHex;

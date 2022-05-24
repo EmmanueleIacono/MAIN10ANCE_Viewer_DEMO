@@ -1,17 +1,12 @@
 <template>
-<Card>
+<div>
   Gestione utenti
-</Card>
+</div>
 </template>
 
 <script>
-import Card from './elementi/Card.vue';
-
 export default {
   name: 'TabDashboardGestioneUtenti',
-  components: {
-    Card,
-  },
 }
 </script>
 

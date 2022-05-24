@@ -5,7 +5,7 @@
       <Card>
         <div>
           <h3 class="title-2 m-b-40">Controllo</h3>
-          <BarChart :chartData="testBarData1" :options="optionsBar" />
+          <BarChart :chartData="testBarData1" :options="optionsBar" class="mxh" />
         </div>
       </Card>
     </div>
@@ -13,7 +13,7 @@
       <Card class="mr">
         <div>
           <h3 class="title-2 m-b-40">Controllo</h3>
-          <PolarAreaChart :chartData="testPolarData1" :options="optionsPolar" />
+          <PolarAreaChart :chartData="testPolarData1" :options="optionsPolar" class="mxh" />
         </div>
       </Card>
     </div>
@@ -21,7 +21,7 @@
       <Card class="ml">
         <div>
           <h3 class="title-2 m-b-40">Controllo</h3>
-          <RadarChart :chartData="testRadarData1" :options="optionsRadar" />
+          <RadarChart :chartData="testRadarData1" :options="optionsRadar" class="mxh" />
         </div>
       </Card>
     </div>
@@ -31,7 +31,7 @@
       <Card>
         <div>
           <h3 class="title-2 m-b-40">Intervento</h3>
-          <BarChart :chartData="testBarData2" :options="optionsBar" />
+          <BarChart :chartData="testBarData2" :options="optionsBar" class="mxh" />
         </div>
       </Card>
     </div>
@@ -39,7 +39,7 @@
       <Card class="mr">
         <div>
           <h3 class="title-2 m-b-40">Intervento</h3>
-          <PolarAreaChart :chartData="testPolarData2" :options="optionsPolar" />
+          <PolarAreaChart :chartData="testPolarData2" :options="optionsPolar" class="mxh" />
         </div>
       </Card>
     </div>
@@ -364,4 +364,5 @@ h3 {
 .m-b-40 {margin-bottom: 40px;}
 .ml {margin-left: 10px;}
 .mr {margin-right: 10px;}
+.mxh {max-height: 400px;}
 </style>

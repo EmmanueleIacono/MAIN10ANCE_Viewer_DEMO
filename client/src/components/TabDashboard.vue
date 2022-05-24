@@ -7,11 +7,16 @@
       <ElementiEdilizi />
       <ElementiGIS />
       <GraficiDettaglio />
-      <GestioneUtenti />
     </div>
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
-    Dashboard Explorer - WIP
+    <Details summary="FILTRI">
+      qui dentro filtri dati
+    </Details>
+    <br />
+    <Details summary="GESTIONE UTENTI">
+      <GestioneUtenti />
+    </Details>
   </Explorer>
 </div>
 </template>
@@ -26,6 +31,7 @@ import ElementiEdilizi from './TabDashboardElementiEdilizi.vue';
 import ElementiGIS from './TabDashboardElementiGIS.vue';
 import GraficiDettaglio from './TabDashboardGraficiDettaglio.vue';
 import GestioneUtenti from './TabDashboardGestioneUtenti.vue';
+import Details from './elementi/Details.vue';
 
 export default {
   name: 'TabDashboard',
@@ -38,6 +44,7 @@ export default {
     ElementiGIS,
     GraficiDettaglio,
     GestioneUtenti,
+    Details,
   },
   setup() {
     const store = inject('store');

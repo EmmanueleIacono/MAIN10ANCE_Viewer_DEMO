@@ -277,3 +277,26 @@ export async function eliminaRecordLOD4(jsonReq) {
     const resJson = await res.json();
     return resJson;
 }
+
+export async function getDatiElementiEdiliziDashboard() {
+    const lod3 = await prendiLOD(3);
+    const listaLod3 = lod3.map(tab => tab.tabella);
+    const listaAlias = lod3.map(tab => tab.alias);
+    const risultato = await fetch('/g/Main10ance_DB/dashboard/conteggio-elementi', {method: "GET", headers: {"content-type": "application/json", tabelle: JSON.stringify(listaLod3), alias: JSON.stringify(listaAlias)}});
+    const risTradotto = await risultato.json();
+    const BIMresult = risTradotto.map(element => (element.count));
+    const BIMlegend = risTradotto.map(element => (element.nome_tabella));
+    return [BIMresult, BIMlegend];
+}
+
+export async function getDatiElementiGISDashboard() {
+    const listaGIS = await getTabelleGIS();
+    const listaTabelle = listaGIS.map(tab => tab.tabella);
+    const listaAlias = listaGIS.map(tab => tab.alias);
+    const risultato = await fetch('/g/Main10ance_DB/dashboard/conteggio-elementi', {method: "GET", headers: {"content-type": "application/json", tabelle: JSON.stringify(listaTabelle), alias: JSON.stringify(listaAlias)}});
+    const risTradotto = await risultato.json();
+    const list = risTradotto.filter(element => (parseInt(element.count)));
+    const GISresult = list.map(element => (element.count));
+    const GISlegend = list.map(element => (element.nome_tabella));
+    return [GISresult, GISlegend];
+}
