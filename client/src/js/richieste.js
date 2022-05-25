@@ -300,3 +300,77 @@ export async function getDatiElementiGISDashboard() {
     const GISlegend = list.map(element => (element.nome_tabella));
     return [GISresult, GISlegend];
 }
+
+export async function getInfoGestioneUtenti() {
+    const utentiRaw = await fetch("/a/utenti", {method: "GET", headers: {"content-type": "application/json"} });
+    const utenti = await utentiRaw.json();
+    return utenti;
+}
+
+export async function getRuoliEnum() {
+    const ruoliRaw = await fetch("/a/ruoli", {method: "GET", headers: {"content-type": "application/json"} });
+    const ruoli = await ruoliRaw.json();
+    return ruoli;
+}
+
+export async function updateRuoloUtente(infoJson) {
+    let ris;
+    try {
+        const risultatoRaw = await fetch("/a/ruoli/nuovo-ruolo", {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(infoJson) });
+        const risultato = await risultatoRaw.json();
+        ris = risultato.success;
+    }
+    catch(e) {
+        console.log("Errore nell'aggiornamento dei ruoli");
+        console.log(e);
+        ris = false;
+    }
+    finally {
+        return ris;
+    }
+}
+
+export async function conteggioRuoli() {
+    const risultato = await fetch('/g/Main10ance_DB/dashboard/conteggio-ruoli', {method: "GET", headers: {"content-type": "application/json"}});
+    const risTradotto = await risultato.json();
+    const dataUtenti = risTradotto.map(element => (element.count));
+    const legendUtenti = risTradotto.map(element => (element.ruolo));
+    return [dataUtenti, legendUtenti];
+}
+
+export async function conteggioModelli() {
+    const località = await fetch('/g/DB_Servizio/lista-localita', {method: "GET", headers: {"content-type": "application/json"}});
+    const localitàJson = await località.json();
+    const listaNomi = localitàJson.map(tab => tab.nome);
+    const listaSigle = localitàJson.map(tab => tab.sigla);
+    const risultato = await fetch('/g/Main10ance_DB/dashboard/conteggio-modelli', {method: "GET", headers: {"content-type": "application/json", nomi: JSON.stringify(listaNomi), sigle: JSON.stringify(listaSigle)}});
+    const risTradotto = await risultato.json();
+    const modelli= risTradotto.map(element => (element.count));
+    const nomi = risTradotto.map(element => (element.nome_tabella));
+    return [modelli, nomi];
+}
+
+async function leggiNumeroOggettiBIM() {
+    const tabelleBIM = await fetch("/g/DB_Servizio/LOD/TabelleBIM", {method: "GET", headers: {"content-type": "application/json"}});
+    const tabelleBIMjson = await tabelleBIM.json();
+    const listaTabelle = tabelleBIMjson.map(tab => tab.tabella);
+    const risultato = await fetch('/g/Main10ance_DB/dashboard/numero-oggetti', {method: "GET", headers: {"content-type": "application/json", tabelle: JSON.stringify(listaTabelle)}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+async function leggiNumeroOggettiGIS() {
+    const tabelleGISjson = await getTabelleGIS();
+    const listaTabelle = tabelleGISjson.map(tab => tab.tabella);
+    const risultato = await fetch('/g/Main10ance_DB/dashboard/numero-oggetti', {method: "GET", headers: {"content-type": "application/json", tabelle: JSON.stringify(listaTabelle)}});
+    const risTradotto = await risultato.json();
+    return risTradotto;
+}
+
+export async function conteggioOggetti() {
+    const datiBIM = await leggiNumeroOggettiBIM();
+    const datiGIS = await leggiNumeroOggettiGIS();
+    const oggettiBIM = datiBIM.sum;
+    const oggettiGIS = datiGIS.sum;
+    return [oggettiBIM, oggettiGIS];
+}

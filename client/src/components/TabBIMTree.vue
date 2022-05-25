@@ -37,7 +37,6 @@ export default {
       const nodi = await getObjects();
       const nodiFiltrati = nodi.filter(nodo => bkts.includes(nodo.id));
       state.nodi = store.state.userSettings.user_id ? nodiFiltrati : nodi;
-      console.log(state.nodi);
       state.nodi.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
     }
 

@@ -4,12 +4,12 @@
     <div class="overview-box clearfix">
       <div class="m-b-20">
         <div class="icon"><i :class="icona" class="zmdi"></i></div>
-        <div class="text"><h2>{{numContenuto}}</h2><span>{{infoContenuto}}</span></div>
+        <div class="text"><h2>{{totale}}</h2><span>{{infoContenuto}}</span></div>
       </div>
       <div class="m-b-20">
         <div class="overview-chart">
           <div class="canvas">
-            <DoughnutChart :chartData="testData" :options="options" />
+            <DoughnutChart :chartData="chartData" :options="options" />
           </div>
         </div>
       </div>
@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import { Chart, DoughnutController, ArcElement, Tooltip, CategoryScale, LinearScale } from 'chart.js';
 import {DoughnutChart} from 'vue-chart-3';
 
@@ -31,29 +32,38 @@ export default {
   },
   props: {
     infoContenuto: String,
-    numContenuto: Number,
     gradiente: String,
     icona: {
       type: String,
       default: 'zmdi-info',
+    },
+    labels: {
+      type: Array,
+      default: () => ['Data_A', 'Data_B', 'Data_C', 'Data_D', 'Data_E'],
+    },
+    data: {
+      type: Array,
+      default: () => [10, 20, 50, 15, 5],
     }
   },
-  setup() {
-    const testData = {
-      labels: ['Data_A', 'Data_B', 'Data_C', 'Data_D', 'Data_E'],
+  setup(props) {
+    const chartData = computed(() => ({
+      labels: props.labels,
       datasets: [
         {
-          data: [30, 40, 60, 70, 5],
+          data: props.data,
           borderColor: "white",
           borderWidth: "2",
           backgroundColor: "rgba(255,255,255,.3)",
           hoverBackgroundColor: 'white',
         },
       ],
-    };
+    }));
+
+    const totale = computed(() => chartData.value.datasets[0].data.map(n => parseInt(n)).reduce((sommaParziale, a) => sommaParziale + a, 0));
+
     const options = {
       cutout: '70%',
-      // maintainAspectRatio: false,
       plugins: {
         legend: {display: false}
       },
@@ -61,11 +71,11 @@ export default {
         x: {display: false, beginAtZero: true},
         y: {display: false, beginAtZero: true}
       },
-      // animation: false
     }
 
     return {
-      testData,
+      chartData,
+      totale,
       options,
     }
   }

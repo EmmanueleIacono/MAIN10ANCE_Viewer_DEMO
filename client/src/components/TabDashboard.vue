@@ -14,7 +14,7 @@
       qui dentro filtri dati
     </Details>
     <br />
-    <Details summary="GESTIONE UTENTI">
+    <Details v-if="store.getters.getUsrVwList().includes('gestioneUtenti')" summary="GESTIONE UTENTI">
       <GestioneUtenti />
     </Details>
   </Explorer>
