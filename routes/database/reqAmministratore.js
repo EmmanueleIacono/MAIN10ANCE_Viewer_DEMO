@@ -1,15 +1,15 @@
 const express = require('express');
-const appA = express.Router();
-appA.use(express.json());
-appA.use(express.static("public"));
+const app = express.Router();
+app.use(express.json());
+app.use(express.static("public"));
 
-const {clientM10a, clientServ} = require('./connessioni');
+const {clientM10a} = require('./connessioni');
 
 //////////          RICHIESTE          //////////
 
 // per testare la richiesta:
 // fetch("/a/utenti", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appA.get('/utenti', async (req, res) => {
+app.get('/utenti', async (req, res) => {
     const users = await getUtenti();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(users));
@@ -17,13 +17,13 @@ appA.get('/utenti', async (req, res) => {
 
 // per testare la richiesta
 // fetch("/a/ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appA.get('/ruoli', async (req, res) => {
+app.get('/ruoli', async (req, res) => {
     const ruoli = await getListaRuoli();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(ruoli));
 });
 
-appA.patch('/ruoli/nuovo-ruolo', async (req, res) => {
+app.patch('/ruoli/nuovo-ruolo', async (req, res) => {
     let result = {}
     try {
         const reqJson = req.body;
@@ -41,7 +41,7 @@ appA.patch('/ruoli/nuovo-ruolo', async (req, res) => {
 
 // per testare la richiesta
 // fetch("/a/conteggio-ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-appA.get('/conteggio-ruoli', async (req, res) => {
+app.get('/conteggio-ruoli', async (req, res) => {
     const ruoli = await conteggioRuoli();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(ruoli));
@@ -51,7 +51,7 @@ appA.get('/conteggio-ruoli', async (req, res) => {
 
 async function getUtenti() {
     try {
-        const results = await clientServ.query(`SELECT "user", "email", "ruolo" FROM "utenti" ORDER BY "user";`);
+        const results = await clientM10a.query(`SELECT "user", "email", "ruolo" FROM servizio."utenti" ORDER BY "user";`);
         return results.rows;
     }
     catch(e) {
@@ -61,7 +61,7 @@ async function getUtenti() {
 
 async function getListaRuoli() {
     try {
-        const result = await clientServ.query(`SELECT ARRAY(SELECT "ruolo" FROM "ruoli") AS "roles";`);
+        const result = await clientM10a.query(`SELECT ARRAY(SELECT "ruolo" FROM servizio."ruoli") AS "roles";`);
         return result.rows[0].roles;
     }
     catch(e) {
@@ -71,7 +71,7 @@ async function getListaRuoli() {
 
 async function updateRuoloUtente(userJson) {
     try {
-        await clientServ.query(`UPDATE "utenti" SET "ruolo" = ($1) WHERE "user" = ($2);`, [userJson.ruolo, userJson.user]);
+        await clientM10a.query(`UPDATE servizio."utenti" SET "ruolo" = ($1) WHERE "user" = ($2);`, [userJson.ruolo, userJson.user]);
     }
     catch(e) {
         throw(e);
@@ -80,7 +80,7 @@ async function updateRuoloUtente(userJson) {
 
 async function conteggioRuoli() {
     try {
-        const result = await clientServ.query(`SELECT ruolo, COUNT(ruolo) FROM utenti GROUP BY ruolo;`);
+        const result = await clientM10a.query(`SELECT "ruolo", COUNT(ruolo) FROM servizio."utenti" GROUP BY "ruolo";`);
         return result.rows;
     }
     catch(e) {
@@ -88,4 +88,4 @@ async function conteggioRuoli() {
     }
 }
 
-module.exports = appA;
+module.exports = app;

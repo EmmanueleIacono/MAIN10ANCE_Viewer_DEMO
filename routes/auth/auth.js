@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 router.use(express.json());
 
-const {clientServ} = require('../database/connessioni');
+const {clientM10a} = require('../database/connessioni');
 
 const scadenza = new Date(Date.now() + 1000*60*60*24*365);
 
@@ -49,6 +49,7 @@ router.post('/login', async (req, res, next) => {
             const comp = await bcrypt.compare(req.body.pw, datiUtente.pw);
             if (comp) {
                 const roleSettings = await getSettingsByRuolo(datiUtente.role);
+                const ambitoSettings = await getSettingsByAmbito(datiUtente.ambito);
                 res.cookie('user_id', datiUtente.username, {
                     httpOnly: true,
                     secure: (!process.env.DEV_PLACEHOLDER),
@@ -61,11 +62,18 @@ router.post('/login', async (req, res, next) => {
                     signed: true,
                     expires: scadenza
                 });
+                res.cookie('ambito', datiUtente.ambito, {
+                    httpOnly: true,
+                    secure: (!process.env.DEV_PLACEHOLDER),
+                    signed: true,
+                    expires: scadenza
+                });
                 res.json({
                     message: 'Login completato',
                     id: datiUtente.username,
                     bim_vw_sets: roleSettings.bim_vw_sets,
-                    usr_vw: roleSettings.usr_vw
+                    usr_vw: roleSettings.usr_vw,
+                    buckets: ambitoSettings.buckets
                 });
             }
             else {
@@ -84,6 +92,7 @@ router.post('/login', async (req, res, next) => {
 router.get('/logout', (req, res) => {
     res.clearCookie('user_id');
     res.clearCookie('role');
+    res.clearCookie('ambito');
     res.json({
         message: 'Logout avvenuto con successo'
     });
@@ -102,7 +111,7 @@ function validazioneUsers(user) {
 
 async function getUtenteByNome(nome) {
     try {
-        const results = await clientServ.query(`SELECT "user" AS "username", "pw", "ruolo" AS "role" FROM "utenti" WHERE "user" = ($1);`, [nome]);
+        const results = await clientM10a.query(`SELECT "user" AS "username", "pw", "ruolo" AS "role", "ambito" FROM servizio."utenti" WHERE "user" = ($1);`, [nome]);
         return results.rows[0];
     }
     catch(e) {
@@ -112,7 +121,7 @@ async function getUtenteByNome(nome) {
 
 async function insertNuovoUtente(user) {
     try {
-        await clientServ.query(`INSERT INTO "utenti" ("user", "pw", "ruolo", "email") VALUES (($1), ($2), 'turista', ($3));`, [user.username, user.pw, user.email]);
+        await clientM10a.query(`INSERT INTO servizio."utenti" ("user", "pw", "ruolo", "email") VALUES (($1), ($2), 'turista', ($3));`, [user.username, user.pw, user.email]);
         return true;
     }
     catch(e) {
@@ -123,7 +132,17 @@ async function insertNuovoUtente(user) {
 
 async function getSettingsByRuolo(ruolo) {
     try {
-        const results = await clientServ.query(`SELECT "bim_vw_sets", "elementi_visibili" AS "usr_vw" FROM "ruoli" WHERE "ruolo" = ($1);`, [ruolo]);
+        const results = await clientM10a.query(`SELECT "bim_vw_sets", "elementi_visibili" AS "usr_vw" FROM servizio."ruoli" WHERE "ruolo" = ($1);`, [ruolo]);
+        return results.rows[0];
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function getSettingsByAmbito(ambito) {
+    try {
+        const results = await clientM10a.query(`SELECT "buckets", "schema", "storage" FROM servizio."ambiti" WHERE "ambito" = ($1);`, [ambito]);
         return results.rows[0];
     }
     catch(e) {
