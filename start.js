@@ -26,10 +26,7 @@ function main() {
     if (process.env.NODE_ENV === 'production') {
         app.use(express.static('client/dist'));
     }
-    // per localhost:3000, ma poi sarà eliminabile
-    else {
-        app.use(express.static(path.join(__dirname, 'public')));
-    }
+
     app.use(express.json({ limit: '50mb' }));
     app.use('/api/forge/oauth', require('./routes/oauth'));
     app.use('/api/forge/oss', require('./routes/oss'));

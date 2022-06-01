@@ -1,6 +1,4 @@
-const fs = require('fs');
 const express = require('express');
-const multer  = require('multer');
 const { BucketsApi, ObjectsApi } = require('forge-apis');
 
 const { getClient, getInternalToken } = require('./common/oauth');
