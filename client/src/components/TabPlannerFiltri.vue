@@ -1,5 +1,5 @@
 <template>
-  <Details class="loading-wrapper" summary="FILTRI" :open="true">
+  <Details class="loading-wrapper" summary="FILTRI STORICO" :open="true">
     <LoadingScreen :caricamento="caricamento" />
     <input v-model="vediSchedeAttivi" type="checkbox" id="check-generale">
     <label for="check-generale">ATTIVA FILTRI</label>
