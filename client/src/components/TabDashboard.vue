@@ -11,7 +11,7 @@
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
     <Details summary="FILTRI">
-      qui dentro filtri dati
+      WIP
     </Details>
     <br />
     <Details v-if="store.getters.getUsrVwList().includes('gestioneUtenti')" summary="GESTIONE UTENTI">

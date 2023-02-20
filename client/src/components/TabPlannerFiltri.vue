@@ -35,18 +35,18 @@
     <select v-model="selectElemento">
       <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option>
     </select>
-    <br>
+    <!-- <br>
     <input v-model="cbxStCons" :disabled="!vediSchedeAttivi" type="checkbox" id="check-stato-conservazione">
     <label for="check-stato-conservazione">Stato di conservazione</label>
     <select v-model="selectStCons">
       <option v-for="stCons in store.statePlanner.listaStCons" :key="stCons.unnest" :value="stCons.unnest">{{stCons.unnest}}</option>
-    </select>
-    <br>
+    </select> -->
+    <!-- <br>
     <input v-model="cbxFenomeno" :disabled="!vediSchedeAttivi" type="checkbox" id="check-fenomeno">
     <label for="check-fenomeno">Fenomeno</label>
     <select v-model="selectFenomeno">
       <option v-for="f in store.statePlanner.listaFenomeni" :key="f.id_gloss" :value="f.id_gloss">{{f.id_gloss}}</option>
-    </select>
+    </select> -->
     <br>
     <input v-model="cbxData" :disabled="!vediSchedeAttivi" type="checkbox" id="check-data">
     <label for="check-data">Data</label>
@@ -86,8 +86,8 @@ export default {
       selectLocalità: '',
       selectEdificio: '',
       selectElemento: '',
-      selectStCons: '',
-      selectFenomeno: '',
+      // selectStCons: '',
+      // selectFenomeno: '',
       selectDataDa: '',
       selectDataA: '',
       // listaSigleLoc: [],
@@ -130,8 +130,8 @@ export default {
     function inizializzaSelect() {
       if (store.statePlanner.listaSigleLoc.length) state.selectLocalità = store.statePlanner.listaSigleLoc[0].sigla;
       if (store.statePlanner.listaElementi.length) state.selectElemento = store.statePlanner.listaElementi[0].tabella;
-      if (store.statePlanner.listaStCons.length) state.selectStCons = store.statePlanner.listaStCons[0].unnest;
-      if (store.statePlanner.listaFenomeni.length) state.selectFenomeno = store.statePlanner.listaFenomeni[0].id_gloss;
+      // if (store.statePlanner.listaStCons.length) state.selectStCons = store.statePlanner.listaStCons[0].unnest;
+      // if (store.statePlanner.listaFenomeni.length) state.selectFenomeno = store.statePlanner.listaFenomeni[0].id_gloss;
     }
 
     function attivaTutto(tutto) {
@@ -139,8 +139,8 @@ export default {
       state.cbxLocalità = tutto;
       state.cbxEdificio = tutto;
       state.cbxElemento = tutto;
-      state.cbxStCons = tutto;
-      state.cbxFenomeno = tutto;
+      // state.cbxStCons = tutto;
+      // state.cbxFenomeno = tutto;
       state.cbxData = tutto;
     }
 
