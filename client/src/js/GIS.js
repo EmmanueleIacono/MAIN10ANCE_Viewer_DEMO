@@ -5,8 +5,10 @@ import proj4 from 'proj4';
 import 'proj4leaflet';
 
 import {getModel} from './BIM';
+import store from '../store/index';
 
 export let mappaGlb;
+export let newLocMatMarker;
 
 // CREAZIONE MAPPA
 export function creaMappa(divId, posizioneIniziale) {
@@ -15,6 +17,7 @@ export function creaMappa(divId, posizioneIniziale) {
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     const tiles = L.tileLayer(tileUrl, { attribution, "detectRetina": false, "maxNativeZoom": 20, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false});
     tiles.addTo(mappaGIS);
+    mappaGIS.on('click', addLocMat);
     if (!mappaGlb) {mappaGlb = mappaGIS};
     return mappaGIS;
 }
@@ -84,6 +87,15 @@ export const iconaCappelle = L.icon({
     shadowAnchor: [18, 15]
 });
 
+const iconaLocMat = L.icon({
+    iconUrl: require('/src/assets/img/icona_capp_blue_small.png'),
+    shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    shadowSize: [36, 36],
+    shadowAnchor: [18, 15]
+});
+
 export function creaMarker(edif, icona) {
     const marker = L.marker(edif.coord, {icon: icona}).bindPopup();
 
@@ -104,4 +116,21 @@ export function creaMarker(edif, icona) {
     });
 
     return marker;
+}
+
+// AGGIUNTA NUOVO PUNTO PER LOCALITÀ MATERIALI
+export function addLocMat(ev) {
+    // check se attiva una qualche "modalità modifica"
+    if (!store.stateGIS.editMode) return;
+    const {lat, lng} = ev.latlng;
+    console.log(lat, lng);
+    // se con click, marker esiste già, sostituire
+    rimuoviMarkerTemporaneo();
+    newLocMatMarker = new L.marker({lat, lng}, {icon: iconaLocMat}).addTo(mappaGlb);
+    // salvare marker da qualche parte
+    return newLocMatMarker;
+}
+
+export function rimuoviMarkerTemporaneo() {
+    if (newLocMatMarker) mappaGlb.removeLayer(newLocMatMarker);
 }

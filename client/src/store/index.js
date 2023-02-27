@@ -24,6 +24,7 @@ const stateGIS = reactive({
     entitàGIS: {},
     markerLoc: null,
     markerEdif: null,
+    editMode: false,
 });
 
 const stateBIM = reactive({
@@ -173,6 +174,14 @@ const methods = {
 
     setMarkerEdif(listaEdif) {
         stateGIS.markerEdif = listaEdif;
+    },
+
+    setEditModeGIStrue() {
+        stateGIS.editMode = true;
+    },
+
+    setEditModeGISfalse() {
+        stateGIS.editMode = false;
     },
 
     async recuperaDatiPlanner() {
