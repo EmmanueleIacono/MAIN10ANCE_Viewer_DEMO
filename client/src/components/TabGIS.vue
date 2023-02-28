@@ -107,7 +107,9 @@ export default {
 
     function salvaLocalMat() {
       console.log('salva');
+      store.methods.setEditModeGISfalse();
       state.confirmMode = false;
+      // quando salvo, id/sigla è LM_{$dataInteger()}
     }
 
     function annullaAddLocalMat() {
@@ -117,9 +119,8 @@ export default {
       state.confirmMode = false;
     }
 
-    // ci sono ancora problemi con alcune visualizzazioni dei bottoni, verificare bene
     function verificaDisplayAdd() {
-      return store.getters.getUsrVwList().includes('addLocMatGIS') && !store.stateGIS.editMode;
+      return store.getters.getUsrVwList().includes('addLocMatGIS') && !store.stateGIS.editMode && !state.confirmMode;
     }
 
     function verificaDisplayConf() {
@@ -127,11 +128,11 @@ export default {
     }
 
     function verificaDisplaySalva() {
-      return store.getters.getUsrVwList().includes('addLocMatGIS') && store.stateGIS.editMode && state.confirmMode;
+      return store.getters.getUsrVwList().includes('addLocMatGIS') && !store.stateGIS.editMode && state.confirmMode;
     }
 
     function verificaDisplayAnnulla() {
-      return store.getters.getUsrVwList().includes('addLocMatGIS') && store.stateGIS.editMode || state.confirmMode;
+      return store.getters.getUsrVwList().includes('addLocMatGIS') && (!(!store.stateGIS.editMode && !state.confirmMode));
     }
 
     return {

@@ -35,6 +35,14 @@ app.get('/DB_Servizio/MarkerEdif', async (req, res) => {
 });
 
 // per testare la richiesta:
+// fetch("/t/DB_Servizio/MarkerLocMat", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+app.get('/DB_Servizio/MarkerLocMat', async (req, res) => {
+    const markerLocMat = await leggiMarkerLocMat();
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(markerLocMat));
+});
+
+// per testare la richiesta:
 // fetch("/t/DB_Servizio/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 app.get('/DB_Servizio/LOD/TabelleGIS', async (req, res) => {
     const tabelleGIS = await leggiListaTabelleGIS();
@@ -112,6 +120,16 @@ async function leggiMarkerLoc() {
 async function leggiMarkerEdif() {
     try {
         const results = await clientM10a.query(`SELECT * FROM servizio."dati_edifici" ORDER BY CAST("numero" AS INTEGER);`);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiMarkerLocMat() {
+    try {
+        const results = await clientM10a.query(`SELECT * FROM servizio."dati_loc_mat" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {

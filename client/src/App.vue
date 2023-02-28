@@ -49,7 +49,7 @@
 
 <script>
 import {provide, onMounted} from 'vue';
-import {getTabelleGIS, getGIS, leggiDBMarkerLoc, leggiDBMarkerEdif} from './js/richieste';
+import {getTabelleGIS, getGIS, leggiDBMarkerLoc, leggiDBMarkerEdif, leggiDBMarkerLocMat} from './js/richieste';
 import store from '@/store';
 import Tab1 from './components/TabBIM.vue';
 import Tab2 from './components/TabGIS.vue';
@@ -82,8 +82,10 @@ export default {
     onMounted(async () => {
       const localitàJson = await leggiDBMarkerLoc();
       const edificiJson = await leggiDBMarkerEdif();
+      const locMatJson = await leggiDBMarkerLocMat();
       store.methods.setMarkerLoc(localitàJson);
       store.methods.setMarkerEdif(edificiJson);
+      store.methods.setMarkerLocMat(locMatJson);
     });
 
     function primoLoad() {

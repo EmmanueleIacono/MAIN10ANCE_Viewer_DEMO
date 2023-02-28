@@ -17,7 +17,7 @@ export function creaMappa(divId, posizioneIniziale) {
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     const tiles = L.tileLayer(tileUrl, { attribution, "detectRetina": false, "maxNativeZoom": 20, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false});
     tiles.addTo(mappaGIS);
-    mappaGIS.on('click', addLocMat);
+    // mappaGIS.on('click', addLocMat);
     if (!mappaGlb) {mappaGlb = mappaGIS};
     return mappaGIS;
 }
@@ -88,7 +88,7 @@ export const iconaCappelle = L.icon({
 });
 
 const iconaLocMat = L.icon({
-    iconUrl: require('/src/assets/img/icona_capp_blue_small.png'),
+    iconUrl: require('/src/assets/img/icona_cubo_v1.png'),
     shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
     iconSize: [30, 30],
     iconAnchor: [15, 15],
@@ -108,6 +108,30 @@ export function creaMarker(edif, icona) {
     contenitorePopup.appendChild(selettore);
     selettore.addEventListener('click', () => {
         getModel(edif.urn);
+        mappaGlb.closePopup();
+    });
+    
+    marker.on('popupopen', () => {
+        marker._popup.setContent(contenitorePopup);
+    });
+
+    return marker;
+}
+
+export function creaMarkerLocMat(locMat) {
+    const marker = L.marker(locMat.coord, {icon: iconaLocMat}).bindPopup();
+
+    const contenitorePopup = document.createElement('div');
+    // const descrizione = locMat.descrizione ? `<br>${locMat.descrizione}` : '';
+    // contenitorePopup.innerHTML = `<b>${locMat.nome}</b>${descrizione}<br>`;
+    contenitorePopup.innerHTML = `<b>${locMat.nome}</b><br>`;
+    const selettore = document.createElement('button');
+    selettore.id = `selettore_${locMat.sigla}`;
+    selettore.innerText = 'DETTAGLI';
+    contenitorePopup.appendChild(selettore);
+    selettore.addEventListener('click', () => {
+        // apri artifact viewer
+        store.methods.setTabAttivo('Tab5');
         mappaGlb.closePopup();
     });
     

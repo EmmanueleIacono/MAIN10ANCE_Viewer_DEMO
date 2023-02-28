@@ -8,7 +8,7 @@
 
 <script>
 import {onMounted, inject, watch, onActivated} from 'vue';
-import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaSM, iconaCappelle} from '../js/GIS';
+import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaSM, iconaCappelle, addLocMat, creaMarkerLocMat} from '../js/GIS';
 import L from 'leaflet';
 
 export default {
@@ -23,6 +23,7 @@ export default {
 
       const gruppoMarkerLocalità = L.layerGroup();
       const gruppoMarkerEdifici = L.layerGroup();
+      const gruppoMarkerLocMat = L.layerGroup();
 
       mappaGlb.on('zoomend', () => {
         const zoomComune = 17;
@@ -44,9 +45,12 @@ export default {
         }
       });
 
-      aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
+      mappaGlb.on('click', addLocMat);
 
-      watch(() => [store.stateGIS.markerLoc, store.stateGIS.markerEdif], () => {
+      aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
+      aggiungiLayer(gruppoMarkerLocMat, mappaGlb);
+
+      watch(() => [store.stateGIS.markerLoc, store.stateGIS.markerEdif, store.stateGIS.markerLocMat], () => {
         if (store.stateGIS.markerLoc) {
           store.stateGIS.markerLoc.forEach(loc => {
             const markerSM = creaMarker(loc, iconaSM);
@@ -57,6 +61,12 @@ export default {
           store.stateGIS.markerEdif.forEach(edif => {
             const markerCapp = creaMarker(edif, iconaCappelle);
             markerCapp.addTo(gruppoMarkerEdifici);
+          });
+        }
+        if (store.stateGIS.markerLocMat) {
+          store.stateGIS.markerLocMat.forEach(lm => {
+            const markerLocMat = creaMarkerLocMat(lm);
+            markerLocMat.addTo(gruppoMarkerLocMat);
           });
         }
       });

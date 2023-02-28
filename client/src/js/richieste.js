@@ -34,6 +34,18 @@ export async function leggiDBMarkerEdif() {
     }
 }
 
+export async function leggiDBMarkerLocMat() {
+    try {
+        const risultato = await fetch(`/t/DB_Servizio/MarkerLocMat`, {method: "GET", headers: {"content-type": "application/json"}});
+        const LocMatJson = await risultato.json();
+        return LocMatJson;
+    }
+    catch(e) {
+        console.log('Errore nella lettura dei marker delle località materiali');
+        console.log(e);
+    }
+}
+
 export async function getGIS(tabella, geometria, colonneUtili) {
     const oggettiGIS = await fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "geometria": geometria, "colonneUtili": colonneUtili} });
     const resp_oggettiGIS = await oggettiGIS.json();
