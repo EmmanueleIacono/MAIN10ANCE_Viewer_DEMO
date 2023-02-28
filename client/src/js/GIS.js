@@ -87,7 +87,7 @@ export const iconaCappelle = L.icon({
     shadowAnchor: [18, 15]
 });
 
-const iconaLocMat = L.icon({
+const iconaLocPdiff = L.icon({
     iconUrl: require('/src/assets/img/icona_cubo_v1.png'),
     shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
     iconSize: [30, 30],
@@ -118,15 +118,13 @@ export function creaMarker(edif, icona) {
     return marker;
 }
 
-export function creaMarkerLocMat(locMat) {
-    const marker = L.marker(locMat.coord, {icon: iconaLocMat}).bindPopup();
+export function creaMarkerLocPdiff(locPdiff) {
+    const marker = L.marker(locPdiff.coord, {icon: iconaLocPdiff}).bindPopup();
 
     const contenitorePopup = document.createElement('div');
-    // const descrizione = locMat.descrizione ? `<br>${locMat.descrizione}` : '';
-    // contenitorePopup.innerHTML = `<b>${locMat.nome}</b>${descrizione}<br>`;
-    contenitorePopup.innerHTML = `<b>${locMat.nome}</b><br>`;
+    contenitorePopup.innerHTML = `<b>${locPdiff.nome}</b><br>`;
     const selettore = document.createElement('button');
-    selettore.id = `selettore_${locMat.sigla}`;
+    selettore.id = `selettore_${locPdiff.sigla}`;
     selettore.innerText = 'DETTAGLI';
     contenitorePopup.appendChild(selettore);
     selettore.addEventListener('click', () => {
@@ -143,16 +141,18 @@ export function creaMarkerLocMat(locMat) {
 }
 
 // AGGIUNTA NUOVO PUNTO PER LOCALITÀ MATERIALI
-export function addLocMat(ev) {
+export function addLocPdiff(ev) {
     // check se attiva una qualche "modalità modifica"
     if (!store.stateGIS.editMode) return;
     const {lat, lng} = ev.latlng;
-    console.log(lat, lng);
     // se con click, marker esiste già, sostituire
     rimuoviMarkerTemporaneo();
-    newLocMatMarker = new L.marker({lat, lng}, {icon: iconaLocMat}).addTo(mappaGlb);
+    newLocMatMarker = new L.marker({lat, lng}, {icon: iconaLocPdiff}).addTo(mappaGlb);
     // salvare marker da qualche parte
-    return newLocMatMarker;
+    return {
+        marker: newLocMatMarker,
+        coord: {lat, lng}
+    };
 }
 
 export function rimuoviMarkerTemporaneo() {

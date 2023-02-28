@@ -24,7 +24,7 @@ const stateGIS = reactive({
     entitàGIS: {},
     markerLoc: null,
     markerEdif: null,
-    markerLocMat: null,
+    markerLocPdiff: null,
     editMode: false,
 });
 
@@ -177,8 +177,8 @@ const methods = {
         stateGIS.markerEdif = listaEdif;
     },
 
-    setMarkerLocMat(listaLocMat) {
-        stateGIS.markerLocMat = listaLocMat;
+    setMarkerLocPdiff(listaLocPdiff) {
+        stateGIS.markerLocPdiff = listaLocPdiff;
     },
 
     setEditModeGIStrue() {

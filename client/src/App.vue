@@ -37,7 +37,7 @@
       <div class="fill loading-wrapper">
         <LoadingScreen :caricamento="store.state.loaderGlobaleVisibile" />
         <keep-alive>
-          <component :is="store.state.tabAttivo" @loadLivelli="loadLayers" />
+          <component :is="store.state.tabAttivo" @loadLivelli="loadLayers" @updateMappa="popolaMappa" />
         </keep-alive>
       </div>
     </div>
@@ -49,7 +49,7 @@
 
 <script>
 import {provide, onMounted} from 'vue';
-import {getTabelleGIS, getGIS, leggiDBMarkerLoc, leggiDBMarkerEdif, leggiDBMarkerLocMat} from './js/richieste';
+import {getTabelleGIS, getGIS, leggiDBMarkerLoc, leggiDBMarkerEdif, leggiDBMarkerLocPdiff} from './js/richieste';
 import store from '@/store';
 import Tab1 from './components/TabBIM.vue';
 import Tab2 from './components/TabGIS.vue';
@@ -80,12 +80,7 @@ export default {
     primoLoad();
 
     onMounted(async () => {
-      const localitàJson = await leggiDBMarkerLoc();
-      const edificiJson = await leggiDBMarkerEdif();
-      const locMatJson = await leggiDBMarkerLocMat();
-      store.methods.setMarkerLoc(localitàJson);
-      store.methods.setMarkerEdif(edificiJson);
-      store.methods.setMarkerLocMat(locMatJson);
+      await popolaMappa();
     });
 
     function primoLoad() {
@@ -116,10 +111,20 @@ export default {
       }
     }
 
+    async function popolaMappa() {
+      const localitàJson = await leggiDBMarkerLoc();
+      const edificiJson = await leggiDBMarkerEdif();
+      const locPdiffJson = await leggiDBMarkerLocPdiff();
+      store.methods.setMarkerLoc(localitàJson);
+      store.methods.setMarkerEdif(edificiJson);
+      store.methods.setMarkerLocPdiff(locPdiffJson);
+    }
+
     return {
       store,
       logout,
       loadLayers,
+      popolaMappa,
     }
   }
 }

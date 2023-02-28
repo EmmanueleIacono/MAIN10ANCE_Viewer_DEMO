@@ -35,11 +35,11 @@ app.get('/DB_Servizio/MarkerEdif', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/t/DB_Servizio/MarkerLocMat", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/MarkerLocMat', async (req, res) => {
-    const markerLocMat = await leggiMarkerLocMat();
+// fetch("/t/DB_Servizio/MarkerLocPdiff", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+app.get('/DB_Servizio/MarkerLocPdiff', async (req, res) => {
+    const markerLocPdiff = await leggiMarkerLocPdiff();
     res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(markerLocMat));
+    res.send(JSON.stringify(markerLocPdiff));
 });
 
 // per testare la richiesta:
@@ -127,9 +127,9 @@ async function leggiMarkerEdif() {
     }
 }
 
-async function leggiMarkerLocMat() {
+async function leggiMarkerLocPdiff() {
     try {
-        const results = await clientM10a.query(`SELECT * FROM servizio."dati_loc_mat" ORDER BY "nome";`);
+        const results = await clientM10a.query(`SELECT * FROM servizio."dati_loc_pdiff" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {

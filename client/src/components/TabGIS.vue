@@ -1,13 +1,32 @@
 <template>
 <div>
   <MainPanel :colonna="'col-sm-9'">
-    <MappaGIS ref="mappaRef" />
+    <MappaGIS ref="mappaRef" @newMarker="updateMarker" />
   </MainPanel>
   <Explorer :colonna="'col-sm-3'">
-    <BtnBIM @click="addLocalMat" v-if="verificaDisplayAdd()" class="btn-gis" icona="glyphicon-plus" nome="addLocMateriale" title="Aggiungi località materiale" colore="verde" />
-    <BtnBIM @click="confermaLocalMat" v-if="verificaDisplayConf()" class="btn-gis" icona="glyphicon-ok" nome="confLocMateriale" title="Conferma" colore="verde" />
-    <BtnBIM @click="salvaLocalMat" v-if="verificaDisplaySalva()" class="btn-gis" icona="glyphicon-floppy-disk" nome="salvaLocMateriale" title="Salva" colore="verde" />
-    <BtnBIM @click="annullaAddLocalMat" v-if="verificaDisplayAnnulla()" class="btn-gis" icona="glyphicon-remove" nome="annullaLocMateriale" title="Annulla" colore="verde" />
+    <BtnBIM @click="addLocPdiff" v-if="verificaDisplayAdd()" class="btn-gis" icona="glyphicon-plus" nome="addLocMateriale" title="Aggiungi località materiale" colore="verde" />
+    <BtnBIM @click="confermaLocPdiff" v-if="verificaDisplayConf()" class="btn-gis" icona="glyphicon-ok" nome="confLocMateriale" title="Conferma" colore="verde" />
+    <BtnBIM @click="salvaLocPdiff" v-if="verificaDisplaySalva()" class="btn-gis" icona="glyphicon-floppy-disk" nome="salvaLocMateriale" title="Salva" colore="verde" />
+    <BtnBIM @click="annullaAddLocPdiff" v-if="verificaDisplayAnnulla()" class="btn-gis" icona="glyphicon-remove" nome="annullaLocMateriale" title="Annulla" colore="verde" />
+    <br />
+    <div v-if="verificaDisplaySalva()" id="campo-nome-marker">
+      <label class="nome" for="select-provincia">Provincia:</label>
+      <select class="valore" id="select-provincia" v-model="state.provinciaMarker">
+        <option v-for="prov in province" :key="prov.sigla" :value="prov.sigla">{{prov.nome}}</option>
+      </select>
+      <br />
+      <label class="nome" for="select-comune">Comune:</label>
+      <select class="valore" id="select-comune" v-model="state.comuneMarker">
+        <option v-for="cm in state.listaComuniFiltrata" :key="cm.codice" :value="cm.nome">{{cm.nome}}</option>
+      </select>
+      <br />
+      <label class="nome" for="input-nome">Nome punto:</label>
+      <input class="valore" id="input-nome" v-model="state.nomeMarker" placeholder="Nome punto" />
+      <br />
+      <br />
+      <p><b>Nome:</b> {{state.provinciaMarker}}_{{state.comuneMarker}}_{{state.nomeMarker}}</p>
+    </div>
+    <br />
     <Details summary="NAVIGAZIONE">
       <button @click="chiamaResetMappa" class="selettoreSM-dropdown">
         <span class="glyphicon glyphicon-home" style="margin-right: 10px;"></span>HOME
@@ -32,7 +51,7 @@
 </template>
 
 <script>
-import {ref, inject, reactive} from 'vue';
+import {ref, inject, reactive, watch} from 'vue';
 import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
 import MappaGIS from './TabGISMappa.vue';
@@ -40,6 +59,10 @@ import CheckboxGIS from './elementi/CheckboxGIS.vue';
 import Details from './elementi/Details.vue';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 import {mappaGlb, creaLivelloGIS, rimuoviMarkerTemporaneo} from '../js/GIS';
+import {creaNuovoLocPdiff} from '../js/richieste';
+import {dataInteger} from '../js/shared';
+import province from '../assets/json/province-italia.json';
+import comuni from '../assets/json/comuni.json';
 
 export default {
   name: 'TabGIS',
@@ -56,9 +79,22 @@ export default {
     const mappaRef = ref(null);
     const primoLoadLivelli = ref(false);
     const state = reactive({
+      listaComuniFiltrata: [],
       nuovoMarker: null,
+      coordMarker: null,
+      provinciaMarker: '',
+      comuneMarker: '',
       nomeMarker: '',
       confirmMode: false,
+    });
+    // console.log(province);
+    // console.log(comuni);
+
+    watch(() => state.provinciaMarker, async newVal => {
+      const listaComuniFiltrata = comuni.filter(cm => cm.sigla === newVal);
+      state.listaComuniFiltrata = listaComuniFiltrata;
+      if (listaComuniFiltrata[0]) state.comuneMarker = listaComuniFiltrata[0].nome;
+      else state.comuneMarker = '';
     });
 
     function chiamaResetMappa() {
@@ -91,32 +127,47 @@ export default {
       }
     }
 
-    async function addLocalMat() {
-      const conferma = await store.methods.setConfirm('Vuoi aggiungere un nuovo marker a NOME LIVELLO?');
+    async function addLocPdiff() {
+      const conferma = await store.methods.setConfirm('Vuoi aggiungere un nuovo marker al livello "Patrimonio diffuso"?');
       if (conferma) {
-        console.log('avvia procedimento');
         store.methods.setEditModeGIStrue();
       }
     }
 
-    function confermaLocalMat() {
-      console.log('conferma');
+    function confermaLocPdiff() {
+      if (!state.nuovoMarker) {
+        store.methods.setAlert('Impossibile continuare senza aver impostato un punto.');
+        return;
+      }
       store.methods.setEditModeGISfalse();
       state.confirmMode = true;
     }
 
-    function salvaLocalMat() {
-      console.log('salva');
+    async function salvaLocPdiff() {
+      if (!state.provinciaMarker || !state.comuneMarker || !state.nomeMarker) {
+        store.methods.setAlert('Impossibile continuare senza aver impostato correttamente un nome.');
+        return;
+      }
       store.methods.setEditModeGISfalse();
       state.confirmMode = false;
-      // quando salvo, id/sigla è LM_{$dataInteger()}
+      const markerJson = {
+        coord: state.coordMarker,
+        nome: `${state.provinciaMarker}_${state.comuneMarker}_${state.nomeMarker}`,
+        id_marker: `LPD_${dataInteger()}`,
+      };
+      const res = await creaNuovoLocPdiff(markerJson);
+      if (res) {
+        store.methods.setAlert('Operazione andata a buon fine.');
+        emit('updateMappa');
+      }
+      else store.methods.setAlert('Operazione non riuscita, riprovare.');
     }
 
-    function annullaAddLocalMat() {
-      console.log('annulla');
+    function annullaAddLocPdiff() {
       store.methods.setEditModeGISfalse();
       rimuoviMarkerTemporaneo();
       state.confirmMode = false;
+      resetStateMarker();
     }
 
     function verificaDisplayAdd() {
@@ -135,23 +186,39 @@ export default {
       return store.getters.getUsrVwList().includes('addLocMatGIS') && (!(!store.stateGIS.editMode && !state.confirmMode));
     }
 
+    function updateMarker(markerJson) {
+      state.nuovoMarker = markerJson.marker;
+      state.coordMarker = markerJson.coord;
+    }
+
+    function resetStateMarker() {
+      state.nuovoMarker = null;
+      state.coordMarker = null;
+      state.provinciaMarker = '';
+      state.comuneMarker = '';
+      state.nomeMarker = '';
+    }
+
     return {
       props,
       store,
       mappaRef,
       state,
+      province,
+      comuni,
       chiamaResetMappa,
       setVistaMappa,
       creaLivello,
       emettiLoadLivelli,
-      addLocalMat,
-      confermaLocalMat,
-      salvaLocalMat,
-      annullaAddLocalMat,
+      addLocPdiff,
+      confermaLocPdiff,
+      salvaLocPdiff,
+      annullaAddLocPdiff,
       verificaDisplayAdd,
       verificaDisplayConf,
       verificaDisplaySalva,
       verificaDisplayAnnulla,
+      updateMarker,
     }
   }
 }
@@ -176,5 +243,9 @@ export default {
 
 .selettoreSM-dropdown:hover {
   background-color: var(--verdeMain10anceTrasparenza);
+}
+
+.valore {
+  float: right;
 }
 </style>

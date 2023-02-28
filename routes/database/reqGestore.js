@@ -11,37 +11,37 @@ const {supabase} = require('../../supabase_config');
 
 //////////          RICHIESTE          //////////
 
-// per testare la richiesta:
-// fetch("/g/utenti/smv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/utenti/:progetto', async (req, res) => {
-    const users = await getUtentiProgetto();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(users));
-});
+// // per testare la richiesta:
+// // fetch("/g/utenti/smv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// app.get('/utenti/:progetto', async (req, res) => {
+//     const users = await getUtentiProgetto();
+//     res.setHeader('content-type', 'application/json');
+//     res.send(JSON.stringify(users));
+// });
 
-// per testare la richiesta
-// fetch("/g/ruoli/smv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/ruoli/:progetto', async (req, res) => {
-    const ruoli = await getListaRuoliProgetto();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(ruoli));
-});
+// // per testare la richiesta
+// // fetch("/g/ruoli/smv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// app.get('/ruoli/:progetto', async (req, res) => {
+//     const ruoli = await getListaRuoliProgetto();
+//     res.setHeader('content-type', 'application/json');
+//     res.send(JSON.stringify(ruoli));
+// });
 
-app.patch('/ruoli/nuovo-ruolo/:progetto', async (req, res) => {
-    let result = {}
-    try {
-        const reqJson = req.body;
-        await updateRuoloUtenteProgetto(reqJson);
-        result.success = true;
-    }
-    catch(e) {
-        result.success = false;
-    }
-    finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+// app.patch('/ruoli/nuovo-ruolo/:progetto', async (req, res) => {
+//     let result = {}
+//     try {
+//         const reqJson = req.body;
+//         await updateRuoloUtenteProgetto(reqJson);
+//         result.success = true;
+//     }
+//     catch(e) {
+//         result.success = false;
+//     }
+//     finally {
+//         res.setHeader('content-type', 'application/json');
+//         res.send(JSON.stringify(result));
+//     }
+// });
 
 //////////          RICHIESTE DASHBOARD          //////////
 
@@ -216,6 +216,23 @@ app.delete('/Main10ance_DB/LOD4/elimina', async (req, res) => {
     try {
         const reqJson = req.body;
         const res = await eliminaImmagini(reqJson);
+        result.success = res;
+    }
+    catch(e) {
+        result.success = false;
+    }
+    finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
+});
+
+// NUOVO PUNTO SU LIVELLO GIS LOCALITÀ MATERIALI
+app.post('/DB_Servizio/loc-pdiff/nuovo', async (req, res) => {
+    const result = {};
+    try {
+        const reqJson = req.body;
+        const res = await creaNuovoLocPdiff(reqJson);
         result.success = res;
     }
     catch(e) {
@@ -406,6 +423,27 @@ async function creaAttProgControllo(listaAtt) {
     }
 }
 
+async function creaNuovoLocPdiff(reqJson) {
+    try {
+        await clientM10a.query("BEGIN;");
+        try {
+            const coord = reqJson.coord;
+            const nome = reqJson.nome;
+            const sigla = reqJson.id_marker;
+            const valuesArray = [[coord.lat, coord.lng], nome, sigla];
+            await clientM10a.query(`INSERT INTO servizio."dati_loc_pdiff" ("coord", "nome", "sigla") VALUES (($1), ($2), ($3))`, valuesArray);
+        } catch (e) {
+            throw e;
+        }
+        await clientM10a.query("COMMIT;");
+        return true;
+    } catch (er) {
+        console.log(`Errore: ${er}`);
+        await clientM10a.query("ROLLBACK;");
+        return false;
+    }
+}
+
 async function leggiAttProgPerIntegrazione(bool) {
     try {
         // const resp = await clientM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "data_prog", to_json("id_main10ance") AS "id_main10ance", "id_group", "località_estesa", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM ${ambito}."attività_prog" WHERE "da_integrare" = ($1) ORDER BY "id_att_prog";`, [bool]);
@@ -563,23 +601,23 @@ async function registraNuoviControlli(listaReqJson) {
 
 ///////////////// PROVVISORIE //////////////
 
-// per testare la richiesta:
-// fetch("/g/utenti-provv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/utenti-provv', async (req, res) => {
-    const users = await getUtentiProvv();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(users));
-});
+// // per testare la richiesta:
+// // fetch("/g/utenti-provv", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+// app.get('/utenti-provv', async (req, res) => {
+//     const users = await getUtentiProvv();
+//     res.setHeader('content-type', 'application/json');
+//     res.send(JSON.stringify(users));
+// });
 
-async function getUtentiProvv() {
-    try {
-        const results = await clientM10a.query(`SELECT "user", "email", "ruolo" FROM servizio."utenti" WHERE NOT "ruolo" = 'amministratore' ORDER BY "user";`);
-        return results.rows;
-    }
-    catch(e) {
-        console.log(e);
-        return [];
-    }
-}
+// async function getUtentiProvv() {
+//     try {
+//         const results = await clientM10a.query(`SELECT "user", "email", "ruolo" FROM servizio."utenti" WHERE NOT "ruolo" = 'amministratore' ORDER BY "user";`);
+//         return results.rows;
+//     }
+//     catch(e) {
+//         console.log(e);
+//         return [];
+//     }
+// }
 
 module.exports = app;

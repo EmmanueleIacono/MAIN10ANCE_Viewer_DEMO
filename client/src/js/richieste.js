@@ -34,9 +34,9 @@ export async function leggiDBMarkerEdif() {
     }
 }
 
-export async function leggiDBMarkerLocMat() {
+export async function leggiDBMarkerLocPdiff() {
     try {
-        const risultato = await fetch(`/t/DB_Servizio/MarkerLocMat`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/t/DB_Servizio/MarkerLocPdiff`, {method: "GET", headers: {"content-type": "application/json"}});
         const LocMatJson = await risultato.json();
         return LocMatJson;
     }
@@ -385,4 +385,21 @@ export async function conteggioOggetti() {
     const oggettiBIM = datiBIM.sum;
     const oggettiGIS = datiGIS.sum;
     return [oggettiBIM, oggettiGIS];
+}
+
+export async function creaNuovoLocPdiff(jsonReq) {
+    let ris;
+    try {
+        const risultatoRaw = await fetch("/g/DB_Servizio/loc-pdiff/nuovo", {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        const risultato = await risultatoRaw.json();
+        ris = risultato.success;
+    }
+    catch(e) {
+        console.log("Errore nell'aggiunta di un nuovo punto");
+        console.log(e);
+        ris = false;
+    }
+    finally {
+        return ris;
+    }
 }

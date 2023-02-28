@@ -8,12 +8,12 @@
 
 <script>
 import {onMounted, inject, watch, onActivated} from 'vue';
-import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaSM, iconaCappelle, addLocMat, creaMarkerLocMat} from '../js/GIS';
+import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaSM, iconaCappelle, addLocPdiff, creaMarkerLocPdiff} from '../js/GIS';
 import L from 'leaflet';
 
 export default {
   name: 'TabGISMappa',
-  setup() {
+  setup(props, {emit}) {
     const store = inject('store');
 
     const posOrigine = [45.61422, 8.410177];
@@ -23,7 +23,7 @@ export default {
 
       const gruppoMarkerLocalità = L.layerGroup();
       const gruppoMarkerEdifici = L.layerGroup();
-      const gruppoMarkerLocMat = L.layerGroup();
+      const gruppoMarkerLocPdiff = L.layerGroup();
 
       mappaGlb.on('zoomend', () => {
         const zoomComune = 17;
@@ -45,28 +45,36 @@ export default {
         }
       });
 
-      mappaGlb.on('click', addLocMat);
+      mappaGlb.on('click', e => {
+        const marker = addLocPdiff(e);
+        if (marker) {
+          emit('newMarker', marker);
+        }
+      });
 
       aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
-      aggiungiLayer(gruppoMarkerLocMat, mappaGlb);
+      aggiungiLayer(gruppoMarkerLocPdiff, mappaGlb);
 
-      watch(() => [store.stateGIS.markerLoc, store.stateGIS.markerEdif, store.stateGIS.markerLocMat], () => {
+      watch(() => [store.stateGIS.markerLoc, store.stateGIS.markerEdif, store.stateGIS.markerLocPdiff], () => {
         if (store.stateGIS.markerLoc) {
+          gruppoMarkerLocalità.clearLayers();
           store.stateGIS.markerLoc.forEach(loc => {
             const markerSM = creaMarker(loc, iconaSM);
             markerSM.addTo(gruppoMarkerLocalità);
           });
         }
         if (store.stateGIS.markerEdif) {
+          gruppoMarkerEdifici.clearLayers();
           store.stateGIS.markerEdif.forEach(edif => {
             const markerCapp = creaMarker(edif, iconaCappelle);
             markerCapp.addTo(gruppoMarkerEdifici);
           });
         }
-        if (store.stateGIS.markerLocMat) {
-          store.stateGIS.markerLocMat.forEach(lm => {
-            const markerLocMat = creaMarkerLocMat(lm);
-            markerLocMat.addTo(gruppoMarkerLocMat);
+        if (store.stateGIS.markerLocPdiff) {
+          gruppoMarkerLocPdiff.clearLayers();
+          store.stateGIS.markerLocPdiff.forEach(lpd => {
+            const markerLocPdiff = creaMarkerLocPdiff(lpd);
+            markerLocPdiff.addTo(gruppoMarkerLocPdiff);
           });
         }
       });
@@ -83,6 +91,7 @@ export default {
     }
 
     return {
+      props,
       store,
       resetMap,
     }
