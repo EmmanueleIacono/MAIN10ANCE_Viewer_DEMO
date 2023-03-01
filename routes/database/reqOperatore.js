@@ -231,6 +231,37 @@ app.get('/Main10ance_DB/tabellaDB/schede-storico-manutenzione-correttiva', async
     res.send(risposta);
 });
 
+// per testare la richiesta:
+// fetch("/o/Main10ance_DB/anagrafica/artifact-viewer/interroga/SMV|39|grata|1826323").then(a => a.json()).then(console.log)
+app.get('/Main10ance_DB/anagrafica/artifact-viewer/interroga/:id', async (req, res) => {
+    const id = req.params.id;
+    const categoria = JSON.parse(req.headers.categoria);
+    let risposta;
+    // qui verifica se LOD4, Manufatto o Dettaglio
+    console.log(categoria);
+    switch (categoria) {
+        // se Manufatto:
+        case 'manufatto':
+            console.log('richiesta manufatto');
+            // risposta = await interrogaAnagraficaManufatto();
+            break;
+    
+        // se Dettaglio:
+        case 'dettaglio':
+            console.log('richiesta dettaglio');
+            // risposta = await interrogaAnagraficaDettaglio();
+            break;
+
+        // ALTRIMENTI, se LOD4:
+        default:
+            risposta = await interrogaAnagraficaLOD4(id);
+            break;
+    }
+    console.log(risposta);
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
 //////////          QUERY          //////////
 
 async function leggiColonneTabella(nomeTab) {
@@ -684,6 +715,17 @@ async function leggiSchedeStoricoManReg() {
 async function leggiSchedeStoricoManCorr() {
     try {
         const result = await clientM10a.query(`SELECT mc.esecutori AS "Operatore", mc.data_ese AS "Data intervento", mc.azione AS "Tipo di intervento", mc.strumentaz AS "Strumentazione", mc.materiale AS "Materiale", mc.costo AS "Costo effettivo (€)", mc.ore AS "Ore effettive", mc.commenti AS "Note", mc.doc AS "Documenti", mc.id_mn_gu AS "Codice scheda manutenzione correttiva", mc.cl_ogg_fr AS "Classe oggetti", ap."località_estesa" AS "Località", (string_to_array(mc.id_main10ance[1], '|'))[2] AS "Edificio", mc.id_main10ance AS "Elementi interessati", mc.data_ins AS "Data programmazione attività" FROM ${ambito}.manutenzione_correttiva_o_a_guasto AS mc JOIN ${ambito}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = TRUE ORDER BY mc.data_ins;`);
+        return result.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function interrogaAnagraficaLOD4(id) {
+    try {
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_sistema AS "Descrizione Sistema", sa.descrizione_subsistema AS "Descrizione subsistema", sa.tecnica_costruttiva AS "Tecnica costruttiva", sa.dimensioni AS "Dimensioni", sa.materiale AS "Materiale/i", sa.epoca AS "Epoca", sa.ispezionabilità AS "Ispezionabilità", sa.fonti AS "Fonti" FROM ${ambito}.scheda_anagrafica AS sa WHERE sa.id_main10ance = '${id}';`);
         return result.rows;
     }
     catch(e) {

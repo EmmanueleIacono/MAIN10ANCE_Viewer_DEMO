@@ -33,7 +33,7 @@ export default {
   props: {
     percorsoCartella: String,
   },
-  setup(props) {
+  setup(props, {emit}) {
     const state = reactive({
       caricamento: false,
       filePaths: [],
@@ -75,6 +75,10 @@ export default {
         state.caricamento = false;
       }
     });
+
+    watch(() => state.percorsiSelezionati, async newPercorsi => {
+      emit('nuovaSelezione', newPercorsi);
+    }, {deep: true});
 
     function isSelected(percorsoFile) {
       if (!state.percorsiSelezionati.includes(percorsoFile)) state.percorsiSelezionati.push(percorsoFile);

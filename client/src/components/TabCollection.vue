@@ -1,11 +1,11 @@
 <template>
 <div>
   <MainPanel :class="`col-sm-${store.getters.getBimVwSets()[0]} fill`"><br>
-    <DownloadImage ref="downloadRef" :percorsoCartella="percorsoCartella" />
+    <DownloadImage @nuovaSelezione="aggiornaSelezione" ref="downloadRef" :percorsoCartella="percorsoCartella" />
     <Galleria v-if="datiGalleria.galleriaVisibile" />
   </MainPanel>
   <Explorer :colonna="`col-sm-${store.getters.getBimVwSets()[1]}`">
-    <Details summary="SELEZIONE IMMAGINI">
+    <Details summary="SELEZIONE IMMAGINI" :open="true">
       <div class="wrapper-crea-percorso">
         <CreaPercorso />
       </div>
@@ -27,8 +27,12 @@
       <BtnBIM @click="anagraficaImmagine" v-if="verificaDisplay('galleryDati')" class="btn-img-plus" icona="glyphicon-plus" nome="img-anagrafica" title="Aggiungi o modifica dati" colore="verde" />
     </div>
     <div class="explorer-body">
-      <UploadImage @annullaCaricamentoImmagine="cancellaAnteprima" @salvaCaricamentoImmagine="salvaImmagine" v-if="datiCaricamento.anteprimaImg" :source="datiCaricamento.anteprimaImg" :percorso="percorsoCartella" :id_main10ance="id_main10ance" />
-      <ModuloAnagrafica ref="anagraficaRef" v-if="datiAnagrafica.moduloAnagraficaVisibile" />
+      <div class="col-lg-12 loading-wrapper">
+        <LoadingScreen :caricamento="datiNavigazione.caricamento" />
+        <UploadImage @annullaCaricamentoImmagine="cancellaAnteprima" @salvaCaricamentoImmagine="salvaImmagine" v-if="datiCaricamento.anteprimaImg" :source="datiCaricamento.anteprimaImg" :percorso="percorsoCartella" :id_main10ance="id_main10ance" />
+        <ModuloAnagrafica ref="anagraficaRef" v-if="datiAnagrafica.moduloAnagraficaVisibile" />
+        <SchedaAnagrafica ref="scAnagraficaRef" v-if="datiAnagrafica.schedaAnagraficaVisibile" />
+        </div>
     </div>
   </Explorer>
 </div>
@@ -38,7 +42,7 @@
 import {inject, reactive, toRefs, provide, computed, ref} from 'vue';
 import {dataInteger, verificaPercorso, dataCorta} from '../js/shared';
 import {getListaImmagini} from '../js/richieste';
-import {creaRecordLOD4, eliminaRecordLOD4} from '../js/richieste';
+import {creaRecordLOD4, eliminaRecordLOD4, getAnagraficaArtifactViewer} from '../js/richieste';
 import Explorer from './elementi/Explorer.vue';
 import Details from './elementi/Details.vue';
 import MainPanel from './elementi/MainPanel.vue';
@@ -48,6 +52,8 @@ import UploadImage from './TabCollectionUploadImage.vue';
 import CreaPercorso from './TabCollectionPercorso.vue';
 import Galleria from './TabCollectionGallery.vue';
 import ModuloAnagrafica from './TabCollectionModuloAnagrafica.vue';
+import SchedaAnagrafica from './TabCollectionSchedaAnagrafica.vue';
+import LoadingScreen from './elementi/LoadingScreen.vue';
 
 export default {
   name: 'TabCollection',
@@ -61,6 +67,8 @@ export default {
     CreaPercorso,
     Galleria,
     ModuloAnagrafica,
+    SchedaAnagrafica,
+    LoadingScreen,
   },
   setup() {
     const store = inject('store');
@@ -68,10 +76,12 @@ export default {
     const inputRef = ref(null);
     const labelRef = ref(null);
     const anagraficaRef = ref(null);
+    const scAnagraficaRef = ref(null);
     const state = reactive({
       datiGalleria: {
         galleriaVisibile: false,
         listaImmagini: [],
+        idImgSelezionate: [],
       },
       datiNavigazione: {
         caricamento: false,
@@ -90,6 +100,8 @@ export default {
       },
       datiAnagrafica: {
         moduloAnagraficaVisibile: false,
+        schedaAnagraficaVisibile: false,
+        schedaAnagrafica: null,
       }
     });
     provide('stateArtifact', state.datiNavigazione);
@@ -141,6 +153,7 @@ export default {
     function deseleziona() {
       downloadRef.value.deselectImage();
       if (anagraficaRef.value) anagraficaRef.value.chiudiScheda();
+      if (scAnagraficaRef.value) scAnagraficaRef.value.chiudiScheda();
     }
 
     async function eliminaImmagine() {
@@ -210,7 +223,20 @@ export default {
         return;
       }
       else {
-        store.methods.setAlert('Interroga - WIP');
+        state.datiNavigazione.caricamento = true;
+        const idMain10ance = state.datiGalleria.idImgSelezionate[0];
+        const categoria = state.datiNavigazione.selectElemento;
+        const jsonReq = {
+          id: idMain10ance,
+          categoria: categoria
+        };
+        console.log(jsonReq);
+        const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
+        console.log(datiAnagrafica);
+        state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+        state.datiAnagrafica.moduloAnagraficaVisibile = false;
+        state.datiAnagrafica.schedaAnagraficaVisibile = true;
+        state.datiNavigazione.caricamento = false;
       }
     }
 
@@ -225,8 +251,15 @@ export default {
         return;
       }
       else {
+        state.datiAnagrafica.schedaAnagraficaVisibile = false;
         state.datiAnagrafica.moduloAnagraficaVisibile = true;
       }
+    }
+
+    function aggiornaSelezione(nuovaSelezione) {
+      const imgSelezionate = state.datiGalleria.listaImmagini.filter(img => nuovaSelezione.includes(img.percorso));
+      const idImgSelezionate = imgSelezionate.map(img => img.info.id_main10ance);
+      state.datiGalleria.idImgSelezionate = idImgSelezionate;
     }
 
     return {
@@ -235,6 +268,7 @@ export default {
       inputRef,
       labelRef,
       anagraficaRef,
+      scAnagraficaRef,
       ...toRefs(state),
       percorsoCartella,
       id_main10ance,
@@ -248,6 +282,7 @@ export default {
       salvaImmagine,
       interrogaImmagine,
       anagraficaImmagine,
+      aggiornaSelezione,
     }
   }
 }

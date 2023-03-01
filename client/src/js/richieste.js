@@ -403,3 +403,11 @@ export async function creaNuovoLocPdiff(jsonReq) {
         return ris;
     }
 }
+
+export async function getAnagraficaArtifactViewer(reqJson) {
+    const categoria = reqJson.categoria;
+    const id = reqJson.id;
+    const datiRaw = await fetch(`/o/Main10ance_DB/anagrafica/artifact-viewer/interroga/${id}`, {method: "GET", headers: {"content-type": "application/json", categoria: JSON.stringify(categoria)} });
+    const dati = await datiRaw.json();
+    return dati;
+}

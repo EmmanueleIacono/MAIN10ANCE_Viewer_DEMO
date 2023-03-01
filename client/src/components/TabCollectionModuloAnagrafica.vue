@@ -5,7 +5,7 @@
       <div class="float-dx div-bottoni">
         <BtnBIM @click="salvaScheda" icona="glyphicon-floppy-disk" nome="salvaScAnagLOD4" title="Salva" colore="blu" />
         <BtnBIM @click="resetState" icona="glyphicon-erase" nome="annullaDBLOD4" title="Cancella tutti i campi" colore="blu" />
-        <BtnBIM @click="chiudiScheda" icona="glyphicon-remove" nome="chiudiScAnagLOD4" title="Salva" colore="blu" />
+        <BtnBIM @click="chiudiScheda" icona="glyphicon-remove" nome="chiudiScAnagLOD4" title="Annulla" colore="blu" />
       </div>
       <h4><b>SCHEDA ANAGRAFICA</b></h4>
     </div>
@@ -42,9 +42,9 @@
 </template>
 
 <script>
-import { inject, reactive, toRefs,/* computed,*/ ref } from 'vue';
-// import {dataCorta, dataInteger} from '../js/shared';
-// import {compilaScheda} from '../js/richieste';
+import { inject, reactive, toRefs, computed, ref } from 'vue';
+import {dataCorta, dataInteger} from '../js/shared';
+import {compilaScheda} from '../js/richieste';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 
 export default {
@@ -55,6 +55,7 @@ export default {
   setup() {
     const store = inject('store');
     const stateAnagrafica = inject('stateAnagrafica');
+    const stateGalleria = inject('stateGalleria');
     const schedaRegistrata = ref(false);
     const state = reactive({
       descrizione_sistema: '',
@@ -72,32 +73,32 @@ export default {
       autore_ultima_mod: null,
     });
 
-    // const schedaVuota = computed(() => {
-    //   return !(state.descrizione_sistema || state.descrizione_subsistema || state.tecnica_costruttiva || state.dimensioni || state.materiale || state.epoca || state.ispezionabilità || state.fonti);
-    // });
+    const schedaVuota = computed(() => {
+      return !(state.descrizione_sistema || state.descrizione_subsistema || state.tecnica_costruttiva || state.dimensioni || state.materiale || state.epoca || state.ispezionabilità || state.fonti);
+    });
 
     async function salvaScheda() {
-        alert('salva scheda');
-    //   if (store.stateBIM.elementiSelezionati) {
-    //     if (schedaVuota.value) {
-    //       store.methods.setAlert('Non è possibile salvare una scheda vuota');
-    //       return;
-    //     }
-    //     impostaMetadati();
-    //     const jsonReq = impostaOggetti(Object.entries(state), store.stateBIM.elementiSelezionati);
-    //     const resp = await compilaScheda(jsonReq);
-    //     if (resp.success) {
-    //       store.methods.setAlert('Operazione andata a buon fine');
-    //       chiudiScheda();
-    //     }
-    //     else {
-    //       store.methods.setAlert('Operazione non riuscita');
-    //     }
-    //   }
-    //   else {
-    //     store.methods.setAlert('Nessun ID associato alla scheda. Selezionare un elemento e riprovare.');
-    //     chiudiScheda();
-    //   }
+      console.log('salva scheda');
+      if (stateGalleria.idImgSelezionate) {
+        if (schedaVuota.value) {
+          store.methods.setAlert('Non è possibile salvare una scheda vuota');
+          return;
+        }
+        impostaMetadati();
+        const jsonReq = impostaOggetti(Object.entries(state), stateGalleria.idImgSelezionate);
+        const resp = await compilaScheda(jsonReq);
+        if (resp.success) {
+          store.methods.setAlert('Operazione andata a buon fine');
+          chiudiScheda();
+        }
+        else {
+          store.methods.setAlert('Operazione non riuscita');
+        }
+      }
+      else {
+        store.methods.setAlert('Nessun ID associato alla scheda. Selezionare un elemento e riprovare.');
+        chiudiScheda();
+      }
     }
 
     function chiudiScheda() {
@@ -122,36 +123,36 @@ export default {
       schedaRegistrata.value = false;
     }
 
-    // function impostaMetadati() {
-    //   state.id_anagr = dataInteger();
-    //   state.data_registrazione = dataCorta();
-    //   state.data_ultima_mod = dataCorta();
-    //   state.autore_scheda = store.state.userSettings.user_id;
-    //   state.autore_ultima_mod = store.state.userSettings.user_id;
-    // }
+    function impostaMetadati() {
+      state.id_anagr = dataInteger();
+      state.data_registrazione = dataCorta();
+      state.data_ultima_mod = dataCorta();
+      state.autore_scheda = store.state.userSettings.user_id;
+      state.autore_ultima_mod = store.state.userSettings.user_id;
+    }
 
-    // function impostaOggetti(stateArray, idMain10ance) {
-    //   const listaOgg = [];
-    //   idMain10ance.forEach((id, ind) => {
-    //     const ogg = {
-    //       tabella: 'scheda_anagrafica',
-    //       colonne: [],
-    //       valori: [],
-    //     };
-    //     stateArray.forEach(stateVal => {
-    //       if (stateVal[1]) {
-    //         ogg.colonne.push(stateVal[0]);
-    //         ogg.valori.push(stateVal[1]);
-    //       }
-    //     });
-    //     ogg.valori[ogg.colonne.indexOf('id_anagr')] += ind;
-    //     ogg.colonne.push('id_main10ance');
-    //     ogg.valori.push(id);
-    //     listaOgg.push(ogg);
-    //   });
+    function impostaOggetti(stateArray, idMain10ance) {
+      const listaOgg = [];
+      idMain10ance.forEach((id, ind) => {
+        const ogg = {
+          tabella: 'scheda_anagrafica',
+          colonne: [],
+          valori: [],
+        };
+        stateArray.forEach(stateVal => {
+          if (stateVal[1]) {
+            ogg.colonne.push(stateVal[0]);
+            ogg.valori.push(stateVal[1]);
+          }
+        });
+        ogg.valori[ogg.colonne.indexOf('id_anagr')] += ind;
+        ogg.colonne.push('id_main10ance');
+        ogg.valori.push(id);
+        listaOgg.push(ogg);
+      });
 
-    //   return listaOgg;
-    // }
+      return listaOgg;
+    }
 
     return {
       store,

@@ -4,15 +4,25 @@
   <label class="nome" for="check-località">Località</label>
   <select class="valore" v-model="selectLocalità">
     <option v-for="loc in listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
+    <option value="" disabled>----------</option>
+    <option value="loc-pdiff">Patrimonio diffuso</option>
   </select>
   <br>
-  <label class="nome" for="check-edificio">Edificio</label>
-  <select class="valore" v-model="selectEdificio">
+  <label class="nome" for="check-edificio">{{selectLocalità === 'loc-pdiff' ? 'Punto' : 'Edificio'}}</label>
+  <select v-if="selectLocalità === 'loc-pdiff'" class="valore" v-model="selectEdificio">
+    <!-- QUI V-FOR DI OPTION CON LISTA LOCALITÀ PDIFF -->
+    <option value="test">prova</option>
+  </select>
+  <select v-else class="valore" v-model="selectEdificio">
     <option v-for="edif in listaEdifFiltrata" :key="edif.numero" :value="edif.numero">{{edif.nome}}</option>
   </select>
   <br>
-  <label class="nome" for="check-elemento">Elemento</label>
-  <select class="valore" v-model="selectElemento">
+  <label class="nome" for="check-elemento">Categoria elemento</label>
+  <select v-if="selectLocalità === 'loc-pdiff'" class="valore" v-model="selectElemento">
+    <option value="manufatto">Manufatto</option>
+    <option value="dettaglio">Dettaglio</option>
+  </select>
+  <select v-else class="valore" v-model="selectElemento">
     <option v-for="el in listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option>
   </select>
   <br>
@@ -37,6 +47,8 @@ export default {
       statePercorso.listaEdifFiltrata = listaEdifFiltrata;
       if (listaEdifFiltrata[0]) statePercorso.selectEdificio = listaEdifFiltrata[0].numero;
       else statePercorso.selectEdificio = '';
+      if (newVal !== 'loc-pdiff') statePercorso.selectElemento = statePercorso.listaElementi[0].tabella;
+      else statePercorso.selectElemento = 'manufatto';
     });
 
     onMounted(async () => {
