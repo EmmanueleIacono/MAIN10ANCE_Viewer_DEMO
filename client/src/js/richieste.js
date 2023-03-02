@@ -275,6 +275,7 @@ export async function downloadImmagini(percorsoFile) {
 export async function getInfoImmagine(percorsoFile, tabella) {
     const res = await fetch('/t/Main10ance_DB/LOD4/info', {method: "GET", headers: {"percorso": JSON.stringify(percorsoFile), "tabella": JSON.stringify(tabella)}});
     const resJson = await res.json();
+    console.log(resJson);
     return resJson;
 }
 

@@ -44,7 +44,8 @@ export default {
     watch(() => statePercorso.selectLocalità, async newVal => {
       const listaEdifFiltrata = statePercorso.listaEdif.filter(ed => ed.località === newVal);
       statePercorso.listaEdifFiltrata = listaEdifFiltrata;
-      if (listaEdifFiltrata[0]) statePercorso.selectEdificio = listaEdifFiltrata[0].numero;
+      if (listaEdifFiltrata[0] && listaEdifFiltrata[0].numero) statePercorso.selectEdificio = listaEdifFiltrata[0].numero;
+      else if (listaEdifFiltrata[0] && listaEdifFiltrata[0].sigla) statePercorso.selectEdificio = listaEdifFiltrata[0].sigla;
       else statePercorso.selectEdificio = '';
       if (newVal !== 'loc-pdiff') statePercorso.selectElemento = statePercorso.listaElementi[0].tabella;
       else statePercorso.selectElemento = 'manufatto';

@@ -19,7 +19,7 @@
       <input v-model="nome" id="nome" class="colonna2">
     </div>
     <div class="contenitore">
-      <label for="artista" class="colonna1">Artista</label>
+      <label for="artista" class="colonna1">Artista/Autore</label>
       <input v-model="artista" id="artista" class="colonna2">
     </div>
     <div class="contenitore">

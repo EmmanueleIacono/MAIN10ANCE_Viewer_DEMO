@@ -514,24 +514,35 @@ async function uploadImmagine(files, dati) {
     const file = files.file;
     const datiJson = JSON.parse(dati.dati);
     const percorso = datiJson.percorso;
+    const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.artista, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, `${percorso}/${file.name}`];
+    const idMap = {
+        arredo: 'id_arr',
+        dipinto_murale: 'id_dipmur',
+        pavimento_decorativo: 'id_pd',
+        quadro: 'id_quadro',
+        statua: 'id_statua',
+        manufatto: 'id_man',
+        dettaglio: 'id_dett',
+    };
+    const fileOptions = {contentType: file.mimetype};
     try {
         await clientM10a.query('BEGIN;');
-        try {
-            // query con dati
-            const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.artista, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, `${percorso}/${file.name}`];
-            const idMap = {
-                arredo: 'id_arr',
-                dipinto_murale: 'id_dipmur',
-                pavimento_decorativo: 'id_pd',
-                quadro: 'id_quadro',
-                statua: 'id_statua',
-            };
-            await clientM10a.query(`INSERT INTO ${ambito}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9));`, arrayDatiImg);
-
-            // caricamento immagine supabase
-            const fileOptions = {contentType: file.mimetype};
-            const {error} = await supabase.storage.from("sacri-monti").upload(`${percorso}/${file.name}`, file.data, fileOptions);
-            if (error) throw error;
+        try { // QUI CONDIZIONI DA RISISTEMARE COME QUELLE IN REQTURISTA DOWNLOADIMMAGINI, GETINFOIMMAGINE
+            if (datiJson.id_main10ance.startsWith('loc-pdiff')) {
+                const rid_loc_pdiff = datiJson.id_main10ance.split('|')[1];
+                // query con dati
+                await clientM10a.query(`INSERT INTO servizio."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10));`, [...arrayDatiImg, rid_loc_pdiff]);
+                // caricamento immagine supabase
+                const {error} = await supabase.storage.from("generale").upload(`${percorso}/${file.name}`, file.data, fileOptions);
+                if (error) throw error;
+            }
+            else {
+                // query con dati
+                await clientM10a.query(`INSERT INTO ${ambito}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9));`, arrayDatiImg);
+                // caricamento immagine supabase
+                const {error} = await supabase.storage.from("sacri-monti").upload(`${percorso}/${file.name}`, file.data, fileOptions);
+                if (error) throw error;
+            }
         }
         catch(err) {
             throw err;
@@ -548,16 +559,18 @@ async function uploadImmagine(files, dati) {
 
 async function eliminaImmagini(jsonDati) {
     const listaImmagini = jsonDati.immagini;
+    const bucket = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? 'generale' : 'sacri-monti';
+    const schema = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? 'servizio' : ambito;
     try {
         await clientM10a.query('BEGIN;');
         try {
             // query elimina record
             for await (const img of listaImmagini) {
-                await clientM10a.query(`DELETE FROM ${ambito}.${jsonDati.entità} WHERE "immagine" IN (($1));`, [img]);
+                await clientM10a.query(`DELETE FROM ${schema}.${jsonDati.entità} WHERE "immagine" IN (($1));`, [img]);
             }
 
             // eliminazione immagine supabase
-            const {error} = await supabase.storage.from("sacri-monti").remove(listaImmagini);
+            const {error} = await supabase.storage.from(bucket).remove(listaImmagini);
             if (error) throw error;
         }
         catch(err) {

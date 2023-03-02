@@ -158,14 +158,15 @@ async function leggiListaTabelleLOD(LOD) {
 }
 
 async function leggiListaImmagini(percorso) {
+    const bucket = percorso.startsWith('loc-pdiff') ? 'generale' : 'sacri-monti';
     try {
-      const {data, error} = await supabase.storage.from('sacri-monti').list(percorso);
+        const {data, error} = await supabase.storage.from(bucket).list(percorso);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      const fileNames = data.map(data => data.name);
-      const filePaths = fileNames.map(name => `${percorso}/${name}`);
-      return filePaths;
+        const fileNames = data.map(data => data.name);
+        const filePaths = fileNames.map(name => `${percorso}/${name}`);
+        return filePaths;
     }
     catch(e) {
         console.log(e);
@@ -174,8 +175,9 @@ async function leggiListaImmagini(percorso) {
 }
 
 async function downloadImmagini(percorsoFile) {
+    const bucket = percorsoFile.startsWith('loc-pdiff') ? 'generale' : 'sacri-monti';
     try {
-        const {data, error} = await supabase.storage.from("sacri-monti").download(percorsoFile);
+        const {data, error} = await supabase.storage.from(bucket).download(percorsoFile);
 
         if (error) throw error;
 
@@ -190,8 +192,9 @@ async function downloadImmagini(percorsoFile) {
 }
 
 async function getInfoImmagine(percorsoFile, tabella) {
+    const schema = percorsoFile.startsWith('loc-pdiff') ? 'servizio' : ambito;
     try {
-        const result = await clientM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "id_main10ance" FROM ${ambito}.${tabella} WHERE "immagine" = ($1);`, [percorsoFile]);
+        const result = await clientM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "id_main10ance" FROM ${schema}.${tabella} WHERE "immagine" = ($1);`, [percorsoFile]);
         return result.rows;
     }
     catch(e) {
