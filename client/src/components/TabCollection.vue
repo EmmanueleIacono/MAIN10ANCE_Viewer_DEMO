@@ -6,7 +6,8 @@
   </MainPanel>
   <Explorer :colonna="`col-sm-${store.getters.getBimVwSets()[1]}`">
     <Details summary="SELEZIONE IMMAGINI" :open="true">
-      <div class="wrapper-crea-percorso">
+      <div class="wrapper-crea-percorso loading-wrapper">
+        <LoadingScreen :caricamento="datiNavigazione.caricamento" />
         <CreaPercorso />
       </div>
     </Details>
@@ -102,11 +103,30 @@ export default {
         moduloAnagraficaVisibile: false,
         schedaAnagraficaVisibile: false,
         schedaAnagrafica: null,
+      },
+      datiModuloAnagrafica: {
+        descrizione_sistema: '',
+        descrizione_subsistema: '',
+        tecnica_costruttiva: '',
+        dimensioni: '',
+        materiale: '',
+        epoca: '',
+        ispezionabilità: '',
+        fonti: '',
+        id_anagr: null,
+        data_registrazione: null,
+        data_ultima_mod: null,
+        autore_scheda: null,
+        autore_ultima_mod: null,
+      },
+      datiUtility: {
+        schedaPreesistente: false,
       }
     });
     provide('stateArtifact', state.datiNavigazione);
     provide('stateGalleria', state.datiGalleria);
     provide('stateAnagrafica', state.datiAnagrafica);
+    provide('stateModuloAnagrafica', state.datiModuloAnagrafica);
 
     const percorsoCartella = computed(() => `${state.datiNavigazione.selectLocalità}/${state.datiNavigazione.selectEdificio}/${state.datiNavigazione.selectElemento}`);
     const id_main10ance = computed(() => `${state.datiNavigazione.selectLocalità}|${state.datiNavigazione.selectEdificio}|${state.datiNavigazione.selectElemento}|${state.datiCaricamento.idImmagine}`);
@@ -182,6 +202,7 @@ export default {
 
     async function salvaImmagine(dati) {
       if (verificaPercorso(percorsoCartella.value)) {
+        // QUI SE MANUFATTO O DETTAGLIO, SERVE MODIFICA DATI COMPLETI
         const datiCompleti = {
           ...dati,
           id_immagine: state.datiCaricamento.idImmagine,
@@ -251,8 +272,50 @@ export default {
         return;
       }
       else {
+        state.datiNavigazione.caricamento = true;
+        state.datiAnagrafica.schedaAnagrafica = null;
+        const idMain10ance = state.datiGalleria.idImgSelezionate[0];
+        const categoria = state.datiNavigazione.selectElemento;
+        const jsonReq = {
+          id: idMain10ance,
+          categoria: categoria
+        };
+        console.log(jsonReq);
+        const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
+        console.log(datiAnagrafica);
         state.datiAnagrafica.schedaAnagraficaVisibile = false;
         state.datiAnagrafica.moduloAnagraficaVisibile = true;
+        if (datiAnagrafica.length) {
+          console.log('ci sono dei dati');
+          // QUI IMPOSTARE DATI ANAGRAFICA
+          switch (categoria) {
+            case 'manufatto':
+              // dati Manufatto
+              break;
+
+            case 'dettaglio':
+              // dati Dettaglio
+              break;
+          
+            default:
+              // dati LOD4
+              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+              console.log('state anagrafica: ', state.datiAnagrafica.schedaAnagrafica);
+              state.datiModuloAnagrafica.descrizione_sistema = state.datiAnagrafica.schedaAnagrafica['Descrizione sistema'];
+              state.datiModuloAnagrafica.descrizione_subsistema = state.datiAnagrafica.schedaAnagrafica['Descrizione subsistema'];
+              state.datiModuloAnagrafica.tecnica_costruttiva = state.datiAnagrafica.schedaAnagrafica['Tecnica costruttiva'];
+              state.datiModuloAnagrafica.dimensioni = state.datiAnagrafica.schedaAnagrafica['Dimensioni'];
+              state.datiModuloAnagrafica.materiale = state.datiAnagrafica.schedaAnagrafica['Materiale/i'];
+              state.datiModuloAnagrafica.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
+              state.datiModuloAnagrafica.ispezionabilità = state.datiAnagrafica.schedaAnagrafica['Ispezionabilità'];
+              state.datiModuloAnagrafica.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
+              break;
+          }
+        }
+        else {
+          console.log('non ci sono dati');
+        }
+        state.datiNavigazione.caricamento = false;
       }
     }
 
@@ -260,6 +323,8 @@ export default {
       const imgSelezionate = state.datiGalleria.listaImmagini.filter(img => nuovaSelezione.includes(img.percorso));
       const idImgSelezionate = imgSelezionate.map(img => img.info.id_main10ance);
       state.datiGalleria.idImgSelezionate = idImgSelezionate;
+      // PER SICUREZZA, RESET STATE MODULO ANAGRAFICA
+      if (anagraficaRef.value) anagraficaRef.value.resetState();
     }
 
     return {

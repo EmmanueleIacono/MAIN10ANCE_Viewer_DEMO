@@ -10,8 +10,7 @@
   <br>
   <label class="nome" for="check-edificio">{{selectLocalità === 'loc-pdiff' ? 'Punto' : 'Edificio'}}</label>
   <select v-if="selectLocalità === 'loc-pdiff'" class="valore" v-model="selectEdificio">
-    <!-- QUI V-FOR DI OPTION CON LISTA LOCALITÀ PDIFF -->
-    <option value="test">prova</option>
+    <option v-for="edif in listaEdifFiltrata" :key="edif.sigla" :value="edif.sigla">{{edif.nome}}</option>
   </select>
   <select v-else class="valore" v-model="selectEdificio">
     <option v-for="edif in listaEdifFiltrata" :key="edif.numero" :value="edif.numero">{{edif.nome}}</option>
@@ -31,7 +30,7 @@
 
 <script>
 import { onMounted, toRefs, watch, inject} from 'vue';
-import {prendiSigleLocalità, leggiDBMarkerEdif, prendiLOD} from '../js/richieste';
+import {prendiSigleLocalità, leggiDBMarkerEdif, prendiLOD, leggiDBMarkerLocPdiff} from '../js/richieste';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 
 export default {
@@ -55,13 +54,15 @@ export default {
       statePercorso.caricamento = true;
       const listaSigleLoc = await prendiSigleLocalità();
       const listaEdif = await leggiDBMarkerEdif();
+      const listaLocPdiff = await leggiDBMarkerLocPdiff();
       const listaElementi = await prendiLOD(4);
       statePercorso.listaSigleLoc = listaSigleLoc;
-      statePercorso.listaEdif = listaEdif;
+      statePercorso.listaEdif = [...listaEdif, ...listaLocPdiff];
       statePercorso.listaElementi = listaElementi;
       statePercorso.selectLocalità = listaSigleLoc[0].sigla;
       statePercorso.selectElemento = listaElementi[0].tabella;
       statePercorso.caricamento = false;
+      console.log(statePercorso.listaEdif);
     });
 
     return {

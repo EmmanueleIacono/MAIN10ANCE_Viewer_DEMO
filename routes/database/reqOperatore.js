@@ -725,7 +725,7 @@ async function leggiSchedeStoricoManCorr() {
 
 async function interrogaAnagraficaLOD4(id) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_sistema AS "Descrizione Sistema", sa.descrizione_subsistema AS "Descrizione subsistema", sa.tecnica_costruttiva AS "Tecnica costruttiva", sa.dimensioni AS "Dimensioni", sa.materiale AS "Materiale/i", sa.epoca AS "Epoca", sa.ispezionabilità AS "Ispezionabilità", sa.fonti AS "Fonti" FROM ${ambito}.scheda_anagrafica AS sa WHERE sa.id_main10ance = '${id}';`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_sistema AS "Descrizione sistema", sa.descrizione_subsistema AS "Descrizione subsistema", sa.tecnica_costruttiva AS "Tecnica costruttiva", sa.dimensioni AS "Dimensioni", sa.materiale AS "Materiale/i", sa.epoca AS "Epoca", sa.ispezionabilità AS "Ispezionabilità", sa.fonti AS "Fonti" FROM ${ambito}.scheda_anagrafica AS sa WHERE sa.id_main10ance = '${id}';`);
         return result.rows;
     }
     catch(e) {

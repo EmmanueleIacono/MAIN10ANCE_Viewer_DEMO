@@ -54,10 +54,11 @@ export default {
     });
 
     watch(() => state.filePaths, async newFilePaths => {
-      stateGalleria.listaImmagini.forEach(url => URL.revokeObjectURL(url));
+      stateGalleria.listaImmagini.forEach(img => URL.revokeObjectURL(img.object));
       stateGalleria.listaImmagini = [];
       if (verificaPercorso(props.percorsoCartella)) {
         state.caricamento = true;
+        stateArtifact.caricamento = true;
 
         await Promise.all(newFilePaths.map(async path => {
           const fileImmagine = await downloadImmagini(path);
@@ -66,6 +67,7 @@ export default {
           if (fileImmagine.errMsg) {
             console.log(fileImmagine.errMsg);
             state.caricamento = false;
+            stateArtifact.caricamento = false;
             return;
           }
 
@@ -73,6 +75,7 @@ export default {
         }));
   
         state.caricamento = false;
+        stateArtifact.caricamento = false;
       }
     });
 

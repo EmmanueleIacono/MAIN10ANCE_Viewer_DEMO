@@ -37,6 +37,7 @@ export default {
 
     function chiudiScheda() {
       stateAnagrafica.schedaAnagraficaVisibile = false;
+      stateAnagrafica.schedaAnagrafica = null;
     }
 
     return {

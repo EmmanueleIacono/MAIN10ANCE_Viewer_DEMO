@@ -41,7 +41,7 @@ export async function leggiDBMarkerLocPdiff() {
         return LocMatJson;
     }
     catch(e) {
-        console.log('Errore nella lettura dei marker delle località materiali');
+        console.log('Errore nella lettura dei marker delle località del patrimonio diffuso');
         console.log(e);
     }
 }

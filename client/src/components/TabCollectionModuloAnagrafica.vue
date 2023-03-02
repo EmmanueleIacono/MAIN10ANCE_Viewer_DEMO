@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { inject, reactive, toRefs, computed, ref } from 'vue';
+import { inject, toRefs, computed, ref } from 'vue';
 import {dataCorta, dataInteger} from '../js/shared';
 import {compilaScheda} from '../js/richieste';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
@@ -56,25 +56,11 @@ export default {
     const store = inject('store');
     const stateAnagrafica = inject('stateAnagrafica');
     const stateGalleria = inject('stateGalleria');
+    const stateModuloAnagrafica = inject('stateModuloAnagrafica');
     const schedaRegistrata = ref(false);
-    const state = reactive({
-      descrizione_sistema: '',
-      descrizione_subsistema: '',
-      tecnica_costruttiva: '',
-      dimensioni: '',
-      materiale: '',
-      epoca: '',
-      ispezionabilità: '',
-      fonti: '',
-      id_anagr: null,
-      data_registrazione: null,
-      data_ultima_mod: null,
-      autore_scheda: null,
-      autore_ultima_mod: null,
-    });
 
     const schedaVuota = computed(() => {
-      return !(state.descrizione_sistema || state.descrizione_subsistema || state.tecnica_costruttiva || state.dimensioni || state.materiale || state.epoca || state.ispezionabilità || state.fonti);
+      return !(stateModuloAnagrafica.descrizione_sistema || stateModuloAnagrafica.descrizione_subsistema || stateModuloAnagrafica.tecnica_costruttiva || stateModuloAnagrafica.dimensioni || stateModuloAnagrafica.materiale || stateModuloAnagrafica.epoca || stateModuloAnagrafica.ispezionabilità || stateModuloAnagrafica.fonti);
     });
 
     async function salvaScheda() {
@@ -85,7 +71,7 @@ export default {
           return;
         }
         impostaMetadati();
-        const jsonReq = impostaOggetti(Object.entries(state), stateGalleria.idImgSelezionate);
+        const jsonReq = impostaOggetti(Object.entries(stateModuloAnagrafica), stateGalleria.idImgSelezionate);
         const resp = await compilaScheda(jsonReq);
         if (resp.success) {
           store.methods.setAlert('Operazione andata a buon fine');
@@ -106,29 +92,29 @@ export default {
       resetState();
     }
 
-    function resetState() {
-      state.descrizione_sistema = '';
-      state.descrizione_subsistema = '';
-      state.tecnica_costruttiva = '';
-      state.dimensioni = '';
-      state.materiale = '';
-      state.epoca = '';
-      state.ispezionabilità = '';
-      state.fonti = '';
-      state.id_anagr = null;
-      state.data_registrazione = null;
-      state.data_ultima_mod = null;
-      state.autore_scheda = null;
-      state.autore_ultima_mod = null;
+    function resetState() { // QUESTA MAGARI SI PUÒ SPOSTARE SU TABCOLLECTION
+      stateModuloAnagrafica.descrizione_sistema = '';
+      stateModuloAnagrafica.descrizione_subsistema = '';
+      stateModuloAnagrafica.tecnica_costruttiva = '';
+      stateModuloAnagrafica.dimensioni = '';
+      stateModuloAnagrafica.materiale = '';
+      stateModuloAnagrafica.epoca = '';
+      stateModuloAnagrafica.ispezionabilità = '';
+      stateModuloAnagrafica.fonti = '';
+      stateModuloAnagrafica.id_anagr = null;
+      stateModuloAnagrafica.data_registrazione = null;
+      stateModuloAnagrafica.data_ultima_mod = null;
+      stateModuloAnagrafica.autore_scheda = null;
+      stateModuloAnagrafica.autore_ultima_mod = null;
       schedaRegistrata.value = false;
     }
 
     function impostaMetadati() {
-      state.id_anagr = dataInteger();
-      state.data_registrazione = dataCorta();
-      state.data_ultima_mod = dataCorta();
-      state.autore_scheda = store.state.userSettings.user_id;
-      state.autore_ultima_mod = store.state.userSettings.user_id;
+      stateModuloAnagrafica.id_anagr = dataInteger();
+      stateModuloAnagrafica.data_registrazione = dataCorta();
+      stateModuloAnagrafica.data_ultima_mod = dataCorta();
+      stateModuloAnagrafica.autore_scheda = store.state.userSettings.user_id;
+      stateModuloAnagrafica.autore_ultima_mod = store.state.userSettings.user_id;
     }
 
     function impostaOggetti(stateArray, idMain10ance) {
@@ -157,7 +143,7 @@ export default {
     return {
       store,
       schedaRegistrata,
-      ...toRefs(state),
+      ...toRefs(stateModuloAnagrafica),
       salvaScheda,
       resetState,
       chiudiScheda,
