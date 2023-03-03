@@ -130,7 +130,8 @@ export default {
   border-radius: 0.75rem;
 }
 .image-grid > img:hover {
-  opacity: 70%;
+  opacity: 0.7;
+  /* border: .25rem solid var(--verdeMain10anceTrasparenza); */
 }
 .bordo-verde {
   border: 1rem solid var(--verdeMain10ance);

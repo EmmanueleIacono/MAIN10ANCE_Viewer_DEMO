@@ -243,13 +243,13 @@ app.get('/Main10ance_DB/anagrafica/artifact-viewer/interroga/:id', async (req, r
         // se Manufatto:
         case 'manufatto':
             console.log('richiesta manufatto');
-            // risposta = await interrogaAnagraficaManufatto();
+            risposta = await interrogaAnagraficaManufatto(id);
             break;
     
         // se Dettaglio:
         case 'dettaglio':
             console.log('richiesta dettaglio');
-            // risposta = await interrogaAnagraficaDettaglio();
+            risposta = await interrogaAnagraficaDettaglio(id);
             break;
 
         // ALTRIMENTI, se LOD4:
@@ -734,11 +734,34 @@ async function interrogaAnagraficaLOD4(id) {
     }
 }
 
+async function interrogaAnagraficaManufatto(id) {
+    try {
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.epoca AS "Epoca", sa.autore AS "Autore", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.documenti AS "Documenti", sa.iter_autorizzativo AS "Iter autorizzativo" FROM servizio.anagrafica_manufatto AS sa WHERE sa.id_main10ance = '${id}';`);
+        return result.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function interrogaAnagraficaDettaglio(id) {
+    try {
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.epoca AS "Epoca", sa.documenti AS "Documenti", sa.autore AS "Autore", sa.data AS "Data" FROM servizio.anagrafica_dettaglio AS sa WHERE sa.id_main10ance = '${id}';`);
+        return result.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
 //////////          ALTRE FUNZIONI          //////////
 
 function gestisciStringheSchede(listaOggetti) {
     let listaStringheEValori = [];
     listaOggetti.forEach(async jsn => {
+        const schema = (jsn.tabella === 'anagrafica_manufatto' || jsn.tabella === 'anagrafica_dettaglio') ? 'servizio' : ambito;
         let listaInterna = [];
         const listaValori = jsn.valori;
         const stringaColonne = jsn.colonne.join(', ');
@@ -749,7 +772,7 @@ function gestisciStringheSchede(listaOggetti) {
             listaValues.push(str);
         }
         const stringaValues = listaValues.join(', ');
-        const stringa = `INSERT INTO ${ambito}.${jsn.tabella} (${stringaColonne}) VALUES (${stringaValues});`;
+        const stringa = `INSERT INTO ${schema}.${jsn.tabella} (${stringaColonne}) VALUES (${stringaValues});`;
         listaInterna.push(stringa);
         listaInterna.push(listaValori);
         listaStringheEValori.push(listaInterna);

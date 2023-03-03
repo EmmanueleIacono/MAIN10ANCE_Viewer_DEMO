@@ -113,6 +113,13 @@ export default {
         epoca: '',
         ispezionabilità: '',
         fonti: '',
+        definizione: '',
+        autore: '',
+        descrizione: '',
+        tecniche: '',
+        documenti: '',
+        iter_autorizzativo: '',
+        data: '',
         id_anagr: null,
         data_registrazione: null,
         data_ultima_mod: null,
@@ -291,10 +298,30 @@ export default {
           switch (categoria) {
             case 'manufatto':
               // dati Manufatto
+              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+              console.log('state anagrafica: ', state.datiAnagrafica.schedaAnagrafica);
+              state.datiModuloAnagrafica.definizione = state.datiAnagrafica.schedaAnagrafica['Definizione'];
+              state.datiModuloAnagrafica.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
+              state.datiModuloAnagrafica.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
+              state.datiModuloAnagrafica.descrizione = state.datiAnagrafica.schedaAnagrafica['Descrizione'];
+              state.datiModuloAnagrafica.materiale = state.datiAnagrafica.schedaAnagrafica['Materiale/i'];
+              state.datiModuloAnagrafica.tecniche = state.datiAnagrafica.schedaAnagrafica['Tecniche'];
+              state.datiModuloAnagrafica.documenti = state.datiAnagrafica.schedaAnagrafica['Documenti'];
+              state.datiModuloAnagrafica.iter_autorizzativo = state.datiAnagrafica.schedaAnagrafica['Iter autorizzativo'];
               break;
 
             case 'dettaglio':
               // dati Dettaglio
+              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+              console.log('state anagrafica: ', state.datiAnagrafica.schedaAnagrafica);
+              state.datiModuloAnagrafica.definizione = state.datiAnagrafica.schedaAnagrafica['Definizione'];
+              state.datiModuloAnagrafica.descrizione = state.datiAnagrafica.schedaAnagrafica['Descrizione'];
+              state.datiModuloAnagrafica.materiale = state.datiAnagrafica.schedaAnagrafica['Materiale/i'];
+              state.datiModuloAnagrafica.tecniche = state.datiAnagrafica.schedaAnagrafica['Tecniche'];
+              state.datiModuloAnagrafica.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
+              state.datiModuloAnagrafica.documenti = state.datiAnagrafica.schedaAnagrafica['Documenti'];
+              state.datiModuloAnagrafica.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
+              state.datiModuloAnagrafica.data = state.datiAnagrafica.schedaAnagrafica['Data'];
               break;
           
             default:
@@ -320,6 +347,7 @@ export default {
     }
 
     function aggiornaSelezione(nuovaSelezione) {
+      // deseleziona(); // QUESTA DA' PROBLEMI MA SERVE RISOLVERE IN QUALCHE MODO
       const imgSelezionate = state.datiGalleria.listaImmagini.filter(img => nuovaSelezione.includes(img.percorso));
       const idImgSelezionate = imgSelezionate.map(img => img.info.id_main10ance);
       state.datiGalleria.idImgSelezionate = idImgSelezionate;
