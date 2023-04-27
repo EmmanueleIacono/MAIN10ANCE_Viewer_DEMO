@@ -8,4 +8,4 @@ Repository per l'app web del progetto Main10ance, dopo conversione in Vue del fr
 ### DEMO
 Prima versione dell'app.  
 Branch: **master**  
-Deployed: <https://main10ance-app-demo.herokuapp.com/>  
+Deployed: <https://main10ance-app-demo.onrender.com/>  
