@@ -1,11 +1,9 @@
 
-# N.B.: NUOVA VERSIONE DELL'APP
+## MAIN10ANCE_Viewer_DEMO
 
-# MAIN10ANCE_Viewer_DEMO
+Repository for the Main10ance project web-app   
 
-Repository per l'app web del progetto Main10ance, dopo conversione in Vue del front-end
-
-### DEMO
-Prima versione dell'app.  
+### APP DEMO
+First demo version of the app.  
 Branch: **master**  
-Deployed: <https://main10ance-app-demo.onrender.com/>  
+Deployed at: <https://main10ance-app-demo.onrender.com/>  
