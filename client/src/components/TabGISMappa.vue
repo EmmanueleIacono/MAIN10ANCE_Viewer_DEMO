@@ -10,6 +10,7 @@
 import {onMounted, inject, watch, onActivated} from 'vue';
 import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaSM, iconaCappelle, addLocPdiff, creaMarkerLocPdiff} from '../js/GIS';
 import L from 'leaflet';
+import 'leaflet.markercluster';
 
 export default {
   name: 'TabGISMappa',
@@ -23,7 +24,8 @@ export default {
 
       const gruppoMarkerLocalità = L.layerGroup();
       const gruppoMarkerEdifici = L.layerGroup();
-      const gruppoMarkerLocPdiff = L.layerGroup();
+      // const gruppoMarkerLocPdiff = L.layerGroup();
+      const clusterMarkerLocPdiff = L.markerClusterGroup(); // per opzioni, L.markerClusterGroup({...})
 
       mappaGlb.on('zoomend', () => {
         const zoomComune = 17;
@@ -53,7 +55,8 @@ export default {
       });
 
       aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
-      aggiungiLayer(gruppoMarkerLocPdiff, mappaGlb);
+      // aggiungiLayer(gruppoMarkerLocPdiff, mappaGlb);
+      aggiungiLayer(clusterMarkerLocPdiff, mappaGlb);
 
       watch(() => [store.stateGIS.markerLoc, store.stateGIS.markerEdif, store.stateGIS.markerLocPdiff], () => {
         if (store.stateGIS.markerLoc) {
@@ -71,10 +74,12 @@ export default {
           });
         }
         if (store.stateGIS.markerLocPdiff) {
-          gruppoMarkerLocPdiff.clearLayers();
+          // gruppoMarkerLocPdiff.clearLayers();
+          clusterMarkerLocPdiff.clearLayers();
           store.stateGIS.markerLocPdiff.forEach(lpd => {
             const markerLocPdiff = creaMarkerLocPdiff(lpd);
-            markerLocPdiff.addTo(gruppoMarkerLocPdiff);
+            // markerLocPdiff.addTo(gruppoMarkerLocPdiff);
+            markerLocPdiff.addTo(clusterMarkerLocPdiff);
           });
         }
       });
@@ -101,6 +106,8 @@ export default {
 
 <style scoped>
 @import '~leaflet/dist/leaflet.css';
+@import '~leaflet.markercluster/dist/MarkerCluster.css';
+@import '~leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 #appGIS, #appGIS-parent {
   height: 100%;

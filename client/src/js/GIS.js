@@ -140,7 +140,7 @@ export function creaMarkerLocPdiff(locPdiff) {
     return marker;
 }
 
-// AGGIUNTA NUOVO PUNTO PER LOCALITÀ MATERIALI
+// AGGIUNTA NUOVO PUNTO PER LOCALITÀ PATRIMONIO DIFFUSO
 export function addLocPdiff(ev) {
     // check se attiva una qualche "modalità modifica"
     if (!store.stateGIS.editMode) return;
