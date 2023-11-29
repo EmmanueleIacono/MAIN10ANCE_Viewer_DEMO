@@ -26,13 +26,17 @@
       <BtnBIM @click="eliminaImmagine" v-if="verificaDisplay('galleryMod')" class="btn-img-plus" icona="glyphicon-trash" nome="img-elimina" title="Elimina selezionati" colore="verde" />
       <BtnBIM @click="interrogaImmagine" v-if="verificaDisplay('galleryDati')" class="btn-img-plus" icona="glyphicon-list-alt" nome="img-interroga" title="Interroga" colore="verde" />
       <BtnBIM @click="anagraficaImmagine" v-if="verificaDisplay('galleryDati')" class="btn-img-plus" icona="glyphicon-plus" nome="img-anagrafica" title="Aggiungi o modifica dati" colore="verde" />
+      <BtnBIM @click="segnalazioneImmagine" v-if="verificaDisplay('galleryDati')" class="btn-img-plus" icona="glyphicon-alert" nome="img-segnalazione" title="Segnalazione" colore="verde" />
     </div>
     <div class="explorer-body">
       <div class="col-lg-12 loading-wrapper">
         <LoadingScreen :caricamento="datiNavigazione.caricamento" />
         <UploadImage @annullaCaricamentoImmagine="cancellaAnteprima" @salvaCaricamentoImmagine="salvaImmagine" v-if="datiCaricamento.anteprimaImg" :source="datiCaricamento.anteprimaImg" :percorso="percorsoCartella" :id_main10ance="id_main10ance" />
         <ModuloAnagrafica ref="anagraficaRef" v-if="datiAnagrafica.moduloAnagraficaVisibile" />
+        <ModuloSegnalazione ref="segnalazioneRef" v-if="datiSegnalazione.moduloSegnalazioneVisibile" />
         <SchedaAnagrafica ref="scAnagraficaRef" v-if="datiAnagrafica.schedaAnagraficaVisibile" />
+        <br />
+        <SchedaSegnalazione ref="scSegnalazioneRef" v-if="datiSegnalazione.schedaSegnalazioneVisibile" />
         </div>
     </div>
   </Explorer>
@@ -43,7 +47,7 @@
 import {inject, reactive, toRefs, provide, computed, ref} from 'vue';
 import {dataInteger, verificaPercorso, dataCorta} from '../js/shared';
 import {getListaImmagini} from '../js/richieste';
-import {creaRecordLOD4, eliminaRecordLOD4, getAnagraficaArtifactViewer} from '../js/richieste';
+import {creaRecordLOD4, eliminaRecordLOD4, getAnagraficaArtifactViewer, getSegnalazioneArtifactViewer} from '../js/richieste';
 import Explorer from './elementi/Explorer.vue';
 import Details from './elementi/Details.vue';
 import MainPanel from './elementi/MainPanel.vue';
@@ -53,7 +57,9 @@ import UploadImage from './TabCollectionUploadImage.vue';
 import CreaPercorso from './TabCollectionPercorso.vue';
 import Galleria from './TabCollectionGallery.vue';
 import ModuloAnagrafica from './TabCollectionModuloAnagrafica.vue';
+import ModuloSegnalazione from './TabCollectionModuloSegnalazione.vue';
 import SchedaAnagrafica from './TabCollectionSchedaAnagrafica.vue';
+import SchedaSegnalazione from './TabCollectionSchedaSegnalazione.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 
 export default {
@@ -68,7 +74,9 @@ export default {
     CreaPercorso,
     Galleria,
     ModuloAnagrafica,
+    ModuloSegnalazione,
     SchedaAnagrafica,
+    SchedaSegnalazione,
     LoadingScreen,
   },
   setup() {
@@ -104,6 +112,11 @@ export default {
         schedaAnagraficaVisibile: false,
         schedaAnagrafica: null,
       },
+      datiSegnalazione: {
+        moduloSegnalazioneVisibile: false,
+        schedaSegnalazioneVisibile: false,
+        schedaSegnalazione: null,
+      },
       datiModuloAnagrafica: {
         descrizione_sistema: '',
         descrizione_subsistema: '',
@@ -126,6 +139,18 @@ export default {
         autore_scheda: null,
         autore_ultima_mod: null,
       },
+      datiModuloSegnalazione: {
+        meteo: '',
+        temperatura: '',
+        condizioni_sett_precedente: '',
+        descrizione: '',
+        intervento_urgenza: '',
+        id_segnalazione: null,
+        data_registrazione: null,
+        data_ultima_mod: null,
+        autore_scheda: null,
+        autore_ultima_mod: null,
+      },
       datiUtility: {
         schedaPreesistente: false,
       }
@@ -133,7 +158,9 @@ export default {
     provide('stateArtifact', state.datiNavigazione);
     provide('stateGalleria', state.datiGalleria);
     provide('stateAnagrafica', state.datiAnagrafica);
+    provide('stateSegnalazione', state.datiSegnalazione);
     provide('stateModuloAnagrafica', state.datiModuloAnagrafica);
+    provide('stateModuloSegnalazione', state.datiModuloSegnalazione);
 
     const percorsoCartella = computed(() => `${state.datiNavigazione.selectLocalità}/${state.datiNavigazione.selectEdificio}/${state.datiNavigazione.selectElemento}`);
     const id_main10ance = computed(() => `${state.datiNavigazione.selectLocalità}|${state.datiNavigazione.selectEdificio}|${state.datiNavigazione.selectElemento}|${state.datiCaricamento.idImmagine}`);
@@ -260,10 +287,15 @@ export default {
         };
         console.log(jsonReq);
         const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
+        const datiSegnalazione = await getSegnalazioneArtifactViewer(jsonReq);
         console.log(datiAnagrafica);
+        console.log(datiSegnalazione);
         state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+        state.datiSegnalazione.schedaSegnalazione = datiSegnalazione[0];
         state.datiAnagrafica.moduloAnagraficaVisibile = false;
+        state.datiSegnalazione.moduloSegnalazioneVisibile = false;
         state.datiAnagrafica.schedaAnagraficaVisibile = true;
+        state.datiSegnalazione.schedaSegnalazioneVisibile = true;
         state.datiNavigazione.caricamento = false;
       }
     }
@@ -291,6 +323,8 @@ export default {
         const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
         console.log(datiAnagrafica);
         state.datiAnagrafica.schedaAnagraficaVisibile = false;
+        state.datiSegnalazione.schedaSegnalazioneVisibile = false;
+        state.datiSegnalazione.moduloSegnalazioneVisibile = false;
         state.datiAnagrafica.moduloAnagraficaVisibile = true;
         if (datiAnagrafica.length) {
           console.log('ci sono dei dati');
@@ -346,6 +380,51 @@ export default {
       }
     }
 
+    async function segnalazioneImmagine() {
+      const immaginiSelezionate = downloadRef.value.getPercorsiSelezionati();
+      if (!immaginiSelezionate.length) {
+        store.methods.setAlert('Nessun elemento selezionato');
+        return;
+      }
+      else if (immaginiSelezionate.length !== 1) {
+        store.methods.setAlert('Selezionare un solo elemento per volta');
+        return;
+      }
+      else {
+        state.datiNavigazione.caricamento = true;
+        state.datiSegnalazione.schedaSegnalazione = null;
+        const idMain10ance = state.datiGalleria.idImgSelezionate[0];
+        const categoria = state.datiNavigazione.selectElemento;
+        const jsonReq = {
+          id: idMain10ance,
+          categoria: categoria
+        };
+        console.log(jsonReq);
+        // const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
+        const datiSegnalazione = await getSegnalazioneArtifactViewer(jsonReq);
+        console.log(datiSegnalazione);
+        state.datiAnagrafica.schedaAnagraficaVisibile = false;
+        state.datiAnagrafica.moduloAnagraficaVisibile = false;
+        state.datiSegnalazione.schedaSegnalazioneVisibile = false;
+        state.datiSegnalazione.moduloSegnalazioneVisibile = true;
+        if (datiSegnalazione.length) {
+          console.log('ci sono dei dati');
+          // QUI IMPOSTARE DATI SEGNALAZIONE
+          state.datiSegnalazione.schedaSegnalazione = datiSegnalazione[0];
+          console.log('state segnalazione: ', state.datiSegnalazione.schedaSegnalazione);
+          state.datiModuloSegnalazione.meteo = state.datiSegnalazione.schedaSegnalazione['Meteo'];
+          state.datiModuloSegnalazione.temperatura = state.datiSegnalazione.schedaSegnalazione['Temperatura'];
+          state.datiModuloSegnalazione.condizioni_sett_precedente = state.datiSegnalazione.schedaSegnalazione['Condizioni sett. precedente'];
+          state.datiModuloSegnalazione.descrizione = state.datiSegnalazione.schedaSegnalazione['Descrizione'];
+          state.datiModuloSegnalazione.intervento_urgenza = state.datiSegnalazione.schedaSegnalazione['Intervento di urgenza'];
+        }
+        else {
+          console.log('non ci sono dati');
+        }
+        state.datiNavigazione.caricamento = false;
+      }
+    }
+
     function aggiornaSelezione(nuovaSelezione) {
       // deseleziona(); // QUESTA DA' PROBLEMI MA SERVE RISOLVERE IN QUALCHE MODO
       const imgSelezionate = state.datiGalleria.listaImmagini.filter(img => nuovaSelezione.includes(img.percorso));
@@ -375,6 +454,7 @@ export default {
       salvaImmagine,
       interrogaImmagine,
       anagraficaImmagine,
+      segnalazioneImmagine,
       aggiornaSelezione,
     }
   }

@@ -262,6 +262,20 @@ app.get('/Main10ance_DB/anagrafica/artifact-viewer/interroga/:id', async (req, r
     res.send(risposta);
 });
 
+// per testare la richiesta:
+// fetch("/o/Main10ance_DB/segnalazione/artifact-viewer/interroga/loc-pdiff|LPD_230301184934871|manufatto|231124123134626").then(a => a.json()).then(console.log)
+app.get('/Main10ance_DB/segnalazione/artifact-viewer/interroga/:id', async (req, res) => {
+    const id = req.params.id;
+    const categoria = JSON.parse(req.headers.categoria);
+    let risposta;
+    // qui verifica se LOD4, Manufatto o Dettaglio
+    console.log(categoria);
+    risposta = await interrogaSegnalazione(id);
+    console.log(risposta);
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
 //////////          QUERY          //////////
 
 async function leggiColonneTabella(nomeTab) {
@@ -756,12 +770,23 @@ async function interrogaAnagraficaDettaglio(id) {
     }
 }
 
+async function interrogaSegnalazione(id) {
+    try {
+        const result = await clientM10a.query(`SELECT sg.autore_ultima_mod AS "Operatore", sg.meteo AS "Meteo", sg.temperatura AS "Temperatura", sg.condizioni_sett_precedente AS "Condizioni sett. precedente", sg.descrizione AS "Descrizione", sg.intervento_urgenza AS "Intervento di urgenza" FROM servizio.segnalazione AS sg WHERE sg.id_main10ance = '${id}';`);
+        return result.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
 //////////          ALTRE FUNZIONI          //////////
 
 function gestisciStringheSchede(listaOggetti) {
     let listaStringheEValori = [];
     listaOggetti.forEach(async jsn => {
-        const schema = (jsn.tabella === 'anagrafica_manufatto' || jsn.tabella === 'anagrafica_dettaglio') ? 'servizio' : ambito;
+        const schema = (jsn.tabella === 'anagrafica_manufatto' || jsn.tabella === 'anagrafica_dettaglio' || jsn.tabella === 'segnalazione') ? 'servizio' : ambito;
         let listaInterna = [];
         const listaValori = jsn.valori;
         const stringaColonne = jsn.colonne.join(', ');

@@ -412,3 +412,11 @@ export async function getAnagraficaArtifactViewer(reqJson) {
     const dati = await datiRaw.json();
     return dati;
 }
+
+export async function getSegnalazioneArtifactViewer(reqJson) {
+    const categoria = reqJson.categoria;
+    const id = reqJson.id;
+    const datiRaw = await fetch(`/o/Main10ance_DB/segnalazione/artifact-viewer/interroga/${id}`, {method: "GET", headers: {"content-type": "application/json", categoria: JSON.stringify(categoria)} });
+    const dati = await datiRaw.json();
+    return dati;
+}
