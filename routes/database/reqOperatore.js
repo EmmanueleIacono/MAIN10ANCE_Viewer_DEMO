@@ -750,7 +750,7 @@ async function interrogaAnagraficaLOD4(id) {
 
 async function interrogaAnagraficaManufatto(id) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.epoca AS "Epoca", sa.autore AS "Autore", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.documenti AS "Documenti", sa.iter_autorizzativo AS "Iter autorizzativo" FROM servizio.anagrafica_manufatto AS sa WHERE sa.id_main10ance = '${id}';`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.epoca AS "Epoca", sa.autore AS "Autore", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.documenti AS "Documenti", sa.iter_autorizzativo AS "Iter autorizzativo" FROM servizio.anagrafica_manufatto AS sa WHERE sa.id_main10ance = '${id}' ORDER BY sa.id_anagr DESC;`);
         return result.rows;
     }
     catch(e) {
@@ -761,7 +761,7 @@ async function interrogaAnagraficaManufatto(id) {
 
 async function interrogaAnagraficaDettaglio(id) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.epoca AS "Epoca", sa.documenti AS "Documenti", sa.autore AS "Autore", sa.data AS "Data" FROM servizio.anagrafica_dettaglio AS sa WHERE sa.id_main10ance = '${id}';`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.epoca AS "Epoca", sa.documenti AS "Documenti", sa.autore AS "Autore", sa.data AS "Data" FROM servizio.anagrafica_dettaglio AS sa WHERE sa.id_main10ance = '${id}' ORDER BY sa.id_anagr DESC;`);
         return result.rows;
     }
     catch(e) {
