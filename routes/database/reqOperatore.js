@@ -772,7 +772,7 @@ async function interrogaAnagraficaDettaglio(id) {
 
 async function interrogaSegnalazione(id) {
     try {
-        const result = await clientM10a.query(`SELECT sg.autore_ultima_mod AS "Operatore", sg.meteo AS "Meteo", sg.temperatura AS "Temperatura", sg.condizioni_sett_precedente AS "Condizioni sett. precedente", sg.descrizione AS "Descrizione", sg.intervento_urgenza AS "Intervento di urgenza" FROM servizio.segnalazione AS sg WHERE sg.id_main10ance = '${id}';`);
+        const result = await clientM10a.query(`SELECT sg.autore_ultima_mod AS "Operatore", sg.meteo AS "Meteo", sg.temperatura AS "Temperatura", sg.condizioni_sett_precedente AS "Condizioni sett. precedente", sg.descrizione AS "Descrizione", sg.intervento_urgenza AS "Intervento di urgenza" FROM servizio.segnalazione AS sg WHERE sg.id_main10ance = '${id}' ORDER BY sg.id_segnalazione DESC;`);
         return result.rows;
     }
     catch(e) {
