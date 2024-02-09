@@ -244,6 +244,23 @@ app.post('/DB_Servizio/loc-pdiff/nuovo', async (req, res) => {
     }
 });
 
+// REGISTRAZIONE ATTIVITÀ PRECEDENTI
+app.post('/Main10ance_DB/programmazione/att-precedenti', async (req, res) => {
+    let result = {}
+    try {
+        const reqJson = req.body;
+        const res = await registraAttPrecedenti(reqJson);
+        result.success = res;
+    }
+    catch(e) {
+        result.success = false;
+    }
+    finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
+});
+
 //////////          QUERY          //////////
 
 // async function getUtentiProgetto() {
@@ -596,6 +613,84 @@ async function registraNuoviControlli(listaReqJson) {
                 if (reqJson.dati_manutenzione) {
                     await clientM10a.query(`INSERT INTO ${ambito}."manutenzione_regolare" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "data_ins", "id_main10ance") VALUES (($1), ($2), ($3), ($4), ($5), ($6));`, [reqJson.dati_manutenzione.id_mn_reg, reqJson.dati_manutenzione.cl_ogg, reqJson.dati_manutenzione.azione, reqJson.dati_manutenzione.data_ese, reqJson.dati_manutenzione.data_ins, reqJson.dati_manutenzione.id_main10ance]);
                 }
+            }
+        }
+        catch(e) {
+            throw e;
+        }
+
+        await clientM10a.query("COMMIT;");
+        return true;
+    }
+    catch (ex) {
+        console.log(`Errore: ${ex}`);
+        await clientM10a.query("ROLLBACK;");
+        return false;
+    }
+}
+
+// REGISTRAZIONE ATTIVITÀ PRECEDENTI
+async function registraAttPrecedenti(reqJson) {
+    const stringaContr = 'controllo_stato_di_conservazione_livello_di_urgenza';
+    const stringaManReg = 'manutenzione_regolare';
+    const stringaManCorr = 'manutenzione_correttiva_o_a_guasto';
+    const stringaManStr = 'manutenzione_straordinaria';
+    const stringaRestauro = 'restauri';
+    const stringaDiagnosi = 'danno_alterazione_degrado';
+    try {
+        await clientM10a.query("BEGIN;");
+        console.log(reqJson);
+        try {
+            switch (reqJson.metadati.tabella) {
+                case stringaContr:
+                    for (const edificio of reqJson.edifici) {
+                        const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
+                        await clientM10a.query(`INSERT INTO ${ambito}."${stringaContr}"
+                        ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "st_cons", "liv_urg", "cl_racc", "data_ins", "autore_ultima_mod", "id_main10ance")
+                        VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15));`,
+                        [(reqJson.metadati.id_scheda + reqJson.edifici.indexOf(edificio)), reqJson.cl_ogg, reqJson.dati.descrizioneContr, reqJson.dati.esecutori, reqJson.dati.strumentazione, reqJson.dati.note, reqJson.dati.costo, reqJson.dati.dataInizio, reqJson.dati.dataFine, reqJson.dati.st_cons, reqJson.dati.liv_urg, reqJson.dati.cl_racc, reqJson.metadati.data_ins, reqJson.metadati.autore, [id_main10ance]]);
+                    }
+                    break;
+                case stringaManReg:
+                    for (const edificio of reqJson.edifici) {
+                        const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
+                        await clientM10a.query(`INSERT INTO ${ambito}."${stringaManReg}"
+                        ("id_mn_reg", "cl_ogg_fr", "azione", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
+                        VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
+                        [(reqJson.metadati.id_scheda + reqJson.edifici.indexOf(edificio)), reqJson.cl_ogg, reqJson.dati.descrizioneManReg, reqJson.dati.esecutori, reqJson.dati.strumentazione, reqJson.dati.note, reqJson.dati.costo, reqJson.dati.dataInizio, reqJson.dati.dataFine, reqJson.metadati.data_ins, reqJson.metadati.autore, [id_main10ance]]);
+                    }
+                    break;
+                case stringaManCorr:
+                    for (const edificio of reqJson.edifici) {
+                        const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
+                        await clientM10a.query(`INSERT INTO ${ambito}."${stringaManCorr}"
+                        ("id_mn_gu", "cl_ogg_fr", "azione", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
+                        VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
+                        [(reqJson.metadati.id_scheda + reqJson.edifici.indexOf(edificio)), reqJson.cl_ogg, reqJson.dati.descrizioneManCorr, reqJson.dati.esecutori, reqJson.dati.strumentazione, reqJson.dati.note, reqJson.dati.costo, reqJson.dati.dataInizio, reqJson.dati.dataFine, reqJson.metadati.data_ins, reqJson.metadati.autore, [id_main10ance]]);
+                    }
+                    break;
+                case stringaManStr:
+                    for (const edificio of reqJson.edifici) {
+                        const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
+                        await clientM10a.query(`INSERT INTO ${ambito}."${stringaManStr}"
+                        ("id_mn_str", "cl_ogg_fr", "azione", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
+                        VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
+                        [(reqJson.metadati.id_scheda + reqJson.edifici.indexOf(edificio)), reqJson.cl_ogg, reqJson.dati.descrizioneManStr, reqJson.dati.esecutori, reqJson.dati.strumentazione, reqJson.dati.note, reqJson.dati.costo, reqJson.dati.dataInizio, reqJson.dati.dataFine, reqJson.metadati.data_ins, reqJson.metadati.autore, [id_main10ance]]);
+                    }
+                    break;
+                case stringaRestauro:
+                    for (const edificio of reqJson.edifici) {
+                        const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
+                        await clientM10a.query(`INSERT INTO ${ambito}."${stringaRestauro}"
+                        ("id_restaur", "cl_ogg_fr", "descriz", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
+                        VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
+                        [(reqJson.metadati.id_scheda + reqJson.edifici.indexOf(edificio)), reqJson.cl_ogg, reqJson.dati.descrizioneRestauro, reqJson.dati.esecutori, reqJson.dati.strumentazione, reqJson.dati.note, reqJson.dati.costo, reqJson.dati.dataInizio, reqJson.dati.dataFine, reqJson.metadati.data_ins, reqJson.metadati.autore, [id_main10ance]]);
+                    }
+                    break;
+                default:
+                    console.log('altra tabella');
+                    console.log(reqJson.metadati.tabella);
+                    break;
             }
         }
         catch(e) {

@@ -420,3 +420,9 @@ export async function getSegnalazioneArtifactViewer(reqJson) {
     const dati = await datiRaw.json();
     return dati;
 }
+
+export async function registraAttPrecedenti(jsonAtt) {
+    const res = await fetch('/g/Main10ance_DB/programmazione/att-precedenti', {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonAtt)});
+    const resJson = await res.json();
+    return resJson;
+}

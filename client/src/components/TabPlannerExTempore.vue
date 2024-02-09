@@ -2,11 +2,12 @@
   <Card>
     <Details summary="PROGRAMMAZIONE EX-TEMPORE" :open="false">
       <div class="contenitore-bottoni-scelta">
-        <button @click="moduloVisibile = 'contr'">Programma controllo straordinario</button>
-        <button @click="moduloVisibile = 'int'">Programma pronto intervento</button>
+        <!-- <button @click="moduloVisibile = 'contr'">Programma controllo straordinario</button> -->
+        <!-- <button @click="moduloVisibile = 'int'">Programma intervento a guasto</button> -->
       </div>
       <div v-if="moduloVisibile">
-        <h4>{{moduloVisibile === 'contr' ? 'Controllo straordinario' : 'Pronto intervento'}}</h4>
+        <!-- <h4>{{moduloVisibile === 'contr' ? 'Controllo straordinario' : 'Pronto intervento'}}</h4> -->
+        <h4>Controllo straordinario</h4>
       </div>
       <div v-if="moduloVisibile" class="contesto">
         <div class="contenitore-colonne">
@@ -100,7 +101,7 @@ export default {
   setup() {
     const store = inject('store');
     const state = reactive({
-      moduloVisibile: '',
+      moduloVisibile: 'contr',
       selectLocalità: '',
       selectClOgg: '',
       listaSigleEdificiFiltrata: [],
@@ -136,7 +137,7 @@ export default {
       resetDati();
     }
 
-    function salva() {
+    function salva() { // implementare registrazione attività nel database
       switch (state.moduloVisibile) {
         case 'contr': {
           console.log(state.datiContrStr);
