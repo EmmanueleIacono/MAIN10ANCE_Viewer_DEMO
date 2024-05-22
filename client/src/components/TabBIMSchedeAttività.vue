@@ -20,20 +20,22 @@
           <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Strumentazione']"></td>
         </tr>
         <tr>
-          <td class="fLeft"><label><b>CLASSE DI RACCOMANDAZIONE</b></label></td>
-          <td class="fRight"><select v-model="selectClRacc">
-            <option v-for="(en, ind) in store.statePlanner.enumUNI.enumClRacc" :key="ind" :value="ind">{{en}}</option>
-          </select></td>
-        </tr>
-        <tr>
           <td class="fLeft"><label><b>STATO DI CONSERVAZIONE</b></label></td>
-          <td class="fRight"><select v-model="selectStCons" :disabled="selectMatriceDisabled">
+          <td class="fRight"><select v-model="selectStCons">
             <option v-for="(en, ind) in store.statePlanner.enumUNI.enumStCons" :key="ind" :value="ind+2">{{en}}</option>
           </select></td>
         </tr>
         <tr>
+          <td class="fLeft"><label><b>CLASSE DI RACCOMANDAZIONE</b></label></td>
+          <td class="fRight"><select v-model="selectClRacc">
+            <!-- <option v-for="(en, ind) in store.statePlanner.enumUNI.enumClRacc" :key="ind" :value="ind">{{en}}</option> -->
+            <option v-for="(en, ind) in store.statePlanner.enumUNI.enumClRacc" :key="ind" :value="ind" :disabled="selectClRaccOpzioniBloccate.includes(ind)">{{en}}</option>
+          </select></td>
+        </tr>
+        <tr v-if="!selectLivUrgNascosto">
           <td class="fLeft"><label><b>LIVELLO DI URGENZA</b></label></td>
-          <td class="fRight"><select v-model="selectLivUrg" :disabled="selectMatriceDisabled">
+          <!-- <td class="fRight"><select v-model="selectLivUrg" :disabled="selectMatriceDisabled"> -->
+          <td class="fRight"><select v-model="selectLivUrg">
             <option v-for="(en, ind) in store.statePlanner.enumUNI.enumLivUrg" :key="ind" :value="ind+1">{{en}}</option>
           </select></td>
         </tr>
@@ -103,12 +105,17 @@ export default {
       selectStCons: 2,
       selectLivUrg: 1,
       selectClRacc: 0,
-      selectMatriceDisabled: true,
+      selectMatriceDisabled: false, // con vecchia logica partiva da "true"
+      selectLivUrgNascosto: true,
+      selectClRaccOpzioniBloccate: [2, 3], // per bloccare opzioni non selezionabili
       materialeMan: '',
     });
     const livPriorità = computed(() => state.selectStCons * state.selectLivUrg + state.selectClRacc);
     const tipoClass = computed(() => store.stateBIM.schedeAttivitàTipo.replaceAll(' ', '-'));
+    // const nascondiLivUrg = computed(() => state.selectStCons === 2);
 
+    /*
+    // ---------------------------------- VECCHIA LOGICA ----------------------------------
     watch(() => livPriorità.value, newVal => {
       console.log(newVal);
     });
@@ -121,6 +128,53 @@ export default {
         state.selectLivUrg = 1;
       }
     });
+    */
+
+    // ---------------------------------- NUOVA LOGICA ----------------------------------
+    watch(() => state.selectClRacc, newVal => {
+      if (newVal > 1) {
+        state.selectMatriceDisabled = false;
+      } else {
+        state.selectMatriceDisabled = true;
+        if (state.selectStCons === 0) {
+          state.selectStCons = 2;
+          state.selectLivUrg = 1;
+        }
+      }
+    });
+
+    watch(() => state.selectStCons, newVal => {
+      switch(newVal) {
+        case 2:
+          state.selectLivUrgNascosto = true;
+          state.selectClRaccOpzioniBloccate = [2, 3];
+          state.selectClRacc = 0;
+          state.selectLivUrg = 1;
+          break;
+        case 3:
+          state.selectLivUrgNascosto = false;
+          state.selectClRaccOpzioniBloccate = [3];
+          state.selectClRacc = 0;
+          break;
+        case 4:
+        case 5:
+          state.selectLivUrgNascosto = false;
+          state.selectClRaccOpzioniBloccate = [0, 1];
+          state.selectClRacc = 2;
+          break;
+      }
+    });
+
+    watch(() => state.selectLivUrg, () => {
+      if (state.selectStCons === 0) {
+        state.selectLivUrg = 1;
+      }
+    });
+
+    // watch(() => nascondiLivUrg, newVal => {
+    //   console.log(newVal);
+    //   state.selectLivUrgNascosto = newVal;
+    // });
 
     onMounted(async () => {
       await recuperaEnumUNI();

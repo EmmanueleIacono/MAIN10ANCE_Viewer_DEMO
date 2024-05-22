@@ -55,17 +55,19 @@
         <div class="label-cl-racc"><b>Classe di raccomandazione:</b></div>
         <div id="div-cl-racc">
           <select v-model="datiContr.cl_racc">
-            <option v-for="(en, ind) in listaClRacc" :key="ind" :value="en">{{en}}</option>
+            <option v-for="(en, ind) in listaClRacc" :key="ind" :value="en" :disabled="selectClRaccOpzioniBloccate.includes(ind)">{{en}}</option>
           </select>
         </div>
         <br />
-        <div class="label-liv-urg"><b>Livello di urgenza:</b></div>
-        <div id="div-liv-urg">
-          <select v-model="datiContr.liv_urg">
-            <option v-for="(en, ind) in listaLivUrg" :key="ind" :value="en">{{en}}</option>
-          </select>
+        <div v-if="!selectLivUrgNascosto">
+          <div class="label-liv-urg"><b>Livello di urgenza:</b></div>
+          <div id="div-liv-urg">
+            <select v-model="datiContr.liv_urg">
+              <option v-for="(en, ind) in listaLivUrg" :key="ind" :value="en">{{en}}</option>
+            </select>
+          </div>
+          <br />
         </div>
-        <br />
         <div class="label-descrizione"><b>Descrizione attività:</b></div>
         <div id="div-descrizione">
           <textarea v-model="datiContr.descrizioneContr"></textarea>
@@ -238,9 +240,9 @@ export default {
         strumentazione: '',
         note: '',
         costo: '',
-        st_cons: '',
-        liv_urg: '',
-        cl_racc: '',
+        st_cons: 2,
+        liv_urg: 1,
+        cl_racc: 0,
         dataInizio: null,
         dataFine: null,
       },
@@ -280,12 +282,56 @@ export default {
         dataInizio: null,
         dataFine: null,
       },
+      selectMatriceDisabled: false, // con vecchia logica partiva da "true" // FORSE ELIMINABILE, NON AGISCE MAI SU INTERFACCIA
+      selectLivUrgNascosto: true,
+      selectClRaccOpzioniBloccate: [2, 3] // per bloccare opzioni non selezionabili
     });
 
     watch(() => state.selectLocalità, newVal => {
       const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.località === newVal);
       state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
       state.listaSigleEdificiSelezionati = [];
+    });
+
+    // ---------------------------------- NUOVA LOGICA ST_CONS, CL_RACC, LIV_URG ----------------------------------
+    watch(() => state.datiContr.cl_racc, newVal => {
+      if (newVal > 1) {
+        state.selectMatriceDisabled = false;
+      } else {
+        state.selectMatriceDisabled = true;
+        if (state.datiContr.st_cons === 0) {
+          state.datiContr.st_cons = 2;
+          state.datiContr.liv_urg = 1;
+        }
+      }
+    });
+
+    watch(() => state.datiContr.st_cons, newVal => {
+      switch(newVal) {
+        case 2:
+          state.selectLivUrgNascosto = true;
+          state.selectClRaccOpzioniBloccate = [2, 3];
+          state.datiContr.cl_racc = 0;
+          state.datiContr.liv_urg = 1;
+          break;
+        case 3:
+          state.selectLivUrgNascosto = false;
+          state.selectClRaccOpzioniBloccate = [3];
+          state.datiContr.cl_racc = 0;
+          break;
+        case 4:
+        case 5:
+          state.selectLivUrgNascosto = false;
+          state.selectClRaccOpzioniBloccate = [0, 1];
+          state.datiContr.cl_racc = 2;
+          break;
+      }
+    });
+
+    watch(() => state.datiContr.liv_urg, () => {
+      if (state.datiContr.st_cons === 0) {
+        state.datiContr.liv_urg = 1;
+      }
     });
 
     // valutare se mettere un watch per reset dati al cambio di scheda
