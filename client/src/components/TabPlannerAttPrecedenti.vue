@@ -48,14 +48,14 @@
         <div class="label-st-cons"><b>Stato di conservazione:</b></div>
         <div id="div-st-cons">
           <select v-model="datiContr.st_cons">
-            <option v-for="(en, ind) in listaStCons" :key="ind" :value="en">{{en}}</option>
+            <option v-for="(en, ind) in listaStCons" :key="ind" :value="ind+2">{{en}}</option>
           </select>
         </div>
         <br />
         <div class="label-cl-racc"><b>Classe di raccomandazione:</b></div>
         <div id="div-cl-racc">
           <select v-model="datiContr.cl_racc">
-            <option v-for="(en, ind) in listaClRacc" :key="ind" :value="en" :disabled="selectClRaccOpzioniBloccate.includes(ind)">{{en}}</option>
+            <option v-for="(en, ind) in listaClRacc" :key="ind" :value="ind" :disabled="selectClRaccOpzioniBloccate.includes(ind)">{{en}}</option>
           </select>
         </div>
         <br />
@@ -63,7 +63,7 @@
           <div class="label-liv-urg"><b>Livello di urgenza:</b></div>
           <div id="div-liv-urg">
             <select v-model="datiContr.liv_urg">
-              <option v-for="(en, ind) in listaLivUrg" :key="ind" :value="en">{{en}}</option>
+              <option v-for="(en, ind) in listaLivUrg" :key="ind" :value="ind+1">{{en}}</option>
             </select>
           </div>
           <br />
