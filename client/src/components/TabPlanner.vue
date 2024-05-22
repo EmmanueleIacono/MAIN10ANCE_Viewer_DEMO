@@ -99,6 +99,7 @@ export default {
     onMounted(async () => {
       popolaCalendario();
       await store.methods.recuperaDatiPlanner();
+      console.log(store.statePlanner);
     });
 
     onActivated(async () => {

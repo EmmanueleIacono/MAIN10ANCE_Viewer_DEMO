@@ -376,7 +376,7 @@ async function conteggioModelli(listaLocalità, listaSigle) {
 
 async function getSigleEdifici() {
     try {
-        const results = await clientM10a.query(`SELECT DISTINCT "edificio", "località" FROM servizio."dati_edifici" WHERE "urn" IS NOT null ORDER BY "edificio";`);
+        const results = await clientM10a.query(`SELECT DISTINCT "edificio", "località", "edif_nome_menu" FROM servizio."dati_edifici" WHERE "urn" IS NOT null ORDER BY "edificio";`);
         return results.rows;
     }
     catch(e) {

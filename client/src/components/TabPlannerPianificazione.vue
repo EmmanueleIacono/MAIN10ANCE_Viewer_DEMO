@@ -16,7 +16,7 @@
       <div id="div-edificio-prog">
         <div v-for="s in listaSigleEdificiFiltrata" :key="s.edificio" class="checkbox-edifici">
           <input v-model="listaSigleEdificiSelezionati" :id="`check-edif-prog-${s.edificio}`" :value="s.edificio" type="checkbox">
-          <label :for="`check-edif-prog-${s.edificio}`">{{s.edificio}}</label>
+          <label :for="`check-edif-prog-${s.edificio}`">{{s.edif_nome_menu}}</label>
         </div>
       </div>
       <br />

@@ -12,6 +12,15 @@ Deployed at: <https://main10ance-app-demo.onrender.com/>
 - [x] Rimuovere viewer modelli su Planner
 - [ ] Togliere possibilità di lasciare campo vuoto su categoria in registrazione schede "attività precedenti" --> ma aggiungere campo "altro"
 
+DA 22/05/2024:
+- [ ] Creare nuovo ambito "bormida_gotica" con stesse caratteristiche di "patrimonio_diffuso"
+- [ ] Verificare dicitura "Edificio 0" per Portico Via Crucis Ghiffa
+
+DA 08/05/2024:
+- [ ] Creare filtri per programmazione, esecuzione e storico:
+    - [ ] Ricerca per classi oggetti, edificio, e SE POSSIBILE frasi di rischio
+- [ ] Fare in modo che alcune parole "chiave" compaiano in grassetto su tabella frasi di rischio in pianificazione
+
 DA 24/04/2024:
 - [x] Cambiare ordine e logica schede controllo (prima st_cons, sempre compilabile, poi cl_racc, poi liv_urg)
     - [x] st_cons sempre compilabile
@@ -22,11 +31,6 @@ DA 24/04/2024:
 - [x] Modificare ordine in cui compaiono campi su Planner -> Esecuzione (tutti i tipi di schede)
     - [x] Dall'alto: Località, Edificio, Classe oggetti, Tipo di attività, Strumentazione, Costo, Ore [RINOMINARE IN "Durata"?]...
     - [x] Al fondo: Note, Documenti, Operatore, Data programmazione, Data esecuzione/int.
-
-DA 08/05/2024:
-- [ ] Creare filtri per programmazione, esecuzione e storico:
-    - [ ] Ricerca per classi oggetti, edificio, e SE POSSIBILE frasi di rischio
-- [ ] Fare in modo che alcune parole "chiave" compaiano in grassetto su tabella frasi di rischio in pianificazione
 
 ALTRO:
 - [ ] Add un tab per permettere di scaricare documenti utili a utenti ---> NO, ASPETTARE
