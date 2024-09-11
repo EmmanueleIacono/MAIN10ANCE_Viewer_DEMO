@@ -13,8 +13,20 @@ export async function getTabelleGIS() {
 export async function leggiDBMarkerLoc() {
     try {
         const risultato = await fetch(`/t/DB_Servizio/MarkerLoc`, {method: "GET", headers: {"content-type": "application/json"}});
-        const sacriMontiJson = await risultato.json();
-        return sacriMontiJson;
+        const localitàJson = await risultato.json();
+        return localitàJson;
+    }
+    catch(e) {
+        console.log('Errore nella lettura dei marker delle località');
+        console.log(e);
+    }
+}
+
+export async function leggiDBMarkerLocAmbito(ambito) {
+    try {
+        const risultato = await fetch(`/o/DB_Servizio/MarkerLoc?ambito=${ambito}`, {method: "GET", headers: {"content-type": "application/json"}});
+        const localitàJson = await risultato.json();
+        return localitàJson;
     }
     catch(e) {
         console.log('Errore nella lettura dei marker delle località');
@@ -25,8 +37,22 @@ export async function leggiDBMarkerLoc() {
 export async function leggiDBMarkerEdif() {
     try {
         const risultato = await fetch(`/t/DB_Servizio/MarkerEdif`, {method: "GET", headers: {"content-type": "application/json"}});
-        const cappelleJson = await risultato.json();
-        return cappelleJson;
+        const edificiJson = await risultato.json();
+        return edificiJson;
+    }
+    catch(e) {
+        console.log('Errore nella lettura dei marker degli edifici');
+        console.log(e);
+    }
+}
+
+export async function leggiDBMarkerEdifAmbito(ambito) {
+    console.log(ambito);
+    try {
+        const risultato = await fetch(`/o/DB_Servizio/MarkerEdif?ambito=${ambito}`, {method: "GET", headers: {"content-type": "application/json"}});
+        const edificiJson = await risultato.json();
+        console.log(edificiJson);
+        return edificiJson;
     }
     catch(e) {
         console.log('Errore nella lettura dei marker degli edifici');
@@ -392,6 +418,23 @@ export async function creaNuovoLocPdiff(jsonReq) {
     let ris;
     try {
         const risultatoRaw = await fetch("/g/DB_Servizio/loc-pdiff/nuovo", {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        const risultato = await risultatoRaw.json();
+        ris = risultato.success;
+    }
+    catch(e) {
+        console.log("Errore nell'aggiunta di un nuovo punto");
+        console.log(e);
+        ris = false;
+    }
+    finally {
+        return ris;
+    }
+}
+
+export async function creaNuovoMarkerAmbito(jsonReq) {
+    let ris;
+    try {
+        const risultatoRaw = await fetch("/g/DB_Servizio/mk-ambito/nuovo", {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
         const risultato = await risultatoRaw.json();
         ris = risultato.success;
     }

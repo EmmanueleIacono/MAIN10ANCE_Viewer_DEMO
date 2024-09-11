@@ -9,6 +9,8 @@ import store from '../store/index';
 
 export let mappaGlb;
 export let newLocMatMarker;
+export let newLocalitàAmbitoMarker;
+export let newEdificioAmbitoMarker;
 
 // CREAZIONE MAPPA
 export function creaMappa(divId, posizioneIniziale) {
@@ -87,6 +89,15 @@ export const iconaCappelle = L.icon({
     shadowAnchor: [18, 15]
 });
 
+export const iconaEdifGenerico = L.icon({
+    iconUrl: require('/src/assets/img/icona_edif_generico.png'),
+    shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    shadowSize: [36, 36],
+    shadowAnchor: [18, 15]
+});
+
 const iconaLocPdiff = L.icon({
     iconUrl: require('/src/assets/img/icona_cubo_v1.png'),
     shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
@@ -155,6 +166,23 @@ export function addLocPdiff(ev) {
     };
 }
 
+// AGGIUNTA NUOVO PUNTO PER AMBITO SPECIFICO
+export function addMarkerAmbito(ev) {
+    // check se attiva una qualche "modalità modifica"
+    if (!store.stateGIS.editModeMkAmbito) return;
+    const {lat, lng} = ev.latlng;
+    // se con click, marker esiste già, sostituire
+    rimuoviMarkerTemporaneo();
+    newEdificioAmbitoMarker = new L.marker({lat, lng}, {icon: iconaEdifGenerico}).addTo(mappaGlb);
+    // salvare marker da qualche parte
+    return {
+        marker: newEdificioAmbitoMarker,
+        coord: {lat, lng}
+    };
+}
+
 export function rimuoviMarkerTemporaneo() {
     if (newLocMatMarker) mappaGlb.removeLayer(newLocMatMarker);
+    // if (newLocalitàAmbitoMarker) mappaGlb.removeLayer(newLocalitàAmbitoMarker); // PER ORA NO
+    if (newEdificioAmbitoMarker) mappaGlb.removeLayer(newEdificioAmbitoMarker);
 }

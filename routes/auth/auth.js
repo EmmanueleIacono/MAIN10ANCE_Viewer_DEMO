@@ -73,7 +73,10 @@ router.post('/login', async (req, res, next) => {
                     id: datiUtente.username,
                     bim_vw_sets: roleSettings.bim_vw_sets,
                     usr_vw: roleSettings.usr_vw,
-                    buckets: ambitoSettings.buckets
+                    buckets: ambitoSettings.buckets,
+                    ambito: ambitoSettings.ambito, // nuovi settings 29/05/2024
+                    ambito_schema: ambitoSettings.schema, // nuovi settings 29/05/2024
+                    ambito_full_name: ambitoSettings.ambito_full_name, // nuovi settings 29/05/2024
                 });
             }
             else {
@@ -142,7 +145,7 @@ async function getSettingsByRuolo(ruolo) {
 
 async function getSettingsByAmbito(ambito) {
     try {
-        const results = await clientM10a.query(`SELECT "buckets", "schema", "storage" FROM servizio."ambiti" WHERE "ambito" = ($1);`, [ambito]);
+        const results = await clientM10a.query(`SELECT "ambito", "ambito_full_name", "buckets", "schema", "storage" FROM servizio."ambiti" WHERE "ambito" = ($1);`, [ambito]);
         return results.rows[0];
     }
     catch(e) {

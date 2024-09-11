@@ -9,6 +9,9 @@ const state = reactive({
         bim_vw_sets: '9-3',
         usr_vw: '',
         bkts: '',
+        ambito: '',
+        ambito_schema: '',
+        ambito_full_name: '',
     },
     alertVisibile: false,
     alertMessaggio: '',
@@ -26,6 +29,7 @@ const stateGIS = reactive({
     markerEdif: null,
     markerLocPdiff: null,
     editMode: false,
+    editModeMkAmbito: false,
 });
 
 const stateBIM = reactive({
@@ -95,6 +99,9 @@ const methods = {
         localStorage.bim_vw_sets = settingsJson.bim_vw_sets;
         localStorage.usr_vw = settingsJson.usr_vw;
         localStorage.bkts = settingsJson.buckets;
+        localStorage.ambito = settingsJson.ambito; // SAREBBE MEGLIO PRENDERLO DAI COOKIE // nuovi settings 29/05/2024
+        localStorage.ambito_schema = settingsJson.ambito_schema; // nuovi settings 29/05/2024
+        localStorage.ambito_full_name = settingsJson.ambito_full_name // nuovi settings 29/05/2024
         this.setUserSettings();
     },
 
@@ -103,6 +110,9 @@ const methods = {
         state.userSettings.bim_vw_sets = localStorage.bim_vw_sets;
         state.userSettings.usr_vw = localStorage.usr_vw;
         state.userSettings.bkts = localStorage.bkts;
+        state.userSettings.ambito = localStorage.ambito;
+        state.userSettings.ambito_schema = localStorage.ambito_schema;
+        state.userSettings.ambito_full_name = localStorage.ambito_full_name;
     },
 
     setLogoutUserSettings() {
@@ -114,6 +124,9 @@ const methods = {
         state.userSettings.bim_vw_sets = '9-3';
         state.userSettings.usr_vw = '';
         state.userSettings.bkts = '';
+        state.userSettings.ambito = '';
+        state.userSettings.ambito_schema = '';
+        state.userSettings.ambito_full_name = '';
     },
 
     setAlert(messaggio) {
@@ -187,6 +200,14 @@ const methods = {
 
     setEditModeGISfalse() {
         stateGIS.editMode = false;
+    },
+
+    setEditModeMkAmbitoGIStrue() {
+        stateGIS.editModeMkAmbito = true;
+    },
+
+    setEditModeMkAmbitoGISfalse() {
+        stateGIS.editModeMkAmbito = false;
     },
 
     async recuperaDatiPlanner() {
@@ -281,6 +302,13 @@ const getters = {
     },
     getBkts() {
         return state.userSettings.bkts.split(',');
+    },
+    getUsrInfoAmbito() {
+        return {
+            ambito: state.userSettings.ambito,
+            ambito_schema: state.userSettings.ambito_schema,
+            ambito_full_name: state.userSettings.ambito_full_name,
+        }
     }
 }
 

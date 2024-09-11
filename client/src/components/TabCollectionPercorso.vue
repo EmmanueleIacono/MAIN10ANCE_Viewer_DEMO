@@ -30,7 +30,7 @@
 
 <script>
 import { onMounted, toRefs, watch, inject} from 'vue';
-import {prendiSigleLocalità, leggiDBMarkerEdif, prendiLOD, leggiDBMarkerLocPdiff} from '../js/richieste';
+import {prendiSigleLocalità, leggiDBMarkerEdifAmbito, prendiLOD, leggiDBMarkerLocPdiff} from '../js/richieste';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 
 export default {
@@ -39,6 +39,7 @@ export default {
     LoadingScreen,
   },
   setup() {
+    const store = inject('store');
     const statePercorso = inject('stateArtifact');
 
     watch(() => statePercorso.selectLocalità, async newVal => {
@@ -53,8 +54,10 @@ export default {
 
     onMounted(async () => {
       statePercorso.caricamento = true;
+      const {ambito} = store.getters.getUsrInfoAmbito();
       const listaSigleLoc = await prendiSigleLocalità();
-      const listaEdif = await leggiDBMarkerEdif();
+      const listaEdif = await leggiDBMarkerEdifAmbito(ambito);
+      // const listaEdif = await leggiDBMarkerEdif();
       const listaLocPdiff = await leggiDBMarkerLocPdiff();
       const listaElementi = await prendiLOD(4);
       statePercorso.listaSigleLoc = listaSigleLoc;

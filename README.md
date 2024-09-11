@@ -12,9 +12,19 @@ Deployed at: <https://main10ance-app-demo.onrender.com/>
 - [x] Rimuovere viewer modelli su Planner
 - [ ] Togliere possibilità di lasciare campo vuoto su categoria in registrazione schede "attività precedenti" --> ma aggiungere campo "altro"
 
+DA 14/06/2024:
+- [x] Nuove entità da appunti Esteban
+- [ ] Nuova entità per elementi sia decorativi che strutturali, non ricadenti in "apparato_decorativo"
+- [ ] Ragionare su degli "aggregatori" che permettano di considerare degli insiemi di elementi anche appartenenti a entità diverse
+- [x] Tirare fuori tabelle "glossario" e "frase_di_rischio" da ambito sacrimonti e mettere in uno schema comune (es. "servizio"), e permettere di associare a ciascuna frase di rischio uno o più ambiti specifici
+- [x] aggiungere tre nuove colonne a tabella "frase_di_rischio" per indicare ambiti, entità e aggregatori (uno o più ambiti, entità e aggregatori)
+
 DA 22/05/2024:
-- [ ] Creare nuovo ambito "bormida_gotica" con stesse caratteristiche di "patrimonio_diffuso"
-- [ ] Verificare dicitura "Edificio 0" per Portico Via Crucis Ghiffa
+- [ ] Creare nuovo ambito "bormidagotica" con stessa funzionalità di "patrimonio_diffuso"
+    - [x] Creare nuovo ambito "bormidagotica" duplicando "sacrimonti"
+    - [x] Creare nuovo utente gestore associato ad ambito "bormidagotica" per prove
+    - [ ] Creare funzionalità simile a "patrimonio_diffuso", con possibilità gestore di aggiungere marker a quell'ambito
+- [x] Verificare dicitura "Edificio 0" per Portico Via Crucis Ghiffa
 
 DA 08/05/2024:
 - [ ] Creare filtri per programmazione, esecuzione e storico:

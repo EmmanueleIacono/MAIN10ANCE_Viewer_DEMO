@@ -276,6 +276,22 @@ app.get('/Main10ance_DB/segnalazione/artifact-viewer/interroga/:id', async (req,
     res.send(risposta);
 });
 
+// diversa da quella equivalente per turista, qui richiedo dati associati ad ambito specifico utente
+app.get('/DB_Servizio/MarkerLoc', async (req, res) => {
+    const ambito_loc = req.query.ambito;
+    const markerLocalità = await leggiMarkerLocAmbito(ambito_loc);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(markerLocalità));
+});
+
+// diversa da quella equivalente per turista, qui richiedo dati associati ad ambito specifico utente
+app.get('/DB_Servizio/MarkerEdif', async (req, res) => {
+    const ambito_edif = req.query.ambito;
+    const markerEdifici = await leggiMarkerEdifAmbito(ambito_edif);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(markerEdifici));
+});
+
 //////////          QUERY          //////////
 
 async function leggiColonneTabella(nomeTab) {
@@ -300,7 +316,7 @@ async function leggiTabellaDB(nomeTab) {
 
 async function leggiTabellaGlossario() {
     try {
-        const result = await clientM10a.query(`SELECT * FROM ${ambito}."glossario" ORDER BY regexp_replace("id_gloss", '\\D', '', 'g');`);
+        const result = await clientM10a.query(`SELECT * FROM servizio."glossario" ORDER BY regexp_replace("id_gloss", '\\D', '', 'g');`);
         return result.rows;
     }
     catch(e) {
@@ -310,7 +326,7 @@ async function leggiTabellaGlossario() {
 
 async function leggiTabellaGlossarioDegradi() {
     try {
-        const result = await clientM10a.query(`SELECT * FROM ${ambito}."glossario" WHERE ("gloss_ty"='danno' OR "gloss_ty"='alterazione' OR "gloss_ty"='degrado' OR "gloss_ty"='nessuno') ORDER BY regexp_replace("id_gloss", '\\D', '', 'g');`);
+        const result = await clientM10a.query(`SELECT * FROM servizio."glossario" WHERE ("gloss_ty"='danno' OR "gloss_ty"='alterazione' OR "gloss_ty"='degrado' OR "gloss_ty"='nessuno') ORDER BY regexp_replace("id_gloss", '\\D', '', 'g');`);
         return result.rows;
     }
     catch(e) {
@@ -363,7 +379,7 @@ async function leggiSchedeAnagrafica() {
 
 async function leggiSchedeControllo() {
     try {
-        const result = await clientM10a.query(`SELECT mc.data_con, mc.controllo, md.id_dad, md.id_main10ance, md.rid_gloss, mf.mn_reg, mf.frequenza, mf.mn_nec, mc.liv_urg FROM ${ambito}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${ambito}.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN ${ambito}.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
+        const result = await clientM10a.query(`SELECT mc.data_con, mc.controllo, md.id_dad, md.id_main10ance, md.rid_gloss, mf.mn_reg, mf.frequenza, mf.mn_nec, mc.liv_urg FROM ${ambito}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${ambito}.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN servizio.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
         return result.rows;
     }
     catch(e) {
@@ -373,7 +389,7 @@ async function leggiSchedeControllo() {
 
 async function leggiSchedeControllo2() {
     try {
-        // const result = await clientM10a.query(`SELECT mc.esecutori AS "Operatore", mc.data_con AS "Data controllo", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", md.materiale AS "Materiale", mc.st_cons AS "Stato di conservazione", md.dad_ty AS "Tipo di fenomeno", md.rid_gloss AS "Nome fenomeno", md.causa_e AS "Causa", md.est_sup AS "Estensione", mf.fr_risc AS "Frase di rischio", mf.mn_reg AS "Manutenzione regolare prevista", mf.frequenza AS "Frequenza prevista (mesi)", mf.mn_nec AS "Manutenzione correttiva prevista", mc.liv_urg AS "Livello di urgenza", mc.costo AS "Costo previsto (€)", mc.commenti AS "Commenti", mc.doc AS "Documenti", md.id_dad AS "Codice scheda controllo", md.id_main10ance AS "Elementi controllati", mc.data_ins AS "Data registrazione scheda" FROM ${ambito}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${ambito}.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN ${ambito}.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
+        // const result = await clientM10a.query(`SELECT mc.esecutori AS "Operatore", mc.data_con AS "Data controllo", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", md.materiale AS "Materiale", mc.st_cons AS "Stato di conservazione", md.dad_ty AS "Tipo di fenomeno", md.rid_gloss AS "Nome fenomeno", md.causa_e AS "Causa", md.est_sup AS "Estensione", mf.fr_risc AS "Frase di rischio", mf.mn_reg AS "Manutenzione regolare prevista", mf.frequenza AS "Frequenza prevista (mesi)", mf.mn_nec AS "Manutenzione correttiva prevista", mc.liv_urg AS "Livello di urgenza", mc.costo AS "Costo previsto (€)", mc.commenti AS "Commenti", mc.doc AS "Documenti", md.id_dad AS "Codice scheda controllo", md.id_main10ance AS "Elementi controllati", mc.data_ins AS "Data registrazione scheda" FROM ${ambito}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${ambito}.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN servizio.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
         const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_con AS "Data controllo", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_contr AS "Codice scheda controllo", mc.id_main10ance AS "Elementi da controllare" FROM ${ambito}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${ambito}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE ORDER BY mc.data_ins;`);
         return result.rows;
     }
@@ -469,7 +485,7 @@ async function leggiTabelleLOD3e4() {
 /////// DA ELIMINARE O DA RIVEDERE PER FASE 2 //////////////
 // async function leggiDatiControlloProg() {
 //     try {
-//         const results = await clientM10a.query(`SELECT "c".id_contr AS "id", "fr".cl_ogg_fr AS "classe", "fr".fr_risc AS "frase", "fr".controllo, "fr".mn_reg AS "manutenzione_regolare", "fr".mn_nec AS "manutenzione_correttiva", "c".data_con AS "data_operazione", "c".freq AS "frequenza", "c".data_ins AS "data_registrazione", "c".id_main10ance FROM ${ambito}.controllo_stato_di_conservazione_livello_di_urgenza AS "c" JOIN ${ambito}.frase_di_rischio AS "fr" ON "c".rid_fr_risc = "fr".id_fr_risc ORDER BY data_con;`);
+//         const results = await clientM10a.query(`SELECT "c".id_contr AS "id", "fr".cl_ogg_fr AS "classe", "fr".fr_risc AS "frase", "fr".controllo, "fr".mn_reg AS "manutenzione_regolare", "fr".mn_nec AS "manutenzione_correttiva", "c".data_con AS "data_operazione", "c".freq AS "frequenza", "c".data_ins AS "data_registrazione", "c".id_main10ance FROM ${ambito}.controllo_stato_di_conservazione_livello_di_urgenza AS "c" JOIN servizio.frase_di_rischio AS "fr" ON "c".rid_fr_risc = "fr".id_fr_risc ORDER BY data_con;`);
 //         return results.rows;
 //     }
 //     catch(e) {
@@ -774,6 +790,27 @@ async function interrogaSegnalazione(id) {
     try {
         const result = await clientM10a.query(`SELECT sg.autore_ultima_mod AS "Operatore", sg.meteo AS "Meteo", sg.temperatura AS "Temperatura", sg.condizioni_sett_precedente AS "Condizioni sett. precedente", sg.descrizione AS "Descrizione", sg.intervento_urgenza AS "Intervento di urgenza" FROM servizio.segnalazione AS sg WHERE sg.id_main10ance = '${id}' ORDER BY sg.id_segnalazione DESC;`);
         return result.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function leggiMarkerLocAmbito(ambito_loc) {
+    try {
+        const results = await clientM10a.query(`SELECT * FROM servizio."dati_località" WHERE "ambito" = ($1) ORDER BY "nome";`, [ambito_loc]);
+        return results.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiMarkerEdifAmbito(ambito_edif) {
+    try {
+        const results = await clientM10a.query(`SELECT * FROM servizio."dati_edifici" WHERE "ambito" = ($1) ORDER BY CAST("numero" AS INTEGER);`, [ambito_edif]);
+        return results.rows;
     }
     catch(e) {
         console.log(e);

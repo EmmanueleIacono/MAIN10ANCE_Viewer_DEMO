@@ -4,6 +4,8 @@
     <MappaGIS ref="mappaRef" @newMarker="updateMarker" />
   </MainPanel>
   <Explorer :colonna="'col-sm-3'">
+    <AddMarkerAmbito />
+    <br />
     <BtnBIM @click="addLocPdiff" v-if="verificaDisplayAdd()" class="btn-gis" icona="glyphicon-plus" nome="addLocPdiff" title="Aggiungi località patrimonio diffuso" colore="verde" />
     <BtnBIM @click="confermaLocPdiff" v-if="verificaDisplayConf()" class="btn-gis" icona="glyphicon-ok" nome="confLocPdiff" title="Conferma" colore="verde" />
     <BtnBIM @click="salvaLocPdiff" v-if="verificaDisplaySalva()" class="btn-gis" icona="glyphicon-floppy-disk" nome="salvaLocPdiff" title="Salva" colore="verde" />
@@ -51,7 +53,8 @@
 </template>
 
 <script>
-import {ref, inject, reactive, watch} from 'vue';
+import {ref, inject, reactive, watch, provide, toRefs} from 'vue';
+import AddMarkerAmbito from './TabGISAddMarkerAmbito.vue';
 import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
 import MappaGIS from './TabGISMappa.vue';
@@ -67,6 +70,7 @@ import comuni from '../assets/json/comuni.json';
 export default {
   name: 'TabGIS',
   components: {
+    AddMarkerAmbito,
     MainPanel,
     Explorer,
     MappaGIS,
@@ -89,6 +93,12 @@ export default {
     });
     // console.log(province);
     // console.log(comuni);
+
+    // prendo i refs solo di ciò che mi serve
+    const { nuovoMarker, coordMarker } = toRefs(state);
+
+    provide('nuovoMarker', nuovoMarker);
+    provide('coordMarker', coordMarker);
 
     watch(() => state.provinciaMarker, async newVal => {
       const listaComuniFiltrata = comuni.filter(cm => cm.sigla === newVal);

@@ -244,6 +244,23 @@ app.post('/DB_Servizio/loc-pdiff/nuovo', async (req, res) => {
     }
 });
 
+// NUOVO PUNTO SU AMBITO UTENTE
+app.post('/DB_Servizio/mk-ambito/nuovo', async (req, res) => {
+    const result = {};
+    try {
+        const reqJson = req.body;
+        const res = await creaNuovoMarkerAmbito(reqJson);
+        result.success = res;
+    }
+    catch(e) {
+        result.success = false;
+    }
+    finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
+});
+
 // REGISTRAZIONE ATTIVITÀ PRECEDENTI
 app.post('/Main10ance_DB/programmazione/att-precedenti', async (req, res) => {
     let result = {}
@@ -386,7 +403,7 @@ async function getSigleEdifici() {
 
 async function getFrasiDiRischio() {
     try {
-        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM ${ambito}."frase_di_rischio" ORDER BY "id_fr_risc";`);
+        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM servizio."frase_di_rischio" ORDER BY "id_fr_risc";`);
         return results.rows;
     }
     catch(e) {
@@ -461,10 +478,36 @@ async function creaNuovoLocPdiff(reqJson) {
     }
 }
 
+async function creaNuovoMarkerAmbito(reqJson) {
+    try {
+        await clientM10a.query("BEGIN;");
+        try {
+            const coord = reqJson.coord;
+            const nome = reqJson.nome;
+            const sigla = reqJson.sigla;
+            const descrizione = reqJson.descrizione;
+            const numero = reqJson.numero;
+            const edificio = reqJson.edificio;
+            const edif_nome_menu = reqJson.edif_nome_menu;
+            const ambito = reqJson.ambito;
+            const valuesArray = [[coord.lat, coord.lng], nome, sigla, descrizione, numero, edificio, edif_nome_menu, ambito];
+            await clientM10a.query(`INSERT INTO servizio."dati_edifici" ("coord", "nome", "sigla", "descrizione", "numero", "edificio", "edif_nome_menu", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8))`, valuesArray);
+        } catch (e) {
+            throw e;
+        }
+        await clientM10a.query("COMMIT;");
+        return true;
+    } catch (er) {
+        console.log(`Errore: ${er}`);
+        await clientM10a.query("ROLLBACK;");
+        return false;
+    }
+}
+
 async function leggiAttProgPerIntegrazione(bool) {
     try {
         // const resp = await clientM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "data_prog", to_json("id_main10ance") AS "id_main10ance", "id_group", "località_estesa", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM ${ambito}."attività_prog" WHERE "da_integrare" = ($1) ORDER BY "id_att_prog";`, [bool]);
-        const resp = await clientM10a.query(`SELECT a."id_att_prog", a."rid_fr_risc", a."data_prog", to_json(a."id_main10ance") AS "id_main10ance", a."id_group", a."località_estesa", a."cl_ogg_fr", to_json(a."tipo_attività") AS "tipo_attività", a."data_ins", a."data_ultima_mod", a."frequenza", a."da_integrare", a."necessaria_revisione", a."costo", a."ore", a."esecutori", a."strumentaz" AS "strumentazione", a."commenti", a."liv_priorità", a."rid_contr", a."rid_dad", a."rid_att_ciclica_prec", f."fr_risc", f."controllo", f."mn_reg" AS "manutenzione regolare", f."mn_nec" AS "manutenzione correttiva" FROM ${ambito}."attività_prog" AS "a" JOIN ${ambito}."frase_di_rischio" AS "f" ON a."rid_fr_risc" = f."id_fr_risc" WHERE a."da_integrare" = ($1) ORDER BY "id_att_prog";`, [bool]);
+        const resp = await clientM10a.query(`SELECT a."id_att_prog", a."rid_fr_risc", a."data_prog", to_json(a."id_main10ance") AS "id_main10ance", a."id_group", a."località_estesa", a."cl_ogg_fr", to_json(a."tipo_attività") AS "tipo_attività", a."data_ins", a."data_ultima_mod", a."frequenza", a."da_integrare", a."necessaria_revisione", a."costo", a."ore", a."esecutori", a."strumentaz" AS "strumentazione", a."commenti", a."liv_priorità", a."rid_contr", a."rid_dad", a."rid_att_ciclica_prec", f."fr_risc", f."controllo", f."mn_reg" AS "manutenzione regolare", f."mn_nec" AS "manutenzione correttiva" FROM ${ambito}."attività_prog" AS "a" JOIN servizio."frase_di_rischio" AS "f" ON a."rid_fr_risc" = f."id_fr_risc" WHERE a."da_integrare" = ($1) ORDER BY "id_att_prog";`, [bool]);
         return resp.rows;
     }
     catch(e) {

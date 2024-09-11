@@ -8,7 +8,7 @@
 
 <script>
 import {onMounted, inject, watch, onActivated} from 'vue';
-import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaSM, iconaCappelle, addLocPdiff, creaMarkerLocPdiff} from '../js/GIS';
+import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaSM, iconaCappelle, addLocPdiff, addMarkerAmbito, creaMarkerLocPdiff} from '../js/GIS';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 
@@ -48,9 +48,13 @@ export default {
       });
 
       mappaGlb.on('click', e => {
-        const marker = addLocPdiff(e);
-        if (marker) {
-          emit('newMarker', marker);
+        const markerPdiff = addLocPdiff(e);
+        const markerEdifAmbito = addMarkerAmbito(e);
+        if (markerPdiff) {
+          emit('newMarker', markerPdiff);
+        }
+        else if (markerEdifAmbito) {
+          emit('newMarker', markerEdifAmbito);
         }
       });
 
