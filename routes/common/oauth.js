@@ -1,15 +1,15 @@
-const { AuthClientTwoLegged } = require('forge-apis');
+const { AuthClientTwoLeggedV2 } = require('forge-apis');
 
 const config = require('../../config');
 
 /**
  * Initializes a Forge client for 2-legged authentication.
  * @param {string[]} scopes List of resource access scopes.
- * @returns {AuthClientTwoLegged} 2-legged authentication client.
+ * @returns {AuthClientTwoLeggedV2} 2-legged authentication client.
  */
 function getClient(scopes) {
     const { client_id, client_secret } = config.credentials;
-    return new AuthClientTwoLegged(client_id, client_secret, scopes || config.scopes.internal);
+    return new AuthClientTwoLeggedV2(client_id, client_secret, scopes || config.scopes.internal);
 }
 
 let cache = {};
