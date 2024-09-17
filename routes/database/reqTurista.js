@@ -4,7 +4,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 const {clientM10a} = require('./connessioni');
-const {ambito} = require('./ambito');
+const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
 
 //////////          RICHIESTE          //////////
@@ -99,7 +99,7 @@ app.get('/Main10ance_DB/LOD4/info', async (req, res) => {
 
 async function leggiGIS(tabella, geometria, colonneUtili) {
     try {
-        const result = await clientM10a.query(`SELECT ST_AsGeoJSON(${geometria}) AS "geom", CONCAT_WS(', ', ${colonneUtili}) AS "info" FROM ${ambito}.${tabella};`);
+        const result = await clientM10a.query(`SELECT ST_AsGeoJSON(${geometria}) AS "geom", CONCAT_WS(', ', ${colonneUtili}) AS "info" FROM ${data_schema}.${tabella};`);
         return result.rows;
     }
     catch(e) {
@@ -109,7 +109,7 @@ async function leggiGIS(tabella, geometria, colonneUtili) {
 
 async function leggiMarkerLoc() {
     try {
-        const results = await clientM10a.query(`SELECT * FROM servizio."dati_località" ORDER BY "nome";`);
+        const results = await clientM10a.query(`SELECT * FROM ${data_schema}."dati_località" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {
@@ -119,7 +119,7 @@ async function leggiMarkerLoc() {
 
 async function leggiMarkerEdif() {
     try {
-        const results = await clientM10a.query(`SELECT * FROM servizio."dati_edifici" ORDER BY CAST("numero" AS INTEGER);`);
+        const results = await clientM10a.query(`SELECT * FROM ${data_schema}."dati_edifici" ORDER BY CAST("numero" AS INTEGER);`);
         return results.rows;
     }
     catch(e) {
@@ -129,7 +129,7 @@ async function leggiMarkerEdif() {
 
 async function leggiMarkerLocPdiff() {
     try {
-        const results = await clientM10a.query(`SELECT "dati_loc_pdiff".*, 'loc-pdiff' AS "località" FROM servizio."dati_loc_pdiff" ORDER BY "nome";`);
+        const results = await clientM10a.query(`SELECT "dati_loc_pdiff".*, 'loc-pdiff' AS "località" FROM ${utility_schema}."dati_loc_pdiff" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {
@@ -139,7 +139,7 @@ async function leggiMarkerLocPdiff() {
 
 async function leggiListaTabelleGIS() {
     try {
-        const results = await clientM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias", "geometria", "colonne_utili" AS "colonneUtili" FROM servizio."lod" WHERE "BIM-GIS" = 'GIS' ORDER BY "alias";`);
+        const results = await clientM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias", "geometria", "colonne_utili" AS "colonneUtili" FROM ${utility_schema}."lod" WHERE "BIM-GIS" = 'GIS' ORDER BY "alias";`);
         return results.rows;
     }
     catch(e) {
@@ -149,7 +149,7 @@ async function leggiListaTabelleGIS() {
 
 async function leggiListaTabelleLOD(LOD) {
     try {
-        const results = await clientM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM servizio."lod" WHERE "LOD" = ($1) ORDER BY "alias";`, [LOD]);
+        const results = await clientM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM ${utility_schema}."lod" WHERE "LOD" = ($1) ORDER BY "alias";`, [LOD]);
         return results.rows;
     }
     catch(e) {
@@ -192,7 +192,7 @@ async function downloadImmagini(percorsoFile) {
 }
 
 async function getInfoImmagine(percorsoFile, tabella) {
-    const schema = percorsoFile.startsWith('loc-pdiff') ? 'servizio' : ambito;
+    const schema = percorsoFile.startsWith('loc-pdiff') ? utility_schema : data_schema;
     try {
         const result = await clientM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "id_main10ance" FROM ${schema}.${tabella} WHERE "immagine" = ($1);`, [percorsoFile]);
         return result.rows;

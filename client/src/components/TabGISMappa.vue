@@ -8,7 +8,7 @@
 
 <script>
 import {onMounted, inject, watch, onActivated} from 'vue';
-import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaSM, iconaCappelle, addLocPdiff, addMarkerAmbito, creaMarkerLocPdiff} from '../js/GIS';
+import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaLocalità, iconaEdifici, addLocPdiff, addMarkerAmbito, creaMarkerLocPdiff} from '../js/GIS';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 
@@ -66,14 +66,14 @@ export default {
         if (store.stateGIS.markerLoc) {
           gruppoMarkerLocalità.clearLayers();
           store.stateGIS.markerLoc.forEach(loc => {
-            const markerSM = creaMarker(loc, iconaSM);
+            const markerSM = creaMarker(loc, iconaLocalità);
             markerSM.addTo(gruppoMarkerLocalità);
           });
         }
         if (store.stateGIS.markerEdif) {
           gruppoMarkerEdifici.clearLayers();
           store.stateGIS.markerEdif.forEach(edif => {
-            const markerCapp = creaMarker(edif, iconaCappelle);
+            const markerCapp = creaMarker(edif, iconaEdifici);
             markerCapp.addTo(gruppoMarkerEdifici);
           });
         }

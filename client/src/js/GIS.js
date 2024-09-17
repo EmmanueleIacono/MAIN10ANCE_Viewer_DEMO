@@ -71,8 +71,8 @@ export function creaLivelloGIS(livello) {
     return livelloTabella;
 }
 
-export const iconaSM = L.icon({
-    iconUrl: require('/src/assets/img/logo_b.png'),
+export const iconaLocalità = L.icon({
+    iconUrl: require('/src/assets/img/location_icon.png'),
     shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
     iconSize: [30, 30],
     iconAnchor: [15, 15],
@@ -80,8 +80,8 @@ export const iconaSM = L.icon({
     shadowAnchor: [18, 15]
 });
 
-export const iconaCappelle = L.icon({
-    iconUrl: require('/src/assets/img/icona_capp_blue_small.png'),
+export const iconaEdifici = L.icon({
+    iconUrl: require('/src/assets/img/edificio_icon.png'),
     shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
     iconSize: [30, 30],
     iconAnchor: [15, 15],
