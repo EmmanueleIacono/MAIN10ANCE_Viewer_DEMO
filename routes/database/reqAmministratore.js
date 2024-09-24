@@ -4,6 +4,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 const {clientM10a} = require('./connessioni');
+const {utility_schema} = require('./schemi');
 
 //////////          RICHIESTE          //////////
 
@@ -51,7 +52,7 @@ app.get('/conteggio-ruoli', async (req, res) => {
 
 async function getUtenti() {
     try {
-        const results = await clientM10a.query(`SELECT "user", "email", "ruolo" FROM servizio."utenti" ORDER BY "user";`);
+        const results = await clientM10a.query(`SELECT "user", "email", "ruolo" FROM ${utility_schema}."utenti" ORDER BY "user";`);
         return results.rows;
     }
     catch(e) {
@@ -61,7 +62,7 @@ async function getUtenti() {
 
 async function getListaRuoli() {
     try {
-        const result = await clientM10a.query(`SELECT ARRAY(SELECT "ruolo" FROM servizio."ruoli") AS "roles";`);
+        const result = await clientM10a.query(`SELECT ARRAY(SELECT "ruolo" FROM ${utility_schema}."ruoli") AS "roles";`);
         return result.rows[0].roles;
     }
     catch(e) {
@@ -71,7 +72,7 @@ async function getListaRuoli() {
 
 async function updateRuoloUtente(userJson) {
     try {
-        await clientM10a.query(`UPDATE servizio."utenti" SET "ruolo" = ($1) WHERE "user" = ($2);`, [userJson.ruolo, userJson.user]);
+        await clientM10a.query(`UPDATE ${utility_schema}."utenti" SET "ruolo" = ($1) WHERE "user" = ($2);`, [userJson.ruolo, userJson.user]);
     }
     catch(e) {
         throw(e);
@@ -80,7 +81,7 @@ async function updateRuoloUtente(userJson) {
 
 async function conteggioRuoli() {
     try {
-        const result = await clientM10a.query(`SELECT "ruolo", COUNT(ruolo) FROM servizio."utenti" GROUP BY "ruolo";`);
+        const result = await clientM10a.query(`SELECT "ruolo", COUNT(ruolo) FROM ${utility_schema}."utenti" GROUP BY "ruolo";`);
         return result.rows;
     }
     catch(e) {
