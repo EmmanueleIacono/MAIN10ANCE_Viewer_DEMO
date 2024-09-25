@@ -1,6 +1,16 @@
 import {reactive, readonly} from 'vue';
 import {generaColoreRandom} from '../js/shared';
-import {prendiSigleLocalità, prendiSigleEdifici, leggiEnum, prendiFrasiDiRischio, leggiDBMarkerEdif, prendiLOD3e4, leggiGlossDegradi} from '../js/richieste';
+import {
+    prendiSigleLocalità,
+    prendiSigleEdifici,
+    leggiEnum,
+    prendiFrasiDiRischio,
+    leggiDBMarkerEdif,
+    prendiLOD3e4,
+    prendiSchedeStoricoControllo,
+    prendiSchedeStoricoManReg,
+    prendiSchedeStoricoManCorr
+} from '../js/richieste';
 
 const state = reactive({
     tabAttivo: 'Tab2',
@@ -51,8 +61,22 @@ const statePlanner = reactive({
     listaFrasiDiRischio: [],
     listaEdif: [],
     listaElementi: [],
-    listaStCons: [],
-    listaFenomeni: [],
+    schedeStorico: {
+        "controllo": [],
+        "manutenzione regolare": [],
+        "manutenzione correttiva": [],
+        "manutenzione straordinaria": [],
+        "restauro": [],
+        "diagnosi": [],
+    },
+    schedeStoricoFiltrate: {
+        "controllo": [],
+        "manutenzione regolare": [],
+        "manutenzione correttiva": [],
+        "manutenzione straordinaria": [],
+        "restauro": [],
+        "diagnosi": [],
+    },
     attività: {
         'controllo': {
             tabella: 'controllo_stato_di_conservazione_livello_di_urgenza',
@@ -82,7 +106,6 @@ const statePlanner = reactive({
     compilazioneParziale: false,
     listaCRregistrati: [],
     refreshPlanner: false,
-    urnModelloCorrente: null,
     datiProgrammazione: {
         attCicliche: [],
         attRiallineamento: [],
@@ -218,37 +241,33 @@ const methods = {
         const listaFrasiDiRischio = await prendiFrasiDiRischio();
         const listaEdif = await leggiDBMarkerEdif();
         const listaElementi = await prendiLOD3e4();
-        const listaStCons = await leggiEnum('st_cons');
-        const listaFenomeni = await leggiGlossDegradi();
+        const attStoricoContr = await prendiSchedeStoricoControllo();
+        const attStoricoManReg = await prendiSchedeStoricoManReg();
+        const attStoricoManCorr = await prendiSchedeStoricoManCorr();
+        const attStoricoManStr = []; // DA IMPLEMENTARE (24-09-2024)
+        const attStoricoRest = []; // DA IMPLEMENTARE (24-09-2024)
+        const attStoricoDiagn = []; // DA IMPLEMENTARE (24-09-2024)
         statePlanner.listaSigleLoc = listaSigleLoc;
         statePlanner.listaSigleEdifici = listaSigleEdifici;
         statePlanner.listaClOgg = listaClOgg;
         statePlanner.listaFrasiDiRischio = listaFrasiDiRischio;
         statePlanner.listaEdif = listaEdif;
         statePlanner.listaElementi = listaElementi;
-        statePlanner.listaStCons = listaStCons;
-        statePlanner.listaFenomeni = listaFenomeni;
+        statePlanner.schedeStorico['controllo'] = attStoricoContr;
+        statePlanner.schedeStorico['manutenzione regolare'] = attStoricoManReg;
+        statePlanner.schedeStorico['manutenzione correttiva'] = attStoricoManCorr;
+        statePlanner.schedeStorico['manutenzione straordinaria'] = attStoricoManStr;
+        statePlanner.schedeStorico['restauro'] = attStoricoRest;
+        statePlanner.schedeStorico['diagnosi'] = attStoricoDiagn;
+        statePlanner.schedeStoricoFiltrate['controllo'] = attStoricoContr;
+        statePlanner.schedeStoricoFiltrate['manutenzione regolare'] = attStoricoManReg;
+        statePlanner.schedeStoricoFiltrate['manutenzione correttiva'] = attStoricoManCorr;
+        statePlanner.schedeStoricoFiltrate['manutenzione straordinaria'] = attStoricoManStr;
+        statePlanner.schedeStoricoFiltrate['restauro'] = attStoricoRest;
+        statePlanner.schedeStoricoFiltrate['diagnosi'] = attStoricoDiagn;
         statePlanner.datiPlannerLoaded = true;
         this.toggleLoaderGlobale();
     },
-
-    // resetStateBIM() {
-    //     stateBIM.modelPlaceholder = true;
-    //     stateBIM.urnModelloCorrente = null;
-    //     stateBIM.elementiSelezionati = null;
-    //     stateBIM.schedeRisultatiVisibile = false;
-    //     stateBIM.schedeModuliVisibile = false;
-    //     stateBIM.schedeAttivitàVisibile = false;
-    //     stateBIM.schedeAttivitàTipo = '';
-    //     stateBIM.elementiDaSchedare = [];
-    // },
-
-    // resetStateGIS() {
-    //     stateGIS.tabelleGIS = null;
-    //     stateGIS.entitàGIS = {};
-    //     stateGIS.markerLoc = null;
-    //     stateGIS.markerEdif = null;
-    // },
 
     resetStatePlanner() {
         statePlanner.datiPlannerLoaded = false;
@@ -258,27 +277,21 @@ const methods = {
         statePlanner.listaFrasiDiRischio = [];
         statePlanner.listaEdif = [];
         statePlanner.listaElementi = [];
-        statePlanner.listaStCons = [];
-        statePlanner.listaFenomeni = [];
-        statePlanner.attività = {
-            'controllo': {
-                tabella: 'controllo_stato_di_conservazione_livello_di_urgenza',
-            },
-            'manutenzione regolare': {
-                tabella: 'manutenzione_regolare',
-            },
-            'manutenzione correttiva': {
-                tabella: 'manutenzione_correttiva_o_a_guasto',
-            },
-            'manutenzione straordinaria': {
-                tabella: 'manutenzione_straordinaria',
-            },
-            'restauro': {
-                tabella: 'restauri',
-            },
-            'diagnosi': {
-                tabella: 'danno_alterazione_degrado',
-            },
+        statePlanner.schedeStorico = {
+            "controllo": [],
+            "manutenzione regolare": [],
+            "manutenzione correttiva": [],
+            "manutenzione straordinaria": [],
+            "restauro": [],
+            "diagnosi": [],
+        };
+        statePlanner.schedeStoricoFiltrate = {
+            "controllo": [],
+            "manutenzione regolare": [],
+            "manutenzione correttiva": [],
+            "manutenzione straordinaria": [],
+            "restauro": [],
+            "diagnosi": [],
         };
         statePlanner.enumUNI = {
             enumStCons: [],
@@ -289,7 +302,6 @@ const methods = {
         statePlanner.compilazioneParziale = false;
         statePlanner.listaCRregistrati = [];
         statePlanner.refreshPlanner = false;
-        statePlanner.urnModelloCorrente = null;
     },
 }
 

@@ -2,16 +2,10 @@
 <div v-if="store.getters.getUsrVwList().includes('apriTabSchede')">
   <MainPanel :colonna="'col-sm-7'">
     <br />
-    <!-- <div v-if="store.getters.getUsrVwList().includes('pianificazione')"> -->
-      <!-- <ViewerPlanner v-if="store.getters.getUsrVwList().includes('pianificazione')" /> -->
-      <!-- <br v-if="store.getters.getUsrVwList().includes('pianificazione')" />
-      <br v-if="store.getters.getUsrVwList().includes('pianificazione')" />
-      <br v-if="store.getters.getUsrVwList().includes('pianificazione')" /> -->
-      <Pianificazione @pianificazioneAggiornata="aggiornaEventi" v-if="store.getters.getUsrVwList().includes('pianificazione')" />
-      <Programmazione @integrazioneAggiornata="aggiornaEventi" v-if="store.getters.getUsrVwList().includes('pianificazione')" ref="IntegrazioneRef" />
-      <ExTempore v-if="store.getters.getUsrVwList().includes('pianificazione')" />
-      <AttPrecedenti v-if="store.getters.getUsrVwList().includes('pianificazione')" />
-    <!-- </div> -->
+    <Pianificazione @pianificazioneAggiornata="aggiornaEventi" v-if="store.getters.getUsrVwList().includes('pianificazione')" />
+    <Programmazione @integrazioneAggiornata="aggiornaEventi" v-if="store.getters.getUsrVwList().includes('pianificazione')" ref="IntegrazioneRef" />
+    <ExTempore v-if="store.getters.getUsrVwList().includes('pianificazione')" />
+    <AttPrecedenti v-if="store.getters.getUsrVwList().includes('pianificazione')" />
     <Esecuzione ref="EsecuzioneRef" />
     <Storico />
   </MainPanel>
@@ -24,7 +18,7 @@
 </template>
 
 <script>
-import {inject, onActivated, onMounted, reactive, ref, watch} from 'vue';
+import {inject, onActivated, reactive, ref, watch} from 'vue';
 import {leggiAttivitàProg} from '../js/richieste';
 import FullCalendar from '@fullcalendar/vue3';
 import DayGridPlugin from '@fullcalendar/daygrid';
@@ -38,7 +32,6 @@ import Esecuzione from './TabPlannerEsecuzione.vue';
 import Storico from './TabPlannerStorico.vue';
 import ExTempore from './TabPlannerExTempore.vue';
 import AttPrecedenti from './TabPlannerAttPrecedenti.vue';
-// import ViewerPlanner from './TabPlannerBIMViewer.vue';
 
 export default {
   name: 'TabPlanner',
@@ -53,7 +46,6 @@ export default {
     Storico,
     ExTempore,
     AttPrecedenti,
-    // ViewerPlanner,
   },
   setup() {
     const store = inject('store');
@@ -82,8 +74,6 @@ export default {
       },
     });
 
-    // popolaCalendario();
-
     watch(() => store.statePlanner.refreshPlanner, () => {
       aggiornaEventi();
     });
@@ -95,12 +85,6 @@ export default {
         }, 100);
       }
     }, {immediate: true});
-
-    onMounted(async () => {
-      popolaCalendario();
-      await store.methods.recuperaDatiPlanner();
-      console.log(store.statePlanner);
-    });
 
     onActivated(async () => {
       if (!store.statePlanner.datiPlannerLoaded) {

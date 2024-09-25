@@ -6,7 +6,8 @@
     "open": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --open",
     "serve": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
     "build": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
-    "lint": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service lint"
+    "lint": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service lint",
+    "vca": "vca --dir src --port 6060"
   },
   "dependencies": {
     "@fullcalendar/core": "^5.10.1",
@@ -22,6 +23,7 @@
     "vue-chart-3": "^3.1.2"
   },
   "devDependencies": {
+    "@tkskto/vue-component-analyzer": "^0.9.0",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
