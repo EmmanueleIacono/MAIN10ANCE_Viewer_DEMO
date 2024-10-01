@@ -12,7 +12,7 @@
   <Explorer :colonna="'col-sm-5'">
     <FullCalendar ref="fullCalendarPlanner" :options="calendarOptions" />
     <br />
-    <Filtri />
+    <FiltriStorico />
   </Explorer>
 </div>
 </template>
@@ -25,7 +25,7 @@ import DayGridPlugin from '@fullcalendar/daygrid';
 import itLocale from '@fullcalendar/core/locales/it';
 import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
-import Filtri from './TabPlannerFiltri.vue';
+import FiltriStorico from './TabPlannerFiltriStorico.vue';
 import Pianificazione from './TabPlannerPianificazione.vue';
 import Programmazione from './TabPlannerIntegrazione.vue';
 import Esecuzione from './TabPlannerEsecuzione.vue';
@@ -39,7 +39,7 @@ export default {
     MainPanel,
     Explorer,
     FullCalendar,
-    Filtri,
+    FiltriStorico,
     Pianificazione,
     Programmazione,
     Esecuzione,
