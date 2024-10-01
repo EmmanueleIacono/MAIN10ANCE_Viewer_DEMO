@@ -263,21 +263,21 @@ export async function prendiFrequenzaAttProg(jsonAtt) {
 }
 
 export async function prendiSchedeStoricoControllo() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-storico-controllo');
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    const risultato = await fetch('/o/schede-storico-controllo');
+    const risJson = await risultato.json();
+    return risJson;
 }
 
 export async function prendiSchedeStoricoManReg() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-storico-manutenzione-regolare');
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    const risultato = await fetch('/o/schede-storico-manutenzione-regolare');
+    const risJson = await risultato.json();
+    return risJson;
 }
 
 export async function prendiSchedeStoricoManCorr() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-storico-manutenzione-correttiva');
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    const risultato = await fetch('/o/schede-storico-manutenzione-correttiva');
+    const risJson = await risultato.json();
+    return risJson;
 }
 
 export async function getListaImmagini(percorso) {
