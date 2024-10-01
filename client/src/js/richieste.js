@@ -177,7 +177,7 @@ export async function leggiGlossDegradi() {
 }
 
 export async function prendiSigleEdifici() {
-    const risultato = await fetch('/g/DB_Servizio/sigle-edifici', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/g/sigle-edifici', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }

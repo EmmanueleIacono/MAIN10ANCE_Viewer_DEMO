@@ -68,9 +68,10 @@ app.get('/Main10ance_DB/dashboard/conteggio-modelli', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/g/DB_Servizio/sigle-edifici", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/sigle-edifici', async (req, res) => {
-    const edifici = await getSigleEdifici();
+// fetch("/g/sigle-edifici", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+app.get('/sigle-edifici', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
+    const edifici = await getSigleEdifici(ambito);
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(edifici));
 });
@@ -326,9 +327,9 @@ async function conteggioModelli(listaLocalità, listaSigle) {
     }
 }
 
-async function getSigleEdifici() {
+async function getSigleEdifici(ambito) {
     try {
-        const results = await clientM10a.query(`SELECT DISTINCT "edificio", "località", "edif_nome_menu" FROM ${data_schema}."dati_edifici" WHERE "urn" IS NOT null ORDER BY "edificio";`);
+        const results = await clientM10a.query(`SELECT DISTINCT "edificio", "località", "edif_nome_menu" FROM ${data_schema}."dati_edifici" WHERE "ambito" LIKE '${ambito}' ORDER BY "edificio";`);
         return results.rows;
     }
     catch(e) {
