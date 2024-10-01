@@ -277,16 +277,16 @@ app.get('/Main10ance_DB/segnalazione/artifact-viewer/interroga/:id', async (req,
 });
 
 // diversa da quella equivalente per turista, qui richiedo dati associati ad ambito specifico utente
-app.get('/DB_Servizio/MarkerLoc', async (req, res) => {
-    const ambito_loc = req.query.ambito;
+app.get('/MarkerLoc', async (req, res) => {
+    const ambito_loc = req.signedCookies.ambito;
     const markerLocalità = await leggiMarkerLocAmbito(ambito_loc);
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(markerLocalità));
 });
 
 // diversa da quella equivalente per turista, qui richiedo dati associati ad ambito specifico utente
-app.get('/DB_Servizio/MarkerEdif', async (req, res) => {
-    const ambito_edif = req.query.ambito;
+app.get('/MarkerEdif', async (req, res) => {
+    const ambito_edif = req.signedCookies.ambito;
     const markerEdifici = await leggiMarkerEdifAmbito(ambito_edif);
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(markerEdifici));
@@ -799,7 +799,7 @@ async function interrogaSegnalazione(id) {
 
 async function leggiMarkerLocAmbito(ambito_loc) {
     try {
-        const results = await clientM10a.query(`SELECT * FROM ${data_schema}."dati_località" WHERE "ambito" = ($1) ORDER BY "nome";`, [ambito_loc]);
+        const results = await clientM10a.query(`SELECT * FROM ${data_schema}."dati_località" WHERE "ambito" LIKE ($1) ORDER BY "nome";`, [ambito_loc]);
         return results.rows;
     }
     catch(e) {
@@ -809,7 +809,7 @@ async function leggiMarkerLocAmbito(ambito_loc) {
 
 async function leggiMarkerEdifAmbito(ambito_edif) {
     try {
-        const results = await clientM10a.query(`SELECT * FROM ${data_schema}."dati_edifici" WHERE "ambito" = ($1) ORDER BY CAST("numero" AS INTEGER);`, [ambito_edif]);
+        const results = await clientM10a.query(`SELECT * FROM ${data_schema}."dati_edifici" WHERE "ambito" LIKE ($1) ORDER BY CAST("numero" AS INTEGER);`, [ambito_edif]);
         return results.rows;
     }
     catch(e) {

@@ -329,7 +329,7 @@ async function conteggioModelli(listaLocalità, listaSigle) {
 
 async function getSigleEdifici(ambito) {
     try {
-        const results = await clientM10a.query(`SELECT DISTINCT "edificio", "località", "edif_nome_menu" FROM ${data_schema}."dati_edifici" WHERE "ambito" LIKE '${ambito}' ORDER BY "edificio";`);
+        const results = await clientM10a.query(`SELECT DISTINCT "edificio", "località", "edif_nome_menu" FROM ${data_schema}."dati_edifici" WHERE "ambito" LIKE ($1) ORDER BY "edificio";`, [ambito]);
         return results.rows;
     }
     catch(e) {

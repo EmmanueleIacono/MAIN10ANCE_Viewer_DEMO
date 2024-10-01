@@ -39,7 +39,6 @@ export default {
     LoadingScreen,
   },
   setup() {
-    const store = inject('store');
     const statePercorso = inject('stateArtifact');
 
     watch(() => statePercorso.selectLocalità, async newVal => {
@@ -54,9 +53,8 @@ export default {
 
     onMounted(async () => {
       statePercorso.caricamento = true;
-      const {ambito} = store.getters.getUsrInfoAmbito();
       const listaSigleLoc = await prendiSigleLocalità();
-      const listaEdif = await leggiDBMarkerEdifAmbito(ambito);
+      const listaEdif = await leggiDBMarkerEdifAmbito();
       // const listaEdif = await leggiDBMarkerEdif();
       const listaLocPdiff = await leggiDBMarkerLocPdiff();
       const listaElementi = await prendiLOD(4);

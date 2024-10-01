@@ -19,40 +19,40 @@ app.get('/Main10ance_DB/GIS', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/t/DB_Servizio/MarkerLoc", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/MarkerLoc', async (req, res) => {
+// fetch("/t/MarkerLoc", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+app.get('/MarkerLoc', async (req, res) => {
     const markerLocalità = await leggiMarkerLoc();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(markerLocalità));
 });
 
 // per testare la richiesta:
-// fetch("/t/DB_Servizio/MarkerEdif", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/MarkerEdif', async (req, res) => {
+// fetch("/t/MarkerEdif", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+app.get('/MarkerEdif', async (req, res) => {
     const markerEdifici = await leggiMarkerEdif();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(markerEdifici));
 });
 
 // per testare la richiesta:
-// fetch("/t/DB_Servizio/MarkerLocPdiff", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/MarkerLocPdiff', async (req, res) => {
+// fetch("/t/MarkerLocPdiff", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+app.get('/MarkerLocPdiff', async (req, res) => {
     const markerLocPdiff = await leggiMarkerLocPdiff();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(markerLocPdiff));
 });
 
 // per testare la richiesta:
-// fetch("/t/DB_Servizio/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/LOD/TabelleGIS', async (req, res) => {
+// fetch("/t/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
+app.get('/LOD/TabelleGIS', async (req, res) => {
     const tabelleGIS = await leggiListaTabelleGIS();
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(tabelleGIS));
 });
 
 // per testare la richiesta:
-// fetch("/t/DB_Servizio/LOD/TabelleLOD", {method: "GET", headers: {"content-type": "application/json", lod: 5} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/LOD/TabelleLOD', async (req, res) => {
+// fetch("/t/LOD/TabelleLOD", {method: "GET", headers: {"content-type": "application/json", lod: 5} }).then(a => a.json()).then(console.log)
+app.get('/LOD/TabelleLOD', async (req, res) => {
     const reqJson = req.headers;
     const tabelleLOD = await leggiListaTabelleLOD(reqJson.lod);
     res.setHeader('content-type', 'application/json');

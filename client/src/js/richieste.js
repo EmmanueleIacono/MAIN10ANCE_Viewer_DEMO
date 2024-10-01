@@ -1,18 +1,18 @@
 export async function prendiLOD(lod) {
-    const risultato = await fetch('/t/DB_Servizio/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
+    const risultato = await fetch('/t/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 export async function getTabelleGIS() {
-    const tabelleGIS = await fetch("/t/DB_Servizio/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} });
+    const tabelleGIS = await fetch("/t/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} });
     const resp_tabelleGIS = await tabelleGIS.json();
     return resp_tabelleGIS;
 }
 
 export async function leggiDBMarkerLoc() {
     try {
-        const risultato = await fetch(`/t/DB_Servizio/MarkerLoc`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/t/MarkerLoc`, {method: "GET", headers: {"content-type": "application/json"}});
         const localitàJson = await risultato.json();
         return localitàJson;
     }
@@ -22,9 +22,9 @@ export async function leggiDBMarkerLoc() {
     }
 }
 
-export async function leggiDBMarkerLocAmbito(ambito) {
+export async function leggiDBMarkerLocAmbito() {
     try {
-        const risultato = await fetch(`/o/DB_Servizio/MarkerLoc?ambito=${ambito}`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/o/MarkerLoc`, {method: "GET", headers: {"content-type": "application/json"}});
         const localitàJson = await risultato.json();
         return localitàJson;
     }
@@ -36,7 +36,7 @@ export async function leggiDBMarkerLocAmbito(ambito) {
 
 export async function leggiDBMarkerEdif() {
     try {
-        const risultato = await fetch(`/t/DB_Servizio/MarkerEdif`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/t/MarkerEdif`, {method: "GET", headers: {"content-type": "application/json"}});
         const edificiJson = await risultato.json();
         return edificiJson;
     }
@@ -46,10 +46,9 @@ export async function leggiDBMarkerEdif() {
     }
 }
 
-export async function leggiDBMarkerEdifAmbito(ambito) {
-    console.log(ambito);
+export async function leggiDBMarkerEdifAmbito() {
     try {
-        const risultato = await fetch(`/o/DB_Servizio/MarkerEdif?ambito=${ambito}`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/o/MarkerEdif`, {method: "GET", headers: {"content-type": "application/json"}});
         const edificiJson = await risultato.json();
         console.log(edificiJson);
         return edificiJson;
@@ -62,7 +61,7 @@ export async function leggiDBMarkerEdifAmbito(ambito) {
 
 export async function leggiDBMarkerLocPdiff() {
     try {
-        const risultato = await fetch(`/t/DB_Servizio/MarkerLocPdiff`, {method: "GET", headers: {"content-type": "application/json"}});
+        const risultato = await fetch(`/t/MarkerLocPdiff`, {method: "GET", headers: {"content-type": "application/json"}});
         const LocMatJson = await risultato.json();
         return LocMatJson;
     }
@@ -123,7 +122,7 @@ export async function prendiSchedeRestauro() {
 
 /////           ATTENZIONE: QUESTA UGUALE A FUNZIONE "leggiDBMarkerLoc" ------> DA RISOLVERE
 export async function prendiSigleLocalità() {
-    const risultato = await fetch('/t/DB_Servizio/MarkerLoc', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/t/MarkerLoc', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
