@@ -112,23 +112,6 @@ export default {
     });
     const livPriorità = computed(() => state.selectStCons * state.selectLivUrg + state.selectClRacc);
     const tipoClass = computed(() => store.stateBIM.schedeAttivitàTipo.replaceAll(' ', '-'));
-    // const nascondiLivUrg = computed(() => state.selectStCons === 2);
-
-    /*
-    // ---------------------------------- VECCHIA LOGICA ----------------------------------
-    watch(() => livPriorità.value, newVal => {
-      console.log(newVal);
-    });
-
-    watch(() => state.selectClRacc, newVal => {
-      if (newVal > 1) state.selectMatriceDisabled = false;
-      else {
-        state.selectMatriceDisabled = true;
-        state.selectStCons = 2;
-        state.selectLivUrg = 1;
-      }
-    });
-    */
 
     // ---------------------------------- NUOVA LOGICA ----------------------------------
     watch(() => state.selectClRacc, newVal => {
@@ -170,11 +153,6 @@ export default {
         state.selectLivUrg = 1;
       }
     });
-
-    // watch(() => nascondiLivUrg, newVal => {
-    //   console.log(newVal);
-    //   state.selectLivUrgNascosto = newVal;
-    // });
 
     onMounted(async () => {
       await recuperaEnumUNI();
@@ -350,11 +328,6 @@ export default {
 table {
   width: 100%;
 }
-
-/* button {
-  float: right;
-  margin-right: 0;
-} */
 
 .div-bottoni {
   float: right;
