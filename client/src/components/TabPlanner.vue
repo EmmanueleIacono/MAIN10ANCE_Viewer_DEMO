@@ -2,6 +2,7 @@
 <div v-if="store.getters.getUsrVwList().includes('apriTabSchede')">
   <MainPanel :colonna="'col-sm-7'">
     <br />
+    <SintesiLavori v-if="store.getters.getUsrVwList().includes('pianificazione')" />
     <Pianificazione @pianificazioneAggiornata="aggiornaEventi" v-if="store.getters.getUsrVwList().includes('pianificazione')" />
     <Programmazione @integrazioneAggiornata="aggiornaEventi" v-if="store.getters.getUsrVwList().includes('pianificazione')" ref="IntegrazioneRef" />
     <ExTempore v-if="store.getters.getUsrVwList().includes('pianificazione')" />
@@ -11,6 +12,8 @@
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
     <FullCalendar ref="fullCalendarPlanner" :options="calendarOptions" />
+    <br />
+    <FiltriEsecuzione />
     <br />
     <FiltriStorico />
   </Explorer>
@@ -25,6 +28,7 @@ import DayGridPlugin from '@fullcalendar/daygrid';
 import itLocale from '@fullcalendar/core/locales/it';
 import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
+import FiltriEsecuzione from './TabPlannerFiltriEsecuzione.vue';
 import FiltriStorico from './TabPlannerFiltriStorico.vue';
 import Pianificazione from './TabPlannerPianificazione.vue';
 import Programmazione from './TabPlannerIntegrazione.vue';
@@ -32,6 +36,7 @@ import Esecuzione from './TabPlannerEsecuzione.vue';
 import Storico from './TabPlannerStorico.vue';
 import ExTempore from './TabPlannerExTempore.vue';
 import AttPrecedenti from './TabPlannerAttPrecedenti.vue';
+import SintesiLavori from './TabPlannerSintesiLavori.vue';
 
 export default {
   name: 'TabPlanner',
@@ -39,6 +44,7 @@ export default {
     MainPanel,
     Explorer,
     FullCalendar,
+    FiltriEsecuzione,
     FiltriStorico,
     Pianificazione,
     Programmazione,
@@ -46,6 +52,7 @@ export default {
     Storico,
     ExTempore,
     AttPrecedenti,
+    SintesiLavori,
   },
   setup() {
     const store = inject('store');
@@ -110,7 +117,7 @@ export default {
       const eventi = await leggiAttivitàProg();
       const nuoviEventiProg = eventi.map(evento => ({
         id: `PROG-${evento.id_att_prog}`,
-        title: `${evento.tipo_attività[0][0].toUpperCase()}${evento.tipo_attività[0].slice(1)}`,
+        title: `${evento.id_main10ance[0]?.split('|')[0]} - ${evento.tipo_attività[0][0].toUpperCase()}${evento.tipo_attività[0].slice(1)}`,
         start: evento.data_prog,
         extendedProps: {
           classe: evento.cl_ogg_fr,

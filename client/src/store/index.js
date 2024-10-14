@@ -9,7 +9,10 @@ import {
     prendiLOD3e4,
     prendiSchedeStoricoControllo,
     prendiSchedeStoricoManReg,
-    prendiSchedeStoricoManCorr
+    prendiSchedeStoricoManCorr,
+    prendiSchedeControllo,
+    prendiSchedeManReg,
+    prendiSchedeManCorr
 } from '../js/richieste';
 
 const state = reactive({
@@ -61,6 +64,22 @@ const statePlanner = reactive({
     listaFrasiDiRischio: [],
     listaEdif: [],
     listaElementi: [],
+    schedeEsecuzione: {
+        "controllo": [],
+        "manutenzione regolare": [],
+        "manutenzione correttiva": [],
+        "manutenzione straordinaria": [],
+        "restauro": [],
+        "diagnosi": [],
+    },
+    schedeEsecuzioneFiltrate: {
+        "controllo": [],
+        "manutenzione regolare": [],
+        "manutenzione correttiva": [],
+        "manutenzione straordinaria": [],
+        "restauro": [],
+        "diagnosi": [],
+    },
     schedeStorico: {
         "controllo": [],
         "manutenzione regolare": [],
@@ -241,6 +260,12 @@ const methods = {
         const listaFrasiDiRischio = await prendiFrasiDiRischio();
         const listaEdif = await leggiDBMarkerEdif();
         const listaElementi = await prendiLOD3e4();
+        const attEsecuzioneContr = await prendiSchedeControllo();
+        const attEsecuzioneManReg = await prendiSchedeManReg();
+        const attEsecuzioneManCorr = await prendiSchedeManCorr();
+        const attEsecuzioneManStr = []; // DA IMPLEMENTARE (11-10-2024)
+        const attEsecuzioneRest = []; // DA IMPLEMENTARE (11-10-2024)
+        const attEsecuzioneDiagn = []; // DA IMPLEMENTARE (11-10-2024)
         const attStoricoContr = await prendiSchedeStoricoControllo();
         const attStoricoManReg = await prendiSchedeStoricoManReg();
         const attStoricoManCorr = await prendiSchedeStoricoManCorr();
@@ -253,6 +278,18 @@ const methods = {
         statePlanner.listaFrasiDiRischio = listaFrasiDiRischio;
         statePlanner.listaEdif = listaEdif;
         statePlanner.listaElementi = listaElementi;
+        statePlanner.schedeEsecuzione['controllo'] = attEsecuzioneContr;
+        statePlanner.schedeEsecuzione['manutenzione regolare'] = attEsecuzioneManReg;
+        statePlanner.schedeEsecuzione['manutenzione correttiva'] = attEsecuzioneManCorr;
+        statePlanner.schedeEsecuzione['manutenzione straordinaria'] = attEsecuzioneManStr;
+        statePlanner.schedeEsecuzione['restauro'] = attEsecuzioneRest;
+        statePlanner.schedeEsecuzione['diagnosi'] = attEsecuzioneDiagn;
+        statePlanner.schedeEsecuzioneFiltrate['controllo'] = attEsecuzioneContr;
+        statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = attEsecuzioneManReg;
+        statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = attEsecuzioneManCorr;
+        statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = attEsecuzioneManStr;
+        statePlanner.schedeEsecuzioneFiltrate['restauro'] = attEsecuzioneRest;
+        statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = attEsecuzioneDiagn;
         statePlanner.schedeStorico['controllo'] = attStoricoContr;
         statePlanner.schedeStorico['manutenzione regolare'] = attStoricoManReg;
         statePlanner.schedeStorico['manutenzione correttiva'] = attStoricoManCorr;
@@ -277,6 +314,22 @@ const methods = {
         statePlanner.listaFrasiDiRischio = [];
         statePlanner.listaEdif = [];
         statePlanner.listaElementi = [];
+        statePlanner.schedeEsecuzione = {
+            "controllo": [],
+            "manutenzione regolare": [],
+            "manutenzione correttiva": [],
+            "manutenzione straordinaria": [],
+            "restauro": [],
+            "diagnosi": [],
+        };
+        statePlanner.schedeEsecuzioneFiltrate = {
+            "controllo": [],
+            "manutenzione regolare": [],
+            "manutenzione correttiva": [],
+            "manutenzione straordinaria": [],
+            "restauro": [],
+            "diagnosi": [],
+        };
         statePlanner.schedeStorico = {
             "controllo": [],
             "manutenzione regolare": [],

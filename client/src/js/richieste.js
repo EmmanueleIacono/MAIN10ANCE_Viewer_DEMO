@@ -464,7 +464,13 @@ export async function getSegnalazioneArtifactViewer(reqJson) {
 }
 
 export async function registraAttPrecedenti(jsonAtt) {
-    const res = await fetch('/g/Main10ance_DB/programmazione/att-precedenti', {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonAtt)});
+    const res = await fetch('/g/programmazione/att-precedenti', {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonAtt)});
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function registraScoreLavori(reqJson) {
+    const res = await fetch('/g/edifici/punteggi-lavori', {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(reqJson)});
     const resJson = await res.json();
     return resJson;
 }

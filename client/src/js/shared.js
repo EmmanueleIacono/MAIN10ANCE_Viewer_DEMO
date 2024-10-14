@@ -135,7 +135,7 @@ export function dataInteger() {
     return dataInteger;
 }
 
-// RESTITUISCE DATA CORDA (AAA-MM-DD) CORRENTE
+// RESTITUISCE DATA CORDA (AAAA-MM-DD) CORRENTE
 export function dataCorta() {
     const dataFull = new Date();
     const dataStringa = dataFull.toISOString();

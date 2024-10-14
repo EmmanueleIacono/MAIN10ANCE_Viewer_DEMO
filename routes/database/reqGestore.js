@@ -229,7 +229,7 @@ app.post('/DB_Servizio/mk-ambito/nuovo', async (req, res) => {
 });
 
 // REGISTRAZIONE ATTIVITÀ PRECEDENTI
-app.post('/Main10ance_DB/programmazione/att-precedenti', async (req, res) => {
+app.post('/programmazione/att-precedenti', async (req, res) => {
     let result = {}
     try {
         const reqJson = req.body;
@@ -240,6 +240,22 @@ app.post('/Main10ance_DB/programmazione/att-precedenti', async (req, res) => {
         result.success = false;
     }
     finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
+});
+
+// REGISTRAZIONE PUNTEGGI LAVORI SU EDIFICI
+app.post('/edifici/punteggi-lavori', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
+    const result = {};
+    try {
+        const reqJson = req.body;
+        const res = await registraScoreLavori(reqJson, ambito);
+        result.success = res;
+    } catch(e) {
+        result.success = false;
+    } finally {
         res.setHeader('content-type', 'application/json');
         res.send(JSON.stringify(result));
     }
@@ -681,6 +697,47 @@ async function registraAttPrecedenti(reqJson) {
     }
     catch (ex) {
         console.log(`Errore: ${ex}`);
+        await clientM10a.query("ROLLBACK;");
+        return false;
+    }
+}
+
+async function registraScoreLavori(reqJson, ambito) {
+    try {
+        await clientM10a.query("BEGIN;");
+        for (const lavoro of reqJson) {
+            const queryTxt = `
+                INSERT INTO main10ance."0_temp" (
+                    "località", edificio, tetti, "umidità", statica, interni, esterni, ambito, data_ins, anno_tetti, "anno_umidità", anno_statica, anno_interni, anno_esterni, id_interno
+                ) VALUES (
+                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+                );
+            `;
+
+            const listaValori = [
+                lavoro.edificio.località,
+                lavoro.edificio.edificio,
+                lavoro.score_tetti?.score_interno || null,
+                lavoro.score_umidità?.score_interno || null,
+                lavoro.score_statica?.score_interno || null,
+                lavoro.score_interni?.score_interno || null,
+                lavoro.score_esterni?.score_interno || null,
+                ambito,
+                lavoro.data,
+                lavoro.anno_tetti || null,
+                lavoro.anno_umidità || null,
+                lavoro.anno_statica || null,
+                lavoro.anno_interni || null,
+                lavoro.anno_esterni || null,
+                lavoro.id_interno
+            ];
+
+            await clientM10a.query(queryTxt, listaValori);
+        }
+        await clientM10a.query("COMMIT;");
+        return true;
+    } catch (e) {
+        console.log(`Errore: ${e}`);
         await clientM10a.query("ROLLBACK;");
         return false;
     }

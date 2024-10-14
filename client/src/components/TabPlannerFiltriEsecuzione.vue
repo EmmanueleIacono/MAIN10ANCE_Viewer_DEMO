@@ -1,5 +1,5 @@
 <template>
-  <Details class="loading-wrapper" summary="FILTRI STORICO" :open="false">
+  <Details class="loading-wrapper" summary="FILTRI ESECUZIONE" :open="false">
     <input v-model="filtri.cbxTipoScheda" type="checkbox" id="check-tipo-scheda">
     <label for="check-tipo-scheda">Scheda</label>
     <select v-model="filtri.selectTipoScheda">
@@ -44,7 +44,7 @@ import {inject, reactive, toRefs, watch} from 'vue';
 import Details from './elementi/Details.vue';
 
 export default {
-  name: 'TabPlannerFiltriStorico',
+  name: 'TabPlannerFiltriEsecuzione',
   components: {
     Details,
   },
@@ -98,38 +98,38 @@ export default {
     }
 
     function filtraTipoScheda(tipoScheda) {
-      store.statePlanner.schedeStoricoFiltrate['controllo'] = [];
-      store.statePlanner.schedeStoricoFiltrate['manutenzione regolare'] = [];
-      store.statePlanner.schedeStoricoFiltrate['manutenzione correttiva'] = [];
-      store.statePlanner.schedeStoricoFiltrate['manutenzione straordinaria'] = [];
-      store.statePlanner.schedeStoricoFiltrate['restauro'] = [];
-      store.statePlanner.schedeStoricoFiltrate['diagnosi'] = [];
+      store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = [];
+      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = [];
+      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = [];
+      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = [];
+      store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = [];
+      store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = [];
 
-      store.statePlanner.schedeStoricoFiltrate[tipoScheda] = store.statePlanner.schedeStorico[tipoScheda];
+      store.statePlanner.schedeEsecuzioneFiltrate[tipoScheda] = store.statePlanner.schedeEsecuzione[tipoScheda];
     }
 
     function filtraLocEdifElemScheda(proprietà, indice) {
-      store.statePlanner.schedeStoricoFiltrate['controllo'] = store.statePlanner.schedeStoricoFiltrate['controllo'].filter(scheda => {
+      store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = store.statePlanner.schedeEsecuzioneFiltrate['controllo'].filter(scheda => {
         const prop = scheda['Elementi da controllare'][0]?.split('|')[indice];
         return prop === proprietà;
       });
-      store.statePlanner.schedeStoricoFiltrate['manutenzione regolare'] = store.statePlanner.schedeStoricoFiltrate['manutenzione regolare'].filter(scheda => {
+      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'].filter(scheda => {
         const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
         return prop === proprietà;
       });
-      store.statePlanner.schedeStoricoFiltrate['manutenzione correttiva'] = store.statePlanner.schedeStoricoFiltrate['manutenzione correttiva'].filter(scheda => {
+      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'].filter(scheda => {
         const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
         return prop === proprietà;
       });
-      store.statePlanner.schedeStoricoFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeStoricoFiltrate['manutenzione straordinaria'].filter(scheda => {
+      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'].filter(scheda => {
         const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
         return prop === proprietà;
       });
-      store.statePlanner.schedeStoricoFiltrate['restauro'] = store.statePlanner.schedeStoricoFiltrate['restauro'].filter(scheda => {
+      store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = store.statePlanner.schedeEsecuzioneFiltrate['restauro'].filter(scheda => {
         const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
         return prop === proprietà;
       });
-      store.statePlanner.schedeStoricoFiltrate['diagnosi'] = store.statePlanner.schedeStoricoFiltrate['diagnosi'].filter(scheda => {
+      store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'].filter(scheda => {
         const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
         return prop === proprietà;
       });
@@ -139,7 +139,7 @@ export default {
       if (dataDa || dataA) {
         const dataFrom = dataDa ? new Date(dataDa) : null;
         const dataTo = dataA ? new Date(dataA) : null;
-        store.statePlanner.schedeStoricoFiltrate['controllo'] = store.statePlanner.schedeStoricoFiltrate['controllo'].filter(scheda => {
+        store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = store.statePlanner.schedeEsecuzioneFiltrate['controllo'].filter(scheda => {
           const dataScheda = new Date(scheda['Data controllo']);
           if (dataFrom && dataTo) {
             return dataScheda >= dataFrom && dataScheda <= dataTo;
@@ -150,7 +150,7 @@ export default {
           }
           return true;
         });
-        store.statePlanner.schedeStoricoFiltrate['manutenzione regolare'] = store.statePlanner.schedeStoricoFiltrate['manutenzione regolare'].filter(scheda => {
+        store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'].filter(scheda => {
           const dataScheda = new Date(scheda['Data intervento']);
           if (dataFrom && dataTo) {
             return dataScheda >= dataFrom && dataScheda <= dataTo;
@@ -161,7 +161,7 @@ export default {
           }
           return true;
         });
-        store.statePlanner.schedeStoricoFiltrate['manutenzione correttiva'] = store.statePlanner.schedeStoricoFiltrate['manutenzione correttiva'].filter(scheda => {
+        store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'].filter(scheda => {
           const dataScheda = new Date(scheda['Data intervento']);
           if (dataFrom && dataTo) {
             return dataScheda >= dataFrom && dataScheda <= dataTo;
@@ -172,7 +172,7 @@ export default {
           }
           return true;
         });
-        store.statePlanner.schedeStoricoFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeStoricoFiltrate['manutenzione straordinaria'].filter(scheda => {
+        store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'].filter(scheda => {
           const dataScheda = new Date(scheda['Data intervento']);
           if (dataFrom && dataTo) {
             return dataScheda >= dataFrom && dataScheda <= dataTo;
@@ -183,7 +183,7 @@ export default {
           }
           return true;
         });
-        store.statePlanner.schedeStoricoFiltrate['restauro'] = store.statePlanner.schedeStoricoFiltrate['restauro'].filter(scheda => {
+        store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = store.statePlanner.schedeEsecuzioneFiltrate['restauro'].filter(scheda => {
           const dataScheda = new Date(scheda['Data intervento']);
           if (dataFrom && dataTo) {
             return dataScheda >= dataFrom && dataScheda <= dataTo;
@@ -194,7 +194,7 @@ export default {
           }
           return true;
         });
-        store.statePlanner.schedeStoricoFiltrate['diagnosi'] = store.statePlanner.schedeStoricoFiltrate['diagnosi'].filter(scheda => {
+        store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'].filter(scheda => {
           const dataScheda = new Date(scheda['Data intervento']);
           if (dataFrom && dataTo) {
             return dataScheda >= dataFrom && dataScheda <= dataTo;
@@ -209,12 +209,12 @@ export default {
     }
 
     function resetFiltroSchede() {
-      store.statePlanner.schedeStoricoFiltrate['controllo'] = store.statePlanner.schedeStorico['controllo'];
-      store.statePlanner.schedeStoricoFiltrate['manutenzione regolare'] = store.statePlanner.schedeStorico['manutenzione regolare'];
-      store.statePlanner.schedeStoricoFiltrate['manutenzione correttiva'] = store.statePlanner.schedeStorico['manutenzione correttiva'];
-      store.statePlanner.schedeStoricoFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeStorico['manutenzione straordinaria'];
-      store.statePlanner.schedeStoricoFiltrate['restauro'] = store.statePlanner.schedeStorico['restauro'];
-      store.statePlanner.schedeStoricoFiltrate['diagnosi'] = store.statePlanner.schedeStorico['diagnosi'];
+      store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = store.statePlanner.schedeEsecuzione['controllo'];
+      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = store.statePlanner.schedeEsecuzione['manutenzione regolare'];
+      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = store.statePlanner.schedeEsecuzione['manutenzione correttiva'];
+      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeEsecuzione['manutenzione straordinaria'];
+      store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = store.statePlanner.schedeEsecuzione['restauro'];
+      store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = store.statePlanner.schedeEsecuzione['diagnosi'];
     }
 
     return {
