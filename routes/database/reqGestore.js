@@ -105,11 +105,12 @@ app.get('/Main10ance_DB/lista-identificativi', async (req, res) => {
     res.send(JSON.stringify(frasi));
 });
 
-app.post('/Main10ance_DB/pianificazione/rischi', async (req, res) => {
+app.post('/pianificazione', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
     const result = {};
     try {
         const reqJson = req.body;
-        const res = await creaAttProgControllo(reqJson);
+        const res = await creaAttProgControllo(reqJson, ambito);
         result.success = res;
     }
     catch(e) {
@@ -384,7 +385,7 @@ async function getIdentificativiDaEntità(entità, id) {
     }
 }
 
-async function creaAttProgControllo(listaAtt) {
+async function creaAttProgControllo(listaAtt, ambito) {
     try {
         await clientM10a.query("BEGIN;");
         try {
@@ -392,8 +393,8 @@ async function creaAttProgControllo(listaAtt) {
                 const tipo_att = att.data_prog_mr && att.freq_mr ? ['manutenzione regolare'] : ['controllo'];
                 const data_prog = att.data_prog_mr ? att.data_prog_mr : att.data_prog_c;
                 const freq = att.freq_mr ? att.freq_mr : att.freq_c;
-                const valuesArray = [att.id_att_prog, tipo_att, att.cl_ogg, att.rid_fr_risc, freq, data_prog, att.id_group, att.elementi, att.data_ins, att.data_ins, att.loc_estesa, true];
-                await clientM10a.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins", "data_ultima_mod", "località_estesa", "da_integrare") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
+                const valuesArray = [att.id_att_prog, tipo_att, att.cl_ogg, att.rid_fr_risc, freq, data_prog, att.id_group, att.elementi, att.data_ins, att.data_ins, att.loc_estesa, true, ambito];
+                await clientM10a.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins", "data_ultima_mod", "località_estesa", "da_integrare", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, valuesArray);
             }
         }
         catch(e) {
