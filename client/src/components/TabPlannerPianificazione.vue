@@ -67,7 +67,7 @@
 
 <script>
 import {reactive, onMounted, toRefs, watch, inject, computed} from 'vue';
-import {/*prendiSigleEdifici, prendiSigleLocalità, leggiEnum, prendiFrasiDiRischio, */getEntitàDaClOgg, getElementiDaEntità, creaAttProgControllo} from '../js/richieste';
+import {getEntitàDaClOgg, getElementiDaEntità, creaAttProgControllo} from '../js/richieste';
 import {dataInteger, dataCorta} from '../js/shared';
 import Details from './elementi/Details.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';

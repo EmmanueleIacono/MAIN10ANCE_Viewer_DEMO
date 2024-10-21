@@ -341,7 +341,7 @@ async function leggiTabellaGlossarioDegradi() {
 
 async function leggiEnum(nomeEnum) {
     try {
-        const result = await clientM10a.query(`SELECT unnest(enum_range(null::${data_schema}.${nomeEnum}));`);
+        const result = await clientM10a.query(`SELECT unnest(enum_range(null::${data_schema}.${nomeEnum}));`); // SANIFICARE INPUT
         return result.rows;
     }
     catch(e) {

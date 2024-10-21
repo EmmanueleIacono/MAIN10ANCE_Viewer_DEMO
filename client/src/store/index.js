@@ -1,7 +1,7 @@
 import {reactive, readonly} from 'vue';
 import {generaColoreRandom} from '../js/shared';
 import {
-    prendiSigleLocalità,
+    prendiSigleLocalitàAmbito,
     prendiSigleEdifici,
     leggiEnum,
     prendiFrasiDiRischio,
@@ -254,9 +254,9 @@ const methods = {
 
     async recuperaDatiPlanner() {
         this.toggleLoaderGlobale();
-        const listaSigleLoc = await prendiSigleLocalità();
+        const listaSigleLoc = await prendiSigleLocalitàAmbito();
         const listaSigleEdifici = await prendiSigleEdifici();
-        const listaClOgg = await leggiEnum('cl_ogg_fr');
+        const listaClOgg = await leggiEnum('cl_ogg_fr'); // USARE UNA TABELLA PER cl_ogg_fr, NON UNA ENUM
         const listaFrasiDiRischio = await prendiFrasiDiRischio();
         const listaEdif = await leggiDBMarkerEdif();
         const listaElementi = await prendiLOD3e4();

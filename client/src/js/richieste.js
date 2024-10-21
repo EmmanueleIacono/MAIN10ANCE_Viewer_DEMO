@@ -120,9 +120,9 @@ export async function prendiSchedeRestauro() {
     return risTradotto;
 }
 
-/////           ATTENZIONE: QUESTA UGUALE A FUNZIONE "leggiDBMarkerLoc" ------> DA RISOLVERE
-export async function prendiSigleLocalità() {
-    const risultato = await fetch('/t/MarkerLoc', {method: "GET", headers: {"content-type": "application/json"}});
+/////           ATTENZIONE: QUESTA UGUALE A FUNZIONE "leggiDBMarkerLocAmbito" ------> DA RISOLVERE
+export async function prendiSigleLocalitàAmbito() {
+    const risultato = await fetch('/o/MarkerLoc', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }

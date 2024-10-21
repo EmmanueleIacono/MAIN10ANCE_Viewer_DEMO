@@ -30,7 +30,7 @@
 
 <script>
 import { onMounted, toRefs, watch, inject} from 'vue';
-import {prendiSigleLocalità, leggiDBMarkerEdifAmbito, prendiLOD, leggiDBMarkerLocPdiff} from '../js/richieste';
+import {prendiSigleLocalitàAmbito, leggiDBMarkerEdifAmbito, prendiLOD, leggiDBMarkerLocPdiff} from '../js/richieste';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 
 export default {
@@ -53,7 +53,7 @@ export default {
 
     onMounted(async () => {
       statePercorso.caricamento = true;
-      const listaSigleLoc = await prendiSigleLocalità();
+      const listaSigleLoc = await prendiSigleLocalitàAmbito();
       const listaEdif = await leggiDBMarkerEdifAmbito();
       // const listaEdif = await leggiDBMarkerEdif();
       const listaLocPdiff = await leggiDBMarkerLocPdiff();
