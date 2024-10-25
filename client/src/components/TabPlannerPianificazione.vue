@@ -132,6 +132,7 @@ export default {
         state.caricamento = true;
         try {
           const dati = await raccogliDati();
+          if (!dati) return;
           const res = await creaAttProgControllo(dati);
           if (res.success) {
             store.methods.setAlert('Programmazione andata a buon fine');
@@ -166,8 +167,22 @@ export default {
       const listaEdifici = state.listaSigleEdificiSelezionati;
       const località = state.selectLocalità;
       const listaEntità = await getEntitàDaClOgg(state.selectClOgg);
+      if (!listaEntità.length) throw new Error('ERRORE: Nessuna entità corrispondente alla classe corrente.');
       const listaIdM10a = await compilaIdM10a(listaEdifici, listaEntità, località);
-      if (listaIdM10a.some(id => !id.elementi.length)) throw new Error('ERRORE: Nessun identificativo associato alla classe corrente o identificativi insufficienti per gli edifici selezionati.');
+      if (listaIdM10a.some(id => !id.elementi.length)) {
+        const continuare = await store.methods.setConfirm('ATTENZIONE: Uno o più edifici non hanno entità corrispondenti per la classe corrente. Sarà generato un identificativo generico.\nContinuare?');
+        if (!continuare) return;
+        else {
+          listaIdM10a.forEach(id => {
+            const loc = località;
+            const ed = id.edificio;
+            listaEntità.forEach(ent => {
+              const id_m10a_generico = `${loc}|${ed}|${ent}|*`;
+              id.elementi.push(id_m10a_generico);
+            });
+          });
+        }
+      }
       const listaAttività = [];
       datiProgrammazione.forEach(dato => {
         listaIdM10a.forEach(id => {
