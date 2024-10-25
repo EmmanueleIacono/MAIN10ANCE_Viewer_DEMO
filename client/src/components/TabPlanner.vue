@@ -103,7 +103,7 @@ export default {
     async function aggiornaEventi() {
       await popolaCalendario();
       await IntegrazioneRef.value.popolaAttività();
-      await EsecuzioneRef.value.popolaSchede(); // QUESTA NON ESISTE PIU'! FIX THIS!
+      await store.methods.recuperaDatiPlanner();
     }
 
     async function popolaCalendario() {
