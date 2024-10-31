@@ -26,6 +26,12 @@
           </select></td>
         </tr>
         <tr>
+          <td class="fLeft"><label><b>ESTENSIONE (%)</b></label></td>
+          <td class="fRight"><select v-model="selectEstensione">
+            <option v-for="(en, ind) in listaEstensioni" :key="ind" :value="en">{{en}}</option>
+          </select></td>
+        </tr>
+        <tr>
           <td class="fLeft"><label><b>CLASSE DI RACCOMANDAZIONE</b></label></td>
           <td class="fRight"><select v-model="selectClRacc">
             <!-- <option v-for="(en, ind) in store.statePlanner.enumUNI.enumClRacc" :key="ind" :value="ind">{{en}}</option> -->
@@ -105,10 +111,12 @@ export default {
       selectStCons: 2,
       selectLivUrg: 1,
       selectClRacc: 0,
+      selectEstensione: '',
       selectMatriceDisabled: false, // con vecchia logica partiva da "true"
       selectLivUrgNascosto: true,
       selectClRaccOpzioniBloccate: [2, 3], // per bloccare opzioni non selezionabili
       materialeMan: '',
+      listaEstensioni: [],
     });
     const livPriorità = computed(() => state.selectStCons * state.selectLivUrg + state.selectClRacc);
     const tipoClass = computed(() => store.stateBIM.schedeAttivitàTipo.replaceAll(' ', '-'));
@@ -156,6 +164,9 @@ export default {
 
     onMounted(async () => {
       await recuperaEnumUNI();
+      const estensione = await leggiEnum('estensione');
+      const estensioneLista = estensione.map(perc => perc.unnest);
+      state.listaEstensioni = estensioneLista;
     });
 
     async function recuperaEnumUNI() {
@@ -174,6 +185,11 @@ export default {
       let datiAttività = {};
       store.statePlanner.listaCRregistrati.push(state.selectClRacc);
       const dati = await raccogliDati(selezione);
+      console.log(dati);
+      if (!dati.estensione) {
+        store.methods.setAlert('Il campo "estensione" deve essere compilato.');
+        return;
+      }
       datiAttività = dati;
       if (store.statePlanner.compilazioneParziale) { // se "true" -> INSERT INTO, se "false" -> UPDATE
         const datiAggiuntivi = raccogliDatiAggiuntivi();
@@ -243,11 +259,12 @@ export default {
           const cl_racc = store.statePlanner.enumUNI.enumClRacc[state.selectClRacc];
           const st_cons = store.statePlanner.enumUNI.enumStCons[state.selectStCons-2];
           const liv_urg = store.statePlanner.enumUNI.enumLivUrg[state.selectLivUrg-1];
+          const estensione = state.selectEstensione;
           const id_contr = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda controllo']);
           const frequenzaJson = await prendiFrequenzaAttProg({id: id_contr, tabella: store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella});
           const frequenza = frequenzaJson.frequenza;
           const data_next = aggiungiMesi(data_con, frequenza);
-          return {data_con, strumentaz, cl_racc, st_cons, liv_urg, id_contr, data_next};
+          return {data_con, strumentaz, cl_racc, st_cons, liv_urg, estensione, id_contr, data_next};
         }
         case 'manutenzione regolare': {
           const data_ese = store.statePlanner.datiSchedaInCompilazione['Data intervento'];
