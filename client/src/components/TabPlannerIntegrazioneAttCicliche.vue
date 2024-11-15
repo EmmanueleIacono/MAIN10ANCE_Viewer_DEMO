@@ -1,5 +1,4 @@
 <template> 
-  <!-- <div class="sfondo-verde"> -->
   <div>
     <div v-if="att.length">
       <div v-for="a in att" :key="a.id_att_prog">

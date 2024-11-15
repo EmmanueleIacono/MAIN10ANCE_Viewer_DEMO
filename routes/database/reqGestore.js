@@ -67,8 +67,6 @@ app.get('/Main10ance_DB/dashboard/conteggio-modelli', async (req, res) => {
     res.send(risposta);
 });
 
-// per testare la richiesta:
-// fetch("/g/sigle-edifici", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 app.get('/sigle-edifici', async (req, res) => {
     const ambito = req.signedCookies.ambito;
     const edifici = await getSigleEdifici(ambito);
@@ -76,10 +74,9 @@ app.get('/sigle-edifici', async (req, res) => {
     res.send(JSON.stringify(edifici));
 });
 
-// per testare la richiesta:
-// fetch("/g/Main10ance_DB/frasi-rischio", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/frasi-rischio', async (req, res) => {
-    const frasi = await getFrasiDiRischio();
+app.get('/frasi-rischio', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
+    const frasi = await getFrasiDiRischio(ambito);
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(frasi));
 });
@@ -138,19 +135,21 @@ app.post('/Main10ance_DB/programmazione/nuovi-controlli', async (req, res) => {
     }
 });
 
-app.get('/Main10ance_DB/integrazione/attivita-per-integrazione', async (req, res) => {
+app.get('/integrazione/attivita-per-integrazione', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
     const reqJson = req.headers;
     const bool = JSON.parse(reqJson.bool);
-    const resp = await leggiAttProgPerIntegrazione(bool);
+    const resp = await leggiAttProgPerIntegrazione(bool, ambito);
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(resp));
 });
 
-app.patch('/Main10ance_DB/integrazione/integrazione-attivita', async (req, res) => {
+app.patch('/integrazione/integrazione-attivita', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
     const result = {};
     try {
         const reqJson = req.body;
-        const res = await integraAtt(reqJson);
+        const res = await integraAtt(reqJson, ambito);
         result.success = res;
     }
     catch(e) {
@@ -354,9 +353,9 @@ async function getSigleEdifici(ambito) {
     }
 }
 
-async function getFrasiDiRischio() {
+async function getFrasiDiRischio(ambito) {
     try {
-        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM ${utility_schema}."frase_di_rischio" ORDER BY "id_fr_risc";`);
+        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM ${utility_schema}."frase_di_rischio" WHERE "ambito" LIKE ($1) ORDER BY "id_fr_risc";`, [ambito]);
         return results.rows;
     }
     catch(e) {
@@ -457,10 +456,9 @@ async function creaNuovoMarkerAmbito(reqJson) {
     }
 }
 
-async function leggiAttProgPerIntegrazione(bool) {
+async function leggiAttProgPerIntegrazione(bool, ambito) {
     try {
-        // const resp = await clientM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "data_prog", to_json("id_main10ance") AS "id_main10ance", "id_group", "località_estesa", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM ${data_schema}."attività_prog" WHERE "da_integrare" = ($1) ORDER BY "id_att_prog";`, [bool]);
-        const resp = await clientM10a.query(`SELECT a."id_att_prog", a."rid_fr_risc", a."data_prog", to_json(a."id_main10ance") AS "id_main10ance", a."id_group", a."località_estesa", a."cl_ogg_fr", to_json(a."tipo_attività") AS "tipo_attività", a."data_ins", a."data_ultima_mod", a."frequenza", a."da_integrare", a."necessaria_revisione", a."costo", a."ore", a."esecutori", a."strumentaz" AS "strumentazione", a."commenti", a."liv_priorità", a."rid_contr", a."rid_dad", a."rid_att_ciclica_prec", f."fr_risc", f."controllo", f."mn_reg" AS "manutenzione regolare", f."mn_nec" AS "manutenzione correttiva" FROM ${data_schema}."attività_prog" AS "a" JOIN ${utility_schema}."frase_di_rischio" AS "f" ON a."rid_fr_risc" = f."id_fr_risc" WHERE a."da_integrare" = ($1) ORDER BY "id_att_prog";`, [bool]);
+        const resp = await clientM10a.query(`SELECT a."id_att_prog", a."rid_fr_risc", a."data_prog", to_json(a."id_main10ance") AS "id_main10ance", a."id_group", a."località_estesa", a."cl_ogg_fr", to_json(a."tipo_attività") AS "tipo_attività", a."data_ins", a."data_ultima_mod", a."frequenza", a."da_integrare", a."necessaria_revisione", a."costo", a."ore", a."esecutori", a."strumentaz" AS "strumentazione", a."commenti", a."liv_priorità", a."rid_contr", a."rid_dad", a."rid_att_ciclica_prec", f."fr_risc", f."controllo", f."mn_reg" AS "manutenzione regolare", f."mn_nec" AS "manutenzione correttiva" FROM ${data_schema}."attività_prog" AS "a" JOIN ${utility_schema}."frase_di_rischio" AS "f" ON a."rid_fr_risc" = f."id_fr_risc" WHERE a."da_integrare" = ($1) AND a."ambito" LIKE ($2) ORDER BY "id_att_prog";`, [bool, ambito]);
         return resp.rows;
     }
     catch(e) {
@@ -468,7 +466,7 @@ async function leggiAttProgPerIntegrazione(bool) {
     }
 }
 
-async function integraAtt(jsonAtt) {
+async function integraAtt(jsonAtt, ambito) {
     const nums = Object.keys(jsonAtt).filter(e => e !== 'dati_inserimento').map((e, i) => `($${i+1})`);
     const ultimoNum = nums.pop();
     const entriesFiltr = Object.entries(jsonAtt).filter(e => e[0] !== 'dati_inserimento').filter(e => e[0] !== 'id_att_prog');
@@ -489,20 +487,20 @@ async function integraAtt(jsonAtt) {
             for (const tab of datiInsert.tabelle) {
                 switch (tab) {
                     case stringaContr: {
-                        const arrayInsertContr = [datiInsert.id_att, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaContr)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, datiInsert.rid_fr_risc, jsonAtt.id_att_prog, datiInsert.id_group, datiInsert.id_att, false];
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "id_att_ciclica", "eseguito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertContr);
+                        const arrayInsertContr = [datiInsert.id_att, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaContr)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, datiInsert.rid_fr_risc, jsonAtt.id_att_prog, datiInsert.id_group, datiInsert.id_att, false, ambito];
+                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "id_att_ciclica", "eseguito", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));`, arrayInsertContr);
                         break;
                     }
 
                     case stringaManReg: {
-                        const arrayInsertManReg = [datiInsert.id_att, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaManReg)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, datiInsert.rid_fr_risc, jsonAtt.id_att_prog, datiInsert.id_group, false];
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManReg}" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "eseguito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, arrayInsertManReg);
+                        const arrayInsertManReg = [datiInsert.id_att, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaManReg)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, datiInsert.rid_fr_risc, jsonAtt.id_att_prog, datiInsert.id_group, false, ambito];
+                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManReg}" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "eseguito", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertManReg);
                         break;
                     }
 
                     case stringaManCorr: {
-                        const arrayInsertManCorr = [datiInsert.id_att, datiInsert.rid_contr, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaManCorr)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, datiInsert.rid_fr_risc, jsonAtt.id_att_prog, datiInsert.id_group, false];
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManCorr}" ("id_mn_gu", "rid_contr", "cl_ogg_fr", "azione", "data_ese", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "eseguito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertManCorr);
+                        const arrayInsertManCorr = [datiInsert.id_att, datiInsert.rid_contr, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaManCorr)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, datiInsert.rid_fr_risc, jsonAtt.id_att_prog, datiInsert.id_group, false, ambito];
+                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManCorr}" ("id_mn_gu", "rid_contr", "cl_ogg_fr", "azione", "data_ese", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "eseguito", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));`, arrayInsertManCorr);
                         break;
                     }
 

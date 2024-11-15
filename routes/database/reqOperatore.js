@@ -89,26 +89,23 @@ app.get('/Main10ance_DB/tabellaDB/schede-controllo', async (req, res) => {
     res.send(risposta);
 });
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/schede-controllo-2", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/schede-controllo-2', async (req, res) => {
-    const risposta = await leggiSchedeControllo2();
+app.get('/schede-controllo-2', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
+    const risposta = await leggiSchedeControllo2(ambito);
     res.setHeader('content-type', 'application/json');
     res.send(risposta);
 });
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/schede-manutenzione-regolare", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/schede-manutenzione-regolare', async (req, res) => {
-    const risposta = await leggiSchedeManReg();
+app.get('/schede-manutenzione-regolare', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
+    const risposta = await leggiSchedeManReg(ambito);
     res.setHeader('content-type', 'application/json');
     res.send(risposta);
 });
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva', async (req, res) => {
-    const risposta = await leggiSchedeManCorr();
+app.get('/schede-manutenzione-correttiva', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
+    const risposta = await leggiSchedeManCorr(ambito);
     res.setHeader('content-type', 'application/json');
     res.send(risposta);
 });
@@ -117,22 +114,6 @@ app.get('/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva', async (req, r
 // fetch("/o/Main10ance_DB/tabellaDB/schede-restauro", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
 app.get('/Main10ance_DB/tabellaDB/schede-restauro', async (req, res) => {
     const risposta = await leggiSchedeRestauro();
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
-
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/eventi-manutenzione-regolare', async (req, res) => {
-    const risposta = await leggiEventiManutenzioneRegolare();
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
-
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/eventi-manutenzione-correttiva', async (req, res) => {
-    const risposta = await leggiEventiManutenzioneCorrettiva();
     res.setHeader('content-type', 'application/json');
     res.send(risposta);
 });
@@ -201,7 +182,7 @@ app.patch('/esecuzione/nuova-attivita', async (req, res) => {
     }
 });
 
-app.get('/Main10ance_DB/esecuzione/frequenza', async (req, res) => {
+app.get('/esecuzione/frequenza', async (req, res) => {
     const reqJson = req.headers;
     const resp = await recuperaFrequenzaAttProg(reqJson.id, reqJson.tabella);
     res.setHeader('content-type', 'application/json');
@@ -391,10 +372,9 @@ async function leggiSchedeControllo() {
     }
 }
 
-async function leggiSchedeControllo2() {
+async function leggiSchedeControllo2(ambito) {
     try {
-        // const result = await clientM10a.query(`SELECT mc.esecutori AS "Operatore", mc.data_con AS "Data controllo", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", md.materiale AS "Materiale", mc.st_cons AS "Stato di conservazione", md.dad_ty AS "Tipo di fenomeno", md.rid_gloss AS "Nome fenomeno", md.causa_e AS "Causa", md.est_sup AS "Estensione", mf.fr_risc AS "Frase di rischio", mf.mn_reg AS "Manutenzione regolare prevista", mf.frequenza AS "Frequenza prevista (mesi)", mf.mn_nec AS "Manutenzione correttiva prevista", mc.liv_urg AS "Livello di urgenza", mc.costo AS "Costo previsto (€)", mc.commenti AS "Commenti", mc.doc AS "Documenti", md.id_dad AS "Codice scheda controllo", md.id_main10ance AS "Elementi controllati", mc.data_ins AS "Data registrazione scheda" FROM ${data_schema}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${data_schema}.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN ${utility_schema}.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
-        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_con AS "Data controllo", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_contr AS "Codice scheda controllo", mc.id_main10ance AS "Elementi da controllare" FROM ${data_schema}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE ORDER BY mc.data_ins;`);
+        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_con AS "Data controllo", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_contr AS "Codice scheda controllo", mc.id_main10ance AS "Elementi da controllare" FROM ${data_schema}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE AND mc."ambito" LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
         return result.rows;
     }
     catch(e) {
@@ -402,10 +382,9 @@ async function leggiSchedeControllo2() {
     }
 }
 
-async function leggiSchedeManReg() {
+async function leggiSchedeManReg(ambito) {
     try {
-        // const result = await clientM10a.query(`SELECT esecutori AS "Operatore", data_ese AS "Data intervento", id_contr AS "Scheda controllo", rid_gloss AS "Fenomeno interessato", fq_eff AS "Frequenza effettiva (mesi)", azione AS "Azione", strumentaz AS "Strumentazione", materiale AS "Materiali utilizzati", costo AS "Costo (€)", commenti AS "Commenti", doc AS "Documenti", id_mn_reg AS "Codice scheda manutenzione regolare", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM ${data_schema}.manutenzione_regolare ORDER BY data_ese;`);
-        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mr.azione AS "Tipo di intervento", mr.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mr.data_ese AS "Data intervento", mr.data_ins AS "Data programmazione attività", mr.esecutori AS "Operatore", mr.doc AS "Documenti", ap.commenti AS "Note", mr.id_mn_reg AS "Codice scheda manutenzione regolare", mr.id_main10ance AS "Elementi interessati" FROM ${data_schema}.manutenzione_regolare AS mr JOIN ${data_schema}.attività_prog AS ap ON mr.rid_att_prog = ap.id_att_prog WHERE mr.eseguito = FALSE ORDER BY mr.data_ins;`);
+        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mr.azione AS "Tipo di intervento", mr.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mr.data_ese AS "Data intervento", mr.data_ins AS "Data programmazione attività", mr.esecutori AS "Operatore", mr.doc AS "Documenti", ap.commenti AS "Note", mr.id_mn_reg AS "Codice scheda manutenzione regolare", mr.id_main10ance AS "Elementi interessati" FROM ${data_schema}.manutenzione_regolare AS mr JOIN ${data_schema}.attività_prog AS ap ON mr.rid_att_prog = ap.id_att_prog WHERE mr.eseguito = FALSE AND mr."ambito" LIKE ($1) ORDER BY mr.data_ins;`, [ambito]);
         return result.rows;
     }
     catch(e) {
@@ -413,10 +392,9 @@ async function leggiSchedeManReg() {
     }
 }
 
-async function leggiSchedeManCorr() {
+async function leggiSchedeManCorr(ambito) {
     try {
-        // const result = await clientM10a.query(`SELECT esecutori AS "Operatore", data_ese AS "Data intervento", progettist AS "Progettista/i", azione AS "Azione", strumentaz AS "Strumentazione", materiale AS "Materiali utilizzati", costo AS "Costo (€)", causa AS "Causa", commenti AS "Commenti", doc AS "Documenti", id_mn_gu AS "Codice scheda manutenzione correttiva", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM ${data_schema}.manutenzione_correttiva_o_a_guasto ORDER BY data_ese;`);
-        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.azione AS "Tipo di intervento", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_ese AS "Data intervento", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_mn_gu AS "Codice scheda manutenzione correttiva", mc.id_main10ance AS "Elementi interessati" FROM ${data_schema}.manutenzione_correttiva_o_a_guasto AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE ORDER BY mc.data_ins;`);
+        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.azione AS "Tipo di intervento", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_ese AS "Data intervento", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_mn_gu AS "Codice scheda manutenzione correttiva", mc.id_main10ance AS "Elementi interessati" FROM ${data_schema}.manutenzione_correttiva_o_a_guasto AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE AND mc."ambito" LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
         return result.rows;
     }
     catch(e) {
@@ -428,26 +406,6 @@ async function leggiSchedeManCorr() {
 async function leggiSchedeRestauro() {
     try {
         const result = await clientM10a.query(`SELECT operatore AS "Operatore", anno_iniz AS "Anno inizio", anno_fine AS "Anno fine", progettist AS "Progettista/i", rid_gloss AS "Fenomeno interessato", descriz AS "Descrizione intervento", costo AS "Costo (€)", commenti AS "Commenti", doc AS "Documenti", id_restaur AS "Codice scheda restauro", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM ${data_schema}.restauri ORDER BY anno_iniz;`);
-        return result.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
-
-async function leggiEventiManutenzioneRegolare() {
-    try {
-        const result = await clientM10a.query(`SELECT "id_mn_reg", "id_contr", "id_main10ance", "rid_gloss", "data_ese", "azione" FROM ${data_schema}."manutenzione_regolare" ORDER BY "id_mn_reg";`);
-        return result.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
-
-async function leggiEventiManutenzioneCorrettiva() {
-    try {
-        const result = await clientM10a.query(`SELECT "id_mn_gu", "id_contr", "id_main10ance", "rid_gloss", "data_ese", "azione" FROM ${data_schema}."manutenzione_correttiva_o_a_guasto" ORDER BY "id_mn_gu";`);
         return result.rows;
     }
     catch(e) {
@@ -588,7 +546,7 @@ async function registraAttivitàEsecuzione(dati, ambito) {
                     }
                     // case 'cr 3 - intervento rilevante dipendente da progetto': {
                     //     const valuesArray = [parseInt(dati.id_att_prog), dati.id_main10ance, dati.data_ultima_mod, dati.data_ultima_mod, dati.liv_priorità, rid_contr, true, ambito];
-                    //     await clientM10a.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "id_group", "località_estesa", "id_main10ance", "data_ins", "data_ultima_mod", "liv_priorità", "rid_contr", "da_integrare") VALUES (($1), '{diagnosi}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, valuesArray);
+                    //     await clientM10a.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "id_group", "località_estesa", "id_main10ance", "data_ins", "data_ultima_mod", "liv_priorità", "rid_contr", "da_integrare", "ambito") VALUES (($1), '{diagnosi}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, valuesArray);
                     //     break;
                     // }
                     default: throw new Error('ERRORE: La richiesta non è andata a buon fine.');
@@ -677,7 +635,6 @@ async function registraAttivitàEsecuzione(dati, ambito) {
             default: throw new Error('ERRORE: La richiesta non è andata a buon fine.');
         }
         await clientM10a.query('COMMIT;');
-        // await clientM10a.query('ROLLBACK;');
         return true;
     }
     catch(e) {

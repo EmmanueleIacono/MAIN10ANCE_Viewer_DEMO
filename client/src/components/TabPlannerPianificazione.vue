@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import {reactive, onMounted, toRefs, watch, inject, computed} from 'vue';
+import {reactive, toRefs, watch, inject, computed} from 'vue';
 import {getEntitàDaClOgg, getElementiDaEntità, creaAttProgControllo} from '../js/richieste';
 import {dataInteger, dataCorta} from '../js/shared';
 import Details from './elementi/Details.vue';
@@ -86,12 +86,8 @@ export default {
       caricamento: false,
       selectLocalità: '',
       selectClOgg: '',
-      // listaSigleLoc: [],
-      // listaSigleEdifici: [],
       listaSigleEdificiFiltrata: [],
       listaSigleEdificiSelezionati: [],
-      // listaClOgg: [],
-      // listaFrasiDiRischio: [],
       listaFrasiDiRischioFiltrate: [],
       datiFrasiDiRischioFiltrate: [],
     });
@@ -112,19 +108,6 @@ export default {
       state.listaFrasiDiRischioFiltrate = listaFrasiDiRischioFiltrate;
       const listaIdFrRiscFiltrati = listaFrasiDiRischioFiltrate.map(fr => ({id_fr_risc: fr.id_fr_risc, freq: null, data: null, man_reg: !!fr.mn_reg}));
       state.datiFrasiDiRischioFiltrate = listaIdFrRiscFiltrati;
-    });
-
-    onMounted(async () => {
-      // state.caricamento = true;
-      // const listaSigleLoc = await prendiSigleLocalità();
-      // const listaSigleEdifici = await prendiSigleEdifici();
-      // const listaClOgg = await leggiEnum('cl_ogg_fr');
-      // const listaFrasiDiRischio = await prendiFrasiDiRischio();
-      // state.listaSigleLoc = listaSigleLoc;
-      // state.listaSigleEdifici = listaSigleEdifici;
-      // state.listaClOgg = listaClOgg;
-      // state.listaFrasiDiRischio = listaFrasiDiRischio;
-      // state.caricamento = false;
     });
 
     async function programmaControlli() {
@@ -280,14 +263,9 @@ tr:nth-child(odd) {
   margin-top: 10px;
 }
 .bottone-prog {
-  /* background-color: var(--bluInterreg);
-  color: white;
-  border: none;
-  margin-left: 10px; */
   float: right;
 }
 .bottone-prog:hover {
-  /* background-color: var(--grigioScuro); */
   background-color: var(--verdeMain10anceTrasparenza);
 }
 .tabella-prog-controlli {

@@ -24,9 +24,6 @@
         <button @click="mostraTutteAttProg" v-if="store.statePlanner.datiProgrammazione.attCicliche.some(att => !att.visibile)" class="glyphicon glyphicon-list" title="Mostra tutto"></button>
       </div>
     </div>
-    <!-- <div class="contenitore-bottone">
-      <button @click="mostraTutteAttProg" v-if="store.statePlanner.datiProgrammazione.attCicliche.some(att => !att.visibile)" class="glyphicon glyphicon-list" title="Mostra tutto"></button>
-    </div> -->
     <AttCicliche @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttPianificate'" :att="store.statePlanner.datiProgrammazione.attCicliche" />
     <AttRiallineamento @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttSegnalate'" :att="store.statePlanner.datiProgrammazione.attRiallineamento" />
   </Details>
@@ -58,8 +55,6 @@ export default {
       caricamento: false,
       tabIntegrazioneAttivo: 'AttPianificate',
       ordinaPer: 'data_prog',
-      // attCicliche: [],
-      // attRiallineamento: [],
     });
 
     watch(() => state.tabIntegrazioneAttivo, newVal => {

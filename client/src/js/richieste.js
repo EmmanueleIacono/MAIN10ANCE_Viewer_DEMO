@@ -90,19 +90,19 @@ export async function prendiSchedeAnagrafica() {
 }
 
 export async function prendiSchedeControllo() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-controllo-2', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/o/schede-controllo-2', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 export async function prendiSchedeManReg() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-manutenzione-regolare', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/o/schede-manutenzione-regolare', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
 
 export async function prendiSchedeManCorr() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-manutenzione-correttiva', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/o/schede-manutenzione-correttiva', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
@@ -115,9 +115,10 @@ export async function prendiSchedeManStr() {
 }
 
 export async function prendiSchedeRestauro() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-restauro', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    // const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-restauro', {method: "GET", headers: {"content-type": "application/json"}});
+    // const risTradotto = await risultato.json();
+    // return risTradotto;
+    return [];
 }
 
 /////           ATTENZIONE: QUESTA UGUALE A FUNZIONE "leggiDBMarkerLocAmbito" ------> DA RISOLVERE
@@ -182,7 +183,7 @@ export async function prendiSigleEdifici() {
 }
 
 export async function prendiFrasiDiRischio() {
-    const risultato = await fetch('/g/Main10ance_DB/frasi-rischio', {method: "GET", headers: {"content-type": "application/json"}});
+    const risultato = await fetch('/g/frasi-rischio', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
 }
@@ -227,13 +228,13 @@ export async function leggiAttivitàProg() {
 }
 
 export async function leggiAttProgPerIntegrazione(bool) {
-    const res = await fetch('/g/Main10ance_DB/integrazione/attivita-per-integrazione', {method: "GET", headers: {"content-type": "application/json", "bool": JSON.stringify(bool)} });
+    const res = await fetch('/g/integrazione/attivita-per-integrazione', {method: "GET", headers: {"content-type": "application/json", "bool": JSON.stringify(bool)} });
     const resJson = await res.json();
     return resJson;
 }
 
 export async function integraAttività(jsonAtt) {
-    const res = await fetch('/g/Main10ance_DB/integrazione/integrazione-attivita', {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonAtt)});
+    const res = await fetch('/g/integrazione/integrazione-attivita', {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonAtt)});
     const resJson = await res.json();
     return resJson;
 }
@@ -257,7 +258,7 @@ export async function registraAttivitàEseguita(jsonAtt) {
 }
 
 export async function prendiFrequenzaAttProg(jsonAtt) {
-    const res = await fetch('/o/Main10ance_DB/esecuzione/frequenza', {method: "GET", headers: {"content-type": "application/json", "id": jsonAtt.id, "tabella": jsonAtt.tabella}});
+    const res = await fetch('/o/esecuzione/frequenza', {method: "GET", headers: {"content-type": "application/json", "id": jsonAtt.id, "tabella": jsonAtt.tabella}});
     const resJson = await res.json();
     return resJson;
 }

@@ -1,5 +1,4 @@
 <template>
-  <!-- <div class="sfondo-giallo"> -->
   <div>
     <div v-if="att.length">
       <SchedaInt @integrazioneCompletata="emettiOkInt" v-for="a in att" :key="a.id_att_prog" :pianificate="false" :att="a" />
