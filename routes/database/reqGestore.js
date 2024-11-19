@@ -355,7 +355,7 @@ async function getSigleEdifici(ambito) {
 
 async function getFrasiDiRischio(ambito) {
     try {
-        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM ${utility_schema}."frase_di_rischio" WHERE "ambito" LIKE ($1) ORDER BY "id_fr_risc";`, [ambito]);
+        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM ${utility_schema}."frase_di_rischio" WHERE ($1 = '%' OR $1 = ANY(ambiti)) ORDER BY "id_fr_risc";`, [ambito]);
         return results.rows;
     }
     catch(e) {
