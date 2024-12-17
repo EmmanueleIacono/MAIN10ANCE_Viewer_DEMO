@@ -4,7 +4,7 @@
     <div v-if="store.statePlanner.schedeEsecuzioneFiltrate['controllo'].length || store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'].length || store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'].length">
       <SchedaEsecuzione v-for="att in store.statePlanner.schedeEsecuzioneFiltrate['controllo']" :key="att['Codice scheda controllo']" :dati="att" :tipo="'controllo'" />
       <SchedaEsecuzione v-for="att in store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare']" :key="att['Codice scheda manutenzione regolare']" :dati="att" :tipo="'manutenzione regolare'" />
-      <SchedaEsecuzione v-for="att in store.statePlanner.schedeStoricoFiltrate['manutenzione correttiva']" :key="att['Codice scheda manutenzione correttiva']" :dati="att" :tipo="'manutenzione correttiva'" />
+      <SchedaEsecuzione v-for="att in store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva']" :key="att['Codice scheda manutenzione correttiva']" :dati="att" :tipo="'manutenzione correttiva'" />
     </div>
     <div v-else>Nessuna attività da eseguire</div>
   </Details>
