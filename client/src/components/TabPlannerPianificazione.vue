@@ -20,11 +20,58 @@
         </div>
       </div>
       <br />
-      <label for="select-cl-ogg">Classe oggetti</label>
-      <select v-model="selectClOgg" id="select-cl-ogg">
-        <option value=""></option>
-        <option v-for="cl in store.statePlanner.listaClOgg" :key="cl.unnest" :value="cl.unnest">{{cl.unnest}}</option>
-      </select>
+      <!-- SELECT ENTITA' -->
+      <div class="select-wrapper">
+        <input type="checkbox" id="cbx-cl-ogg" v-model="stateCheckBx.clOgg">
+        <label for="cbx-cl-ogg">Classe oggetti</label>
+        <select v-model="selectClOgg" id="select-cl-ogg">
+          <option value=""></option>
+          <option v-for="cl in store.statePlanner.listaClOgg" :key="cl.unnest" :value="cl.unnest">{{cl.unnest}}</option>
+        </select>
+      </div>
+      <br />
+      <!-- SELECT ENTITA' -->
+      <div class="select-wrapper">
+        <input type="checkbox" id="cbx-entita" v-model="stateCheckBx.Ent">
+        <label for="cbx-entita">Entità</label>
+        <select v-model="selectEntità" id="select-entita">
+          <option value=""></option>
+          <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option>
+        </select>
+      </div>
+      <br />
+      <!-- SELECT AGGREGATORI -->
+      <div class="select-wrapper">
+        <input type="checkbox" id="cbx-aggr" v-model="stateCheckBx.Aggr">
+        <label for="cbx-aggr">Aggregatori</label>
+        <select v-model="selectAggregatori" id="select-aggr">
+          <option value=""></option>
+          <!-- TO DO -->
+          <!-- <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option> -->
+        </select>
+      </div>
+      <br />
+      <!-- SELECT TEMI -->
+      <div class="select-wrapper">
+        <input type="checkbox" id="cbx-temi" v-model="stateCheckBx.Temi">
+        <label for="cbx-temi">Temi</label>
+        <select v-model="selectTemi" id="select-temi">
+          <option value=""></option>
+          <!-- TO DO -->
+          <!-- <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option> -->
+        </select>
+      </div>
+      <br />
+      <!-- SELECT MATERIALI -->
+      <div class="select-wrapper">
+        <input type="checkbox" id="cbx-mat" v-model="stateCheckBx.Mat">
+        <label for="cbx-mat">Materiali</label>
+        <select v-model="selectMateriali" id="select-mat">
+          <option value=""></option>
+          <!-- TO DO -->
+          <!-- <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option> -->
+        </select>
+      </div>
       <br />
       <br />
       <table v-if="selectClOgg" class="tabella-prog-controlli">
@@ -84,8 +131,19 @@ export default {
     const store = inject('store');
     const state = reactive({
       caricamento: false,
+      stateCheckBx: {
+        clOgg: false,
+        Ent: false,
+        Aggr: false,
+        Temi: false,
+        Mat: false,
+      },
       selectLocalità: '',
       selectClOgg: '',
+      selectEntità: '', // []
+      selectAggregatori: '', // []
+      selectTemi: '', // []
+      selectMateriali: '', // []
       listaSigleEdificiFiltrata: [],
       listaSigleEdificiSelezionati: [],
       listaFrasiDiRischioFiltrate: [],
@@ -249,6 +307,21 @@ select {
 input[type=checkbox] {
   margin-right: .4rem;
 }
+
+.select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.select-wrapper input[type="checkbox"] {
+  margin: 0;
+}
+
+.select-wrapper label {
+  margin-bottom: 0;
+}
+
 td, th {
   border: 1px solid #dddddd;
   padding: 8px;

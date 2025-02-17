@@ -80,7 +80,24 @@
       </tr>
       <tr>
         <td class="fLeft"><label><b>DOCUMENTI</b></label></td>
-        <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Documenti']"></td>
+        <!-- <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Documenti']"></td> -->
+        <!-- <td class="fRight"><input type="file" accept="*/*" @change="gestisciFileUpload"></td> -->
+      </tr>
+      <tr v-for="(file_item, index) in files" :key="index">
+        <td class="fLeft">
+          <label><b>Documento {{ index+1 }}</b></label>
+        </td>
+        <td class="fRight">
+          <input :ref="el => fileInputs[index] = el" type="file" accept="*/*" @change="gestisciFileUpload($event, index)" style="display: none;">
+          <button v-if="files.length > 1" class="x" type="button" @click="rimuoviFile(index)">x</button>
+          <button @click="scegliFile(index)">Scegli file</button>
+          <span v-if="file_item.name">{{ file_item.name }}</span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <button type="button" class="x" @click="aggiungiFile">+</button>
+        </td>
       </tr>
     </table>
     <div class="div-bottoni">
@@ -114,7 +131,11 @@ export default {
       selectClRaccOpzioniBloccate: [2, 3], // per bloccare opzioni non selezionabili
       materialeMan: '',
       listaEstensioni: [],
+      files: [
+        {file: null, name: ""}
+      ],
     });
+    const fileInputs = reactive([null]);
     const livPriorità = computed(() => state.selectStCons * state.selectLivUrg + state.selectClRacc);
     const tipoClass = computed(() => store.stateBIM.schedeAttivitàTipo.replaceAll(' ', '-'));
 
@@ -175,6 +196,37 @@ export default {
       store.statePlanner.enumUNI.enumClRacc = enumClRacc.map(en => en.unnest);
     }
 
+    function scegliFile(ind) {
+      fileInputs[ind]?.click();
+    }
+
+    function gestisciFileUpload(evt, ind) {
+      const file = evt.target.files[0];
+
+      if (!store.statePlanner.datiSchedaInCompilazione["Documenti"]) {
+        store.statePlanner.datiSchedaInCompilazione["Documenti"] = [];
+      }
+
+      if (file) {
+        store.statePlanner.datiSchedaInCompilazione["Documenti"][ind] = `${file.name}`;
+        state.files[ind].file = file;
+        state.files[ind].name = file.name;
+      } else {
+        store.statePlanner.datiSchedaInCompilazione["Documenti"][ind] = null;
+        store.statePlanner.datiSchedaInCompilazione["Documenti"].splice(ind, 1);
+        state.files[ind].file = null;
+        state.files[ind].name = "";
+      }
+    }
+
+    function aggiungiFile() {
+      state.files.push({file: null, name: ""});
+    }
+
+    function rimuoviFile(ind) {
+      state.files.splice(ind, 1);
+    }
+
     async function salvaAttività() {
       console.log(store.statePlanner.datiSchedaInCompilazione);
       const {selezione, parziale, rimanenti} = await verificaSelezione();
@@ -196,9 +248,19 @@ export default {
         datiAttività['listaCRregistrati'] = store.statePlanner.listaCRregistrati;
         datiAttività['idDiEmergenza'] = dataInteger()+100; // necessario per evitare conflitto con "id_att_prog", creato nello stesso processo
       }
-      console.log(datiAttività);
 
-      const resp = await registraAttivitàEseguita(datiAttività);
+      // FILE (+ DATI)
+      const fd = new FormData();
+      // 1) aggiungo ogni file
+      state.files.forEach((file_item, idx) => {
+        if (file_item.file) {
+          fd.append(`file_${idx}`, file_item.file, file_item.name);
+        }
+      });
+      // 2) aggiungo i dati
+      fd.append('dati', JSON.stringify(datiAttività));
+
+      const resp = await registraAttivitàEseguita(fd);
       if (resp.success) {
         const fraseContinuare = rimanenti.length ? '. Si prega di continuare la registrazione per gli elementi rimanenti.' : '';
         store.methods.setAlert(`Operazione completata${fraseContinuare}`);
@@ -233,15 +295,15 @@ export default {
     async function raccogliDati(selezione) {
       const datiSpec = await datiSpecifici();
       if (state.selectClRacc > 1) datiSpec['liv_priorità'] = livPriorità.value;
-      const tabella = store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella;
-      const doc = store.statePlanner.datiSchedaInCompilazione['Documenti'];
-      const costo = store.statePlanner.datiSchedaInCompilazione['Costo previsto (€)'];
-      const ore = store.statePlanner.datiSchedaInCompilazione['Ore previste'];
-      const commenti = store.statePlanner.datiSchedaInCompilazione['Note'];
-      const id_main10ance = selezione;
       const autore_ultima_mod = store.state.userSettings.user_id;
       const data_ultima_mod = dataCorta();
       const id_att_prog = dataInteger();
+      const id_main10ance = selezione;
+      const tabella = store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella;
+      const doc = store.statePlanner.datiSchedaInCompilazione['Documenti'].map(fl => `${id_att_prog}/${fl}`);
+      const costo = store.statePlanner.datiSchedaInCompilazione['Costo previsto (€)'];
+      const ore = store.statePlanner.datiSchedaInCompilazione['Ore previste'];
+      const commenti = store.statePlanner.datiSchedaInCompilazione['Note'];
       const edificio = store.statePlanner.datiSchedaInCompilazione['Edificio'];
       const esecutori = store.statePlanner.datiSchedaInCompilazione['Operatore'];
       return {...datiSpec, tabella, doc, costo, ore, commenti, id_main10ance, autore_ultima_mod, data_ultima_mod, id_att_prog, edificio, esecutori};
@@ -330,7 +392,12 @@ export default {
     return {
       store,
       ...toRefs(state),
+      fileInputs,
       tipoClass,
+      scegliFile,
+      gestisciFileUpload,
+      aggiungiFile,
+      rimuoviFile,
       salvaAttività,
       chiudiAttReset,
     }
@@ -386,6 +453,21 @@ td.fLeft {
 td.fRight {
   flex: .65;
   padding-right: 10px;
+}
+td button.x {
+  width: 25px;
+  height: 25px;
+  margin: 5px;
+  font-weight: bold;
+  font-size: large;
+  border: none;
+  align-content: center;
+  justify-content: center;
+  color: #fff;
+  background-color: var(--verdeMain10ance);
+}
+td button.x:hover {
+  background-color: var(--verdeMain10anceTrasparenza);
 }
 table.controllo, table.manutenzione-regolare {
   background-color: var(--verdeMain10anceTrasparenza);

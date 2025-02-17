@@ -7,11 +7,11 @@
         <select v-model="moduloVisibile" id="tabella" class="colonna">
           <option v-for="(tab, ind) in listaTabelle" :key="ind" :value="tab.tab">{{tab.nome}}</option>
         </select>
-        <h4 v-if="moduloVisibile === 'controllo_stato_di_conservazione_livello_di_urgenza'">Controllo</h4>
-        <h4 v-if="moduloVisibile === 'manutenzione_regolare'">Manutenzione regolare</h4>
-        <h4 v-if="moduloVisibile === 'manutenzione_correttiva_o_a_guasto'">Manutenzione correttiva</h4>
-        <h4 v-if="moduloVisibile === 'manutenzione_straordinaria'">Manutenzione straordinaria</h4>
-        <h4 v-if="moduloVisibile === 'restauri'">Restauro</h4>
+        <h4 v-if="moduloVisibile === 'scheda_controllo'">Controllo</h4>
+        <h4 v-if="moduloVisibile === 'scheda_manutenzione_regolare'">Manutenzione regolare</h4>
+        <h4 v-if="moduloVisibile === 'scheda_manutenzione_correttiva'">Manutenzione correttiva</h4>
+        <h4 v-if="moduloVisibile === 'scheda_manutenzione_straordinaria'">Manutenzione straordinaria</h4>
+        <h4 v-if="moduloVisibile === 'scheda_restauro'">Restauro</h4>
       </div>
       <div v-if="moduloVisibile" class="contesto">
         <div class="contenitore-colonne">
@@ -44,7 +44,7 @@
         </div>
         <br />
       </div>
-      <div v-if="moduloVisibile === 'controllo_stato_di_conservazione_livello_di_urgenza'">
+      <div v-if="moduloVisibile === 'scheda_controllo'">
         <div class="label-st-cons"><b>Stato di conservazione:</b></div>
         <div id="div-st-cons">
           <select v-model="datiContr.st_cons">
@@ -91,7 +91,7 @@
           <input v-model="datiContr.dataFine" type="date" id="data-f" class="colonna">
         </div>
       </div>
-      <div v-if="moduloVisibile === 'manutenzione_regolare'">
+      <div v-if="moduloVisibile === 'scheda_manutenzione_regolare'">
         <div class="label-descrizione"><b>Descrizione attività:</b></div>
         <div id="div-descrizione">
           <textarea v-model="datiManReg.descrizioneManReg"></textarea>
@@ -115,7 +115,7 @@
           <input v-model="datiManReg.dataFine" type="date" id="data-f" class="colonna">
         </div>
       </div>
-      <div v-if="moduloVisibile === 'manutenzione_correttiva_o_a_guasto'">
+      <div v-if="moduloVisibile === 'scheda_manutenzione_correttiva'">
         <div class="label-descrizione"><b>Descrizione attività:</b></div>
         <div id="div-descrizione">
           <textarea v-model="datiManCorr.descrizioneManCorr"></textarea>
@@ -139,7 +139,7 @@
           <input v-model="datiManCorr.dataFine" type="date" id="data-f" class="colonna">
         </div>
       </div>
-      <div v-if="moduloVisibile === 'manutenzione_straordinaria'">
+      <div v-if="moduloVisibile === 'scheda_manutenzione_straordinaria'">
         <div class="label-descrizione"><b>Descrizione attività:</b></div>
         <div id="div-descrizione">
           <textarea v-model="datiManStr.descrizioneManStr"></textarea>
@@ -163,7 +163,7 @@
           <input v-model="datiManStr.dataFine" type="date" id="data-f" class="colonna">
         </div>
       </div>
-      <div v-if="moduloVisibile === 'restauri'">
+      <div v-if="moduloVisibile === 'scheda_restauro'">
         <div class="label-descrizione"><b>Descrizione attività:</b></div>
         <div id="div-descrizione">
           <textarea v-model="datiRest.descrizioneRestauro"></textarea>
@@ -214,16 +214,16 @@ export default {
     });
 
     const listaTabelle = [
-      {nome: 'Controllo', tab: 'controllo_stato_di_conservazione_livello_di_urgenza'},
-      {nome: 'Manutenzione regolare', tab: 'manutenzione_regolare'},
-      {nome: 'Manutenzione correttiva', tab: 'manutenzione_correttiva_o_a_guasto'},
-      {nome: 'Manutenzione straordinaria', tab: 'manutenzione_straordinaria'},
-      {nome: 'Restauro', tab: 'restauri'},
+      {nome: 'Controllo', tab: 'scheda_controllo'},
+      {nome: 'Manutenzione regolare', tab: 'scheda_manutenzione_regolare'},
+      {nome: 'Manutenzione correttiva', tab: 'scheda_manutenzione_correttiva'},
+      {nome: 'Manutenzione straordinaria', tab: 'scheda_manutenzione_straordinaria'},
+      {nome: 'Restauro', tab: 'scheda_restauro'},
     ];
 
     const store = inject('store');
     const state = reactive({
-      moduloVisibile: 'controllo_stato_di_conservazione_livello_di_urgenza',
+      moduloVisibile: 'scheda_controllo',
       selectLocalità: '',
       selectClOgg: '',
       selectCategoria: '',
@@ -365,23 +365,23 @@ export default {
       jsonReq.metadati = metadati;
       // IMPOSTAZIONE DATI SPECIFICI SCHEDA
       switch (state.moduloVisibile) {
-        case 'controllo_stato_di_conservazione_livello_di_urgenza': {
+        case 'scheda_controllo': {
           jsonReq.dati = state.datiContr;
           break;
         }
-        case 'manutenzione_regolare': {
+        case 'scheda_manutenzione_regolare': {
           jsonReq.dati = state.datiManReg;
           break;
         }
-        case 'manutenzione_correttiva_o_a_guasto': {
+        case 'scheda_manutenzione_correttiva': {
           jsonReq.dati = state.datiManCorr;
           break;
         }
-        case 'manutenzione_straordinaria': {
+        case 'scheda_manutenzione_straordinaria': {
           jsonReq.dati = state.datiManStr;
           break;
         }
-        case 'restauri': {
+        case 'scheda_restauro': {
           jsonReq.dati = state.datiRest;
           break;
         }

@@ -98,19 +98,19 @@ const statePlanner = reactive({
     },
     attività: {
         'controllo': {
-            tabella: 'controllo_stato_di_conservazione_livello_di_urgenza',
+            tabella: 'scheda_controllo',
         },
         'manutenzione regolare': {
-            tabella: 'manutenzione_regolare',
+            tabella: 'scheda_manutenzione_regolare',
         },
         'manutenzione correttiva': {
-            tabella: 'manutenzione_correttiva_o_a_guasto',
+            tabella: 'scheda_manutenzione_correttiva',
         },
         'manutenzione straordinaria': {
-            tabella: 'manutenzione_straordinaria',
+            tabella: 'scheda_manutenzione_straordinaria',
         },
         'restauro': {
-            tabella: 'restauri',
+            tabella: 'scheda_restauro',
         },
         'diagnosi': {
             tabella: 'danno_alterazione_degrado',

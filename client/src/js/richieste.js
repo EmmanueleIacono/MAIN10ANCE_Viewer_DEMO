@@ -251,8 +251,8 @@ export async function prendiUrnLocalità(jsonReq) {
     return risTradotto;
 }
 
-export async function registraAttivitàEseguita(jsonAtt) {
-    const res = await fetch('/o/esecuzione/nuova-attivita', {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonAtt)});
+export async function registraAttivitàEseguita(formData) {
+    const res = await fetch('/o/esecuzione/nuova-attivita', {method: "PATCH", body: formData});
     const resJson = await res.json();
     return resJson;
 }
