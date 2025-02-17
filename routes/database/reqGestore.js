@@ -355,7 +355,7 @@ async function getSigleEdifici(ambito) {
 
 async function getFrasiDiRischio(ambito) {
     try {
-        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec" FROM ${utility_schema}."frase_di_rischio" WHERE ($1 = '%' OR $1 = ANY(ambiti)) ORDER BY "id_fr_risc";`, [ambito]);
+        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec", "entità", "aggregatori", "temi", "materiali" FROM ${utility_schema}."frase_di_rischio" WHERE ($1 = '%' OR $1 = ANY(ambiti)) ORDER BY "id_fr_risc";`, [ambito]);
         return results.rows;
     }
     catch(e) {
@@ -478,11 +478,11 @@ async function integraAtt(jsonAtt, ambito) {
         try {
             await clientM10a.query(`UPDATE ${data_schema}."attività_prog" SET ${strSet}, "da_integrare" = FALSE WHERE "id_att_prog" = ${ultimoNum};`, values);
             const datiInsert = jsonAtt.dati_inserimento;
-            const stringaContr = 'controllo_stato_di_conservazione_livello_di_urgenza';
-            const stringaManReg = 'manutenzione_regolare';
-            const stringaManCorr = 'manutenzione_correttiva_o_a_guasto';
-            const stringaManStr = 'manutenzione_straordinaria';
-            const stringaRestauro = 'restauri';
+            const stringaContr = 'scheda_controllo';
+            const stringaManReg = 'scheda_manutenzione_regolare';
+            const stringaManCorr = 'scheda_manutenzione_correttiva';
+            const stringaManStr = 'scheda_manutenzione_straordinaria';
+            const stringaRestauro = 'scheda_restauro';
             const stringaDiagnosi = 'danno_alterazione_degrado';
             for (const tab of datiInsert.tabelle) {
                 switch (tab) {
@@ -603,9 +603,9 @@ async function registraNuoviControlli(listaReqJson) {
         await clientM10a.query("BEGIN;");
         try {
             for (const reqJson of listaReqJson) {
-                await clientM10a.query(`INSERT INTO ${data_schema}."controllo_stato_di_conservazione_livello_di_urgenza" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "data_ins", "id_main10ance", "rid_fr_risc", "freq") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, [reqJson.id_contr, reqJson.cl_ogg, reqJson.controllo, reqJson.data_con, reqJson.data_ins, reqJson.id_main10ance, reqJson.rid_fr_risc, reqJson.frequenza]);
+                await clientM10a.query(`INSERT INTO ${data_schema}."scheda_controllo" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "data_ins", "id_main10ance", "rid_fr_risc", "freq") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, [reqJson.id_contr, reqJson.cl_ogg, reqJson.controllo, reqJson.data_con, reqJson.data_ins, reqJson.id_main10ance, reqJson.rid_fr_risc, reqJson.frequenza]);
                 if (reqJson.dati_manutenzione) {
-                    await clientM10a.query(`INSERT INTO ${data_schema}."manutenzione_regolare" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "data_ins", "id_main10ance") VALUES (($1), ($2), ($3), ($4), ($5), ($6));`, [reqJson.dati_manutenzione.id_mn_reg, reqJson.dati_manutenzione.cl_ogg, reqJson.dati_manutenzione.azione, reqJson.dati_manutenzione.data_ese, reqJson.dati_manutenzione.data_ins, reqJson.dati_manutenzione.id_main10ance]);
+                    await clientM10a.query(`INSERT INTO ${data_schema}."scheda_manutenzione_regolare" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "data_ins", "id_main10ance") VALUES (($1), ($2), ($3), ($4), ($5), ($6));`, [reqJson.dati_manutenzione.id_mn_reg, reqJson.dati_manutenzione.cl_ogg, reqJson.dati_manutenzione.azione, reqJson.dati_manutenzione.data_ese, reqJson.dati_manutenzione.data_ins, reqJson.dati_manutenzione.id_main10ance]);
                 }
             }
         }
@@ -625,11 +625,11 @@ async function registraNuoviControlli(listaReqJson) {
 
 // REGISTRAZIONE ATTIVITÀ PRECEDENTI
 async function registraAttPrecedenti(reqJson) {
-    const stringaContr = 'controllo_stato_di_conservazione_livello_di_urgenza';
-    const stringaManReg = 'manutenzione_regolare';
-    const stringaManCorr = 'manutenzione_correttiva_o_a_guasto';
-    const stringaManStr = 'manutenzione_straordinaria';
-    const stringaRestauro = 'restauri';
+    const stringaContr = 'scheda_controllo';
+    const stringaManReg = 'scheda_manutenzione_regolare';
+    const stringaManCorr = 'scheda_manutenzione_correttiva';
+    const stringaManStr = 'scheda_manutenzione_straordinaria';
+    const stringaRestauro = 'scheda_restauro';
     const stringaDiagnosi = 'danno_alterazione_degrado';
     try {
         await clientM10a.query("BEGIN;");

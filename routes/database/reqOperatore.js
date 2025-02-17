@@ -1,10 +1,13 @@
 const express = require('express');
+const fileupload = require('express-fileupload');
 const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
+app.use(fileupload());
 
 const {clientM10a} = require('./connessioni');
 const {data_schema, utility_schema} = require('./schemi');
+const {supabase} = require('../../supabase_config');
 
 //////////          RICHIESTE          //////////
 
@@ -169,8 +172,10 @@ app.patch('/esecuzione/nuova-attivita', async (req, res) => {
     const ambito = req.signedCookies.ambito;
     const result = {};
     try {
-        const reqJson = req.body;
-        const resp = await registraAttivitàEsecuzione(reqJson, ambito);
+        const allReqFiles = req.files || {};
+        const reqJsonRaw = req.body.dati;
+        const reqJson = JSON.parse(reqJsonRaw);
+        const resp = await registraAttivitàEsecuzione(reqJson, allReqFiles, ambito);
         result.success = resp;
     }
     catch(e) {
@@ -364,7 +369,7 @@ async function leggiSchedeAnagrafica() {
 
 async function leggiSchedeControllo() {
     try {
-        const result = await clientM10a.query(`SELECT mc.data_con, mc.controllo, md.id_dad, md.id_main10ance, md.rid_gloss, mf.mn_reg, mf.frequenza, mf.mn_nec, mc.liv_urg FROM ${data_schema}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${data_schema}.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN ${utility_schema}.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
+        const result = await clientM10a.query(`SELECT mc.data_con, mc.controllo, md.id_dad, md.id_main10ance, md.rid_gloss, mf.mn_reg, mf.frequenza, mf.mn_nec, mc.liv_urg FROM ${data_schema}.scheda_controllo AS mc JOIN ${data_schema}.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN ${utility_schema}.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
         return result.rows;
     }
     catch(e) {
@@ -374,7 +379,7 @@ async function leggiSchedeControllo() {
 
 async function leggiSchedeControllo2(ambito) {
     try {
-        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_con AS "Data controllo", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_contr AS "Codice scheda controllo", mc.id_main10ance AS "Elementi da controllare" FROM ${data_schema}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE AND mc."ambito" LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
+        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_con AS "Data controllo", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_contr AS "Codice scheda controllo", mc.id_main10ance AS "Elementi da controllare" FROM ${data_schema}.scheda_controllo AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE AND mc."ambito" LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
         return result.rows;
     }
     catch(e) {
@@ -383,8 +388,8 @@ async function leggiSchedeControllo2(ambito) {
 }
 
 async function leggiSchedeManReg(ambito) {
-    try {
-        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mr.azione AS "Tipo di intervento", mr.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mr.data_ese AS "Data intervento", mr.data_ins AS "Data programmazione attività", mr.esecutori AS "Operatore", mr.doc AS "Documenti", ap.commenti AS "Note", mr.id_mn_reg AS "Codice scheda manutenzione regolare", mr.id_main10ance AS "Elementi interessati" FROM ${data_schema}.manutenzione_regolare AS mr JOIN ${data_schema}.attività_prog AS ap ON mr.rid_att_prog = ap.id_att_prog WHERE mr.eseguito = FALSE AND mr."ambito" LIKE ($1) ORDER BY mr.data_ins;`, [ambito]);
+    try { // QUESTA QUERY DA CAMBIARE PER STORICO: NON VA BENE FARE JOIN (OPPURE FARE QUERY PARALLELA PER "ATT PRECEDENTI")
+        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mr.azione AS "Tipo di intervento", mr.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mr.data_ese AS "Data intervento", mr.data_ins AS "Data programmazione attività", mr.esecutori AS "Operatore", mr.doc AS "Documenti", ap.commenti AS "Note", mr.id_mn_reg AS "Codice scheda manutenzione regolare", mr.id_main10ance AS "Elementi interessati" FROM ${data_schema}.scheda_manutenzione_regolare AS mr JOIN ${data_schema}.attività_prog AS ap ON mr.rid_att_prog = ap.id_att_prog WHERE mr.eseguito = FALSE AND mr."ambito" LIKE ($1) ORDER BY mr.data_ins;`, [ambito]);
         return result.rows;
     }
     catch(e) {
@@ -394,7 +399,7 @@ async function leggiSchedeManReg(ambito) {
 
 async function leggiSchedeManCorr(ambito) {
     try {
-        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.azione AS "Tipo di intervento", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_ese AS "Data intervento", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_mn_gu AS "Codice scheda manutenzione correttiva", mc.id_main10ance AS "Elementi interessati" FROM ${data_schema}.manutenzione_correttiva_o_a_guasto AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE AND mc."ambito" LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
+        const result = await clientM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.azione AS "Tipo di intervento", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_ese AS "Data intervento", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_mn_gu AS "Codice scheda manutenzione correttiva", mc.id_main10ance AS "Elementi interessati" FROM ${data_schema}.scheda_manutenzione_correttiva AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE AND mc."ambito" LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
         return result.rows;
     }
     catch(e) {
@@ -405,7 +410,7 @@ async function leggiSchedeManCorr(ambito) {
 
 async function leggiSchedeRestauro() {
     try {
-        const result = await clientM10a.query(`SELECT operatore AS "Operatore", anno_iniz AS "Anno inizio", anno_fine AS "Anno fine", progettist AS "Progettista/i", rid_gloss AS "Fenomeno interessato", descriz AS "Descrizione intervento", costo AS "Costo (€)", commenti AS "Commenti", doc AS "Documenti", id_restaur AS "Codice scheda restauro", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM ${data_schema}.restauri ORDER BY anno_iniz;`);
+        const result = await clientM10a.query(`SELECT operatore AS "Operatore", anno_iniz AS "Anno inizio", anno_fine AS "Anno fine", progettist AS "Progettista/i", rid_gloss AS "Fenomeno interessato", descriz AS "Descrizione intervento", costo AS "Costo (€)", commenti AS "Commenti", doc AS "Documenti", id_restaur AS "Codice scheda restauro", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM ${data_schema}.scheda_restauro ORDER BY anno_iniz;`);
         return result.rows;
     }
     catch(e) {
@@ -447,7 +452,7 @@ async function leggiTabelleLOD3e4() {
 /////// DA ELIMINARE O DA RIVEDERE PER FASE 2 //////////////
 // async function leggiDatiControlloProg() {
 //     try {
-//         const results = await clientM10a.query(`SELECT "c".id_contr AS "id", "fr".cl_ogg_fr AS "classe", "fr".fr_risc AS "frase", "fr".controllo, "fr".mn_reg AS "manutenzione_regolare", "fr".mn_nec AS "manutenzione_correttiva", "c".data_con AS "data_operazione", "c".freq AS "frequenza", "c".data_ins AS "data_registrazione", "c".id_main10ance FROM ${data_schema}.controllo_stato_di_conservazione_livello_di_urgenza AS "c" JOIN ${utility_schema}.frase_di_rischio AS "fr" ON "c".rid_fr_risc = "fr".id_fr_risc ORDER BY data_con;`);
+//         const results = await clientM10a.query(`SELECT "c".id_contr AS "id", "fr".cl_ogg_fr AS "classe", "fr".fr_risc AS "frase", "fr".controllo, "fr".mn_reg AS "scheda_manutenzione_regolare", "fr".mn_nec AS "manutenzione_correttiva", "c".data_con AS "data_operazione", "c".freq AS "frequenza", "c".data_ins AS "data_registrazione", "c".id_main10ance FROM ${data_schema}.scheda_controllo AS "c" JOIN ${utility_schema}.frase_di_rischio AS "fr" ON "c".rid_fr_risc = "fr".id_fr_risc ORDER BY data_con;`);
 //         return results.rows;
 //     }
 //     catch(e) {
@@ -458,11 +463,11 @@ async function leggiTabelleLOD3e4() {
 async function leggiAttivitàProg() {
     try {
         const withString = `WITH totale AS (
-            (SELECT rid_att_prog FROM ${data_schema}."controllo_stato_di_conservazione_livello_di_urgenza" WHERE eseguito = FALSE)
-            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."manutenzione_regolare" WHERE eseguito = FALSE)
-            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."manutenzione_correttiva_o_a_guasto" WHERE eseguito = FALSE)
-            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."manutenzione_straordinaria" WHERE eseguito = FALSE)
-            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."restauri" WHERE eseguito = FALSE)
+            (SELECT rid_att_prog FROM ${data_schema}."scheda_controllo" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."scheda_manutenzione_regolare" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."scheda_manutenzione_correttiva" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."scheda_manutenzione_straordinaria" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."scheda_restauro" WHERE eseguito = FALSE)
             UNION ALL (SELECT rid_att_prog FROM ${data_schema}."danno_alterazione_degrado" WHERE eseguito = FALSE)
             )`;
         const subQueryString = `SELECT ("rid_att_prog") AS "lista_id" FROM totale`;
@@ -477,11 +482,11 @@ async function leggiAttivitàProg() {
 async function leggiAttivitàProgOperatore() {
     try {
         const withString = `WITH totale AS (
-            (SELECT rid_att_prog FROM ${data_schema}."controllo_stato_di_conservazione_livello_di_urgenza" WHERE eseguito = FALSE)
-            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."manutenzione_regolare" WHERE eseguito = FALSE)
-            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."manutenzione_correttiva_o_a_guasto" WHERE eseguito = FALSE)
-            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."manutenzione_straordinaria" WHERE eseguito = FALSE)
-            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."restauri" WHERE eseguito = FALSE)
+            (SELECT rid_att_prog FROM ${data_schema}."scheda_controllo" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."scheda_manutenzione_regolare" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."scheda_manutenzione_correttiva" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."scheda_manutenzione_straordinaria" WHERE eseguito = FALSE)
+            UNION ALL (SELECT rid_att_prog FROM ${data_schema}."scheda_restauro" WHERE eseguito = FALSE)
             UNION ALL (SELECT rid_att_prog FROM ${data_schema}."danno_alterazione_degrado" WHERE eseguito = FALSE)
             )`;
         const subQueryString = `SELECT ("rid_att_prog") AS "lista_id" FROM totale`;
@@ -494,13 +499,14 @@ async function leggiAttivitàProgOperatore() {
     }
 }
 
-async function registraAttivitàEsecuzione(dati, ambito) {
-    const stringaContr = 'controllo_stato_di_conservazione_livello_di_urgenza';
-    const stringaManReg = 'manutenzione_regolare';
-    const stringaManCorr = 'manutenzione_correttiva_o_a_guasto';
-    const stringaManStr = 'manutenzione_straordinaria';
-    const stringaRestauro = 'restauri';
+async function registraAttivitàEsecuzione(dati, all_files, ambito) {
+    const stringaContr = 'scheda_controllo';
+    const stringaManReg = 'scheda_manutenzione_regolare';
+    const stringaManCorr = 'scheda_manutenzione_correttiva';
+    const stringaManStr = 'scheda_manutenzione_straordinaria';
+    const stringaRestauro = 'scheda_restauro';
     const stringaDiagnosi = 'danno_alterazione_degrado';
+    const docsArray = dati.doc;
     try {
         await clientM10a.query('BEGIN;');
         switch (dati.tabella) {
@@ -513,11 +519,11 @@ async function registraAttivitàEsecuzione(dati, ambito) {
                     const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM ${data_schema}.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
                     const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM ${data_schema}.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
                     const stringaSelectIdGroup = `SELECT "id_group" FROM ${data_schema}.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
-                    await clientM10a.query(`INSERT INTO ${data_schema}."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_con", "data_ins", "data_ultima_mod", "strumentaz", "id_main10ance", "cl_racc", "st_cons", "liv_urg", "estensione", "commenti", "doc", "autore_ultima_mod", "id_att_ciclica", "eseguito", "ambito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectContr}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ($16));`, arrayInsertContr);
+                    await clientM10a.query(`INSERT INTO ${data_schema}."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_con", "data_ins", "data_ultima_mod", "strumentaz", "id_main10ance", "cl_racc", "st_cons", "liv_urg", "estensione", "commenti", "docs", "autore_ultima_mod", "id_att_ciclica", "eseguito", "ambito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectContr}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15), ($16));`, arrayInsertContr);
                 }
                 else {
                     const arrayUpdateContr = [dati.id_contr, dati.cl_racc, dati.st_cons, dati.liv_urg, dati.estensione, dati.strumentaz, dati.commenti, dati.doc, dati.costo, dati.ore, dati.data_con, dati.data_ultima_mod, dati.autore_ultima_mod, dati.id_main10ance, true, ambito];
-                    await clientM10a.query(`UPDATE ${data_schema}."${stringaContr}" SET "cl_racc" = ($2), "st_cons" = ($3), "liv_urg" = ($4), "estensione" = ($5), "strumentaz" = ($6), "commenti" = ($7), "doc" = ($8), "costo" = ($9), "ore" = ($10), "data_con" = ($11), "data_ultima_mod" = ($12), "autore_ultima_mod" = ($13), "id_main10ance" = ($14), "eseguito" = ($15) WHERE "id_contr" = ($1) AND "ambito" = ($16);`, arrayUpdateContr);
+                    await clientM10a.query(`UPDATE ${data_schema}."${stringaContr}" SET "cl_racc" = ($2), "st_cons" = ($3), "liv_urg" = ($4), "estensione" = ($5), "strumentaz" = ($6), "commenti" = ($7), "docs" = ($8), "costo" = ($9), "ore" = ($10), "data_con" = ($11), "data_ultima_mod" = ($12), "autore_ultima_mod" = ($13), "id_main10ance" = ($14), "eseguito" = ($15) WHERE "id_contr" = ($1) AND "ambito" = ($16);`, arrayUpdateContr);
                 }
 
                 const rid_contr = dati.nuovo_record ? dati.nuovo_id : dati.id_contr;
@@ -556,6 +562,19 @@ async function registraAttivitàEsecuzione(dati, ambito) {
                     const valuesArray = [parseInt(dati.idDiEmergenza), dati.data_next, [], dati.data_ultima_mod, dati.data_ultima_mod, dati.costo, dati.ore, dati.strumentaz, dati.esecutori, rid_contr, true, ambito];
                     await clientM10a.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "id_group", "località_estesa", "data_prog", "id_main10ance", "data_ins", "data_ultima_mod", "costo", "ore", "strumentaz", "esecutori", "rid_att_ciclica_prec", "da_integrare", "ambito") VALUES (($1), '{controllo}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
                 }
+
+                // FILE UPLOAD
+                for (let i = 0; i < docsArray.length; i++) {
+                    const docPath = docsArray[i];
+                    const fieldName = `file_${i}`;
+                    const singleFile = all_files[fieldName];
+                    if (!singleFile) continue;
+                    
+                    const fileOptions = {contentType: singleFile.mimetype};
+                    const {error} = await supabase.storage.from("documenti-schede").upload(`${ambito}/${docPath}`, singleFile.data, fileOptions);
+                    if (error) throw error;
+                }
+
                 break;
             }
             case stringaManReg: {
@@ -567,11 +586,11 @@ async function registraAttivitàEsecuzione(dati, ambito) {
                     const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM ${data_schema}.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
                     const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM ${data_schema}.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
                     const stringaSelectIdGroup = `SELECT "id_group" FROM ${data_schema}.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
-                    await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManReg}" ("id_mn_reg", "cl_ogg_fr", "azione", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_ese", "data_ins", "data_ultima_mod", "materiale", "strumentaz", "id_main10ance", "commenti", "doc", "autore_ultima_mod", "id_att_ciclica", "eseguito", "ambito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectAzione}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertManReg);
+                    await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManReg}" ("id_mn_reg", "cl_ogg_fr", "azione", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_ese", "data_ins", "data_ultima_mod", "materiale", "strumentaz", "id_main10ance", "commenti", "docs", "autore_ultima_mod", "id_att_ciclica", "eseguito", "ambito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectAzione}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertManReg);
                 }
                 else {
                     const arrayUpdateManReg = [dati.id_mn_reg, dati.materiale, dati.strumentaz, dati.commenti, dati.doc, dati.costo, dati.ore, dati.data_ese, dati.data_ultima_mod, dati.autore_ultima_mod, dati.id_main10ance, true];
-                    await clientM10a.query(`UPDATE ${data_schema}."${stringaManReg}" SET "materiale" = ($2), "strumentaz" = ($3), "commenti" = ($4), "doc" = ($5), "costo" = ($6), "ore" = ($7), "data_ese" = ($8), "data_ultima_mod" = ($9), "autore_ultima_mod" = ($10), "id_main10ance" = ($11), "eseguito" = ($12) WHERE "id_mn_reg" = ($1);`, arrayUpdateManReg);
+                    await clientM10a.query(`UPDATE ${data_schema}."${stringaManReg}" SET "materiale" = ($2), "strumentaz" = ($3), "commenti" = ($4), "docs" = ($5), "costo" = ($6), "ore" = ($7), "data_ese" = ($8), "data_ultima_mod" = ($9), "autore_ultima_mod" = ($10), "id_main10ance" = ($11), "eseguito" = ($12) WHERE "id_mn_reg" = ($1);`, arrayUpdateManReg);
                 }
 
                 const rid_mn_reg = dati.nuovo_record ? dati.nuovo_id : dati.id_mn_reg;
@@ -584,6 +603,19 @@ async function registraAttivitàEsecuzione(dati, ambito) {
                 const stringaSelectAttProgLoc = `SELECT "località_estesa" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
                 const valuesArray = [parseInt(dati.id_att_prog), dati.data_next, dati.id_main10ance, dati.data_ultima_mod, dati.data_ultima_mod, dati.costo, dati.ore, dati.strumentaz, dati.esecutori, rid_mn_reg, true, ambito];
                 await clientM10a.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "id_group", "località_estesa", "data_prog", "id_main10ance", "data_ins", "data_ultima_mod", "costo", "ore", "strumentaz", "esecutori", "rid_att_ciclica_prec", "da_integrare", "ambito") VALUES (($1), '{manutenzione regolare}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
+                
+                // FILE UPLOAD
+                for (let i = 0; i < docsArray.length; i++) {
+                    const docPath = docsArray[i];
+                    const fieldName = `file_${i}`;
+                    const singleFile = all_files[fieldName];
+                    if (!singleFile) continue;
+                    
+                    const fileOptions = {contentType: singleFile.mimetype};
+                    const {error} = await supabase.storage.from("documenti-schede").upload(`${ambito}/${docPath}`, singleFile.data, fileOptions);
+                    if (error) throw error;
+                }
+
                 break;
             }
             case stringaManCorr: {
@@ -595,11 +627,11 @@ async function registraAttivitàEsecuzione(dati, ambito) {
                     const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM ${data_schema}.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
                     const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM ${data_schema}.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
                     const stringaSelectIdGroup = `SELECT "id_group" FROM ${data_schema}.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
-                    await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManCorr}" ("id_mn_gu", "cl_ogg_fr", "azione", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_ese", "data_ins", "data_ultima_mod", "materiale", "strumentaz", "id_main10ance", "commenti", "doc", "autore_ultima_mod", "eseguito", "ambito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectAzione}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, arrayInsertManCorr);
+                    await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManCorr}" ("id_mn_gu", "cl_ogg_fr", "azione", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_ese", "data_ins", "data_ultima_mod", "materiale", "strumentaz", "id_main10ance", "commenti", "docs", "autore_ultima_mod", "eseguito", "ambito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectAzione}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, arrayInsertManCorr);
                 }
                 else {
                     const arrayUpdateManCorr = [dati.id_mn_gu, dati.materiale, dati.strumentaz, dati.commenti, dati.doc, dati.costo, dati.ore, dati.data_ese, dati.data_ultima_mod, dati.autore_ultima_mod, dati.id_main10ance, true];
-                    await clientM10a.query(`UPDATE ${data_schema}."${stringaManCorr}" SET "materiale" = ($2), "strumentaz" = ($3), "commenti" = ($4), "doc" = ($5), "costo" = ($6), "ore" = ($7), "data_ese" = ($8), "data_ultima_mod" = ($9), "autore_ultima_mod" = ($10), "id_main10ance" = ($11), "eseguito" = ($12) WHERE "id_mn_gu" = ($1);`, arrayUpdateManCorr);
+                    await clientM10a.query(`UPDATE ${data_schema}."${stringaManCorr}" SET "materiale" = ($2), "strumentaz" = ($3), "commenti" = ($4), "docs" = ($5), "costo" = ($6), "ore" = ($7), "data_ese" = ($8), "data_ultima_mod" = ($9), "autore_ultima_mod" = ($10), "id_main10ance" = ($11), "eseguito" = ($12) WHERE "id_mn_gu" = ($1);`, arrayUpdateManCorr);
                 }
 
                 const attRiall = await cercaAttProgPerRiallineamento(dati.id_mn_gu, 'id_mn_gu', stringaManCorr);
@@ -609,6 +641,19 @@ async function registraAttivitàEsecuzione(dati, ambito) {
                     const attEsec = await cercaAttEsecPerRiallineamento(attRiall.id_att_prog, 'id_contr', stringaContr);
                     await clientM10a.query(`UPDATE ${data_schema}.${stringaContr} SET "id_main10ance" = array_cat("id_main10ance", ($1)) WHERE "id_contr" = ($2);`, [dati.id_main10ance, parseInt(attEsec.id_contr)]);
                 }
+
+                // FILE UPLOAD
+                for (let i = 0; i < docsArray.length; i++) {
+                    const docPath = docsArray[i];
+                    const fieldName = `file_${i}`;
+                    const singleFile = all_files[fieldName];
+                    if (!singleFile) continue;
+                    
+                    const fileOptions = {contentType: singleFile.mimetype};
+                    const {error} = await supabase.storage.from("documenti-schede").upload(`${ambito}/${docPath}`, singleFile.data, fileOptions);
+                    if (error) throw error;
+                }
+
                 break;
             }
             case stringaManStr: {
@@ -645,7 +690,7 @@ async function registraAttivitàEsecuzione(dati, ambito) {
 }
 
 async function recuperaFrequenzaAttProg(id, tabella) {
-    const id_tab = tabella === 'controllo_stato_di_conservazione_livello_di_urgenza' ? 'id_contr' : 'id_mn_reg';
+    const id_tab = tabella === 'scheda_controllo' ? 'id_contr' : 'id_mn_reg';
     const stringaSelectIdGroup = `SELECT "id_group" FROM ${data_schema}.${tabella} WHERE "${id_tab}" = ${id}`;
     const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM ${data_schema}.${tabella} WHERE "${id_tab}" = ${id}`;
     try {
@@ -659,7 +704,7 @@ async function recuperaFrequenzaAttProg(id, tabella) {
 
 async function cercaAttProgPerRiallineamento(id, nomeId, nomeTabella) {
     const stringaSelectRidContr = `SELECT "rid_contr" FROM ${data_schema}.${nomeTabella} WHERE "${nomeId}" = ${id}`;
-    const stringaSelectIdAttCiclica = `SELECT id_att_ciclica FROM ${data_schema}.controllo_stato_di_conservazione_livello_di_urgenza WHERE id_contr = (${stringaSelectRidContr})`;
+    const stringaSelectIdAttCiclica = `SELECT id_att_ciclica FROM ${data_schema}.scheda_controllo WHERE id_contr = (${stringaSelectRidContr})`;
     try {
         const res = await clientM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "id_main10ance", "id_group", "tipo_attività", "da_integrare", "necessaria_revisione", "rid_att_ciclica_prec" FROM ${data_schema}.attività_prog WHERE "rid_att_ciclica_prec" = (${stringaSelectIdAttCiclica}) AND 'controllo' = ANY("tipo_attività") AND ("necessaria_revisione" IS NULL OR "necessaria_revisione" = FALSE) ORDER BY "id_att_prog" ASC LIMIT 1;`);
         if (res.rowCount) return res.rows[0];
@@ -685,7 +730,7 @@ async function cercaAttEsecPerRiallineamento(id, nomeId, nomeTabella) {
 
 async function leggiSchedeStoricoControllo(ambito) {
     try {
-        const result = await clientM10a.query(`SELECT mc.data_con AS "Data controllo", ap."località_estesa" AS "Località", (string_to_array(mc.id_main10ance[1], '|'))[2] AS "Edificio", mc.cl_ogg_fr AS "Classe oggetti",  mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", mc.st_cons AS "Stato di conservazione", mc.cl_racc AS "Classe di raccomandazione", mc.liv_urg AS "Livello di urgenza", mc.costo AS "Costo effettivo (€)", mc.ore AS "Ore effettive", mc.esecutori AS "Operatore", mc.doc AS "Documenti", mc.commenti AS "Note", mc.id_contr AS "Codice scheda controllo", mc.id_main10ance AS "Elementi da controllare", mc.data_ins AS "Data programmazione attività" FROM ${data_schema}.controllo_stato_di_conservazione_livello_di_urgenza AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = TRUE AND mc.ambito LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
+        const result = await clientM10a.query(`SELECT mc.data_con AS "Data controllo", ap."località_estesa" AS "Località", (string_to_array(mc.id_main10ance[1], '|'))[2] AS "Edificio", mc.cl_ogg_fr AS "Classe oggetti",  mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", mc.st_cons AS "Stato di conservazione", mc.cl_racc AS "Classe di raccomandazione", mc.liv_urg AS "Livello di urgenza", mc.costo AS "Costo effettivo (€)", mc.ore AS "Ore effettive", mc.esecutori AS "Operatore", mc.doc AS "Documenti", mc.commenti AS "Note", mc.id_contr AS "Codice scheda controllo", mc.id_main10ance AS "Elementi da controllare", mc.data_ins AS "Data programmazione attività" FROM ${data_schema}.scheda_controllo AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = TRUE AND mc.ambito LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
         return result.rows;
     }
     catch(e) {
@@ -695,7 +740,7 @@ async function leggiSchedeStoricoControllo(ambito) {
 
 async function leggiSchedeStoricoManReg(ambito) {
     try {
-        const result = await clientM10a.query(`SELECT mr.data_ese AS "Data intervento", ap."località_estesa" AS "Località", (string_to_array(mr.id_main10ance[1], '|'))[2] AS "Edificio", mr.cl_ogg_fr AS "Classe oggetti", mr.azione AS "Tipo di intervento", mr.strumentaz AS "Strumentazione", mr.materiale AS "Materiale", mr.costo AS "Costo effettivo (€)", mr.ore AS "Ore effettive", mr.esecutori AS "Operatore", mr.doc AS "Documenti", mr.commenti AS "Note", mr.id_mn_reg AS "Codice scheda manutenzione regolare", mr.id_main10ance AS "Elementi interessati", mr.data_ins AS "Data programmazione attività" FROM ${data_schema}.manutenzione_regolare AS mr JOIN ${data_schema}.attività_prog AS ap ON mr.rid_att_prog = ap.id_att_prog WHERE mr.eseguito = TRUE AND mc.ambito LIKE ($1) ORDER BY mr.data_ins;`, [ambito]);
+        const result = await clientM10a.query(`SELECT mr.data_ese AS "Data intervento", ap."località_estesa" AS "Località", (string_to_array(mr.id_main10ance[1], '|'))[2] AS "Edificio", mr.cl_ogg_fr AS "Classe oggetti", mr.azione AS "Tipo di intervento", mr.strumentaz AS "Strumentazione", mr.materiale AS "Materiale", mr.costo AS "Costo effettivo (€)", mr.ore AS "Ore effettive", mr.esecutori AS "Operatore", mr.doc AS "Documenti", mr.commenti AS "Note", mr.id_mn_reg AS "Codice scheda manutenzione regolare", mr.id_main10ance AS "Elementi interessati", mr.data_ins AS "Data programmazione attività" FROM ${data_schema}.scheda_manutenzione_regolare AS mr JOIN ${data_schema}.attività_prog AS ap ON mr.rid_att_prog = ap.id_att_prog WHERE mr.eseguito = TRUE AND mc.ambito LIKE ($1) ORDER BY mr.data_ins;`, [ambito]);
         return result.rows;
     }
     catch(e) {
@@ -705,7 +750,7 @@ async function leggiSchedeStoricoManReg(ambito) {
 
 async function leggiSchedeStoricoManCorr(ambito) {
     try {
-        const result = await clientM10a.query(`SELECT mc.data_ese AS "Data intervento", ap."località_estesa" AS "Località", (string_to_array(mc.id_main10ance[1], '|'))[2] AS "Edificio", mc.cl_ogg_fr AS "Classe oggetti", mc.azione AS "Tipo di intervento", mc.strumentaz AS "Strumentazione", mc.materiale AS "Materiale", mc.costo AS "Costo effettivo (€)", mc.ore AS "Ore effettive", mc.esecutori AS "Operatore", mc.doc AS "Documenti", mc.commenti AS "Note", mc.id_mn_gu AS "Codice scheda manutenzione correttiva", mc.id_main10ance AS "Elementi interessati", mc.data_ins AS "Data programmazione attività" FROM ${data_schema}.manutenzione_correttiva_o_a_guasto AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = TRUE AND mc.ambito LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
+        const result = await clientM10a.query(`SELECT mc.data_ese AS "Data intervento", ap."località_estesa" AS "Località", (string_to_array(mc.id_main10ance[1], '|'))[2] AS "Edificio", mc.cl_ogg_fr AS "Classe oggetti", mc.azione AS "Tipo di intervento", mc.strumentaz AS "Strumentazione", mc.materiale AS "Materiale", mc.costo AS "Costo effettivo (€)", mc.ore AS "Ore effettive", mc.esecutori AS "Operatore", mc.doc AS "Documenti", mc.commenti AS "Note", mc.id_mn_gu AS "Codice scheda manutenzione correttiva", mc.id_main10ance AS "Elementi interessati", mc.data_ins AS "Data programmazione attività" FROM ${data_schema}.scheda_manutenzione_correttiva AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = TRUE AND mc.ambito LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
         return result.rows;
     }
     catch(e) {
