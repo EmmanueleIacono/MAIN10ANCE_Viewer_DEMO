@@ -130,7 +130,19 @@ export async function prendiSigleLocalitàAmbito() {
 
 export async function leggiEnum(nomeEnum) {
     try {
-        const risultato = await fetch('/o/Main10ance_DB/tabellaDB/enum', {method: "GET", headers: {"content-type": "application/json", "nomeEnum": nomeEnum} });
+        const risultato = await fetch('/o/enum', {method: "GET", headers: {"content-type": "application/json", "nomeEnum": nomeEnum} });
+        const listaEnum = await risultato.json();
+        return listaEnum;
+    }
+    catch(e) {
+        console.log('Errore nella lettura delle Enumeration');
+        console.log(e);
+    }
+}
+
+export async function leggiEnumServizio(nomeEnum) {
+    try {
+        const risultato = await fetch('/o/enum-servizio', {method: "GET", headers: {"content-type": "application/json", "nomeEnum": nomeEnum} });
         const listaEnum = await risultato.json();
         return listaEnum;
     }
@@ -149,7 +161,7 @@ export async function leggiEnum(nomeEnum) {
 
 export async function compilaScheda(jsonReq) {
     try {
-        const resp = await fetch(`/o/Main10ance_DB/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        const resp = await fetch(`/o/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
         const respData = await resp.json();
         return respData;
     }
@@ -451,7 +463,7 @@ export async function creaNuovoMarkerAmbito(jsonReq) {
 export async function getAnagraficaArtifactViewer(reqJson) {
     const categoria = reqJson.categoria;
     const id = reqJson.id;
-    const datiRaw = await fetch(`/o/Main10ance_DB/anagrafica/artifact-viewer/interroga/${id}`, {method: "GET", headers: {"content-type": "application/json", categoria: JSON.stringify(categoria)} });
+    const datiRaw = await fetch(`/o/anagrafica/artifact-viewer/interroga/${id}`, {method: "GET", headers: {"content-type": "application/json", categoria: JSON.stringify(categoria)} });
     const dati = await datiRaw.json();
     return dati;
 }
@@ -459,7 +471,7 @@ export async function getAnagraficaArtifactViewer(reqJson) {
 export async function getSegnalazioneArtifactViewer(reqJson) {
     const categoria = reqJson.categoria;
     const id = reqJson.id;
-    const datiRaw = await fetch(`/o/Main10ance_DB/segnalazione/artifact-viewer/interroga/${id}`, {method: "GET", headers: {"content-type": "application/json", categoria: JSON.stringify(categoria)} });
+    const datiRaw = await fetch(`/o/segnalazione/artifact-viewer/interroga/${id}`, {method: "GET", headers: {"content-type": "application/json", categoria: JSON.stringify(categoria)} });
     const dati = await datiRaw.json();
     return dati;
 }

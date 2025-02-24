@@ -139,6 +139,28 @@ export default {
         autore_scheda: null,
         autore_ultima_mod: null,
       },
+      datiModuloAnagraficaStatua: {
+        descrizione_statua: '',
+        tecnica_esecuzione: '',
+        dimensioni: '',
+        materiale_annotazioni: '',
+        materiale_armatura: '', // enum
+        materiale_supporto: '', // enum
+        lamina_metallica: false, // bool
+        pellicola_pittorica: '',
+        strato_di_preparazione: '',
+        elementi_accessori: '', // enum
+        monili: '', // enum
+        epoca: '',
+        fonti: '',
+        autore: '',
+        accessibilità: false, // bool
+        id_anagr: null,
+        data_registrazione: null,
+        data_ultima_mod: null,
+        autore_scheda: null,
+        autore_ultima_mod: null,
+      },
       datiModuloSegnalazione: {
         meteo: '',
         temperatura: '',
@@ -153,13 +175,14 @@ export default {
       },
       datiUtility: {
         schedaPreesistente: false,
-      }
+      },
     });
     provide('stateArtifact', state.datiNavigazione);
     provide('stateGalleria', state.datiGalleria);
     provide('stateAnagrafica', state.datiAnagrafica);
     provide('stateSegnalazione', state.datiSegnalazione);
     provide('stateModuloAnagrafica', state.datiModuloAnagrafica);
+    provide('stateModuloAnagraficaStatua', state.datiModuloAnagraficaStatua);
     provide('stateModuloSegnalazione', state.datiModuloSegnalazione);
 
     const percorsoCartella = computed(() => `${state.datiNavigazione.selectLocalità}/${state.datiNavigazione.selectEdificio}/${state.datiNavigazione.selectElemento}`);
@@ -356,6 +379,26 @@ export default {
               state.datiModuloAnagrafica.documenti = state.datiAnagrafica.schedaAnagrafica['Documenti'];
               state.datiModuloAnagrafica.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
               state.datiModuloAnagrafica.data = state.datiAnagrafica.schedaAnagrafica['Data'];
+              break;
+
+            case 'statua':
+              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+              console.log('state anagrafica statua: ', state.datiAnagrafica.schedaAnagrafica);
+              state.datiModuloAnagraficaStatua.descrizione_statua = state.datiAnagrafica.schedaAnagrafica['Descrizione statua'];
+              state.datiModuloAnagraficaStatua.tecnica_esecuzione = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione'];
+              state.datiModuloAnagraficaStatua.dimensioni = state.datiAnagrafica.schedaAnagrafica['Dimensioni'];
+              state.datiModuloAnagraficaStatua.materiale_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale annotazioni'];
+              state.datiModuloAnagraficaStatua.materiale_armatura = state.datiAnagrafica.schedaAnagrafica['Materiale armatura'];
+              state.datiModuloAnagraficaStatua.materiale_supporto = state.datiAnagrafica.schedaAnagrafica['Materiale supporto'];
+              state.datiModuloAnagraficaStatua.lamina_metallica = state.datiAnagrafica.schedaAnagrafica['Lamina metallica'];
+              state.datiModuloAnagraficaStatua.pellicola_pittorica = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica'];
+              state.datiModuloAnagraficaStatua.strato_di_preparazione = state.datiAnagrafica.schedaAnagrafica['Strato di preparazione'];
+              state.datiModuloAnagraficaStatua.elementi_accessori = state.datiAnagrafica.schedaAnagrafica['Elementi accessori'];
+              state.datiModuloAnagraficaStatua.monili = state.datiAnagrafica.schedaAnagrafica['Monili'];
+              state.datiModuloAnagraficaStatua.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
+              state.datiModuloAnagraficaStatua.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
+              state.datiModuloAnagraficaStatua.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
+              state.datiModuloAnagraficaStatua.accessibilità = state.datiAnagrafica.schedaAnagrafica['Accessibilità'];
               break;
           
             default:

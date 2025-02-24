@@ -46,19 +46,29 @@ app.get('/Main10ance_DB/tabellaDB/glossario/degradi', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/enum", {method: "GET", headers: {"content-type": "application/json", nomeenum: "cl_ogg_fr"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/enum', async (req, res) => {
+// fetch("/o/enum", {method: "GET", headers: {"content-type": "application/json", nomeenum: "cl_ogg_fr"} }).then(a => a.json()).then(console.log)
+app.get('/enum', async (req, res) => {
     const reqJson = req.headers;
     const risposta = await leggiEnum(reqJson.nomeenum);
     res.setHeader('content-type', 'application/json');
     res.send(risposta);
 });
 
-app.post('/Main10ance_DB/schede/nuova', async (req, res) => {
+// per testare la richiesta:
+// fetch("/o/enum-servizio", {method: "GET", headers: {"content-type": "application/json", nomeenum: "cl_ogg_fr"} }).then(a => a.json()).then(console.log)
+app.get('/enum-servizio', async (req, res) => {
+    const reqJson = req.headers;
+    const risposta = await leggiEnumServizio(reqJson.nomeenum);
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
+app.post('/schede/nuova', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
     let result = {};
     try {
         const reqJson = req.body;
-        const listaStringheValues = gestisciStringheSchede(reqJson);
+        const listaStringheValues = gestisciStringheSchede(reqJson, ambito);
         const succ = await transazioneScheda(listaStringheValues);
         if (succ) {
             result.success = true;
@@ -222,29 +232,35 @@ app.get('/schede-storico-manutenzione-correttiva', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/o/Main10ance_DB/anagrafica/artifact-viewer/interroga/SMV|39|grata|1826323").then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/anagrafica/artifact-viewer/interroga/:id', async (req, res) => {
+// fetch("/o/anagrafica/artifact-viewer/interroga/SMV|39|grata|1826323").then(a => a.json()).then(console.log)
+app.get('/anagrafica/artifact-viewer/interroga/:id', async (req, res) => {
     const id = req.params.id;
     const categoria = JSON.parse(req.headers.categoria);
+    const ambito = req.signedCookies.ambito;
     let risposta;
     // qui verifica se LOD4, Manufatto o Dettaglio
     console.log(categoria);
     switch (categoria) {
-        // se Manufatto:
+        // se Manufatto (servizio):
         case 'manufatto':
             console.log('richiesta manufatto');
             risposta = await interrogaAnagraficaManufatto(id);
             break;
     
-        // se Dettaglio:
+        // se Dettaglio (servizio):
         case 'dettaglio':
             console.log('richiesta dettaglio');
             risposta = await interrogaAnagraficaDettaglio(id);
             break;
 
+        case 'statua':
+            console.log('richiesta statua');
+            risposta = await interrogaAnagraficaStatua(id, ambito);
+            break;
+
         // ALTRIMENTI, se LOD4:
         default:
-            risposta = await interrogaAnagraficaLOD4(id);
+            risposta = await interrogaAnagraficaLOD4(id, ambito);
             break;
     }
     console.log(risposta);
@@ -253,10 +269,11 @@ app.get('/Main10ance_DB/anagrafica/artifact-viewer/interroga/:id', async (req, r
 });
 
 // per testare la richiesta:
-// fetch("/o/Main10ance_DB/segnalazione/artifact-viewer/interroga/loc-pdiff|LPD_230301184934871|manufatto|231124123134626").then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/segnalazione/artifact-viewer/interroga/:id', async (req, res) => {
+// fetch("/o/segnalazione/artifact-viewer/interroga/loc-pdiff|LPD_230301184934871|manufatto|231124123134626").then(a => a.json()).then(console.log)
+app.get('/segnalazione/artifact-viewer/interroga/:id', async (req, res) => {
     const id = req.params.id;
     const categoria = JSON.parse(req.headers.categoria);
+    const ambito = req.signedCookies.ambito;
     let risposta;
     // qui verifica se LOD4, Manufatto o Dettaglio
     console.log(categoria);
@@ -328,6 +345,16 @@ async function leggiTabellaGlossarioDegradi() {
 async function leggiEnum(nomeEnum) {
     try {
         const result = await clientM10a.query(`SELECT unnest(enum_range(null::${data_schema}.${nomeEnum}));`); // SANIFICARE INPUT
+        return result.rows;
+    }
+    catch(e) {
+        return [];
+    }
+}
+
+async function leggiEnumServizio(nomeEnum) {
+    try {
+        const result = await clientM10a.query(`SELECT unnest(enum_range(null::${utility_schema}.${nomeEnum}));`); // SANIFICARE INPUT
         return result.rows;
     }
     catch(e) {
@@ -759,9 +786,20 @@ async function leggiSchedeStoricoManCorr(ambito) {
     }
 }
 
-async function interrogaAnagraficaLOD4(id) {
+async function interrogaAnagraficaLOD4(id, ambito) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_sistema AS "Descrizione sistema", sa.descrizione_subsistema AS "Descrizione subsistema", sa.tecnica_costruttiva AS "Tecnica costruttiva", sa.dimensioni AS "Dimensioni", sa.materiale AS "Materiale/i", sa.epoca AS "Epoca", sa.ispezionabilità AS "Ispezionabilità", sa.fonti AS "Fonti" FROM ${data_schema}.scheda_anagrafica AS sa WHERE sa.id_main10ance = '${id}';`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_sistema AS "Descrizione sistema", sa.descrizione_subsistema AS "Descrizione subsistema", sa.tecnica_costruttiva AS "Tecnica costruttiva", sa.dimensioni AS "Dimensioni", sa.materiale AS "Materiale/i", sa.epoca AS "Epoca", sa.ispezionabilità AS "Ispezionabilità", sa.fonti AS "Fonti" FROM ${data_schema}.scheda_anagrafica AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}';`);
+        return result.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function interrogaAnagraficaStatua(id, ambito) {
+    try {
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_statua AS "Descrizione statua", sa.tecnica_esecuzione AS "Tecnica di esecuzione", sa.dimensioni AS "Dimensioni", sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiale_armatura AS "Materiale armatura", sa.materiale_supporto AS "Materiale supporto", sa.lamina_metallica AS "Lamina metallica", sa.pellicola_pittorica AS "Pellicola pittorica", sa.strato_di_preparazione AS "Strato di preparazione", sa.elementi_accessori AS "Elementi accessori", sa.monili AS "Monili", sa.epoca AS "Epoca", sa.fonti AS "Fonti", sa.autore AS "Autore", sa."accessibilità" AS "Accessibilità" FROM ${data_schema}.scheda_anagrafica_statua AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}';`);
         return result.rows;
     }
     catch(e) {
@@ -772,7 +810,7 @@ async function interrogaAnagraficaLOD4(id) {
 
 async function interrogaAnagraficaManufatto(id) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.epoca AS "Epoca", sa.autore AS "Autore", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.documenti AS "Documenti", sa.iter_autorizzativo AS "Iter autorizzativo" FROM ${utility_schema}.anagrafica_manufatto AS sa WHERE sa.id_main10ance = '${id}' ORDER BY sa.id_anagr DESC;`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.epoca AS "Epoca", sa.autore AS "Autore", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.documenti AS "Documenti", sa.iter_autorizzativo AS "Iter autorizzativo" FROM ${utility_schema}.anagrafica_manufatto AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}' ORDER BY sa.id_anagr DESC;`);
         return result.rows;
     }
     catch(e) {
@@ -783,7 +821,7 @@ async function interrogaAnagraficaManufatto(id) {
 
 async function interrogaAnagraficaDettaglio(id) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.epoca AS "Epoca", sa.documenti AS "Documenti", sa.autore AS "Autore", sa.data AS "Data" FROM ${utility_schema}.anagrafica_dettaglio AS sa WHERE sa.id_main10ance = '${id}' ORDER BY sa.id_anagr DESC;`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.epoca AS "Epoca", sa.documenti AS "Documenti", sa.autore AS "Autore", sa.data AS "Data" FROM ${utility_schema}.anagrafica_dettaglio AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}' ORDER BY sa.id_anagr DESC;`);
         return result.rows;
     }
     catch(e) {
@@ -826,14 +864,15 @@ async function leggiMarkerEdifAmbito(ambito_edif) {
 
 //////////          ALTRE FUNZIONI          //////////
 
-function gestisciStringheSchede(listaOggetti) {
+function gestisciStringheSchede(listaOggetti, ambito) {
     let listaStringheEValori = [];
     listaOggetti.forEach(async jsn => {
         const schema = (jsn.tabella === 'anagrafica_manufatto' || jsn.tabella === 'anagrafica_dettaglio' || jsn.tabella === 'segnalazione') ? utility_schema : data_schema;
         let listaInterna = [];
-        const listaValori = jsn.valori;
-        const stringaColonne = jsn.colonne.join(', ');
-        const lenColonne = (jsn.colonne).length;
+        const listaValori = [...jsn.valori, ambito];
+        const colonneConAmbito = [...jsn.colonne, "ambito"];
+        const stringaColonne = colonneConAmbito.join(', ');
+        const lenColonne = colonneConAmbito.length;
         let listaValues = [];
         for (let n=1; n<=lenColonne; n++) {
             let str = `$${n}`;

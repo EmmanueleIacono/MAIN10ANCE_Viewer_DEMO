@@ -1,5 +1,6 @@
 <template>
 <div>
+  <!-- DA QUALCHE PARTE IN QUESTO COMPONENT INSERIRE SCHEDA ANAGRAFICA STATUA -->
   <div class="scheda-anagrafica">
     <div class="div-titolo-bottoni">
       <div class="float-dx div-bottoni">
