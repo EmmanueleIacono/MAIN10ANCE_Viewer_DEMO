@@ -706,7 +706,7 @@ async function registraScoreLavori(reqJson, ambito) {
         await clientM10a.query("BEGIN;");
         for (const lavoro of reqJson) {
             const queryTxt = `
-                INSERT INTO main10ance."0_temp" (
+                INSERT INTO main10ance."a_temp" (
                     "località", edificio, tetti, "umidità", statica, interni, esterni, ambito, data_ins, anno_tetti, "anno_umidità", anno_statica, anno_interni, anno_esterni, id_interno
                 ) VALUES (
                     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
