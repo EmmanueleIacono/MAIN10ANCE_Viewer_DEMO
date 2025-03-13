@@ -67,15 +67,19 @@ app.post('/schede/nuova', async (req, res) => {
     const ambito = req.signedCookies.ambito;
     let result = {};
     try {
-        const reqJson = req.body;
-        const listaStringheValues = gestisciStringheSchede(reqJson, ambito);
-        const succ = await transazioneScheda(listaStringheValues);
-        if (succ) {
-            result.success = true;
+        let reqJson;
+        const allReqFiles = req.files || {};
+        if (req.headers['content-type']?.startsWith('multipart/form-data')) {
+            reqJson = JSON.parse(req.body.dati);
+        } else {
+            reqJson = req.body;
         }
-        else {
-            result.success = false;
-        }
+        console.log("reqJson:");
+        console.log(reqJson);
+        const listaStringheValues = gestisciStringheSchede(reqJson, ambito); // una stringa per ogni SCHEDA da salvare
+        const docsArray = gestisciDocumenti(reqJson); // un array di documenti per ogni SCHEDA da salvare
+        const succ = await transazioneScheda(listaStringheValues, allReqFiles, docsArray, ambito); // qui anche file upload
+        result.success = !!succ;
     }
     catch(e) {
         result.success = false;
@@ -362,12 +366,30 @@ async function leggiEnumServizio(nomeEnum) {
     }
 }
 
-async function transazioneScheda(listaStrVals) {
+async function transazioneScheda(listaStrVals, all_files, docs_array, ambito) {
     try {
         await clientM10a.query("BEGIN;");
         try {
+            let ls_counter = 0;
             for (const sv of listaStrVals) {
                 await clientM10a.query(sv[0], sv[1]);
+
+                // FILE UPLOAD
+                if (Object.entries(all_files).length > 0) {
+                    for (let i = 0; i < docs_array[ls_counter].length; i++) {
+                        const docPath = docs_array[ls_counter][i];
+                        const fieldName = `file_${i}`;
+                        const singleFile = all_files[fieldName];
+                        if (!singleFile) continue;
+
+                        const fileOptions = {contentType: singleFile.mimetype};
+                        // gestire caso di file duplicati da scheda precedente
+                        // ...
+                        const {error} = await supabase.storage.from("documenti-schede").upload(`${ambito}/${docPath}`, singleFile.data, fileOptions);
+                        if (error) throw error;
+                    }
+                }
+                ls_counter++;
             }
         }
         catch(e) {
@@ -379,6 +401,7 @@ async function transazioneScheda(listaStrVals) {
     }
     catch (ex) {
         console.log(`Errore: ${ex}`);
+        console.log(ex);
         await clientM10a.query("ROLLBACK;");
         return false;
     }
@@ -799,7 +822,7 @@ async function interrogaAnagraficaLOD4(id, ambito) {
 
 async function interrogaAnagraficaStatua(id, ambito) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_statua AS "Descrizione statua", sa.tecnica_esecuzione AS "Tecnica di esecuzione", sa.dimensioni AS "Dimensioni", sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiale_armatura AS "Materiale armatura", sa.materiale_supporto AS "Materiale supporto", sa.lamina_metallica AS "Lamina metallica", sa.pellicola_pittorica AS "Pellicola pittorica", sa.strato_di_preparazione AS "Strato di preparazione", sa.elementi_accessori AS "Elementi accessori", sa.monili AS "Monili", sa.epoca AS "Epoca", sa.fonti AS "Fonti", sa.autore AS "Autore", sa."accessibilità" AS "Accessibilità" FROM ${data_schema}.scheda_anagrafica_statua AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}';`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.nome_statua AS "Nome statua", sa.descrizione_statua AS "Descrizione statua", sa.tecnica_esecuzione AS "Tecnica di esecuzione", sa.dimensioni AS "Dimensioni", sa.materiale_statua AS "Materiale statua", sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiale_armatura AS "Materiale armatura", sa.materiale_supporto AS "Materiale supporto", sa.lamina_metallica AS "Lamina metallica", sa.pellicola_pittorica AS "Pellicola pittorica", sa.strato_di_preparazione AS "Strato di preparazione", sa.elementi_accessori AS "Elementi accessori", sa.monili AS "Monili", sa.elementi_di_ancoraggio_a_parete AS "Elementi di ancoraggio a parete", sa.elementi_di_ancoraggio_a_pavimento AS "Elementi di ancoraggio a pavimento", sa.elementi_di_ancoraggio_annotazioni AS "Elementi di ancoraggio annotazioni", sa.epoca AS "Epoca", sa.fonti AS "Fonti", sa.autore AS "Autore", sa."accessibilità" AS "Accessibilità", sa.docs AS "Documenti" FROM ${data_schema}.scheda_anagrafica_statua AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}' ORDER BY id_anagr DESC LIMIT 1;`);
         return result.rows;
     }
     catch(e) {
@@ -885,6 +908,16 @@ function gestisciStringheSchede(listaOggetti, ambito) {
         listaStringheEValori.push(listaInterna);
     });
     return listaStringheEValori;
+}
+
+function gestisciDocumenti(listaOggetti) {
+    let listaDocumenti = [];
+    listaOggetti.forEach(ogg_jsn => {
+        const ind_docs_col = ogg_jsn.colonne.indexOf("docs");
+        const docs_arr = ogg_jsn.valori[ind_docs_col];
+        listaDocumenti.push(docs_arr);
+    });
+    return listaDocumenti;
 }
 
 module.exports = app;

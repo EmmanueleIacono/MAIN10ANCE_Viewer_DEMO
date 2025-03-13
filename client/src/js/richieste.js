@@ -159,9 +159,16 @@ export async function leggiEnumServizio(nomeEnum) {
 //     return risTradotto;
 // }
 
-export async function compilaScheda(jsonReq) {
+export async function compilaScheda(dati) {
     try {
-        const resp = await fetch(`/o/schede/nuova`, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq) });
+        const fetch_opts = {method: "POST"};
+        if (dati instanceof FormData) {
+            fetch_opts.body = dati;
+        } else {
+            fetch_opts.headers = {"content-type": "application/json"};
+            fetch_opts.body = JSON.stringify(dati);
+        }
+        const resp = await fetch(`/o/schede/nuova`, fetch_opts);
         const respData = await resp.json();
         return respData;
     }
