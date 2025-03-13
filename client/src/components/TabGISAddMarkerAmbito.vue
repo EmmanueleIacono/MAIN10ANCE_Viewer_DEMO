@@ -1,9 +1,9 @@
 <template>
-<BtnBIM @click="addMarkerAmbito" v-if="verificaDisplayAdd()" class="btn-gis" icona="glyphicon-plus" nome="addMarkerAmbito" title="Aggiungi località al tuo ambito" colore="blu" />
+<BtnBIM @click="addMarkerAmbito" v-if="verificaDisplayAdd()" class="btn-gis" icona="glyphicon-plus" nome="addMarkerAmbito" title="Aggiungi località al tuo ambito" colore="verde" />
 <!-- ^ in alternativa il BtnBIM per add si poteva fare usando icona glyphicon-map-marker -->
-<BtnBIM @click="confermaMarkerAmbito" v-if="verificaDisplayConf()" class="btn-gis" icona="glyphicon-ok" nome="confMarkerAmbito" title="Conferma" colore="blu" />
-<BtnBIM @click="salvaMarkerAmbito" v-if="verificaDisplaySalva()" class="btn-gis" icona="glyphicon-floppy-disk" nome="salvaMarkerAmbito" title="Salva" colore="blu" />
-<BtnBIM @click="annullaAddMarkerAmbito" v-if="verificaDisplayAnnulla()" class="btn-gis" icona="glyphicon-remove" nome="annullaMarkerAmbito" title="Annulla" colore="blu" />
+<BtnBIM @click="confermaMarkerAmbito" v-if="verificaDisplayConf()" class="btn-gis" icona="glyphicon-ok" nome="confMarkerAmbito" title="Conferma" colore="verde" />
+<BtnBIM @click="salvaMarkerAmbito" v-if="verificaDisplaySalva()" class="btn-gis" icona="glyphicon-floppy-disk" nome="salvaMarkerAmbito" title="Salva" colore="verde" />
+<BtnBIM @click="annullaAddMarkerAmbito" v-if="verificaDisplayAnnulla()" class="btn-gis" icona="glyphicon-remove" nome="annullaMarkerAmbito" title="Annulla" colore="verde" />
 <div v-if="verificaDisplaySalva()" id="campo-dati-marker">
   <!-- PER ORA NON FUNZIONANTE, MA SE IMPLEMENTATO QUESTO, IMPLEMENTARE ANCHE SELETTORE LOC PER QUANDO INSERISCO EDIF -->
   <label class="nome" for="select-tabella">Tipologia marker:</label>
@@ -44,7 +44,7 @@
 </template>
 <script>
 import { inject, reactive, toRefs } from 'vue';
-import {/*mappaGlb, creaLivelloGIS,*/ rimuoviMarkerTemporaneo} from '../js/GIS';
+import {rimuoviMarkerTemporaneo} from '../js/GIS';
 import {creaNuovoMarkerAmbito} from '../js/richieste';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 
@@ -59,12 +59,9 @@ export default {
     const nuovoMarker = inject('nuovoMarker');
     const coordMarker = inject('coordMarker');
     const state = reactive({
-      // nuovoMarker: null,
-      // coordMarker: null,
       datiLocalità: {
         nome: '',
         sigla: '',
-        // capire come aggiungere edifici associati da interfaccia, se necessario // 18/06/2024: FORSE NON NECESSARIO, MAI USATI
       },
       datiEdificio: {
         località: '',
@@ -164,11 +161,11 @@ export default {
         state.datiEdificio.edificio &&
         state.datiEdificio.edif_nome_menu
       );
-}
+    }
 
-function isDatiLocalitàValidi() {
-  return state.datiLocalità.nome && state.datiLocalità.sigla;
-}
+    function isDatiLocalitàValidi() {
+      return state.datiLocalità.nome && state.datiLocalità.sigla;
+    }
 
     return {
       props,
@@ -185,6 +182,7 @@ function isDatiLocalitàValidi() {
   }
 }
 </script>
+
 <style scoped>
 .btn-gis ~ .btn-gis {
   margin-left: .9rem;

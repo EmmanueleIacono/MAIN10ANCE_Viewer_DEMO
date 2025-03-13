@@ -6,10 +6,10 @@
   <Explorer :colonna="'col-sm-3'">
     <AddMarkerAmbito />
     <br />
-    <BtnBIM @click="addLocPdiff" v-if="verificaDisplayAdd()" class="btn-gis" icona="glyphicon-plus" nome="addLocPdiff" title="Aggiungi località patrimonio diffuso" colore="verde" />
-    <BtnBIM @click="confermaLocPdiff" v-if="verificaDisplayConf()" class="btn-gis" icona="glyphicon-ok" nome="confLocPdiff" title="Conferma" colore="verde" />
-    <BtnBIM @click="salvaLocPdiff" v-if="verificaDisplaySalva()" class="btn-gis" icona="glyphicon-floppy-disk" nome="salvaLocPdiff" title="Salva" colore="verde" />
-    <BtnBIM @click="annullaAddLocPdiff" v-if="verificaDisplayAnnulla()" class="btn-gis" icona="glyphicon-remove" nome="annullaLocPdiff" title="Annulla" colore="verde" />
+    <BtnBIM @click="addLocPdiff" v-if="verificaDisplayAdd()" class="btn-gis" icona="glyphicon-plus" nome="addLocPdiff" title="Aggiungi località patrimonio diffuso" colore="blu" />
+    <BtnBIM @click="confermaLocPdiff" v-if="verificaDisplayConf()" class="btn-gis" icona="glyphicon-ok" nome="confLocPdiff" title="Conferma" colore="blu" />
+    <BtnBIM @click="salvaLocPdiff" v-if="verificaDisplaySalva()" class="btn-gis" icona="glyphicon-floppy-disk" nome="salvaLocPdiff" title="Salva" colore="blu" />
+    <BtnBIM @click="annullaAddLocPdiff" v-if="verificaDisplayAnnulla()" class="btn-gis" icona="glyphicon-remove" nome="annullaLocPdiff" title="Annulla" colore="blu" />
     <br />
     <div v-if="verificaDisplaySalva()" id="campo-nome-marker">
       <label class="nome" for="select-provincia">Provincia:</label>
