@@ -1,6 +1,5 @@
 <template>
 <div>
-  <!-- DA QUALCHE PARTE IN QUESTO COMPONENT INSERIRE SCHEDA ANAGRAFICA STATUA -->
   <div class="scheda-anagrafica">
     <div class="div-titolo-bottoni">
       <div class="float-dx div-bottoni">
@@ -12,8 +11,11 @@
     <div v-if="stateAnagrafica.schedaAnagrafica">
       <div v-for="(valore, chiave) in stateAnagrafica.schedaAnagrafica" :key="chiave" class="contenitore-colonne">
         <p class="colonna"><b>{{chiave}}:</b></p>
-        <p v-if="valore || valore === 'null'" class="brk-w user-field colonna">{{valore}}</p>
-        <p v-else class="user-field colonna"><i>Nessun valore</i></p>
+        <p v-if="!valore || valore === 'null'" class="user-field colonna"><i>Nessun valore</i></p>
+        <div v-else-if="chiave === 'Documenti'" class="brk-w user-field colonna">
+          <p v-for="doc in valore" :key="doc" class="download" @click="scarica_doc(doc)">{{ doc }}</p>
+        </div>
+        <p v-else class="brk-w user-field colonna">{{valore}}</p>
       </div>
     </div>
     <div v-else>
@@ -26,6 +28,7 @@
 <script>
 import { inject } from 'vue';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
+import { downloadDocumentiSchede } from '../js/richieste';
 
 export default {
   name: 'TabCollectionModuloAnagrafica',
@@ -35,6 +38,30 @@ export default {
   setup() {
     const store = inject('store');
     const stateAnagrafica = inject('stateAnagrafica');
+    console.log('stateAnagrafica: ', stateAnagrafica);
+    console.log('schedaAnagrafica: ', stateAnagrafica.schedaAnagrafica);
+    console.log('Documenti: ', stateAnagrafica.schedaAnagrafica['Documenti']);
+
+    async function scarica_doc(nome_documento) {
+      try {
+        const doc_blob = await downloadDocumentiSchede(nome_documento);
+        console.log(doc_blob);
+        const blobUrl = URL.createObjectURL(doc_blob);
+
+        const link = document.createElement('a'); // creazione di un <a> nascosto dove inserire l'URL del documento
+        link.href = blobUrl;
+        const nome_doc_pulito = nome_documento.split('/').pop();
+        link.download = nome_doc_pulito; // impostazione del nome del documento
+        document.body.appendChild(link); // simulo un click per avviare il download
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        console.error('Errore nello scaricamento del documento:', err);
+        store.methods.setAlert('Errore nello scaricamento del documento');
+      }
+    }
 
     function chiudiScheda() {
       stateAnagrafica.schedaAnagraficaVisibile = false;
@@ -44,6 +71,7 @@ export default {
     return {
       store,
       stateAnagrafica,
+      scarica_doc,
       chiudiScheda,
     }
   }
@@ -80,5 +108,12 @@ export default {
 }
 .colonna {
   flex: 50%;
+}
+.download {
+  color: var(--bluInterreg);
+}
+.download:hover {
+  cursor: pointer;
+  font-weight: bold;
 }
 </style>

@@ -31,7 +31,13 @@
     <div class="explorer-body">
       <div class="col-lg-12 loading-wrapper">
         <LoadingScreen :caricamento="datiNavigazione.caricamento" />
-        <UploadImage @annullaCaricamentoImmagine="cancellaAnteprima" @salvaCaricamentoImmagine="salvaImmagine" v-if="datiCaricamento.anteprimaImg" :source="datiCaricamento.anteprimaImg" :percorso="percorsoCartella" :id_main10ance="id_main10ance" />
+        <UploadImage
+          @annullaCaricamentoImmagine="cancellaAnteprima"
+          @salvaCaricamentoImmagine="salvaImmagine"
+          v-if="datiCaricamento.anteprimaImg"
+          :source="datiCaricamento.anteprimaImg"
+          :percorso="percorsoCartella"
+        />
         <ModuloAnagrafica ref="anagraficaRef" v-if="datiAnagrafica.moduloAnagraficaVisibile" />
         <ModuloSegnalazione ref="segnalazioneRef" v-if="datiSegnalazione.moduloSegnalazioneVisibile" />
         <SchedaAnagrafica ref="scAnagraficaRef" v-if="datiAnagrafica.schedaAnagraficaVisibile" />
@@ -274,7 +280,6 @@ export default {
         const datiCompleti = {
           ...dati,
           id_immagine: state.datiCaricamento.idImmagine,
-          id_main10ance: id_main10ance.value,
           percorso: percorsoCartella.value,
           entità: state.datiNavigazione.selectElemento,
           data_ins: dataCorta(),

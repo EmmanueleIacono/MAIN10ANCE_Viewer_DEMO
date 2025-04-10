@@ -303,6 +303,27 @@ app.get('/MarkerEdif', async (req, res) => {
     res.send(JSON.stringify(markerEdifici));
 });
 
+app.get('/storage/docs-download', async (req, res) => {
+    try {
+        const ambito = req.signedCookies.ambito;
+        const reqJson = req.headers;
+        const percorsoFile = JSON.parse(reqJson.percorso);
+        const documento = await downloadDocumento(percorsoFile, ambito);
+        if (!documento.length) throw new Error('Nessun file presente');
+        const type = documento[0].type;
+        if (type) {
+            res.type(type);
+            const buffer = await documento[0].arrayBuffer();
+            res.send(Buffer.from(buffer));
+        }
+    }
+    catch(e) {
+        // console.log(e);
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify({errMsg: 'Nessun file presente'}));
+    }
+});
+
 //////////          QUERY          //////////
 
 async function leggiColonneTabella(nomeTab) {
@@ -878,6 +899,23 @@ async function leggiMarkerEdifAmbito(ambito_edif) {
     try {
         const results = await clientM10a.query(`SELECT * FROM ${data_schema}."dati_edifici" WHERE "ambito" LIKE ($1) ORDER BY CAST("numero" AS INTEGER);`, [ambito_edif]);
         return results.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function downloadDocumento(percorsoFile, ambito) {
+    const bucket = 'documenti-schede';
+    try {
+        const {data, error} = await supabase.storage.from(bucket).download(`${ambito}/${percorsoFile}`);
+
+        if (error) throw error;
+
+        if (!data.size) return [];
+
+        return [data];
     }
     catch(e) {
         console.log(e);

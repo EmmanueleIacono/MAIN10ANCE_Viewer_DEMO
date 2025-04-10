@@ -324,6 +324,17 @@ export async function getInfoImmagine(percorsoFile, tabella) {
     return resJson;
 }
 
+export async function downloadDocumentiSchede(percorsoFile) {
+    const res = await fetch('/o/storage/docs-download', {method: "GET", headers: {"percorso": JSON.stringify(percorsoFile)}});
+    const resType = res.headers.get('content-type');
+    if (resType && resType.indexOf("application/json") !== -1) {
+        const resJson = await res.json();
+        return resJson;
+    }
+    const resBlob = await res.blob();
+    return resBlob;
+}
+
 export async function creaRecordLOD4(datiBody) {
     const res = await fetch('/g/Main10ance_DB/LOD4/nuovo', {method: "POST", body: datiBody});
     const resJson = await res.json();

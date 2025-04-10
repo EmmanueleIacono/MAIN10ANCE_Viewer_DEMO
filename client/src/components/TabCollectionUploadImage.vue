@@ -19,6 +19,10 @@
       <input v-model="nome" id="nome" class="colonna2">
     </div>
     <div class="contenitore">
+      <label for="codice" class="colonna1">Codice</label>
+      <input v-model="codice" id="codice" class="colonna2">
+    </div>
+    <div class="contenitore">
       <label for="artista" class="colonna1">Artista/Autore</label>
       <input v-model="artista" id="artista" class="colonna2">
     </div>
@@ -43,7 +47,7 @@
 </template>
 
 <script>
-import {reactive, toRefs} from 'vue';
+import {inject, reactive, toRefs, computed} from 'vue';
 import {verificaPercorso} from '../js/shared';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 
@@ -55,10 +59,10 @@ export default {
   props: {
     source: String,
     percorso: String,
-    id_main10ance: String,
   },
   setup(props, {emit}) {
     const state = reactive({
+      codice: '',
       nome: '',
       artista: '',
       datazione: '',
@@ -66,16 +70,23 @@ export default {
       commenti: '',
     });
 
+    const stateArtifact = inject('stateArtifact');
+
+    const codice_pulito = computed(() => state.codice.trim().replaceAll(/(\s|\|)/g, '_'));
+    const id_main10ance = computed(() => `${stateArtifact.selectLocalità}|${stateArtifact.selectEdificio}|${stateArtifact.selectElemento}|${codice_pulito.value}`);
+
     function annulla() {
       emit('annullaCaricamentoImmagine');
     }
 
     function salva() {
-      emit('salvaCaricamentoImmagine', state);
+      const dati_completi = {...state, id_main10ance: id_main10ance.value};
+      emit('salvaCaricamentoImmagine', dati_completi);
     }
 
     return {
       ...toRefs(state),
+      id_main10ance,
       verificaPercorso,
       annulla,
       salva,
