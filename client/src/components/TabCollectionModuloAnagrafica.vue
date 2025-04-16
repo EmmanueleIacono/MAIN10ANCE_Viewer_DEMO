@@ -2,196 +2,307 @@
 <div>
   <div class="scheda-anagrafica">
     <LoadingScreen :caricamento="loadingDati" />
+
+    <!-- Titolo / Bottoni -->
     <div class="div-titolo-bottoni">
       <div class="float-dx div-bottoni">
-        <BtnBIM @click="salvaScheda" icona="glyphicon-floppy-disk" nome="salvaScAnagLOD4" title="Salva" colore="blu" />
-        <BtnBIM @click="resetState" icona="glyphicon-erase" nome="annullaDBLOD4" title="Cancella tutti i campi" colore="blu" />
-        <BtnBIM @click="chiudiScheda" icona="glyphicon-remove" nome="chiudiScAnagLOD4" title="Annulla" colore="blu" />
+        <BtnBIM @click="salvaScheda" icona="glyphicon-floppy-disk" nome="salvaScAnagLOD4" title="Salva" colore="blu"/>
+        <BtnBIM @click="resetState" icona="glyphicon-erase" nome="annullaDBLOD4" title="Cancella tutti i campi" colore="blu"/>
+        <BtnBIM @click="chiudiScheda" icona="glyphicon-remove" nome="chiudiScAnagLOD4" title="Annulla" colore="blu"/>
       </div>
       <h4 v-if="qualeScheda === 'manufatto'"><b>SCHEDA ANAGRAFICA MANUFATTO</b></h4>
       <h4 v-else-if="qualeScheda === 'dettaglio'"><b>SCHEDA ANAGRAFICA DETTAGLIO</b></h4>
       <h4 v-else-if="qualeScheda === 'statua'"><b>SCHEDA ANAGRAFICA STATUA</b></h4>
       <h4 v-else><b>SCHEDA ANAGRAFICA</b></h4>
     </div>
-    <br />
-    <label><b>OPERATORE</b></label>
-    <p class="user-field float-dx">{{store.state.userSettings.user_id}}</p>
-    <br />
+
+    <!-- Info Operatore -->
+    <table class="form-table">
+      <tr>
+        <th><label>Operatore</label></th>
+        <td><p class="user-field">{{ store.state.userSettings.user_id }}</p></td>
+      </tr>
+    </table>
+
+    <!-- Campi Manufatto -->
     <div v-if="qualeScheda === 'manufatto'">
-      <label><b>DEFINIZIONE</b></label>
-      <input v-model="definizione" :disabled="schedaRegistrata">
-      <br />
-      <label><b>EPOCA</b></label>
-      <input v-model="epoca" :disabled="schedaRegistrata">
-      <br />
-      <label><b>AUTORE</b></label>
-      <input v-model="autore" :disabled="schedaRegistrata">
-      <br />
-      <label><b>DESCRIZIONE</b></label>
-      <input v-model="descrizione" :disabled="schedaRegistrata">
-      <br />
-      <label><b>MATERIALE/I</b></label>
-      <input v-model="materiale" :disabled="schedaRegistrata">
-      <br />
-      <label><b>TECNICHE</b></label>
-      <input v-model="tecniche" :disabled="schedaRegistrata">
-      <br />
-      <label><b>DOCUMENTI</b></label>
-      <input v-model="documenti" :disabled="schedaRegistrata">
-      <br />
-      <label><b>ITER AUTORIZZATIVO</b></label>
-      <input v-model="iter_autorizzativo" :disabled="schedaRegistrata">
-      <br />
+      <table class="form-table">
+        <tr>
+          <th><label>DEFINIZIONE</label></th>
+          <td><input v-model="definizione" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label>EPOCA</label></th>
+          <td><input v-model="epoca" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>AUTORE</b></label></th>
+          <td><input v-model="autore" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>DESCRIZIONE</b></label></th>
+          <td><input v-model="descrizione" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>MATERIALE/I</b></label></th>
+          <td><input v-model="materiale" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>TECNICHE</b></label></th>
+          <td><input v-model="tecniche" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>DOCUMENTI</b></label></th>
+          <td><input v-model="documenti" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>ITER AUTORIZZATIVO</b></label></th>
+          <td><input v-model="iter_autorizzativo" :disabled="schedaRegistrata"></td>
+        </tr>
+      </table>
     </div>
+
+    <!-- Campi Dettaglio -->
     <div v-else-if="qualeScheda === 'dettaglio'">
-      <label><b>DEFINIZIONE</b></label>
-      <input v-model="definizione" :disabled="schedaRegistrata">
-      <br />
-      <label><b>DESCRIZIONE</b></label>
-      <input v-model="descrizione" :disabled="schedaRegistrata">
-      <br />
-      <label><b>MATERIALE/I</b></label>
-      <input v-model="materiale" :disabled="schedaRegistrata">
-      <br />
-      <label><b>TECNICHE</b></label>
-      <input v-model="tecniche" :disabled="schedaRegistrata">
-      <br />
-      <label><b>EPOCA</b></label>
-      <input v-model="epoca" :disabled="schedaRegistrata">
-      <br />
-      <label><b>DOCUMENTI</b></label>
-      <input v-model="documenti" :disabled="schedaRegistrata">
-      <br />
-      <label><b>AUTORE</b></label>
-      <input v-model="autore" :disabled="schedaRegistrata">
-      <br />
-      <label><b>DATA</b></label>
-      <input v-model="data" :disabled="schedaRegistrata">
-      <br />
+      <table class="form-table">
+        <tr>
+          <th><label><b>DEFINIZIONE</b></label></th>
+          <td><input v-model="definizione" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>DESCRIZIONE</b></label></th>
+          <td><input v-model="descrizione" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>MATERIALE/I</b></label></th>
+          <td><input v-model="materiale" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>TECNICHE</b></label></th>
+          <td><input v-model="tecniche" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>EPOCA</b></label></th>
+          <td><input v-model="epoca" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>DOCUMENTI</b></label></th>
+          <td><input v-model="documenti" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>AUTORE</b></label></th>
+          <td><input v-model="autore" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>DATA</b></label></th>
+          <td><input v-model="data" :disabled="schedaRegistrata"></td>
+        </tr>
+      </table>
     </div>
+
+    <!-- Campi Statua -->
     <div v-else-if="qualeScheda === 'statua'">
-      <label><b>NOME STATUA</b></label>
-      <input v-model="stateModuloAnagraficaStatua.nome_statua" :disabled="schedaRegistrata">
-      <br />
-      <label><b>DESCRIZIONE STATUA</b></label>
-      <textarea v-model="stateModuloAnagraficaStatua.descrizione_statua" :disabled="schedaRegistrata" style="height: 20px;"></textarea>
-      <br />
-      <label><b>DIMENSIONI</b></label>
-      <input v-model="stateModuloAnagraficaStatua.dimensioni" :disabled="schedaRegistrata">
-      <br />
-      <label><b>ELEMENTI DI ANCORAGGIO A PARETE</b></label>
-      <input type="checkbox" v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete" :disabled="schedaRegistrata">
-      <br />
-      <label><b>ELEMENTI DI ANCORAGGIO A PAVIMENTO</b></label>
-      <input type="checkbox" v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento" :disabled="schedaRegistrata">
-      <br />
-      <label><b>ELEMENTI DI ANCORAGGIO ANNOTAZIONI</b></label>
-      <textarea v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_annotazioni" :disabled="schedaRegistrata" style="height: 20px;"></textarea>
-      <br />
-      <label><b>TECNICA DI ESECUZIONE</b></label>
-      <input v-model="stateModuloAnagraficaStatua.tecnica_esecuzione" :disabled="schedaRegistrata">
-      <br />
-      <label><b>MATERIALE STATUA</b></label>
-      <select v-model="stateModuloAnagraficaStatua.materiale_statua" :disabled="schedaRegistrata" class="float-dx">
-        <option value=""></option>
-        <option v-for="mat in datiEnum.materiale_statua" :key="mat" :value="mat">{{ mat }}</option>
-      </select>
-      <br />
-      <label><b>MATERIALE ANNOTAZIONI</b></label>
-      <input v-model="stateModuloAnagraficaStatua.materiale_annotazioni" :disabled="schedaRegistrata">
-      <br />
-      <label><b>MATERIALE ARMATURA</b></label>
-      <select v-model="stateModuloAnagraficaStatua.materiale_armatura" :disabled="schedaRegistrata" class="float-dx">
-        <option value=""></option>
-        <option v-for="mat in datiEnum.materiale_armatura" :key="mat" :value="mat">{{ mat }}</option>
-      </select>
-      <br />
-      <label><b>MATERIALE SUPPORTO</b></label>
-      <select v-model="stateModuloAnagraficaStatua.materiale_supporto" :disabled="schedaRegistrata" class="float-dx">
-        <option value=""></option>
-        <option v-for="mat in datiEnum.materiale_supporto" :key="mat" :value="mat">{{ mat }}</option>
-      </select>
-      <br />
-      <label><b>LAMINA METALLICA</b></label>
-      <input type="checkbox" v-model="stateModuloAnagraficaStatua.lamina_metallica" :disabled="schedaRegistrata">
-      <br />
-      <label><b>PELLICOLA PITTORICA</b></label>
-      <input v-model="stateModuloAnagraficaStatua.pellicola_pittorica" :disabled="schedaRegistrata">
-      <br />
-      <label><b>STRATO DI PREPARAZIONE</b></label>
-      <input v-model="stateModuloAnagraficaStatua.strato_di_preparazione" :disabled="schedaRegistrata">
-      <br />
-      <label><b>ELEMENTI ACCESSORI</b></label>
-      <select v-model="stateModuloAnagraficaStatua.elementi_accessori" :disabled="schedaRegistrata" class="float-dx">
-        <option value=""></option>
-        <option v-for="mat in datiEnum.elementi_accessori" :key="mat" :value="mat">{{ mat }}</option>
-      </select>
-      <br />
-      <label><b>MONILI</b></label>
-      <select v-model="stateModuloAnagraficaStatua.monili" :disabled="schedaRegistrata" class="float-dx">
-        <option value=""></option>
-        <option v-for="mat in datiEnum.monili" :key="mat" :value="mat">{{ mat }}</option>
-      </select>
-      <br />
-      <label><b>EPOCA</b></label>
-      <input v-model="stateModuloAnagraficaStatua.epoca" :disabled="schedaRegistrata">
-      <br />
-      <label><b>FONTI</b></label>
-      <input v-model="stateModuloAnagraficaStatua.fonti" :disabled="schedaRegistrata">
-      <br />
-      <label><b>AUTORE</b></label>
-      <input v-model="stateModuloAnagraficaStatua.autore" :disabled="schedaRegistrata">
-      <br />
-      <label><b>ACCESSIBILITÀ</b></label>
-      <input type="checkbox" v-model="stateModuloAnagraficaStatua.accessibilità" :disabled="schedaRegistrata">
-      <br />
-      <label><b>NOTE</b></label>
-      <input v-model="stateModuloAnagraficaStatua.note" :disabled="schedaRegistrata">
-      <br />
+      <table class="form-table">
+        <tr>
+          <th><label><b>Nome statua</b></label></th>
+          <!-- <td><input v-model="stateModuloAnagraficaStatua.nome_statua" :disabled="schedaRegistrata"></td> -->
+          <td><p class="user-field">qui nome statua</p></td>
+        </tr>
+        <tr>
+          <th><label><b>Codice statua</b></label></th>
+          <!-- <td><input v-model="stateModuloAnagraficaStatua.nome_statua" :disabled="schedaRegistrata"></td> -->
+          <td><p class="user-field">qui codice statua</p></td>
+        </tr>
+        <tr>
+          <th><label><b>Dimensioni</b></label></th>
+          <td><input v-model="stateModuloAnagraficaStatua.dimensioni" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>Descrizione statua</b></label></th>
+          <td><textarea v-model="stateModuloAnagraficaStatua.descrizione_statua" :disabled="schedaRegistrata" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr class="section-title-row">
+          <td colspan="2"><b>ANCORAGGI</b></td>
+        </tr>
+        <tr>
+          <th><label><b>A parete</b></label></th>
+          <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>A pavimento</b></label></th>
+          <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>Annotazioni</b></label></th>
+          <td><textarea v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_annotazioni" :disabled="schedaRegistrata" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label><b>Tecnica di esecuzione</b></label></th>
+          <td><input v-model="stateModuloAnagraficaStatua.tecnica_esecuzione" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr class="section-title-row">
+          <td colspan="2"><b>MATERIALI</b></td>
+        </tr>
+        <tr>
+          <th><label><b>Statua</b></label></th>
+          <td><select v-model="stateModuloAnagraficaStatua.materiale_statua" :disabled="schedaRegistrata" class="float-dx">
+            <option value=""></option>
+            <option v-for="mat in datiEnum.materiale_statua" :key="mat" :value="mat">{{ mat }}</option>
+          </select></td>
+        </tr>
+        <tr>
+          <th><label><b>Annotazioni</b></label></th>
+          <td><input v-model="stateModuloAnagraficaStatua.materiale_annotazioni" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>Armatura</b></label></th>
+          <td><select v-model="stateModuloAnagraficaStatua.materiale_armatura" :disabled="schedaRegistrata" class="float-dx">
+            <option value=""></option>
+            <option v-for="mat in datiEnum.materiale_armatura" :key="mat" :value="mat">{{ mat }}</option>
+          </select></td>
+        </tr>
+        <tr>
+          <th><label><b>Supporto</b></label></th>
+          <td><select v-model="stateModuloAnagraficaStatua.materiale_supporto" :disabled="schedaRegistrata" class="float-dx">
+            <option value=""></option>
+            <option v-for="mat in datiEnum.materiale_supporto" :key="mat" :value="mat">{{ mat }}</option>
+          </select></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label><b>Strato di preparazione</b></label></th>
+          <td><input v-model="stateModuloAnagraficaStatua.strato_di_preparazione" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>Pellicola pittorica</b></label></th>
+          <td><input v-model="stateModuloAnagraficaStatua.pellicola_pittorica" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>Lamina metallica</b></label></th>
+          <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.lamina_metallica" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>Elementi accessori</b></label></th>
+          <td><select v-model="stateModuloAnagraficaStatua.elementi_accessori" :disabled="schedaRegistrata" class="float-dx">
+            <option value=""></option>
+            <option v-for="mat in datiEnum.elementi_accessori" :key="mat" :value="mat">{{ mat }}</option>
+          </select></td>
+        </tr>
+        <tr>
+          <th><label><b>Monili</b></label></th>
+          <td><select v-model="stateModuloAnagraficaStatua.monili" :disabled="schedaRegistrata" class="float-dx">
+            <option value=""></option>
+            <option v-for="mat in datiEnum.monili" :key="mat" :value="mat">{{ mat }}</option>
+          </select></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr class="section-title-row">
+          <td colspan="2"><b>DOCUMENTAZIONE GENERALE</b></td>
+        </tr>
+        <tr>
+          <th><label><b>Epoca</b></label></th>
+          <td><input v-model="stateModuloAnagraficaStatua.epoca" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>Fonti</b></label></th>
+          <td><input v-model="stateModuloAnagraficaStatua.fonti" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>Autore</b></label></th>
+          <td><input v-model="stateModuloAnagraficaStatua.autore" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label><b>Accessibilità</b></label></th>
+          <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.accessibilità" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label><b>Note</b></label></th>
+          <td><input v-model="stateModuloAnagraficaStatua.note" :disabled="schedaRegistrata"></td>
+        </tr>
+      </table>
     </div>
+
+    <!-- Campi Default -->
     <div v-else>
-      <label><b>DESCRIZIONE SISTEMA</b></label>
-      <textarea v-model="descrizione_sistema" :disabled="schedaRegistrata" style="height: 20px;"></textarea>
-      <br />
-      <label><b>DESCRIZIONE SUBSISTEMA</b></label>
-      <textarea v-model="descrizione_subsistema" :disabled="schedaRegistrata" style="height: 20px;"></textarea>
-      <br />
-      <label><b>TECNICA COSTRUTTIVA</b></label>
-      <input v-model="tecnica_costruttiva" :disabled="schedaRegistrata">
-      <br />
-      <label><b>DIMENSIONI</b></label>
-      <input v-model="dimensioni" :disabled="schedaRegistrata">
-      <br />
-      <label><b>MATERIALE/I</b></label>
-      <input v-model="materiale" :disabled="schedaRegistrata">
-      <br />
-      <label><b>EPOCA</b></label>
-      <input v-model="epoca" :disabled="schedaRegistrata">
-      <br />
-      <label><b>ISPEZIONABILITÀ</b></label>
-      <input v-model="ispezionabilità" :disabled="schedaRegistrata">
-      <br />
-      <label><b>FONTI</b></label>
-      <input v-model="fonti" :disabled="schedaRegistrata">
-      <br />
+      <table class="form-table">
+        <tr>
+          <th><label><b>DESCRIZIONE SISTEMA</b></label></th>
+          <td><textarea v-model="descrizione_sistema" :disabled="schedaRegistrata" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th><label><b>DESCRIZIONE SUBSISTEMA</b></label></th>
+          <td><textarea v-model="descrizione_subsistema" :disabled="schedaRegistrata" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th><label><b>TECNICA COSTRUTTIVA</b></label></th>
+          <td><input v-model="tecnica_costruttiva" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>DIMENSIONI</b></label></th>
+          <td><input v-model="dimensioni" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>MATERIALE/I</b></label></th>
+          <td><input v-model="materiale" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>EPOCA</b></label></th>
+          <td><input v-model="epoca" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>ISPEZIONABILITÀ</b></label></th>
+          <td><input v-model="ispezionabilità" :disabled="schedaRegistrata"></td>
+        </tr>
+        <tr>
+          <th><label><b>FONTI</b></label></th>
+          <td><input v-model="fonti" :disabled="schedaRegistrata"></td>
+        </tr>
+      </table>
     </div>
+
     <!-- DOCUMENTI -->
     <!-- (capire switch tra file input e risultato query scheda esistente) -->
     <div class="div-docs">
-      <label><b>DOCUMENTI</b></label>
-      <div v-if="stateDocumenti.docs?.length > 0">
-        <p><b>Documenti esistenti:</b></p>
-        <p v-for="doc in stateDocumenti.docs" :key="doc">{{ doc.split("/").pop() }}</p>
-      </div>
-      <div class="div-doc-vfor" v-for="(file_item, index) in files" :key="index">
-        <label class="label-doc"><b>Documento {{ index+1 }}</b></label>
-        <input :ref="el => fileInputs[index] = el" type="file" accept="*/*" @change="gestisciFileUpload($event, index)" style="display: none;">
-        <button v-if="files.length > 1" class="x" type="button" @click="rimuoviFile(index)">x</button>
-        <button class="scegli-file-btn" @click="scegliFile(index)">Scegli file</button>
-        <span v-if="file_item.name">{{ file_item.name }}</span>
-      </div>
-      <button type="button" class="x" @click="aggiungiFile">+</button>
+      <table class="form-table">
+        <tr>
+          <th><label><b>Documenti</b></label></th>
+          <td>
+            <div v-if="stateDocumenti.docs?.length > 0">
+              <p><b>Documenti esistenti:</b></p>
+              <p v-for="doc in stateDocumenti.docs" :key="doc">{{ doc.split("/").pop() }}</p>
+            </div>
+            <div class="div-doc-vfor" v-for="(file_item, index) in files" :key="index">
+              <label class="label-doc"><b>Documento {{ index+1 }}</b></label>
+              <input :ref="el => fileInputs[index] = el" type="file" accept="*/*" @change="gestisciFileUpload($event, index)" style="display: none;">
+              <button v-if="files.length > 1" class="x" type="button" @click="rimuoviFile(index)">x</button>
+              <button class="scegli-file-btn" @click="scegliFile(index)">Scegli file</button>
+              <span v-if="file_item.name">{{ file_item.name }}</span>
+            </div>
+            <button type="button" class="x" @click="aggiungiFile">+</button>
+          </td>
+        </tr>
+      </table>
     </div>
+
   </div>
 </div>
 </template>
@@ -553,6 +664,11 @@ input, textarea {
   padding: 1px;
   border: 0;
 }
+
+textarea {
+  height: 100%; /* non funziona, ma trovare il modo */
+}
+
 .scheda-anagrafica {
   background-color: var(--bluInterregTrasparenza);
   font-size: 13px;
@@ -566,6 +682,40 @@ input, textarea {
   padding: 0px;
   text-align: right;
 }
+
+.form-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px; /* aggiunge spazio fra righe, se voluto */
+}
+
+.form-table .section-title-row td {
+  padding: 5px 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.form-table .divider-row hr {
+  border: none;
+  border-top: 1px solid #808080;
+  padding: 5px 0;
+  width: 60%;
+  margin: 0 auto;
+}
+
+.form-table th {
+  text-align: left;
+  width: 50%;
+  vertical-align: top;
+  padding-right: 10px;
+  background-color: unset;
+}
+
+.form-table td {
+  width: 50%;
+  vertical-align: top;
+}
+
 .div-titolo-bottoni {
   position: relative;
 }
