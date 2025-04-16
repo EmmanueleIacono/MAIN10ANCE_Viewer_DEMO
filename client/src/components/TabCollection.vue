@@ -167,6 +167,7 @@ export default {
         fonti: '',
         autore: '',
         accessibilità: false, // bool
+        note: '',
         docs: [], // lista nomi documenti
         id_anagr: null,
         data_registrazione: null,
@@ -420,6 +421,7 @@ export default {
               state.datiModuloAnagraficaStatua.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
               state.datiModuloAnagraficaStatua.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
               state.datiModuloAnagraficaStatua.accessibilità = state.datiAnagrafica.schedaAnagrafica['Accessibilità'];
+              state.datiModuloAnagraficaStatua.note = state.datiAnagrafica.schedaAnagrafica['Note'];
               state.datiDocumenti.docs = state.datiAnagrafica.schedaAnagrafica['Documenti'];
               break;
           

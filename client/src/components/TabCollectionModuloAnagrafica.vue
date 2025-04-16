@@ -145,6 +145,9 @@
       <label><b>ACCESSIBILITÀ</b></label>
       <input type="checkbox" v-model="stateModuloAnagraficaStatua.accessibilità" :disabled="schedaRegistrata">
       <br />
+      <label><b>NOTE</b></label>
+      <input v-model="stateModuloAnagraficaStatua.note" :disabled="schedaRegistrata">
+      <br />
     </div>
     <div v-else>
       <label><b>DESCRIZIONE SISTEMA</b></label>
@@ -255,7 +258,7 @@ export default {
         || stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento || stateModuloAnagraficaStatua.elementi_di_ancoraggio_annotazioni
         || stateModuloAnagraficaStatua.epoca || stateModuloAnagraficaStatua.fonti
         || stateModuloAnagraficaStatua.definizione || stateModuloAnagraficaStatua.autore
-        || stateModuloAnagraficaStatua.accessibilità
+        || stateModuloAnagraficaStatua.accessibilità || stateModuloAnagraficaStatua.note
       );
     });
 
@@ -380,6 +383,7 @@ export default {
           stateModuloAnagraficaStatua.fonti = '';
           stateModuloAnagraficaStatua.autore = '';
           stateModuloAnagraficaStatua.accessibilità = false; // bool
+          stateModuloAnagraficaStatua.note = '';
           stateModuloAnagraficaStatua.id_anagr = null;
           stateModuloAnagraficaStatua.data_registrazione = null;
           stateModuloAnagraficaStatua.data_ultima_mod = null;
