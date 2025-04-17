@@ -158,34 +158,54 @@ async function leggiListaTabelleLOD(LOD) {
 }
 
 async function leggiListaImmagini(percorso) {
-    const bucket = percorso.startsWith('loc-pdiff') ? 'generale' : 'sacri-monti';
+    const is_pdiff = percorso.startsWith('loc-pdiff');
+    const bucket = is_pdiff ? 'generale' : 'elementi';
     try {
-        const {data, error} = await supabase.storage.from(bucket).list(percorso);
+        // PATRIMONIO DIFFUSO
+        if (is_pdiff) {
+            const {data, error} = await supabase.storage.from(bucket).list(percorso);
+            if (error) throw error;
+            return data.map(file => `${percorso}/${file.name}`);
+        }
 
+        // AMBITI
+        const sigla = percorso.split('/')[0];
+        const ambito_sigla = await getAmbitoPerLoc(sigla);
+        if (!ambito_sigla.length) return [];
+
+        const full_path = `${ambito_sigla[0]["ambito"]}/${percorso}`; // [0] perché c'è sempre corrispondenza univoca tra località e ambito
+        const {data, error} = await supabase.storage.from(bucket).list(full_path);
         if (error) throw error;
-
-        const fileNames = data.map(data => data.name);
-        const filePaths = fileNames.map(name => `${percorso}/${name}`);
-        return filePaths;
-    }
-    catch(e) {
+        return data.map(file => `${percorso}/${file.name}`);
+    } catch(e) {
         console.log(e);
         return [];
     }
 }
 
 async function downloadImmagini(percorsoFile) {
-    const bucket = percorsoFile.startsWith('loc-pdiff') ? 'generale' : 'sacri-monti';
+    const is_pdiff = percorsoFile.startsWith('loc-pdiff');
+    const bucket = is_pdiff ? 'generale' : 'elementi';
     try {
-        const {data, error} = await supabase.storage.from(bucket).download(percorsoFile);
+        // PATRIMONIO DIFFUSO
+        if (is_pdiff) {
+            const {data, error} = await supabase.storage.from(bucket).download(percorsoFile);
+            if (error) throw error;
+            if (!data.size) return [];
+            return [data];
+        }
 
+        // AMBITI
+        const sigla = percorsoFile.split('/')[0];
+        const ambito_sigla = await getAmbitoPerLoc(sigla);
+        if (!ambito_sigla.length) return [];
+
+        const full_path = `${ambito_sigla[0]["ambito"]}/${percorsoFile}`; // [0] perché c'è sempre corrispondenza univoca tra località e ambito
+        const {data, error} = await supabase.storage.from(bucket).download(full_path);
         if (error) throw error;
-
         if (!data.size) return [];
-
         return [data];
-    }
-    catch(e) {
+    } catch(e) {
         console.log(e);
         return [];
     }
@@ -199,6 +219,18 @@ async function getInfoImmagine(percorsoFile, tabella) {
     }
     catch(e) {
         console.log(e);
+        return [];
+    }
+}
+
+////////////////////////// FUNZIONI DI UTILITY //////////////////////////
+
+async function getAmbitoPerLoc(sigla_loc) {
+    try {
+        const results = await clientM10a.query(`SELECT sigla, ambito FROM ${data_schema}."dati_località" WHERE sigla = $1;`, [sigla_loc]);
+        return results.rows;
+    } catch(e) {
+        console.log('Errore nella lettura delle sigle località:\n', e);
         return [];
     }
 }

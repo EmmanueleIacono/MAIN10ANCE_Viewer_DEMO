@@ -161,12 +161,13 @@ app.patch('/integrazione/integrazione-attivita', async (req, res) => {
     }
 });
 
-app.post('/Main10ance_DB/LOD4/nuovo', async (req, res) => {
+app.post('/LOD4/nuovo', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
     const result = {};
     try {
         const reqJson = req.body;
         const reqFiles = req.files;
-        const res = await uploadImmagine(reqFiles, reqJson);
+        const res = await uploadImmagine(reqFiles, reqJson, ambito);
         result.success = res;
     }
     catch(e) {
@@ -178,11 +179,12 @@ app.post('/Main10ance_DB/LOD4/nuovo', async (req, res) => {
     }
 });
 
-app.delete('/Main10ance_DB/LOD4/elimina', async (req, res) => {
+app.delete('/LOD4/elimina', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
     const result = {};
     try {
         const reqJson = req.body;
-        const res = await eliminaImmagini(reqJson);
+        const res = await eliminaImmagini(reqJson, ambito);
         result.success = res;
     }
     catch(e) {
@@ -521,7 +523,7 @@ async function integraAtt(jsonAtt, ambito) {
     }
 }
 
-async function uploadImmagine(files, dati) {
+async function uploadImmagine(files, dati, ambito) {
     const file = files.file;
     const datiJson = JSON.parse(dati.dati);
     const percorso = datiJson.percorso;
@@ -549,9 +551,9 @@ async function uploadImmagine(files, dati) {
             }
             else {
                 // query con dati
-                await clientM10a.query(`INSERT INTO ${data_schema}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9));`, arrayDatiImg);
+                await clientM10a.query(`INSERT INTO ${data_schema}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10));`, [...arrayDatiImg, ambito]); // e "codice"?
                 // caricamento immagine supabase
-                const {error} = await supabase.storage.from("sacri-monti").upload(`${percorso}/${file.name}`, file.data, fileOptions);
+                const {error} = await supabase.storage.from("elementi").upload(`${ambito}/${percorso}/${file.name}`, file.data, fileOptions);
                 if (error) throw error;
             }
         }
@@ -568,20 +570,21 @@ async function uploadImmagine(files, dati) {
     }
 }
 
-async function eliminaImmagini(jsonDati) {
+async function eliminaImmagini(jsonDati, ambito) {
     const listaImmagini = jsonDati.immagini;
-    const bucket = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? 'generale' : 'sacri-monti';
+    const listaImmaginiSupa = ambito ? listaImmagini.map(img => `${ambito}/${img}`) : listaImmagini;
+    const bucket = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? 'generale' : 'elementi';
     const schema = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? utility_schema : data_schema;
     try {
         await clientM10a.query('BEGIN;');
         try {
             // query elimina record
             for await (const img of listaImmagini) {
-                await clientM10a.query(`DELETE FROM ${schema}.${jsonDati.entità} WHERE "immagine" IN (($1));`, [img]);
+                await clientM10a.query(`DELETE FROM ${schema}.${jsonDati.entità} WHERE "immagine" IN (($1)) AND "ambito" = ($2);`, [img, ambito]);
             }
 
             // eliminazione immagine supabase
-            const {error} = await supabase.storage.from(bucket).remove(listaImmagini);
+            const {error} = await supabase.storage.from(bucket).remove(listaImmaginiSupa);
             if (error) throw error;
         }
         catch(err) {

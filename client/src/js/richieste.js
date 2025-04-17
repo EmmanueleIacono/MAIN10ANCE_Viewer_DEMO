@@ -336,13 +336,13 @@ export async function downloadDocumentiSchede(percorsoFile) {
 }
 
 export async function creaRecordLOD4(datiBody) {
-    const res = await fetch('/g/Main10ance_DB/LOD4/nuovo', {method: "POST", body: datiBody});
+    const res = await fetch('/g/LOD4/nuovo', {method: "POST", body: datiBody});
     const resJson = await res.json();
     return resJson;
 }
 
 export async function eliminaRecordLOD4(jsonReq) {
-    const res = await fetch('/g/Main10ance_DB/LOD4/elimina', {method: "DELETE", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq)});
+    const res = await fetch('/g/LOD4/elimina', {method: "DELETE", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonReq)});
     const resJson = await res.json();
     return resJson;
 }
