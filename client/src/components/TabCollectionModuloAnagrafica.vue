@@ -226,7 +226,10 @@
           <td colspan="2"><hr /></td>
         </tr>
         <tr>
-          <th><label><b>Accessibilità</b></label></th>
+          <th>
+            <label><b>Accessibilità</b></label>
+            <p style="font-size: smaller; font-weight: normal;">I beni si considerano accessibili se ad altezza uomo o raggiungibili con l'ausilio di piccoli trabattelli o scale</p>
+          </th>
           <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.accessibilità" :disabled="schedaRegistrata"></td>
         </tr>
         <tr class="divider-row">
