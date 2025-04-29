@@ -159,7 +159,7 @@
         </tr>
         <tr>
           <th><label><b>Annotazioni</b></label></th>
-          <td><input v-model="stateModuloAnagraficaStatua.materiale_annotazioni" :disabled="schedaRegistrata"></td>
+          <td><textarea v-model="stateModuloAnagraficaStatua.materiale_annotazioni" :disabled="schedaRegistrata" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
           <th><label><b>Armatura</b></label></th>
@@ -237,7 +237,7 @@
         </tr>
         <tr>
           <th><label><b>Note</b></label></th>
-          <td><input v-model="stateModuloAnagraficaStatua.note" :disabled="schedaRegistrata"></td>
+          <td><textarea v-model="stateModuloAnagraficaStatua.note" :disabled="schedaRegistrata" style="height: 20px;"></textarea></td>
         </tr>
       </table>
     </div>
