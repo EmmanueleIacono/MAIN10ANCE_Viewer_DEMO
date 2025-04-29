@@ -527,7 +527,7 @@ async function uploadImmagine(files, dati, ambito) {
     const file = files.file;
     const datiJson = JSON.parse(dati.dati);
     const percorso = datiJson.percorso;
-    const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.artista, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, `${percorso}/${file.name}`];
+    const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.codice, datiJson.artista, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, `${percorso}/${file.name}`];
     const idMap = {
         arredo: 'id_arr',
         dipinto_murale: 'id_dipmur',
@@ -544,14 +544,14 @@ async function uploadImmagine(files, dati, ambito) {
             if (datiJson.id_main10ance.startsWith('loc-pdiff')) {
                 const rid_loc_pdiff = datiJson.id_main10ance.split('|')[1];
                 // query con dati
-                await clientM10a.query(`INSERT INTO ${utility_schema}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10));`, [...arrayDatiImg, rid_loc_pdiff]);
+                await clientM10a.query(`INSERT INTO ${utility_schema}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, rid_loc_pdiff]);
                 // caricamento immagine supabase
                 const {error} = await supabase.storage.from("generale").upload(`${percorso}/${file.name}`, file.data, fileOptions);
                 if (error) throw error;
             }
             else {
                 // query con dati
-                await clientM10a.query(`INSERT INTO ${data_schema}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10));`, [...arrayDatiImg, ambito]); // e "codice"?
+                await clientM10a.query(`INSERT INTO ${data_schema}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, ambito]); // e "codice"?
                 // caricamento immagine supabase
                 const {error} = await supabase.storage.from("elementi").upload(`${ambito}/${percorso}/${file.name}`, file.data, fileOptions);
                 if (error) throw error;

@@ -850,7 +850,7 @@ async function interrogaAnagraficaStatua(id, ambito) {
                                                      [id, ambito]
                                                    );
 
-        const result_st = await clientM10a.query(`SELECT nome AS "Nome statua", codice AS "Codice statua"
+        const result_st = await clientM10a.query(`SELECT nome AS "Soggetto statua", codice AS "Codice statua"
                                                   FROM ${data_schema}.statua
                                                   WHERE id_main10ance = $1 AND ambito = $2
                                                   ORDER BY id_statua DESC

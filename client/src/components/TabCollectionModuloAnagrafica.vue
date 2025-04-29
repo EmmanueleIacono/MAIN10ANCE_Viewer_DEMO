@@ -104,11 +104,11 @@
     <div v-else-if="qualeScheda === 'statua'">
       <table class="form-table">
         <tr>
-          <th><label><b>Nome statua</b></label></th>
+          <th><label><b>Soggetto</b></label></th>
           <td><p class="user-field">{{ stateModuloAnagraficaStatua.nome_statua }}</p></td>
         </tr>
         <tr>
-          <th><label><b>Codice statua</b></label></th>
+          <th><label><b>Codice</b></label></th>
           <td><p class="user-field">{{ stateModuloAnagraficaStatua.codice_statua }}</p></td>
         </tr>
         <tr>
@@ -444,7 +444,6 @@ export default {
         // append JSONREQ a fd
         fd.append('dati', JSON.stringify(jsonReq));
 
-        // const resp = await compilaScheda(jsonReq);
         const resp = await compilaScheda(fd);
         if (resp.success) {
           store.methods.setAlert('Operazione andata a buon fine');

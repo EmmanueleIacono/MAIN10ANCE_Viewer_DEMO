@@ -15,7 +15,7 @@
       <p id="id_main10ance" class="colonna2"><b>{{id_main10ance}}</b></p>
     </div>
     <div class="contenitore">
-      <label for="nome" class="colonna1">Nome</label>
+      <label for="nome" class="colonna1">Nome/Soggetto</label>
       <input v-model="nome" id="nome" class="colonna2">
     </div>
     <div class="contenitore">
