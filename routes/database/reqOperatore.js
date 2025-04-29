@@ -236,7 +236,6 @@ app.get('/schede-storico-manutenzione-correttiva', async (req, res) => {
 });
 
 // per testare la richiesta:
-// fetch("/o/anagrafica/artifact-viewer/interroga/SMV|39|grata|1826323").then(a => a.json()).then(console.log)
 app.get('/anagrafica/artifact-viewer/interroga/:id', async (req, res) => {
     const id = req.params.id;
     const categoria = JSON.parse(req.headers.categoria);
@@ -843,8 +842,24 @@ async function interrogaAnagraficaLOD4(id, ambito) {
 
 async function interrogaAnagraficaStatua(id, ambito) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.nome_statua AS "Nome statua", sa.descrizione_statua AS "Descrizione statua", sa.tecnica_esecuzione AS "Tecnica di esecuzione", sa.dimensioni AS "Dimensioni", sa.materiale_statua AS "Materiale statua", sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiale_armatura AS "Materiale armatura", sa.materiale_supporto AS "Materiale supporto", sa.lamina_metallica AS "Lamina metallica", sa.pellicola_pittorica AS "Pellicola pittorica", sa.strato_di_preparazione AS "Strato di preparazione", sa.elementi_accessori AS "Elementi accessori", sa.monili AS "Monili", sa.elementi_di_ancoraggio_a_parete AS "Elementi di ancoraggio a parete", sa.elementi_di_ancoraggio_a_pavimento AS "Elementi di ancoraggio a pavimento", sa.elementi_di_ancoraggio_annotazioni AS "Elementi di ancoraggio annotazioni", sa.epoca AS "Epoca", sa.fonti AS "Fonti", sa.autore AS "Autore", sa."accessibilità" AS "Accessibilità", sa.note AS "Note", sa.docs AS "Documenti" FROM ${data_schema}.scheda_anagrafica_statua AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}' ORDER BY id_anagr DESC LIMIT 1;`);
-        return result.rows;
+        const result_anagr = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_statua AS "Descrizione statua", sa.tecnica_esecuzione AS "Tecnica di esecuzione", sa.dimensioni AS "Dimensioni", sa.materiale_statua AS "Materiale statua", sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiale_armatura AS "Materiale armatura", sa.materiale_supporto AS "Materiale supporto", sa.lamina_metallica AS "Lamina metallica", sa.pellicola_pittorica AS "Pellicola pittorica", sa.strato_di_preparazione AS "Strato di preparazione", sa.elementi_accessori AS "Elementi accessori", sa.monili AS "Monili", sa.elementi_di_ancoraggio_a_parete AS "Elementi di ancoraggio a parete", sa.elementi_di_ancoraggio_a_pavimento AS "Elementi di ancoraggio a pavimento", sa.elementi_di_ancoraggio_annotazioni AS "Elementi di ancoraggio annotazioni", sa.epoca AS "Epoca", sa.fonti AS "Fonti", sa.autore AS "Autore", sa."accessibilità" AS "Accessibilità", sa.note AS "Note", sa.docs AS "Documenti"
+                                                     FROM ${data_schema}.scheda_anagrafica_statua AS sa
+                                                     WHERE sa.id_main10ance = $1 AND sa.ambito = $2
+                                                     ORDER BY id_anagr DESC
+                                                     LIMIT 1;`,
+                                                     [id, ambito]
+                                                   );
+
+        const result_st = await clientM10a.query(`SELECT nome AS "Nome statua", codice AS "Codice statua"
+                                                  FROM ${data_schema}.statua
+                                                  WHERE id_main10ance = $1 AND ambito = $2
+                                                  ORDER BY id_statua DESC
+                                                  LIMIT 1;`,
+                                                  [id, ambito]
+                                                );
+
+        const full_res = {...result_st.rows[0], ...result_anagr.rows[0]};
+        return [full_res];
     }
     catch(e) {
         console.log(e);

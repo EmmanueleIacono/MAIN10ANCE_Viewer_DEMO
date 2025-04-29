@@ -105,13 +105,11 @@
       <table class="form-table">
         <tr>
           <th><label><b>Nome statua</b></label></th>
-          <!-- <td><input v-model="stateModuloAnagraficaStatua.nome_statua" :disabled="schedaRegistrata"></td> -->
-          <td><p class="user-field">qui nome statua</p></td>
+          <td><p class="user-field">{{ stateModuloAnagraficaStatua.nome_statua }}</p></td>
         </tr>
         <tr>
           <th><label><b>Codice statua</b></label></th>
-          <!-- <td><input v-model="stateModuloAnagraficaStatua.nome_statua" :disabled="schedaRegistrata"></td> -->
-          <td><p class="user-field">qui codice statua</p></td>
+          <td><p class="user-field">{{ stateModuloAnagraficaStatua.codice_statua }}</p></td>
         </tr>
         <tr>
           <th><label><b>Dimensioni</b></label></th>
@@ -359,7 +357,7 @@ export default {
 
     const schedaVuotaStatua = computed(() => {
       return !(
-        stateModuloAnagraficaStatua.nome_statua || stateModuloAnagraficaStatua.descrizione_statua
+        stateModuloAnagraficaStatua.descrizione_statua
         || stateModuloAnagraficaStatua.tecnica_esecuzione || stateModuloAnagraficaStatua.dimensioni
         || stateModuloAnagraficaStatua.materiale_statua || stateModuloAnagraficaStatua.materiale_annotazioni
         || stateModuloAnagraficaStatua.materiale_armatura || stateModuloAnagraficaStatua.materiale_supporto
@@ -420,10 +418,6 @@ export default {
           store.methods.setAlert('Non è possibile salvare una scheda vuota');
           return;
         }
-        if (qualeScheda.value == 'statua' && !stateModuloAnagraficaStatua.nome_statua) {
-          store.methods.setAlert('Il campo "Nome statua" deve essere compilato.');
-          return;
-        }
         impostaMetadati();
         let jsonReq;
         let qualeState;
@@ -475,6 +469,7 @@ export default {
       switch (qualeScheda.value) {
         case 'statua':
           stateModuloAnagraficaStatua.nome_statua = '';
+          stateModuloAnagraficaStatua.codice_statua = '';
           stateModuloAnagraficaStatua.descrizione_statua = '';
           stateModuloAnagraficaStatua.tecnica_esecuzione = '';
           stateModuloAnagraficaStatua.dimensioni = '';
