@@ -263,6 +263,16 @@ app.post('/edifici/punteggi-lavori', async (req, res) => {
     }
 });
 
+// RECUPERO PUNTEGGI LAVORI SU EDIFICI
+app.get('/edifici/punteggi-lavori', async (req, res) => {
+    const reqJson = req.headers;
+    const ambito = req.signedCookies.ambito;
+    const loc = JSON.parse(reqJson.loc);
+    const resp = await leggiScoreLavori(loc, ambito);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(resp));
+});
+
 //////////          QUERY          //////////
 
 async function leggiNumeroOggetti(listaTabelle) {
@@ -718,7 +728,7 @@ async function registraScoreLavori(reqJson, ambito) {
 
             const listaValori = [
                 lavoro.edificio.località,
-                lavoro.edificio.edificio,
+                lavoro.edificio.edificio, // questo è lo stesso campo "edificio" di "dati_edifici"
                 lavoro.score_tetti?.score_interno || null,
                 lavoro.score_umidità?.score_interno || null,
                 lavoro.score_statica?.score_interno || null,
@@ -742,6 +752,33 @@ async function registraScoreLavori(reqJson, ambito) {
         console.log(`Errore: ${e}`);
         await clientM10a.query("ROLLBACK;");
         return false;
+    }
+}
+
+async function leggiScoreLavori(località, ambito) {
+    try {
+        const queryTxt = `
+            WITH distinct_edifici AS (
+                SELECT DISTINCT edificio, edif_nome_menu FROM ${data_schema}.dati_edifici
+            )
+            SELECT 
+                tp.data_ins, tp.id_interno,
+                tp.tetti, tp."umidità", tp.statica, tp.interni, tp.esterni,
+                tp.anno_tetti, tp."anno_umidità", tp.anno_statica, tp.anno_interni, tp.anno_esterni,
+                de.edif_nome_menu
+            FROM ${data_schema}."a_temp" AS tp
+            JOIN distinct_edifici AS de
+            ON tp.edificio = de.edificio
+            WHERE tp."località" = $1
+            AND tp.ambito = $2
+            ORDER BY id_interno, tp.edificio;
+        `;
+        const resp = await clientM10a.query(queryTxt, [località, ambito]);
+        return resp.rows;
+    }
+    catch(e) {
+        console.log(`Errore nella lettura delle attività precedenti: ${e}`);
+        return [];
     }
 }
 

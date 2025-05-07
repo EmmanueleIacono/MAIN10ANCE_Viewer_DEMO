@@ -26,7 +26,7 @@
           <td><b>{{ edf.edif_nome_menu }}</b></td>
           <!-- tetti -->
           <td>
-            <select v-model="datiLavori.listaScoreTetti[ind]" id="tetti">
+            <select v-model="datiLavori.listaScoreTetti[ind]" id="tetti" class="sct-tabella">
               <option value=""></option>
               <option v-for="score in scoreLavori" :key="score.stato" :value="score">{{ score.stato }}</option>
             </select>
@@ -40,7 +40,7 @@
           </td>
           <!-- umidità -->
           <td>
-            <select v-model="datiLavori.listaScoreUmidità[ind]" id="umidita">
+            <select v-model="datiLavori.listaScoreUmidità[ind]" id="umidita" class="sct-tabella">
               <option value=""></option>
               <option v-for="score in scoreLavori" :key="score.stato" :value="score">{{ score.stato }}</option>
             </select>
@@ -54,7 +54,7 @@
           </td>
           <!-- statica -->
           <td>
-            <select v-model="datiLavori.listaScoreStatica[ind]" id="statica">
+            <select v-model="datiLavori.listaScoreStatica[ind]" id="statica" class="sct-tabella">
               <option value=""></option>
               <option v-for="score in scoreLavori" :key="score.stato" :value="score">{{ score.stato }}</option>
             </select>
@@ -68,7 +68,7 @@
           </td>
           <!-- interni -->
           <td>
-            <select v-model="datiLavori.listaScoreInterni[ind]" id="interni">
+            <select v-model="datiLavori.listaScoreInterni[ind]" id="interni" class="sct-tabella">
               <option value=""></option>
               <option v-for="score in scoreLavori" :key="score.stato" :value="score">{{ score.stato }}</option>
             </select>
@@ -82,7 +82,7 @@
           </td>
           <!-- esterni -->
           <td>
-            <select v-model="datiLavori.listaScoreEsterni[ind]" id="esterni">
+            <select v-model="datiLavori.listaScoreEsterni[ind]" id="esterni" class="sct-tabella">
               <option value=""></option>
               <option v-for="score in scoreLavori" :key="score.stato" :value="score">{{ score.stato }}</option>
             </select>
@@ -97,24 +97,28 @@
         </tr>
       </table>
       </div>
+      <br>
+      <TabPlannerSintesiLavoriVisualizzazione :state-località="selectLocalità" :score-lavori="scoreLavori" />
     </Details>
   </Card>
 </template>
 
 <script>
 import {reactive, toRefs, watch, inject} from 'vue';
+import { dataCorta, dataInteger } from '../js/shared';
+import { registraScoreLavori } from '../js/richieste';
 import Details from './elementi/Details.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 import Card from './elementi/Card.vue';
-import { dataCorta, dataInteger } from '../js/shared';
-import { registraScoreLavori } from '../js/richieste';
+import TabPlannerSintesiLavoriVisualizzazione from './TabPlannerSintesiLavoriVisualizzazione.vue';
 
 export default {
-  name: 'TabDashboardPianificazione',
+  name: 'TabPlannerSintesiLavori',
   components: {
     Details,
     LoadingScreen,
     Card,
+    TabPlannerSintesiLavoriVisualizzazione,
   },
   setup() {
     const store = inject('store');
@@ -149,6 +153,7 @@ export default {
     watch(() => state.selectLocalità, newVal => {
       const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.località === newVal);
       state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
+      console.log(listaSigleEdificiFiltrata);
       state.listaSigleEdificiSelezionati = [];
       resetDatiLavori();
     });
@@ -183,8 +188,8 @@ export default {
       const risultati = state.listaSigleEdificiFiltrata.map((edf, ind) => {
         return {
           data: dataCorta(),
-          id_interno: dataInteger(),
-          edificio: edf,
+          id_interno: dataInteger(), // a che serviva questo???
+          edificio: edf, // questo è lo stesso campo "edificio" di "dati_edifici"
           score_tetti: state.datiLavori.listaScoreTetti[ind],
           anno_tetti: state.datiLavori.listaAnnoTetti[ind],
           score_umidità: state.datiLavori.listaScoreUmidità[ind],
@@ -253,6 +258,10 @@ export default {
 <style scoped>
 select {
   margin-left: 1rem;
+}
+
+select.sct-tabella {
+  width: 90%;
 }
 
 .tabella-sintesi-lavori {
