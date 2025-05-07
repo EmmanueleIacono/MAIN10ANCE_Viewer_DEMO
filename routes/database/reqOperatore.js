@@ -323,6 +323,14 @@ app.get('/storage/docs-download', async (req, res) => {
     }
 });
 
+app.get('/viste', async (req, res) => {
+    const nome_vista = JSON.parse(req.headers.nome_vista);
+    const utility = JSON.parse(req.headers.utility);
+    const risposta = await leggiVistaDB(nome_vista, utility);
+    res.setHeader('content-type', 'application/json');
+    res.send(risposta);
+});
+
 //////////          QUERY          //////////
 
 async function leggiColonneTabella(nomeTab) {
@@ -842,7 +850,25 @@ async function interrogaAnagraficaLOD4(id, ambito) {
 
 async function interrogaAnagraficaStatua(id, ambito) {
     try {
-        const result_anagr = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_statua AS "Descrizione statua", sa.tecnica_esecuzione AS "Tecnica di esecuzione", sa.dimensioni AS "Dimensioni", sa.materiale_statua AS "Materiale statua", sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiale_armatura AS "Materiale armatura", sa.materiale_supporto AS "Materiale supporto", sa.lamina_metallica AS "Lamina metallica", sa.pellicola_pittorica AS "Pellicola pittorica", sa.strato_di_preparazione AS "Strato di preparazione", sa.elementi_accessori AS "Elementi accessori", sa.monili AS "Monili", sa.elementi_di_ancoraggio_a_parete AS "Elementi di ancoraggio a parete", sa.elementi_di_ancoraggio_a_pavimento AS "Elementi di ancoraggio a pavimento", sa.elementi_di_ancoraggio_annotazioni AS "Elementi di ancoraggio annotazioni", sa.epoca AS "Epoca", sa.fonti AS "Fonti", sa.autore AS "Autore", sa."accessibilità" AS "Accessibilità", sa.note AS "Note", sa.docs AS "Documenti"
+        const result_anagr = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore",
+                                                     sa.descrizione_statua AS "Descrizione statua", sa.tecnica_esecuzione AS "Tecnica di esecuzione",
+                                                     sa.dimensioni AS "Dimensioni", sa.materiale_statua AS "Materiale statua",
+                                                     sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiale_armatura AS "Materiale armatura",
+                                                     sa.materiale_supporto AS "Materiale supporto", sa.lamina_metallica AS "Lamina metallica",
+                                                     (sa.pellicola_pittorica_tecnica_e_mat).su_legno AS "Pellicola pittorica su legno",
+                                                     (sa.pellicola_pittorica_tecnica_e_mat).su_gesso AS "Pellicola pittorica su gesso",
+                                                     (sa.pellicola_pittorica_tecnica_e_mat).su_terracotta AS "Pellicola pittorica su terracotta",
+                                                     (sa.pellicola_pittorica_tecnica_e_mat).altro AS "Pellicola pittorica - Altro",
+                                                     sa.strato_di_preparazione AS "Strato di preparazione",
+                                                     sa.elementi_accessori_monili AS "Elementi accessori e monili", sa.materiale_elementi_accessori_monili AS "Materiale elementi accessori e monili",
+                                                     sa.elementi_accessori_monili_annotazioni AS "Annotazioni elementi accessori e monili",
+                                                     sa.elementi_di_ancoraggio_a_parete AS "Elementi di ancoraggio a parete", sa.materiale_ancoraggio_parete AS "Materiale ancoraggi a parete",
+                                                     sa.ancoraggio_parete_annotazioni AS "Annotazioni ancoraggi a parete",
+                                                     sa.elementi_di_ancoraggio_a_pavimento AS "Elementi di ancoraggio a pavimento", sa.materiale_ancoraggio_pavimento AS "Materiale ancoraggi a pavimento",
+                                                     sa.ancoraggio_pavimento_annotazioni AS "Annotazioni ancoraggi a pavimento",
+                                                     sa.epoca AS "Epoca", sa.fonti AS "Fonti",
+                                                     sa.autore AS "Autore", sa."accessibilità" AS "Accessibilità",
+                                                     sa.note AS "Note", sa.docs AS "Documenti"
                                                      FROM ${data_schema}.scheda_anagrafica_statua AS sa
                                                      WHERE sa.id_main10ance = $1 AND sa.ambito = $2
                                                      ORDER BY id_anagr DESC
@@ -938,12 +964,74 @@ async function downloadDocumento(percorsoFile, ambito) {
     }
 }
 
+async function leggiVistaDB(nome_vista, utility = false) {
+    const schema = utility ? utility_schema : data_schema;
+    try {
+        const results = await clientM10a.query(`SELECT * FROM ${schema}."${nome_vista}";`);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
 //////////          ALTRE FUNZIONI          //////////
 
 function gestisciStringheSchede(listaOggetti, ambito) {
     let listaStringheEValori = [];
-    listaOggetti.forEach(async jsn => {
+
+    listaOggetti.forEach(jsn => {
+        // target schema
         const schema = (jsn.tabella === 'anagrafica_manufatto' || jsn.tabella === 'anagrafica_dettaglio' || jsn.tabella === 'segnalazione') ? utility_schema : data_schema;
+
+        // costruzione degli INSERT
+        const cols = []; // lista colonne
+        const placeholders = []; // $1, $2 o ROW($1, ...)
+        const vals = []; // lista valori
+        let p = 1; // indice parametro per placeholders
+
+        jsn.colonne.forEach((col, idx) => {
+            // colonne composite
+            if (col === 'pellicola_pittorica_tecnica_e_mat') {
+                placeholders.push(
+                    `ROW($${p}::servizio.pell_pitt_mat_su_legno, ` +
+                    `$${p+1}::servizio.pell_pitt_mat_su_gesso, ` +
+                    `$${p+2}::servizio.pell_pitt_mat_su_terracotta, ` +
+                    `$${p+3})::servizio.stat_pell_pitt`
+                );
+
+                // mi aspetto che QUI jsn.valori[idx] sia un oggetto
+                // {su_legno: ..., su_gesso: ..., etc.}
+                const pellicola = jsn.valori[idx] || {};
+                vals.push(
+                    pellicola.su_legno ?? null,
+                    pellicola.su_gesso ?? null,
+                    pellicola.su_terracotta ?? null,
+                    pellicola.altro ?? null
+                );
+                cols.push(col);
+                p += 4; // ho usato 4 parametri
+            } else { // tutte le altre colonne "normali/singole"
+                cols.push(col);
+                placeholders.push(`$${p}`);
+                vals.push(jsn.valori[idx]);
+                p += 1;
+            }
+        });
+
+        // append sempre la colonna AMBITO
+        cols.push('ambito');
+        placeholders.push(`$${p}`);
+        vals.push(ambito);
+
+        // stringa SQL finale
+        const sql =
+            `INSERT INTO ${schema}.${jsn.tabella} (${cols.join(', ')}) ` +
+            `VALUES (${placeholders.join(', ')});`;
+        
+        listaStringheEValori.push([sql, vals]);
+        /*
         let listaInterna = [];
         const listaValori = [...jsn.valori, ambito];
         const colonneConAmbito = [...jsn.colonne, "ambito"];
@@ -959,7 +1047,9 @@ function gestisciStringheSchede(listaOggetti, ambito) {
         listaInterna.push(stringa);
         listaInterna.push(listaValori);
         listaStringheEValori.push(listaInterna);
+        */
     });
+
     return listaStringheEValori;
 }
 

@@ -159,3 +159,35 @@ export function verificaPercorso(percorso) {
     const listaSezioni = percorso.split('/');
     return !listaSezioni.some(sez => !sez);
 }
+
+export function trattaStringArray(sqlArrayString) { // DA SPOSTARE IN shared.js
+    if (!sqlArrayString) {
+        return []; // valori vuoti o nulli diventano lista vuota
+    }
+
+    // rimuovo graffe iniziale e finale
+    const trimmedString = sqlArrayString.trim();
+    if (!trimmedString.startsWith('{') || !trimmedString.endsWith('}')) {
+        console.warn(`Unexpected format: "${sqlArrayString}". Returning as is.`);
+        return sqlArrayString;
+    }
+
+    const content = trimmedString.slice(1, -1);
+
+    // lista vuota
+    if (!content.trim()) {
+        return [];
+    }
+
+    // split su virgole, ma ignorando le virgole comprese tra virgolette ("")
+    const elements = content.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+
+    // elimino eventuali spazi bianchi (trim()) e rimuovo virgolette ("") esterne se presenti
+    return elements.map(element => {
+        const trimmedElement = element.trim();
+        if (trimmedElement.startsWith('"') && trimmedElement.endsWith('"')) {
+            return trimmedElement.slice(1, -1);
+        }
+        return trimmedElement;
+    });
+}

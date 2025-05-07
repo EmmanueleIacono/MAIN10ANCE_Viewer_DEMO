@@ -505,3 +505,9 @@ export async function registraScoreLavori(reqJson) {
     const resJson = await res.json();
     return resJson;
 }
+
+export async function leggiVistaDB(nome_vista, utility = false) {
+    const res = await fetch(`/o/viste`, {method: "GET", headers: {"content-type": "application/json", nome_vista: JSON.stringify(nome_vista), utility: JSON.stringify(utility)}});
+    const resJson = await res.json();
+    return resJson;
+}
