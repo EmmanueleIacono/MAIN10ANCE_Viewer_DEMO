@@ -1031,23 +1031,6 @@ function gestisciStringheSchede(listaOggetti, ambito) {
             `VALUES (${placeholders.join(', ')});`;
         
         listaStringheEValori.push([sql, vals]);
-        /*
-        let listaInterna = [];
-        const listaValori = [...jsn.valori, ambito];
-        const colonneConAmbito = [...jsn.colonne, "ambito"];
-        const stringaColonne = colonneConAmbito.join(', ');
-        const lenColonne = colonneConAmbito.length;
-        let listaValues = [];
-        for (let n=1; n<=lenColonne; n++) {
-            let str = `$${n}`;
-            listaValues.push(str);
-        }
-        const stringaValues = listaValues.join(', ');
-        const stringa = `INSERT INTO ${schema}.${jsn.tabella} (${stringaColonne}) VALUES (${stringaValues});`;
-        listaInterna.push(stringa);
-        listaInterna.push(listaValori);
-        listaStringheEValori.push(listaInterna);
-        */
     });
 
     return listaStringheEValori;

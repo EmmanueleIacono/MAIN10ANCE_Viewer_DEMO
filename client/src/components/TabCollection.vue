@@ -157,7 +157,6 @@ export default {
         materiale_armatura: '', // enum
         materiale_supporto: '', // enum
         lamina_metallica: false, // bool
-        // pellicola_pittorica: '',
         pellicola_pittorica_tecnica_e_mat: {
           su_legno: '',
           su_gesso: '',
@@ -165,8 +164,6 @@ export default {
           altro: '',
         },
         strato_di_preparazione: '',
-        // elementi_accessori: '', // enum
-        // monili: '', // enum
         elementi_accessori_monili: [], // enum[]
         materiale_elementi_accessori_monili: [], // enum[]
         elementi_accessori_monili_annotazioni: '',
@@ -176,7 +173,6 @@ export default {
         elementi_di_ancoraggio_a_pavimento: false,
         materiale_ancoraggio_pavimento: '', // enum
         ancoraggio_pavimento_annotazioni: '',
-        // elementi_di_ancoraggio_annotazioni: '',
         epoca: '',
         fonti: '',
         autore: '',
@@ -425,14 +421,11 @@ export default {
               state.datiModuloAnagraficaStatua.materiale_armatura = state.datiAnagrafica.schedaAnagrafica['Materiale armatura'];
               state.datiModuloAnagraficaStatua.materiale_supporto = state.datiAnagrafica.schedaAnagrafica['Materiale supporto'];
               state.datiModuloAnagraficaStatua.lamina_metallica = state.datiAnagrafica.schedaAnagrafica['Lamina metallica']; // bool
-              // state.datiModuloAnagraficaStatua.pellicola_pittorica = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica'];
               state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_legno = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su legno'];
               state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_gesso = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su gesso'];
               state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_terracotta = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su terracotta'];
               state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.altro = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica - Altro'];
               state.datiModuloAnagraficaStatua.strato_di_preparazione = state.datiAnagrafica.schedaAnagrafica['Strato di preparazione'];
-              // state.datiModuloAnagraficaStatua.elementi_accessori = state.datiAnagrafica.schedaAnagrafica['Elementi accessori'];
-              // state.datiModuloAnagraficaStatua.monili = state.datiAnagrafica.schedaAnagrafica['Monili'];
               state.datiModuloAnagraficaStatua.elementi_accessori_monili = state.datiAnagrafica.schedaAnagrafica['Elementi accessori e monili'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Elementi accessori e monili']) : []; // array
               state.datiModuloAnagraficaStatua.materiale_elementi_accessori_monili = state.datiAnagrafica.schedaAnagrafica['Materiale elementi accessori e monili'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Materiale elementi accessori e monili']) : []; // array
               state.datiModuloAnagraficaStatua.elementi_accessori_monili_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni elementi accessori e monili'];
@@ -442,7 +435,6 @@ export default {
               state.datiModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento = state.datiAnagrafica.schedaAnagrafica['Elementi di ancoraggio a pavimento']; // bool
               state.datiModuloAnagraficaStatua.materiale_ancoraggio_pavimento = state.datiAnagrafica.schedaAnagrafica['Materiale ancoraggi a pavimento'];
               state.datiModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni ancoraggi a pavimento'];
-              // state.datiModuloAnagraficaStatua.elementi_di_ancoraggio_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi di ancoraggio annotazioni'];
               state.datiModuloAnagraficaStatua.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
               state.datiModuloAnagraficaStatua.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
               state.datiModuloAnagraficaStatua.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];

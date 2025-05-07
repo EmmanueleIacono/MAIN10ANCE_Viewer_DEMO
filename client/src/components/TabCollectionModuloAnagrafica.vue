@@ -155,10 +155,6 @@
           <th><label><i>Annotazioni</i></label></th>
           <td><textarea v-model="stateModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni" style="height: 20px;"></textarea></td>
         </tr>
-        <!-- <tr>
-          <th><label><b>Annotazioni</b></label></th>
-          <td><textarea v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_annotazioni" style="height: 20px;"></textarea></td>
-        </tr> -->
         <tr class="divider-row">
           <td colspan="2"><hr /></td>
         </tr>
@@ -228,10 +224,6 @@
             <textarea v-model="stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.altro" style="height: 20px;"></textarea>
           </td>
         </tr>
-        <!-- <tr>
-          <th><label><b>Pellicola pittorica</b></label></th>
-          <td><input v-model="stateModuloAnagraficaStatua.pellicola_pittorica"></td>
-        </tr> -->
         <tr>
           <th><label><b>Lamina metallica</b></label></th>
           <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.lamina_metallica"></td>
@@ -267,20 +259,6 @@
           <th><label><i>Annotazioni</i></label></th>
           <td><textarea v-model="stateModuloAnagraficaStatua.elementi_accessori_monili_annotazioni" style="height: 20px;"></textarea></td>
         </tr>
-        <!-- <tr>
-          <th><label><b>Elementi accessori</b></label></th>
-          <td><select v-model="stateModuloAnagraficaStatua.elementi_accessori" class="float-dx">
-            <option value=""></option>
-            <option v-for="mat in datiEnum.elementi_accessori" :key="mat" :value="mat">{{ mat }}</option>
-          </select></td>
-        </tr>
-        <tr>
-          <th><label><b>Monili</b></label></th>
-          <td><select v-model="stateModuloAnagraficaStatua.monili" class="float-dx">
-            <option value=""></option>
-            <option v-for="mat in datiEnum.monili" :key="mat" :value="mat">{{ mat }}</option>
-          </select></td>
-        </tr> -->
         <tr class="divider-row">
           <td colspan="2"><hr /></td>
         </tr>
@@ -411,8 +389,6 @@ export default {
       materiale_statua: [],
       materiale_armatura: [],
       materiale_supporto: [],
-      // elementi_accessori: [],
-      // monili: [],
       elementi_accessori_monili: [],
       materiale_elementi_accessori_monili: [],
       materiale_ancoraggio_parete: [],
@@ -420,33 +396,13 @@ export default {
       pellicola_pittorica_tecnica_e_mat: {},
     });
 
-    // const statePellicolaPittoricaStatua = reactive({
-    //   legno: null,
-    //   gesso: null,
-    //   terracotta: null,
-    //   altro: null,
-    // });
-
     const files = reactive([
       {file: null, name: ""}
     ]);
 
     const fileInputs = reactive([null]); // refs per <input type="file">
 
-    // // alla compilazione di uno dei type, gli altri tornano null
-    // ['legno', 'gesso', 'terracotta', 'altro'].forEach((key) => {
-    //   watch(() => statePellicolaPittoricaStatua[key], (val) => {
-    //     console.log(val);
-    //     if (val != null) {
-    //       Object.keys(statePellicolaPittoricaStatua).forEach((other) => {
-    //         if (other != key) statePellicolaPittoricaStatua[other] = null;
-    //       });
-    //     }
-    //   });
-    // });
-
     watch(() => stateModuloAnagraficaStatua.materiale_supporto, () => {
-      // console.log(stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat);
       Object.keys(stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat).forEach(k => {
         stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat[k] = null;
       });
@@ -457,12 +413,6 @@ export default {
     }, {
       deep: true
     });
-
-    // watch(() => stateModuloAnagraficaStatua.materiale_elementi_accessori_monili, () => {
-    //   console.log(stateModuloAnagraficaStatua.materiale_elementi_accessori_monili);
-    // }, {
-    //   deep: true
-    // });
 
     const schedaVuota = computed(() => {
       return !(
@@ -484,16 +434,13 @@ export default {
         || stateModuloAnagraficaStatua.materiale_statua || stateModuloAnagraficaStatua.materiale_annotazioni
         || stateModuloAnagraficaStatua.materiale_armatura || stateModuloAnagraficaStatua.materiale_supporto
         || stateModuloAnagraficaStatua.lamina_metallica
-        // || stateModuloAnagraficaStatua.pellicola_pittorica
         || stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat || stateModuloAnagraficaStatua.strato_di_preparazione
-        // || stateModuloAnagraficaStatua.elementi_accessori || stateModuloAnagraficaStatua.monili
         || stateModuloAnagraficaStatua.elementi_accessori_monili || stateModuloAnagraficaStatua.materiale_elementi_accessori_monili
         || stateModuloAnagraficaStatua.elementi_accessori_monili_annotazioni
         || stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete || stateModuloAnagraficaStatua.materiale_ancoraggio_parete
         || stateModuloAnagraficaStatua.ancoraggio_parete_annotazioni
         || stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento || stateModuloAnagraficaStatua.materiale_ancoraggio_pavimento
         || stateModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni
-        // || stateModuloAnagraficaStatua.elementi_di_ancoraggio_annotazioni
         || stateModuloAnagraficaStatua.epoca || stateModuloAnagraficaStatua.fonti
         || stateModuloAnagraficaStatua.definizione || stateModuloAnagraficaStatua.autore
         || stateModuloAnagraficaStatua.accessibilità || stateModuloAnagraficaStatua.note
@@ -527,8 +474,6 @@ export default {
       const lsMatStat = await leggiEnumServizio('stat_mat'); // materiale statua
       const lsMatArm = await leggiEnumServizio('stat_arm_mat'); // materiale armatura
       const lsMatSupp = await leggiEnumServizio('stat_supp_mat'); // materiale supporto
-      // const lsMatElAcc = await leggiEnumServizio('stat_el_acc_mat'); // elementi accessori
-      // const lsMatMonl = await leggiEnumServizio('stat_monil_mat'); // monili
       const lsElAccMonl = await leggiEnumServizio('stat_el_acc_monil'); // elementi accessori monili
       const lsMatElAccMonl = await leggiEnumServizio('stat_el_acc_monil_mat'); // materiale elementi accessori monili
       const lsMatAncPar = await leggiEnumServizio('stat_anc_par_mat'); // materiale ancoraggio parete
@@ -537,8 +482,6 @@ export default {
       datiEnum.materiale_statua = lsMatStat.map(mat => mat.unnest);
       datiEnum.materiale_armatura = lsMatArm.map(mat => mat.unnest);
       datiEnum.materiale_supporto = lsMatSupp.map(mat => mat.unnest);
-      // datiEnum.elementi_accessori = lsMatElAcc.map(mat => mat.unnest);
-      // datiEnum.monili = lsMatMonl.map(mat => mat.unnest);
       datiEnum.elementi_accessori_monili = lsElAccMonl.map(mat => mat.unnest);
       datiEnum.materiale_elementi_accessori_monili = lsMatElAccMonl.map(mat => mat.unnest);
       datiEnum.materiale_ancoraggio_parete = lsMatAncPar.map(mat => mat.unnest);
@@ -628,7 +571,6 @@ export default {
           stateModuloAnagraficaStatua.materiale_armatura = ''; // enum
           stateModuloAnagraficaStatua.materiale_supporto = ''; // enum
           stateModuloAnagraficaStatua.lamina_metallica = false; // bool
-          // stateModuloAnagraficaStatua.pellicola_pittorica = '';
           stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat = {
             su_legno: '',
             su_gesso: '',
@@ -636,8 +578,6 @@ export default {
             altro: '',
           };
           stateModuloAnagraficaStatua.strato_di_preparazione = '';
-          // stateModuloAnagraficaStatua.elementi_accessori = ''; // enum
-          // stateModuloAnagraficaStatua.monili = ''; // enum
           stateModuloAnagraficaStatua.elementi_accessori_monili = []; // enum[]
           stateModuloAnagraficaStatua.materiale_elementi_accessori_monili = []; // enum[]
           stateModuloAnagraficaStatua.elementi_accessori_monili_annotazioni = '';
@@ -647,7 +587,6 @@ export default {
           stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento = false; // bool
           stateModuloAnagraficaStatua.materiale_ancoraggio_pavimento = ''; // enum
           stateModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni = '';
-          // stateModuloAnagraficaStatua.elementi_di_ancoraggio_annotazioni = '';
           stateModuloAnagraficaStatua.epoca = '';
           stateModuloAnagraficaStatua.fonti = '';
           stateModuloAnagraficaStatua.autore = '';
@@ -795,7 +734,6 @@ export default {
       stateModuloAnagraficaStatua,
       stateDocumenti,
       datiEnum,
-      // statePellicolaPittoricaStatua,
       files,
       fileInputs,
       qualeScheda,
