@@ -113,7 +113,7 @@
         </tr>
         <tr>
           <th>
-            <label><b>Presenza di codici non univoci nell'archivio storico/cartaceo</b></label>
+            <label><b style="color: darkred;">Presenza di codici non univoci nell'archivio storico/cartaceo</b></label>
             <p style="font-size: smaller; font-weight: normal;"><i>
               Indicare (se presente) il codice, seguito dalla breve indicazione del/dei documenti e data
               <br />
