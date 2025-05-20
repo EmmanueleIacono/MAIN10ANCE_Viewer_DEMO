@@ -854,7 +854,7 @@ async function interrogaAnagraficaStatua(id, ambito) {
                                                      sa.codici_altro AS "Altri codici",
                                                      sa.descrizione_statua AS "Descrizione statua", sa.tecnica_esecuzione AS "Tecnica di esecuzione",
                                                      sa.dimensioni AS "Dimensioni", sa.materiale_statua AS "Materiale statua",
-                                                     sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiale_armatura AS "Materiale armatura",
+                                                     sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiali_armatura AS "Materiali armatura",
                                                      sa.materiale_supporto AS "Materiale supporto", sa.lamina_metallica AS "Lamina metallica",
                                                      (sa.pellicola_pittorica_tecnica_e_mat).su_legno AS "Pellicola pittorica su legno",
                                                      (sa.pellicola_pittorica_tecnica_e_mat).su_gesso AS "Pellicola pittorica su gesso",

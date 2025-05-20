@@ -194,10 +194,12 @@
         </tr>
         <tr>
           <th><label><b>Armatura</b></label></th>
-          <td><select v-model="stateModuloAnagraficaStatua.materiale_armatura" class="float-dx">
-            <option value=""></option>
-            <option v-for="mat in datiEnum.materiale_armatura" :key="mat" :value="mat">{{ mat }}</option>
-          </select></td>
+          <td>
+            <div v-for="mat in datiEnum.materiale_armatura" :key="mat">
+              <input :id="`el-acc-cbx-${mat}`" :value="mat" v-model="stateModuloAnagraficaStatua.materiali_armatura" type="checkbox">
+              <label :for="`el-acc-cbx-${mat}`">{{ mat }}</label>
+            </div>
+          </td>
         </tr>
         <tr>
           <th><label><b>Supporto</b></label></th>
@@ -460,7 +462,7 @@ export default {
         stateModuloAnagraficaStatua.descrizione_statua || stateModuloAnagraficaStatua.codici_altro
         || stateModuloAnagraficaStatua.tecnica_esecuzione || stateModuloAnagraficaStatua.dimensioni
         || stateModuloAnagraficaStatua.materiale_statua || stateModuloAnagraficaStatua.materiale_annotazioni
-        || stateModuloAnagraficaStatua.materiale_armatura || stateModuloAnagraficaStatua.materiale_supporto
+        || stateModuloAnagraficaStatua.materiali_armatura || stateModuloAnagraficaStatua.materiale_supporto
         || stateModuloAnagraficaStatua.lamina_metallica
         || stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat || stateModuloAnagraficaStatua.strato_di_preparazione
         || stateModuloAnagraficaStatua.elementi_accessori_monili || stateModuloAnagraficaStatua.materiale_elementi_accessori_monili
@@ -597,7 +599,7 @@ export default {
           stateModuloAnagraficaStatua.dimensioni = '';
           stateModuloAnagraficaStatua.materiale_statua = '', // enum
           stateModuloAnagraficaStatua.materiale_annotazioni = '';
-          stateModuloAnagraficaStatua.materiale_armatura = ''; // enum
+          stateModuloAnagraficaStatua.materiali_armatura = []; // enum[]
           stateModuloAnagraficaStatua.materiale_supporto = ''; // enum
           stateModuloAnagraficaStatua.lamina_metallica = false; // bool
           stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat = {

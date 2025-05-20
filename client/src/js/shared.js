@@ -160,7 +160,7 @@ export function verificaPercorso(percorso) {
     return !listaSezioni.some(sez => !sez);
 }
 
-export function trattaStringArray(sqlArrayString) { // DA SPOSTARE IN shared.js
+export function trattaStringArray(sqlArrayString) {
     if (!sqlArrayString) {
         return []; // valori vuoti o nulli diventano lista vuota
     }

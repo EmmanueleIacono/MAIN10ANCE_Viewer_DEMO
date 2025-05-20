@@ -155,7 +155,7 @@ export default {
         dimensioni: '',
         materiale_statua: '',
         materiale_annotazioni: '',
-        materiale_armatura: '', // enum
+        materiali_armatura: [], // enum[]
         materiale_supporto: '', // enum
         lamina_metallica: false, // bool
         pellicola_pittorica_tecnica_e_mat: {
@@ -420,7 +420,7 @@ export default {
               state.datiModuloAnagraficaStatua.dimensioni = state.datiAnagrafica.schedaAnagrafica['Dimensioni'];
               state.datiModuloAnagraficaStatua.materiale_statua = state.datiAnagrafica.schedaAnagrafica['Materiale statua']
               state.datiModuloAnagraficaStatua.materiale_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale annotazioni'];
-              state.datiModuloAnagraficaStatua.materiale_armatura = state.datiAnagrafica.schedaAnagrafica['Materiale armatura'];
+              state.datiModuloAnagraficaStatua.materiali_armatura = state.datiAnagrafica.schedaAnagrafica['Materiali armatura'] ? state.datiAnagrafica.schedaAnagrafica['Materiali armatura'] : []; // array
               state.datiModuloAnagraficaStatua.materiale_supporto = state.datiAnagrafica.schedaAnagrafica['Materiale supporto'];
               state.datiModuloAnagraficaStatua.lamina_metallica = state.datiAnagrafica.schedaAnagrafica['Lamina metallica']; // bool
               state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_legno = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su legno'];
