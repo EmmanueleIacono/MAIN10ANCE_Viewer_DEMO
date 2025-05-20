@@ -1,10 +1,10 @@
 <template>
 <Card>
-  <Details summary="PROGRAMMAZIONE" :open="aperto" class="loading-wrapper">
+  <Details summary="PROGRAMMAZIONE CON INSERIMENTO A CALENDARIO" :open="aperto" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
     <div class="contenitore-scelta-attività">
-      <button @click="tabIntegrazioneAttivo = 'AttPianificate'" class="verde">ATTIVITÀ CICLICHE</button>
-      <button @click="tabIntegrazioneAttivo = 'AttSegnalate'" class="giallo">ATTIVITÀ DI RIALLINEAMENTO</button>
+      <button @click="tabIntegrazioneAttivo = 'AttPianificate'" class="verde">CONTROLLO E MANUTENZIONE ORDINARIA</button>
+      <button @click="tabIntegrazioneAttivo = 'AttSegnalate'" class="giallo">MANUTENZIONE STRAORDINARIA</button>
     </div>
     <div class="contenitore-ordinaper">
       <p><b>Ordina per: </b></p>

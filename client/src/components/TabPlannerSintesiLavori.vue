@@ -1,6 +1,6 @@
 <template>
   <Card>
-    <Details summary="SINTESI LAVORI" :open="false" class="loading-wrapper">
+    <Details summary="QUADRI DI SINTESI" :open="false" class="loading-wrapper">
       <LoadingScreen :caricamento="caricamento" />
       <button @click="salvaSintesiLavori" class="bottone-main10ance bottone-sint">Salva</button>
         <br />
@@ -13,7 +13,7 @@
         <br />
         <br />
         <table v-if="selectLocalità" class="tabella-sintesi-lavori">
-        <caption class="caption-sintesi-lavori"><b>Sintesi esiti attività eseguite</b></caption>
+        <caption class="caption-sintesi-lavori"><b>Valutazione sintetica stato conservativo</b></caption>
         <tr>
           <th><b>Edificio</b></th>
           <th><b>Tetti</b></th>

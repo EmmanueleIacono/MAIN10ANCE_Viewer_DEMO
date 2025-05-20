@@ -1,6 +1,6 @@
 <template>
 <Card>
-  <Details summary="PIANIFICAZIONE" :open="false" class="loading-wrapper">
+  <Details summary="PIANIFICAZIONE CONTROLLI E MANUTENZIONE ORDINARIA" :open="false" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
     <button @click="programmaControlli" class="bottone-main10ance bottone-prog">Salva</button>
       <br />
