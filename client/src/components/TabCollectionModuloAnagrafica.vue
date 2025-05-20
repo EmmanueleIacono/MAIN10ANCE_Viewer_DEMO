@@ -112,6 +112,19 @@
           <td><p class="user-field">{{ stateModuloAnagraficaStatua.codice_statua }}</p></td>
         </tr>
         <tr>
+          <th>
+            <label><b>Presenza di codici non univoci nell'archivio storico/cartaceo</b></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>
+              Indicare (se presente) il codice, seguito dalla breve indicazione del/dei documenti e data
+              <br />
+              Es.
+              <br />
+              ... fino al ...
+            </i></p>
+          </th>
+          <td><textarea v-model="stateModuloAnagraficaStatua.codici_altro" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
           <th><label><b>Dimensioni</b></label></th>
           <td><input v-model="stateModuloAnagraficaStatua.dimensioni"></td>
         </tr>
@@ -232,7 +245,22 @@
           <td colspan="2"><hr /></td>
         </tr>
         <tr class="section-title-row">
-          <td colspan="2"><b>ELEMENTI ACCESSORI / MONILI</b></td>
+          <td colspan="2">
+            <b>ELEMENTI ACCESSORI / MONILI</b>
+            <br />
+            <p style="font-size: smaller; font-weight: normal;"><i>
+              Per inserire annotazioni riferite a ciascun elemento accessorio e/o monile indicare il nome dell'elemento come compare nell'elenco, in lettere maiuscole, indicando tra parentesi tonde eventuale oggetto specifico, seguito da ":" e dalla annotazione in lettera minuscola (vedi esempio).
+              <br />
+              <br />
+              NOME ELEMENTO (elemento specifico): annotazioni
+              <br />
+              Es.
+              <br />
+              STRUMENTI MUSICALI (piffero): bastoncini in legno…
+              <br />
+              CAPIGLIATURE/BARBE (barba): paglia
+            </i></p>
+          </td>
         </tr>
         <tr>
           <th><label><b>Elementi accessori / monili</b></label></th>
@@ -429,7 +457,7 @@ export default {
 
     const schedaVuotaStatua = computed(() => {
       return !(
-        stateModuloAnagraficaStatua.descrizione_statua
+        stateModuloAnagraficaStatua.descrizione_statua || stateModuloAnagraficaStatua.codici_altro
         || stateModuloAnagraficaStatua.tecnica_esecuzione || stateModuloAnagraficaStatua.dimensioni
         || stateModuloAnagraficaStatua.materiale_statua || stateModuloAnagraficaStatua.materiale_annotazioni
         || stateModuloAnagraficaStatua.materiale_armatura || stateModuloAnagraficaStatua.materiale_supporto
@@ -563,6 +591,7 @@ export default {
         case 'statua':
           stateModuloAnagraficaStatua.nome_statua = '';
           stateModuloAnagraficaStatua.codice_statua = '';
+          stateModuloAnagraficaStatua.codici_altro = '';
           stateModuloAnagraficaStatua.descrizione_statua = '';
           stateModuloAnagraficaStatua.tecnica_esecuzione = '';
           stateModuloAnagraficaStatua.dimensioni = '';

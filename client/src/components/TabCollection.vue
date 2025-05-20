@@ -149,6 +149,7 @@ export default {
       datiModuloAnagraficaStatua: {
         nome_statua: '',
         codice_statua: '',
+        codici_altro: '',
         descrizione_statua: '',
         tecnica_esecuzione: '',
         dimensioni: '',
@@ -413,6 +414,7 @@ export default {
               console.log('state anagrafica statua: ', state.datiAnagrafica.schedaAnagrafica);
               state.datiModuloAnagraficaStatua.nome_statua = state.datiAnagrafica.schedaAnagrafica['Soggetto statua']; // DA TABELLA "statua"
               state.datiModuloAnagraficaStatua.codice_statua = state.datiAnagrafica.schedaAnagrafica['Codice statua']; // DA TABELLA "statua"
+              state.datiModuloAnagraficaStatua.codici_altro = state.datiAnagrafica.schedaAnagrafica['Altri codici'];
               state.datiModuloAnagraficaStatua.descrizione_statua = state.datiAnagrafica.schedaAnagrafica['Descrizione statua'];
               state.datiModuloAnagraficaStatua.tecnica_esecuzione = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione'];
               state.datiModuloAnagraficaStatua.dimensioni = state.datiAnagrafica.schedaAnagrafica['Dimensioni'];

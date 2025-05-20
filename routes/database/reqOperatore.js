@@ -851,6 +851,7 @@ async function interrogaAnagraficaLOD4(id, ambito) {
 async function interrogaAnagraficaStatua(id, ambito) {
     try {
         const result_anagr = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore",
+                                                     sa.codici_altro AS "Altri codici",
                                                      sa.descrizione_statua AS "Descrizione statua", sa.tecnica_esecuzione AS "Tecnica di esecuzione",
                                                      sa.dimensioni AS "Dimensioni", sa.materiale_statua AS "Materiale statua",
                                                      sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiale_armatura AS "Materiale armatura",
