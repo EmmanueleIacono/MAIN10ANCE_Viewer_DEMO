@@ -250,10 +250,11 @@ app.post('/programmazione/att-precedenti', async (req, res) => {
 // REGISTRAZIONE PUNTEGGI LAVORI SU EDIFICI
 app.post('/edifici/punteggi-lavori', async (req, res) => {
     const ambito = req.signedCookies.ambito;
+    const autore = req.signedCookies.user_id;
     const result = {};
     try {
         const reqJson = req.body;
-        const res = await registraScoreLavori(reqJson, ambito);
+        const res = await registraScoreLavori(reqJson, ambito, autore);
         result.success = res;
     } catch(e) {
         result.success = false;
@@ -714,15 +715,15 @@ async function registraAttPrecedenti(reqJson) {
     }
 }
 
-async function registraScoreLavori(reqJson, ambito) {
+async function registraScoreLavori(reqJson, ambito, autore) {
     try {
         await clientM10a.query("BEGIN;");
         for (const lavoro of reqJson) {
             const queryTxt = `
                 INSERT INTO main10ance."a_temp" (
-                    "località", edificio, tetti, "umidità", statica, interni, esterni, ambito, data_ins, anno_tetti, "anno_umidità", anno_statica, anno_interni, anno_esterni, id_interno
+                    "località", edificio, tetti, "umidità", statica, interni, esterni, ambito, data_ins, autore_ins, anno_tetti, "anno_umidità", anno_statica, anno_interni, anno_esterni, id_interno
                 ) VALUES (
-                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
                 );
             `;
 
@@ -736,6 +737,7 @@ async function registraScoreLavori(reqJson, ambito) {
                 lavoro.score_esterni?.score_interno || null,
                 ambito,
                 lavoro.data,
+                autore,
                 lavoro.anno_tetti || null,
                 lavoro.anno_umidità || null,
                 lavoro.anno_statica || null,
