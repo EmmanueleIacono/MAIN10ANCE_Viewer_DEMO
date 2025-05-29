@@ -759,7 +759,10 @@ async function leggiScoreLavori(località, ambito) {
     try {
         const queryTxt = `
             WITH distinct_edifici AS (
-                SELECT DISTINCT edificio, edif_nome_menu FROM ${data_schema}.dati_edifici
+                SELECT DISTINCT edificio, edif_nome_menu
+                FROM ${data_schema}.dati_edifici
+                WHERE "località" = $1
+                AND ambito = $2
             )
             SELECT 
                 tp.data_ins, tp.id_interno,
