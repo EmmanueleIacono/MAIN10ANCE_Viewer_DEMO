@@ -264,6 +264,16 @@ app.post('/edifici/punteggi-lavori', async (req, res) => {
     }
 });
 
+// RECUPERO PUNTEGGI LAVORI ---RECENTI--- SU EDIFICI
+app.get('/edifici/punteggi-lavori-recenti', async (req, res) => {
+    const reqJson = req.headers;
+    const ambito = req.signedCookies.ambito;
+    const loc = JSON.parse(reqJson.loc);
+    const resp = await leggiScoreUltimiLavori(loc, ambito);
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(resp));
+});
+
 // RECUPERO PUNTEGGI LAVORI SU EDIFICI
 app.get('/edifici/punteggi-lavori', async (req, res) => {
     const reqJson = req.headers;
@@ -721,7 +731,11 @@ async function registraScoreLavori(reqJson, ambito, autore) {
         for (const lavoro of reqJson) {
             const queryTxt = `
                 INSERT INTO main10ance."a_temp" (
-                    "località", edificio, tetti, "umidità", statica, interni, esterni, ambito, data_ins, autore_ins, anno_tetti, "anno_umidità", anno_statica, anno_interni, anno_esterni, id_interno
+                    "località", edificio,
+                    tetti, "umidità", statica, interni, esterni,
+                    ambito, data_ins, autore_ins,
+                    anno_tetti, "anno_umidità", anno_statica, anno_interni, anno_esterni,
+                    id_interno
                 ) VALUES (
                     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
                 );
@@ -754,6 +768,45 @@ async function registraScoreLavori(reqJson, ambito, autore) {
         console.log(`Errore: ${e}`);
         await clientM10a.query("ROLLBACK;");
         return false;
+    }
+}
+
+async function leggiScoreUltimiLavori(località, ambito) {
+    try {
+        const queryTxt = `
+            WITH distinct_edifici AS (
+                SELECT DISTINCT edificio, edif_nome_menu
+                FROM ${data_schema}.dati_edifici
+                WHERE "località" = $1
+                AND ambito = $2
+            ),
+            latest_per_edificio AS (
+                SELECT DISTINCT ON (tp.edificio)
+                    tp.data_ins, tp.id_interno,
+                    tp.tetti, tp."umidità", tp.statica, tp.interni, tp.esterni,
+                    tp.anno_tetti, tp."anno_umidità", tp.anno_statica, tp.anno_interni, tp.anno_esterni,
+                    tp.edificio
+                FROM ${data_schema}."a_temp" AS tp
+                WHERE tp."località" = $1
+                AND tp.ambito = $2
+                ORDER BY tp.edificio, tp.id_interno DESC
+            )
+            SELECT
+                lpe.data_ins, lpe.id_interno,
+                lpe.tetti, lpe."umidità", lpe.statica, lpe.interni, lpe.esterni,
+                lpe.anno_tetti, lpe."anno_umidità", lpe.anno_statica, lpe.anno_interni, lpe.anno_esterni,
+                de.edif_nome_menu
+            FROM latest_per_edificio AS lpe
+            JOIN distinct_edifici AS de
+            ON lpe.edificio = de.edificio
+            ORDER BY lpe.edificio;
+        `;
+        const resp = await clientM10a.query(queryTxt, [località, ambito]);
+        return resp.rows;
+    }
+    catch(e) {
+        console.log(`Errore nella lettura delle attività precedenti: ${e}`);
+        return [];
     }
 }
 

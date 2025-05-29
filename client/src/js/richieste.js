@@ -506,6 +506,12 @@ export async function registraScoreLavori(reqJson) {
     return resJson;
 }
 
+export async function leggiScoreUltimiLavori(sigla_località) {
+    const res = await fetch('/g/edifici/punteggi-lavori-recenti', {method: "GET", headers: {"content-type": "application/json", loc: JSON.stringify(sigla_località)}});
+    const resJson = await res.json();
+    return resJson;
+}
+
 export async function leggiScoreLavori(sigla_località) {
     const res = await fetch('/g/edifici/punteggi-lavori', {method: "GET", headers: {"content-type": "application/json", loc: JSON.stringify(sigla_località)}});
     const resJson = await res.json();

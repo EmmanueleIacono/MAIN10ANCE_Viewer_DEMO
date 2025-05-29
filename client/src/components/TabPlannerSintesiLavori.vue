@@ -106,7 +106,7 @@
 <script>
 import {reactive, toRefs, watch, inject} from 'vue';
 import { dataCorta, dataInteger } from '../js/shared';
-import { registraScoreLavori } from '../js/richieste';
+import { leggiScoreUltimiLavori, registraScoreLavori } from '../js/richieste';
 import Details from './elementi/Details.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 import Card from './elementi/Card.vue';
@@ -150,13 +150,64 @@ export default {
       {stato: 'Lavori eseguiti', score: 5, score_interno: 6},
     ];
 
-    watch(() => state.selectLocalità, newVal => {
+    watch(() => state.selectLocalità, async newVal => {
+      state.caricamento = true;
       const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.località === newVal);
       state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
       console.log(listaSigleEdificiFiltrata);
       state.listaSigleEdificiSelezionati = [];
+      // prima cancello dati presenti
       resetDatiLavori();
+      // poi recupero dati esistenti
+      try {
+        const ultimiLavori = await leggiScoreUltimiLavori(newVal);
+        console.log(ultimiLavori);
+        popolaDatiLavori(ultimiLavori);
+      } catch (e) {
+        store.methods.setAlert("Errore nel recupero dei dati esistenti.");
+        console.log(e);
+      } finally {
+        state.caricamento = false;
+      }
     });
+
+    function popolaDatiLavori(ultimiLavori) {
+      // re-inizializza tutti gli array
+      resetDatiLavori();
+
+      // per ogni edificio...
+      state.listaSigleEdificiFiltrata.forEach((edf, idx) => {
+        // trova record corrispondente per edif_nome_menu
+        const rec = ultimiLavori.find(r => r.edif_nome_menu === edf.edif_nome_menu);
+        if (!rec) return;
+
+        // helper per trasformare stringa numerica in oggetto scoreLavori
+        const scoreObj = (val) => {
+          const n = parseInt(val, 10);
+          return scoreLavori.find(s => s.score_interno === n) || null;
+        };
+
+        // tetti
+        state.datiLavori.listaScoreTetti[idx] = scoreObj(rec.tetti);
+        state.datiLavori.listaAnnoTetti[idx] = rec.anno_tetti;
+
+        // umidità
+        state.datiLavori.listaScoreUmidità[idx] = scoreObj(rec["umidità"]);
+        state.datiLavori.listaAnnoUmidità[idx] = rec.anno_umidità;
+
+        // statica
+        state.datiLavori.listaScoreStatica[idx] = scoreObj(rec.statica);
+        state.datiLavori.listaAnnoStatica[idx] = rec.anno_statica;
+
+        // interni
+        state.datiLavori.listaScoreInterni[idx] = scoreObj(rec.interni);
+        state.datiLavori.listaAnnoInterni[idx] = rec.anno_interni;
+
+        // esterni
+        state.datiLavori.listaScoreEsterni[idx] = scoreObj(rec.esterni);
+        state.datiLavori.listaAnnoEsterni[idx] = rec.anno_esterni;
+      });
+    }
 
     async function salvaSintesiLavori() {
       const datiLavori = raccogliDatiLavori();
