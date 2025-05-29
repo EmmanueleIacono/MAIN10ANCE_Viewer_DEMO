@@ -2,6 +2,7 @@
   <div class="main-container">
     <LoadingScreen :caricamento="caricamento" />
     <div v-if="records.length" class="sort-controls">
+      <button :class="{active: oggi}" @click="setOggi">Oggi</button>
       <button :class="{active: sortKey === 'data_ins'}" @click="setSort('data_ins')">
         Data
         <span v-if="sortKey === 'data_ins'">{{ sortAsc ? '↑' : '↓' }}</span>
@@ -26,7 +27,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(rec, idx) in sortedRecords" :key="rec.id_interno + idx">
+        <tr v-for="(rec, idx) in filteredSortedRecords" :key="rec.id_interno + idx">
           <td>{{ rec.data_ins }}</td>
           <td>{{ rec.edif_nome_menu }}</td>
           <td :style="cellStyle(trovaVoceDaScore(rec.tetti, 'score'))">{{ trovaVoceDaScore(rec.tetti, 'stato') ?? '-' }}{{ rec.anno_tetti ? `\n${rec.anno_tetti}` : '' }}</td>
@@ -61,6 +62,7 @@ export default {
       records: [],
       sortKey: 'data_ins',
       sortAsc: false,
+      oggi: false,
     });
 
     const sortedRecords = computed(() => {
@@ -75,6 +77,15 @@ export default {
         const comp = va > vb ? 1 : -1;
         return state.sortAsc ? comp : -comp;
       });
+    });
+
+    const filteredSortedRecords = computed(() => {
+      const sorted = sortedRecords.value;
+      if (state.oggi) {
+        return filtraRecordsOggi(sorted);
+      } else {
+        return sorted;
+      }
     });
 
     watch(() => props.stateLocalità, async newVal => {
@@ -96,6 +107,10 @@ export default {
         state.sortKey = key;
         state.sortAsc = true;
       }
+    }
+
+    function setOggi() {
+      state.oggi = !state.oggi;
     }
 
     function cellStyle(valore) {
@@ -127,11 +142,41 @@ export default {
       }
     }
 
+    function filtraRecordsOggi(records) {
+      const oggiMap = new Map();
+
+      for (const rec of records) {
+        const key = rec.edif_nome_menu;
+        const prev = oggiMap.get(key);
+
+        if (!prev) {
+          oggiMap.set(key, rec);
+        } else {
+          const prevData = new Date(prev.data_ins);
+          const newData = new Date(rec.data_ins);
+
+          // se rec nuovo, o stessa data ma > id_interno (timestamp)
+          if (
+            newData > prevData || // data diversa
+            (
+              newData.getTime() === prevData.getTime() && // stessa data
+              rec.id_interno > prev.id_interno // ma timestamp diverso
+            )
+          ) {
+            oggiMap.set(key, rec);
+          }
+        }
+      }
+
+      return Array.from(oggiMap.values());
+    }
+
     return {
       store,
       ...toRefs(state),
-      sortedRecords,
+      filteredSortedRecords,
       setSort,
+      setOggi,
       cellStyle,
       trovaVoceDaScore,
     };
