@@ -33,6 +33,7 @@ const state = reactive({
     confirmResolvePromise: undefined,
     confirmRejectPromise: undefined,
     loaderGlobaleVisibile: false,
+    docsDialogVisibile: false,
 });
 
 const stateGIS = reactive({
@@ -198,6 +199,14 @@ const methods = {
 
     toggleLoaderGlobale() {
         state.loaderGlobaleVisibile = !state.loaderGlobaleVisibile;
+    },
+
+    apriDocsDialog() {
+        state.docsDialogVisibile = true;
+    },
+
+    chiudiDocsDialog() {
+        state.docsDialogVisibile = false;
     },
 
     setTabelleGIS(tabelle) {

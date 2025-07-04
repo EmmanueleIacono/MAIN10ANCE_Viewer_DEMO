@@ -7,7 +7,7 @@
             <b>ATTENZIONE</b>
           </div>
           <div class="panel-body">
-            <div>{{store.state.confirmMessaggio}}</div>
+            <span style="white-space: pre;">{{store.state.confirmMessaggio}}</span>
           </div>
           <div class="alert-footer">
             <button @click="conferma(true)" class="bottone-main10ance">OK</button>

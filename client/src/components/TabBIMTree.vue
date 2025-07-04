@@ -7,7 +7,7 @@
 <script>
 import {reactive, onMounted, provide, ref, inject, watch} from 'vue';
 import {getObjects} from '../js/richieste';
-import TreeNode from './elementi/TreeNode.vue';
+import TreeNode from './elementi/TreeNodeBIM.vue';
 
 export default {
   name: 'TabBIMTree',

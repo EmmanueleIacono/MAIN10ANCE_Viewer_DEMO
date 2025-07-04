@@ -7,7 +7,7 @@
             <b>ATTENZIONE</b>
           </div>
           <div class="panel-body">
-            <div>{{store.state.alertMessaggio}}</div>
+            <span style="white-space: pre;">{{store.state.alertMessaggio}}</span>
           </div>
           <div class="alert-footer">
             <button @click="store.methods.resetAlert" class="bottone-main10ance">CHIUDI</button>

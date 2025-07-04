@@ -5,7 +5,7 @@ app.use(express.json());
 app.use(express.static("public"));
 app.use(fileupload());
 
-const {clientM10a} = require('./connessioni');
+const {clientM10a, poolM10a} = require('./connessioni');
 const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
 
@@ -329,6 +329,76 @@ app.get('/viste', async (req, res) => {
     const risposta = await leggiVistaDB(nome_vista, utility);
     res.setHeader('content-type', 'application/json');
     res.send(risposta);
+});
+
+app.get('/lista_loc', async (req, res) => {
+    try {
+        const ambito = req.signedCookies.ambito;
+        const risposta = await leggiListaLocalità(ambito);
+        res.setHeader('content-type', 'application/json');
+        res.send(risposta);
+    } catch(e) {
+        console.log(e);
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify({errore: 'Nessuna località presente'}));
+    }
+});
+
+app.get('/lista_edif', async (req, res) => {
+    try {
+        const ambito = req.signedCookies.ambito;
+        const risposta = await leggiListaEdifici(ambito);
+        res.setHeader('content-type', 'application/json');
+        res.send(risposta);
+    } catch(e) {
+        console.log(e);
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify({errore: 'Nessun edificio presente'}));
+    }
+});
+
+app.get('/lista_elems', async (req, res) => {
+    try {
+        const risposta = await leggiListaElementi();
+        res.setHeader('content-type', 'application/json');
+        res.send(risposta);
+    } catch(e) {
+        console.log(e);
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify({errore: 'Nessun elemento presente'}));
+    }
+});
+
+app.post('/docs/upload', async (req, res) => {
+    const ambito = req.signedCookies.ambito;
+    const utente = req.signedCookies.user_id;
+    const datiDocs = req.body;
+    const files = req.files;
+    let result = {success: null};
+    try {
+        const resp = await caricaDocumento(datiDocs, files, ambito, utente);
+        result = resp;
+    } catch(e) {
+        console.log(e);
+        result.success = false;
+    }
+    finally {
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify(result));
+    }
+});
+
+app.get('/docs/ids', async (req, res) => {
+    try {
+        const ambito = req.signedCookies.ambito;
+        const risposta = await leggiIdDocEsistenti(ambito);
+        res.setHeader('content-type', 'application/json');
+        res.send(risposta);
+    } catch(e) {
+        console.log(e);
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify({errore: 'Nessun documento presente'}));
+    }
 });
 
 //////////          QUERY          //////////
@@ -977,6 +1047,147 @@ async function leggiVistaDB(nome_vista, utility = false) {
     }
 }
 
+async function leggiListaLocalità(ambito) {
+    try {
+        const results = await clientM10a.query(`SELECT sigla, nome FROM ${data_schema}."v_elenco_località" WHERE ambito LIKE $1;`, [ambito]);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function leggiListaEdifici(ambito) {
+    try {
+        const results = await clientM10a.query(`SELECT "località", edificio, edif_nome_menu FROM ${data_schema}."v_elenco_edifici" WHERE ambito LIKE $1;`, [ambito]);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function leggiListaElementi() {
+    try {
+        const results = await clientM10a.query(`SELECT cl_ogg, elemento_sigla, elemento_nome FROM ${utility_schema}."classificazione_elementi";`);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function caricaDocumento(dati, files, ambito, utente) {
+    console.log(dati);
+    console.log(files);
+    const file = files.file;
+    const meta = JSON.parse(dati.metadata);
+
+    if (!file || !meta) throw new Error('File o metadati assenti');
+
+    const percorso = `${ambito}/${meta.cartella_tipo}/${meta.id_doc}`;
+    const nomeFile = file.name ? file.name : '---';
+    const fileFullPath = `${percorso}/${nomeFile}`;
+    const fileOpts = { contentType: file.mimetype };
+
+    const id_doc = normalizzaValoriVuoti(meta.id_doc);
+    const data_doc = normalizzaValoriVuoti(meta.data_doc);
+    const autore_doc = normalizzaValoriVuoti(meta.autore_doc);
+    const descrizione = normalizzaValoriVuoti(meta.descrizione);
+    const annotazioni = normalizzaValoriVuoti(meta.annotazioni);
+    const tipo_doc = normalizzaValoriVuoti(meta.tipo_doc);
+    const temi = (meta.temi || []).map(normalizzaValoriVuoti);
+    const sist_composto = normalizzaValoriVuoti(meta.sist_composto);
+
+    // type composito relazione
+    const relazioni = gestisciRelazioniDocs(meta.relazioni || []);
+    console.log('relazioni:\n', relazioni);
+
+    const insertSQL = `
+        INSERT INTO ${data_schema}.documenti (
+            id_doc, data_doc, autore_doc,
+            descrizione, annotazioni,
+            tipo_doc, temi, sist_composto,
+            relazioni,
+            percorso_doc, ambito, autore_ins
+        ) VALUES (
+            $1, $2, $3,
+            $4, $5,
+            $6, $7, $8,
+            (
+                SELECT COALESCE(
+                    array_agg(
+                        ROW(
+                            r."località",
+                            r.edificio,
+                            r.classe::${utility_schema}.cl_ogg,
+                            r.elemento,
+                            r.annotazioni
+                        )::${utility_schema}.doc_relazione
+                    ),
+                    '{}'
+                )
+                FROM jsonb_to_recordset($9::jsonb) AS r(
+                    "località" text,
+                    edificio text,
+                    classe text,
+                    elemento text,
+                    annotazioni text
+                )
+            ),
+            $10, $11, $12
+        );
+    `;
+
+    const insertVals = [
+        id_doc, data_doc, autore_doc,
+        descrizione, annotazioni,
+        tipo_doc, temi, sist_composto,
+        relazioni,
+        fileFullPath, ambito, utente
+    ];
+    console.log(insertVals);
+
+    const client = await poolM10a.connect();
+    try {
+
+        await client.query('BEGIN;');
+
+        // insert DB
+        await client.query(insertSQL, insertVals);
+
+        // insert documenti supabase
+        const { error } = await supabase.storage.from('documenti').upload(fileFullPath, file.data, fileOpts);
+        if (error) throw error;
+
+        await client.query('COMMIT;');
+
+        return { success: true, percorso };
+    } catch (er) {
+        console.error('Errore nel caricamento di documenti: ', er);
+        await client.query('ROLLBACK;'); // rollback su DB
+        await supabase.storage.from('documenti').remove([fileFullPath]) // elimina file caricato su storage
+        return { success: false, error: er.message };
+    } finally {
+        client.release();
+    }
+}
+
+async function leggiIdDocEsistenti(ambito) {
+    const client = await poolM10a.connect();
+    try {
+        const results = await client.query(`SELECT id_doc FROM ${data_schema}.documenti WHERE ambito LIKE $1 ORDER BY id_doc`, [ambito]);
+        return results.rows;
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+    client.release();
+}
+
 //////////          ALTRE FUNZIONI          //////////
 
 function gestisciStringheSchede(listaOggetti, ambito) {
@@ -1045,6 +1256,35 @@ function gestisciDocumenti(listaOggetti) {
         listaDocumenti.push(docs_arr);
     });
     return listaDocumenti;
+}
+
+function normalizzaValoriVuoti(val) {
+    if (typeof val === 'string' && val.trim() === '') return null;
+    return val;
+}
+
+function gestisciRelazioniDocs(rel) {
+    // const items = rel.map(r => {
+    //     const campi = [
+    //         normalizzaValoriVuoti(r.località),
+    //         normalizzaValoriVuoti(r.edificio),
+    //         normalizzaValoriVuoti(r.classe),
+    //         normalizzaValoriVuoti(r.elemento),
+    //         normalizzaValoriVuoti(r.annotazioni),
+    //     ].map(f => f === null ? 'NULL' : `'${f.replace(/'/g, "\\'")}'`);
+    //     // ].map(f => f === null ? 'NULL' : `'${f}'`);
+    //     return `(${campi.join(',')})`;
+    // });
+    // return `{${items.join(',')}}`;
+    const relazioniNorm = (rel || []).map(r => ({
+        "località": normalizzaValoriVuoti(r.località),
+        "edificio": normalizzaValoriVuoti(r.edificio),
+        "classe": normalizzaValoriVuoti(r.classe),
+        "elemento": normalizzaValoriVuoti(r.elemento),
+        "annotazioni": normalizzaValoriVuoti(r.annotazioni)
+    }));
+
+    return JSON.stringify(relazioniNorm);
 }
 
 module.exports = app;

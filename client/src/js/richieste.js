@@ -50,7 +50,6 @@ export async function leggiDBMarkerEdifAmbito() {
     try {
         const risultato = await fetch(`/o/MarkerEdif`, {method: "GET", headers: {"content-type": "application/json"}});
         const edificiJson = await risultato.json();
-        console.log(edificiJson);
         return edificiJson;
     }
     catch(e) {
@@ -520,6 +519,36 @@ export async function leggiScoreLavori(sigla_località) {
 
 export async function leggiVistaDB(nome_vista, utility = false) {
     const res = await fetch(`/o/viste`, {method: "GET", headers: {"content-type": "application/json", nome_vista: JSON.stringify(nome_vista), utility: JSON.stringify(utility)}});
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function leggiListaLocalità() {
+    const res = await fetch(`/o/lista_loc`, {method: "GET", headers: {"content-type": "application/json"}});
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function leggiListaEdifici() {
+    const res = await fetch(`/o/lista_edif`, {method: "GET", headers: {"content-type": "application/json"}});
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function leggiListaElementi() {
+    const res = await fetch(`/o/lista_elems`, {method: "GET", headers: {"content-type": "application/json"}});
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function caricaDocumento(docFormData) {
+    const res = await fetch(`/o/docs/upload`, {method: "POST", body: docFormData});
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function leggiIdDocEsistenti() {
+    const res = await fetch(`/o/docs/ids`, {method: "GET"});
     const resJson = await res.json();
     return resJson;
 }

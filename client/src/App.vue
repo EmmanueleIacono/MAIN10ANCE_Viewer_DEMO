@@ -20,6 +20,7 @@
           <li @click="store.methods.setTabAttivo('Tab5')" :class="{active: store.state.tabAttivo==='Tab5'}" class="tab" id="apriTabCollection">ARTIFACT VIEWER</li>
           <li @click="store.methods.setTabAttivo('Tab3')" :class="{active: store.state.tabAttivo==='Tab3'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabSchede">PLANNER</li>
           <li @click="store.methods.setTabAttivo('Tab4')" :class="{active: store.state.tabAttivo==='Tab4'}" v-if="store.getters.getUsrVwList().includes('apriTabDashboard')" class="tab" id="apriTabDashboard">DASHBOARD</li>
+          <li @click="store.methods.apriDocsDialog" v-if="store.getters.getUsrVwList().includes('apriTabDocumenti')" class="tab">DOCUMENTI</li>
         </ul>
         <div class="pull-right">
           <ul class="nav navbar-nav">
@@ -42,6 +43,7 @@
       </div>
     </div>
   </div>
+  <DialogFileUpload />
   <Alert />
   <Confirm />
 </div>
@@ -60,6 +62,7 @@ import TabAuth from './components/TabAuth.vue';
 import Alert from './components/Alert.vue';
 import Confirm from './components/Confirm.vue';
 import LoadingScreen from './components/elementi/LoadingScreen.vue';
+import DialogFileUpload from './components/DialogFileUpload.vue';
 
 export default {
   name: 'App',
@@ -73,6 +76,7 @@ export default {
     Alert,
     Confirm,
     LoadingScreen,
+    DialogFileUpload,
   },
   setup() {
     provide('store', store);
@@ -147,6 +151,7 @@ export default {
   --verdeMain10ance: #a8c956;
   --bluInterreg: #1a4f9c;
   --blackOlive: #36382e;
+  --blackOliveChiaro: #4e5143;
   --ghostWhite: #f8f8ff;
   --lightGray: #d3d4d9;
   --verdeMain10anceTrasparenza: #a8c95660;
