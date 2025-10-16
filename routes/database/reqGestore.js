@@ -557,6 +557,7 @@ async function uploadImmagine(files, dati, ambito) {
         statua: 'id_statua',
         manufatto: 'id_man',
         dettaglio: 'id_dett',
+        elementi: 'id'
     };
     const fileOptions = {contentType: file.mimetype};
     try {

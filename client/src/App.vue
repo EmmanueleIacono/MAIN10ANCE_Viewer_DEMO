@@ -15,18 +15,24 @@
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav left tabs">
-          <li @click="store.methods.setTabAttivo('Tab2')" :class="{active: store.state.tabAttivo==='Tab2'}" class="tab" id="apriTabGIS">GIS VIEWER</li>
-          <li @click="store.methods.setTabAttivo('Tab1')" :class="{active: store.state.tabAttivo==='Tab1'}" class="tab" id="apriTabBIM">BIM VIEWER</li>
-          <li @click="store.methods.setTabAttivo('Tab5')" :class="{active: store.state.tabAttivo==='Tab5'}" class="tab" id="apriTabCollection">ARTIFACT VIEWER</li>
-          <li @click="store.methods.setTabAttivo('Tab3')" :class="{active: store.state.tabAttivo==='Tab3'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabSchede">PLANNER</li>
+          <li class="tab viz-dropdown">
+            VISUALIZZATORI
+            <ul class="dropdown-menu">
+              <li @click="store.methods.setTabAttivo('Tab2')" :class="{active: store.state.tabAttivo==='Tab2'}" class="tab" id="apriTabGIS">GIS</li>
+              <li @click="store.methods.setTabAttivo('Tab1')" :class="{active: store.state.tabAttivo==='Tab1'}" class="tab" id="apriTabBIM">BIM</li>
+              <li @click="store.methods.setTabAttivo('Tab5')" :class="{active: store.state.tabAttivo==='Tab5'}" class="tab" id="apriTabCollection">GALLERIA</li>
+            </ul>
+          </li>
+          <li @click="store.methods.setTabAttivo('Tab6')" :class="{active: store.state.tabAttivo==='Tab6'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabAnagrafica">ANAGRAFICA</li>
+          <li @click="store.methods.setTabAttivo('Tab3')" :class="{active: store.state.tabAttivo==='Tab3'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabSchede">STRUMENTO OPERATIVO</li>
           <li @click="store.methods.setTabAttivo('Tab4')" :class="{active: store.state.tabAttivo==='Tab4'}" v-if="store.getters.getUsrVwList().includes('apriTabDashboard')" class="tab" id="apriTabDashboard">DASHBOARD</li>
           <li @click="store.methods.apriDocsDialog" v-if="store.getters.getUsrVwList().includes('apriTabDocumenti')" class="tab">DOCUMENTI</li>
         </ul>
         <div class="pull-right">
           <ul class="nav navbar-nav">
             <li id="liUsernameNavbar">{{store.state.userSettings.user_id}}</li>
-            <li @click="store.methods.setTabAttivo('TabAuth')" v-if="!store.state.userSettings.user_id" :class="{active: store.state.tabAttivo==='TabLogin'}" class="tab" id="apriTabLogin">LOGIN</li>
-            <li @click="logout" v-if="store.state.userSettings.user_id" class="tab" id="navbarLogout">LOGOUT</li>
+            <li @click="store.methods.setTabAttivo('TabAuth')" v-if="!store.state.userSettings.user_id" :class="{active: store.state.tabAttivo==='TabLogin'}" class="tab" id="apriTabLogin">ACCEDI</li>
+            <li @click="logout" v-if="store.state.userSettings.user_id" class="tab" id="navbarLogout">ESCI</li>
           </ul>
         </div>
       </div>
@@ -53,11 +59,14 @@
 import {provide, onMounted} from 'vue';
 import {getTabelleGIS, getGIS, leggiDBMarkerLoc, leggiDBMarkerEdif, leggiDBMarkerLocPdiff} from './js/richieste';
 import store from '@/store';
+import store_globale from './store/store_globale';
+import store_anagrafica from './store/store_anagrafica';
 import Tab1 from './components/TabBIM.vue';
 import Tab2 from './components/TabGIS.vue';
 import Tab3 from './components/TabPlanner.vue';
 import Tab4 from './components/TabDashboard.vue';
 import Tab5 from './components/TabCollection.vue';
+import Tab6 from './components/TabAnagrafica/Main.vue'
 import TabAuth from './components/TabAuth.vue';
 import Alert from './components/Alert.vue';
 import Confirm from './components/Confirm.vue';
@@ -72,6 +81,7 @@ export default {
     Tab3,
     Tab4,
     Tab5,
+    Tab6,
     TabAuth,
     Alert,
     Confirm,
@@ -80,6 +90,8 @@ export default {
   },
   setup() {
     provide('store', store);
+    provide('store_globale', store_globale);
+    provide('store_anagrafica', store_anagrafica);
 
     primoLoad();
 
@@ -87,10 +99,11 @@ export default {
       await popolaMappa();
     });
 
-    function primoLoad() {
+    async function primoLoad() {
       if (localStorage.user_id) {
         store.methods.setUserSettings();
       }
+      await store_globale.methods.popolaStoreGlobale();
     }
 
     async function logout() {
@@ -215,6 +228,38 @@ body {
 
 .tab:hover {
   background-color: #aaa;
+}
+
+.viz-dropdown {
+  position: relative;
+}
+
+.viz-dropdown .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  flex-direction: column;
+  background-color: var(--verdeMain10ance);
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 5px 0;
+  z-index: 100;
+}
+
+.viz-dropdown .dropdown-menu .tab {
+  margin: 0;
+  padding: 8px 16px;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.viz-dropdown .dropdown-menu .tab:hover {
+  background-color: #aaa;
+}
+
+.viz-dropdown:hover .dropdown-menu {
+  display: flex;
 }
 
 #liUsernameNavbar {

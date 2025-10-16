@@ -535,6 +535,12 @@ export async function leggiListaEdifici() {
     return resJson;
 }
 
+export async function leggiListaClassiOggetto() {
+    const res = await fetch(`/o/lista_cl_ogg`, {method: "GET", headers: {"content-type": "application/json"}});
+    const resJson = await res.json();
+    return resJson;
+}
+
 export async function leggiListaElementi() {
     const res = await fetch(`/o/lista_elems`, {method: "GET", headers: {"content-type": "application/json"}});
     const resJson = await res.json();
@@ -549,6 +555,12 @@ export async function caricaDocumento(docFormData) {
 
 export async function leggiIdDocEsistenti() {
     const res = await fetch(`/o/docs/ids`, {method: "GET"});
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function leggiDefinizioniClassiElementi() {
+    const res = await fetch(`/t/definizioni_classi`, {method: "GET"});
     const resJson = await res.json();
     return resJson;
 }

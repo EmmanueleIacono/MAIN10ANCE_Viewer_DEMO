@@ -95,6 +95,12 @@ app.get('/Main10ance_DB/LOD4/info', async (req, res) => {
     res.send(JSON.stringify(datiLOD4));
 });
 
+app.get('/definizioni_classi', async (req, res) => {
+    const definizioni = await getDefinizioniClassiElementi();
+    res.setHeader('content-type', 'application/json');
+    res.send(JSON.stringify(definizioni));
+});
+
 //////////          QUERY          //////////
 
 async function leggiGIS(tabella, geometria, colonneUtili) {
@@ -216,6 +222,17 @@ async function getInfoImmagine(percorsoFile, tabella) {
     try {
         const result = await clientM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "id_main10ance" FROM ${schema}.${tabella} WHERE "immagine" = ($1);`, [percorsoFile]);
         return result.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function getDefinizioniClassiElementi() {
+    try {
+        const result = await clientM10a.query(`SELECT full_hierarchy FROM ${utility_schema}.vw_definizioni_classificazione_elementi_json;`);
+        return result.rows[0]["full_hierarchy"];
     }
     catch(e) {
         console.log(e);

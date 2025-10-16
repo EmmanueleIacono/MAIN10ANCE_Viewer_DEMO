@@ -357,6 +357,18 @@ app.get('/lista_edif', async (req, res) => {
     }
 });
 
+app.get('/lista_cl_ogg', async (req, res) => {
+    try {
+        const risposta = await leggiListaClassiOggetto();
+        res.setHeader('content-type', 'application/json');
+        res.send(risposta);
+    } catch(e) {
+        console.log(e);
+        res.setHeader('content-type', 'application/json');
+        res.send(JSON.stringify({errore: 'Nessun elemento presente'}));
+    }
+});
+
 app.get('/lista_elems', async (req, res) => {
     try {
         const risposta = await leggiListaElementi();
@@ -1061,6 +1073,17 @@ async function leggiListaLocalità(ambito) {
 async function leggiListaEdifici(ambito) {
     try {
         const results = await clientM10a.query(`SELECT "località", edificio, edif_nome_menu FROM ${data_schema}."v_elenco_edifici" WHERE ambito LIKE $1;`, [ambito]);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function leggiListaClassiOggetto() {
+    try {
+        const results = await clientM10a.query(`SELECT DISTINCT cl_ogg FROM ${utility_schema}."classificazione_elementi";`);
         return results.rows;
     }
     catch(e) {
