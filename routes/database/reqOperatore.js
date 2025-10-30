@@ -976,6 +976,32 @@ async function interrogaAnagraficaStatua(id, ambito) {
     }
 }
 
+async function interrogaAnagraficaCopertura(id, ambito) {
+    try {
+        const result_anagr = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore",
+                                                     sa.descrizione_copertura_rapporti AS "Descrizione copertura rapporti", sa.descrizione_copertura_rapporti_annotazioni AS "Descrizione copertura rapporti annotazioni",
+                                                     
+                                                     sa.epoca AS "Epoca", sa.fonti AS "Fonti",
+                                                     sa.autore AS "Autore",
+                                                     sa."accessibilità" AS "Accessibilità", sa."accessibilità_annotazioni" AS "Accessibilità annotazioni",
+                                                     sa."ispezionabilità_sottotetto" AS "Ispezionabilità sottotetto", sa."ispezionabilità_sottotetto_annotazioni" AS "Ispezionabilità sottotetto annotazioni",
+                                                     sa.note AS "Note", sa.docs AS "Documenti"
+                                                     FROM ${data_schema}.scheda_anagrafica_statua AS sa
+                                                     WHERE sa.id_main10ance = $1 AND sa.ambito = $2
+                                                     ORDER BY id_anagr DESC
+                                                     LIMIT 1;`,
+                                                     [id, ambito]
+                                                   );
+
+        const full_res = {...result_anagr.rows[0]};
+        return [full_res];
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
 async function interrogaAnagraficaManufatto(id) {
     try {
         const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.epoca AS "Epoca", sa.autore AS "Autore", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.documenti AS "Documenti", sa.iter_autorizzativo AS "Iter autorizzativo" FROM ${utility_schema}.anagrafica_manufatto AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}' ORDER BY sa.id_anagr DESC;`);

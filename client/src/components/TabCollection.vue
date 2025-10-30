@@ -186,6 +186,62 @@ export default {
         autore_scheda: null,
         autore_ultima_mod: null,
       },
+      datiModuloAnagraficaCoperture: {
+        descrizione_copertura_rapporti: '', // enum
+        descrizione_copertura_rapporti_annotazioni: '',
+        estensione_compl: null, // double
+        estensione_compl_comment: '', // enum
+        descrizione_copertura_gen: '',
+        cronologia_cop: '',
+        tipo_manto: '', // enum
+        tipo_manto_annotazioni: '',
+        materiale_manto_pietra: '', // enum
+        materiale_manto_later: '', // enum
+        materiale_manto_annotazioni: '',
+        tipo_elementi_manto_pietra: '', // enum
+        tipo_elementi_manto_later: '', // enum
+        tipo_elementi_manto_annotazioni: '',
+        tecnica_esec_posa_manto_pietra: '', // enum
+        tecnica_esec_posa_manto_later: '', // enum
+        tecnica_esec_posa_manto_annotazioni: '',
+        colmo_sist_descrizione: '',
+        colmo_sist_gloss: '',
+        colmo_sist_annotazioni: '',
+        displuvi_sist_descrizione: '',
+        displuvi_sist_gloss: '',
+        displuvi_sist_annotazioni: '',
+        gronda_sist_descrizione: '',
+        gronda_sist_gloss: '',
+        gronda_sist_annotazioni: '',
+        el_strati_funz_acc: [], // enum[]
+        el_strati_funz_acc_gloss: '',
+        el_strati_funz_acc_annotazioni: '',
+        el_strati_funz_acc_aggiunto: false, // bool
+        materiale_cop_str: '', // enum
+        materiale_cop_strutt_annotazioni: '',
+        grossa_orditura_el: '',
+        grossa_orditura_annotazioni: '',
+        media_orditura_el: '',
+        media_orditura_annotazioni: '',
+        piccola_orditura_el: '',
+        piccola_orditura_annotazioni: '',
+        el_giunzioni: '',
+        el_giunzioni_annotazioni: '',
+        epoca: '',
+        fonti: '',
+        autore: '',
+        accessibilità: false, // bool
+        accessibilità_annotazioni: '',
+        ispezionabilità_sottotetto: false, // bool
+        ispezionabilità_sottotetto_annotazioni: '',
+        note: '',
+        docs: [], // lista nomi documenti
+        id_anagr: null,
+        data_registrazione: null,
+        data_ultima_mod: null,
+        autore_scheda: null,
+        autore_ultima_mod: null,
+      },
       datiModuloSegnalazione: {
         meteo: '',
         temperatura: '',
@@ -211,6 +267,7 @@ export default {
     provide('stateSegnalazione', state.datiSegnalazione);
     provide('stateModuloAnagrafica', state.datiModuloAnagrafica);
     provide('stateModuloAnagraficaStatua', state.datiModuloAnagraficaStatua);
+    provide('stateModuloAnagraficaCoperture', state.datiModuloAnagraficaCoperture);
     provide('stateDocumenti', state.datiDocumenti);
     provide('stateModuloSegnalazione', state.datiModuloSegnalazione);
 
@@ -444,7 +501,63 @@ export default {
               state.datiModuloAnagraficaStatua.note = state.datiAnagrafica.schedaAnagrafica['Note'];
               state.datiDocumenti.docs = state.datiAnagrafica.schedaAnagrafica['Documenti'];
               break;
-          
+
+            case 'elementi':
+              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+              console.log('state anagrafica coperture: ', state.datiAnagrafica.schedaAnagrafica);
+              state.datiModuloAnagraficaCoperture.descrizione_copertura_rapporti = state.datiAnagrafica.schedaAnagrafica['Descrizione copertura rapporti'];
+              state.datiModuloAnagraficaCoperture.descrizione_copertura_rapporti_annotazioni = state.datiAnagrafica.schedaAnagrafica['Descrizione copertura rapporti annotazioni'];
+              //
+              state.datiModuloAnagraficaCoperture.estensione_compl = state.datiAnagrafica.schedaAnagrafica['']; // double
+              state.datiModuloAnagraficaCoperture.estensione_compl_comment = state.datiAnagrafica.schedaAnagrafica['']; // enum
+              state.datiModuloAnagraficaCoperture.descrizione_copertura_gen = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.cronologia_cop = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.tipo_manto = state.datiAnagrafica.schedaAnagrafica['']; // enum
+              state.datiModuloAnagraficaCoperture.tipo_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.materiale_manto_pietra = state.datiAnagrafica.schedaAnagrafica['']; // enum
+              state.datiModuloAnagraficaCoperture.materiale_manto_later = state.datiAnagrafica.schedaAnagrafica['']; // enum
+              state.datiModuloAnagraficaCoperture.materiale_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_pietra = state.datiAnagrafica.schedaAnagrafica['']; // enum
+              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_later = state.datiAnagrafica.schedaAnagrafica['']; // enum
+              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_pietra = state.datiAnagrafica.schedaAnagrafica['']; // enum
+              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_later = state.datiAnagrafica.schedaAnagrafica['']; // enum
+              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.colmo_sist_descrizione = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.colmo_sist_gloss = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.colmo_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.displuvi_sist_descrizione = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.displuvi_sist_gloss = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.displuvi_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.gronda_sist_descrizione = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.gronda_sist_gloss = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.gronda_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.el_strati_funz_acc = state.datiAnagrafica.schedaAnagrafica['']; // enum[] !!!!!!!!!!!!!!!!!! FORSE QUI DA FARE QUELLA COSA DEL TRATTA STRINGHE ARRAY
+              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_gloss = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto = state.datiAnagrafica.schedaAnagrafica['']; // bool
+              state.datiModuloAnagraficaCoperture.materiale_cop_str = state.datiAnagrafica.schedaAnagrafica['']; // enum
+              state.datiModuloAnagraficaCoperture.materiale_cop_strutt_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.grossa_orditura_el = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.grossa_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.media_orditura_el = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.media_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.piccola_orditura_el = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.piccola_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.el_giunzioni = state.datiAnagrafica.schedaAnagrafica[''];
+              state.datiModuloAnagraficaCoperture.el_giunzioni_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
+              //
+              state.datiModuloAnagraficaCoperture.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
+              state.datiModuloAnagraficaCoperture.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
+              state.datiModuloAnagraficaCoperture.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
+              state.datiModuloAnagraficaCoperture.accessibilità = state.datiAnagrafica.schedaAnagrafica['Accessibilità']; // bool
+              state.datiModuloAnagraficaCoperture.accessibilità_annotazioni = state.datiAnagrafica.schedaAnagrafica['Accessibilità annotazioni'];
+              state.datiModuloAnagraficaCoperture.ispezionabilità_sottotetto = state.datiAnagrafica.schedaAnagrafica['Ispezionabilità sottotetto']; // bool
+              state.datiModuloAnagraficaCoperture.ispezionabilità_sottotetto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Ispezionabilità sottotetto annotazioni'];
+              state.datiModuloAnagraficaCoperture.note = state.datiAnagrafica.schedaAnagrafica['Note'];
+              state.datiDocumenti.docs = state.datiAnagrafica.schedaAnagrafica['Documenti'];
+              break;
+
             default:
               // dati LOD4
               state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
