@@ -187,6 +187,7 @@ export default {
         autore_ultima_mod: null,
       },
       datiModuloAnagraficaCoperture: {
+        codice: '',
         descrizione_copertura_rapporti: '', // enum
         descrizione_copertura_rapporti_annotazioni: '',
         estensione_compl: null, // double
@@ -219,13 +220,13 @@ export default {
         el_strati_funz_acc_aggiunto: false, // bool
         materiale_cop_str: '', // enum
         materiale_cop_strutt_annotazioni: '',
-        grossa_orditura_el: '',
+        grossa_orditura_el: [],
         grossa_orditura_annotazioni: '',
-        media_orditura_el: '',
+        media_orditura_el: [],
         media_orditura_annotazioni: '',
-        piccola_orditura_el: '',
+        piccola_orditura_el: [],
         piccola_orditura_annotazioni: '',
-        el_giunzioni: '',
+        el_giunzioni: [],
         el_giunzioni_annotazioni: '',
         epoca: '',
         fonti: '',
@@ -396,8 +397,8 @@ export default {
         console.log(jsonReq);
         const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
         const datiSegnalazione = await getSegnalazioneArtifactViewer(jsonReq);
-        console.log(datiAnagrafica);
-        console.log(datiSegnalazione);
+        console.log("datiAnagrafica\n", datiAnagrafica);
+        console.log("datiSegnalazione\n", datiSegnalazione);
         state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
         state.datiSegnalazione.schedaSegnalazione = datiSegnalazione[0];
         state.datiAnagrafica.moduloAnagraficaVisibile = false;
@@ -429,12 +430,12 @@ export default {
         };
         console.log(jsonReq);
         const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
-        console.log(datiAnagrafica);
+        console.log("datiAnagrafica\n", datiAnagrafica);
         state.datiAnagrafica.schedaAnagraficaVisibile = false;
         state.datiSegnalazione.schedaSegnalazioneVisibile = false;
         state.datiSegnalazione.moduloSegnalazioneVisibile = false;
         state.datiAnagrafica.moduloAnagraficaVisibile = true;
-        if (datiAnagrafica.length) {
+        if (Object.keys(datiAnagrafica).length) {
           console.log('ci sono dei dati');
           // QUI IMPOSTARE DATI ANAGRAFICA
           switch (categoria) {
@@ -467,7 +468,7 @@ export default {
               break;
 
             case 'statua':
-              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica;
               console.log('state anagrafica statua: ', state.datiAnagrafica.schedaAnagrafica);
               state.datiModuloAnagraficaStatua.nome_statua = state.datiAnagrafica.schedaAnagrafica['Soggetto statua']; // DA TABELLA "statua"
               state.datiModuloAnagraficaStatua.codice_statua = state.datiAnagrafica.schedaAnagrafica['Codice statua']; // DA TABELLA "statua"
@@ -503,50 +504,49 @@ export default {
               break;
 
             case 'elementi':
-              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica;
               console.log('state anagrafica coperture: ', state.datiAnagrafica.schedaAnagrafica);
+              state.datiModuloAnagraficaCoperture.codice = state.datiAnagrafica.schedaAnagrafica['Codice copertura']; // DA TABELLA "elementi"
               state.datiModuloAnagraficaCoperture.descrizione_copertura_rapporti = state.datiAnagrafica.schedaAnagrafica['Descrizione copertura rapporti'];
               state.datiModuloAnagraficaCoperture.descrizione_copertura_rapporti_annotazioni = state.datiAnagrafica.schedaAnagrafica['Descrizione copertura rapporti annotazioni'];
-              //
-              state.datiModuloAnagraficaCoperture.estensione_compl = state.datiAnagrafica.schedaAnagrafica['']; // double
-              state.datiModuloAnagraficaCoperture.estensione_compl_comment = state.datiAnagrafica.schedaAnagrafica['']; // enum
-              state.datiModuloAnagraficaCoperture.descrizione_copertura_gen = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.cronologia_cop = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.tipo_manto = state.datiAnagrafica.schedaAnagrafica['']; // enum
-              state.datiModuloAnagraficaCoperture.tipo_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.materiale_manto_pietra = state.datiAnagrafica.schedaAnagrafica['']; // enum
-              state.datiModuloAnagraficaCoperture.materiale_manto_later = state.datiAnagrafica.schedaAnagrafica['']; // enum
-              state.datiModuloAnagraficaCoperture.materiale_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_pietra = state.datiAnagrafica.schedaAnagrafica['']; // enum
-              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_later = state.datiAnagrafica.schedaAnagrafica['']; // enum
-              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_pietra = state.datiAnagrafica.schedaAnagrafica['']; // enum
-              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_later = state.datiAnagrafica.schedaAnagrafica['']; // enum
-              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.colmo_sist_descrizione = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.colmo_sist_gloss = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.colmo_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.displuvi_sist_descrizione = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.displuvi_sist_gloss = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.displuvi_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.gronda_sist_descrizione = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.gronda_sist_gloss = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.gronda_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.el_strati_funz_acc = state.datiAnagrafica.schedaAnagrafica['']; // enum[] !!!!!!!!!!!!!!!!!! FORSE QUI DA FARE QUELLA COSA DEL TRATTA STRINGHE ARRAY
-              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_gloss = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto = state.datiAnagrafica.schedaAnagrafica['']; // bool
-              state.datiModuloAnagraficaCoperture.materiale_cop_str = state.datiAnagrafica.schedaAnagrafica['']; // enum
-              state.datiModuloAnagraficaCoperture.materiale_cop_strutt_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.grossa_orditura_el = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.grossa_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.media_orditura_el = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.media_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.piccola_orditura_el = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.piccola_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.el_giunzioni = state.datiAnagrafica.schedaAnagrafica[''];
-              state.datiModuloAnagraficaCoperture.el_giunzioni_annotazioni = state.datiAnagrafica.schedaAnagrafica[''];
-              //
+              state.datiModuloAnagraficaCoperture.estensione_compl = state.datiAnagrafica.schedaAnagrafica['Estensione complessiva']; // double
+              state.datiModuloAnagraficaCoperture.estensione_compl_comment = state.datiAnagrafica.schedaAnagrafica['Estensione desunta da']; // enum
+              state.datiModuloAnagraficaCoperture.descrizione_copertura_gen = state.datiAnagrafica.schedaAnagrafica['Descrizione generale copertura'];
+              state.datiModuloAnagraficaCoperture.cronologia_cop = state.datiAnagrafica.schedaAnagrafica['Cronologia'];
+              state.datiModuloAnagraficaCoperture.tipo_manto = state.datiAnagrafica.schedaAnagrafica['Tipo manto']; // enum
+              state.datiModuloAnagraficaCoperture.tipo_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Tipo manto annotazioni'];
+              state.datiModuloAnagraficaCoperture.materiale_manto_pietra = state.datiAnagrafica.schedaAnagrafica['Materiale manto pietra']; // enum
+              state.datiModuloAnagraficaCoperture.materiale_manto_later = state.datiAnagrafica.schedaAnagrafica['Materiale manto laterizio']; // enum
+              state.datiModuloAnagraficaCoperture.materiale_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale manto annotazioni'];
+              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_pietra = state.datiAnagrafica.schedaAnagrafica['Tipo elementi manto pietra']; // enum
+              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_later = state.datiAnagrafica.schedaAnagrafica['Tipo elementi manto laterizio']; // enum
+              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Tipo elementi manto annotazioni'];
+              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_pietra = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione posa manto pietra']; // enum
+              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_later = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione posa manto laterizio']; // enum
+              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione posa manto annotazioni'];
+              state.datiModuloAnagraficaCoperture.colmo_sist_descrizione = state.datiAnagrafica.schedaAnagrafica['Sistema colmo descrizione'];
+              state.datiModuloAnagraficaCoperture.colmo_sist_gloss = state.datiAnagrafica.schedaAnagrafica['Sistema colmo glossario'];
+              state.datiModuloAnagraficaCoperture.colmo_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica['Sistema colmo annotazioni'];
+              state.datiModuloAnagraficaCoperture.displuvi_sist_descrizione = state.datiAnagrafica.schedaAnagrafica['Sistema displuvi descrizione'];
+              state.datiModuloAnagraficaCoperture.displuvi_sist_gloss = state.datiAnagrafica.schedaAnagrafica['Sistema displuvi glossario'];
+              state.datiModuloAnagraficaCoperture.displuvi_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica['Sistema displuvi annotazioni'];
+              state.datiModuloAnagraficaCoperture.gronda_sist_descrizione = state.datiAnagrafica.schedaAnagrafica['Sistema gronda descrizione'];
+              state.datiModuloAnagraficaCoperture.gronda_sist_gloss = state.datiAnagrafica.schedaAnagrafica['Sistema gronda glossario'];
+              state.datiModuloAnagraficaCoperture.gronda_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica['Sistema gronda annotazioni'];
+              state.datiModuloAnagraficaCoperture.el_strati_funz_acc = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori']) : []; // enum[]
+              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_gloss = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori glossario'];
+              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_annotazioni = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori annotazioni'];
+              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori aggiunto']; // bool
+              state.datiModuloAnagraficaCoperture.materiale_cop_str = state.datiAnagrafica.schedaAnagrafica['Materiale copertura']; // enum
+              state.datiModuloAnagraficaCoperture.materiale_cop_strutt_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale copertura annotazioni'];
+              state.datiModuloAnagraficaCoperture.grossa_orditura_el = state.datiAnagrafica.schedaAnagrafica['Elementi grossa orditura'] ? state.datiAnagrafica.schedaAnagrafica['Elementi grossa orditura'] : []; // liv4[]
+              state.datiModuloAnagraficaCoperture.grossa_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi grossa orditura annotazioni'];
+              state.datiModuloAnagraficaCoperture.media_orditura_el = state.datiAnagrafica.schedaAnagrafica['Elementi media orditura'] ? state.datiAnagrafica.schedaAnagrafica['Elementi media orditura'] : []; // liv4[]
+              state.datiModuloAnagraficaCoperture.media_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi media orditura annotazioni'];
+              state.datiModuloAnagraficaCoperture.piccola_orditura_el = state.datiAnagrafica.schedaAnagrafica['Elementi piccola orditura'] ? state.datiAnagrafica.schedaAnagrafica['Elementi piccola orditura'] : []; // liv4[]
+              state.datiModuloAnagraficaCoperture.piccola_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi piccola orditura annotazioni'];
+              state.datiModuloAnagraficaCoperture.el_giunzioni = state.datiAnagrafica.schedaAnagrafica['Elementi di giunzione'] ? state.datiAnagrafica.schedaAnagrafica['Elementi di giunzione'] : []; // liv4[]
+              state.datiModuloAnagraficaCoperture.el_giunzioni_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi di giunzione annotazioni'];
               state.datiModuloAnagraficaCoperture.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
               state.datiModuloAnagraficaCoperture.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
               state.datiModuloAnagraficaCoperture.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
