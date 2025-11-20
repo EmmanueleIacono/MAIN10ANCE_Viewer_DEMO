@@ -12,7 +12,8 @@
       </div>
       <h4 v-if="qualeScheda === 'manufatto'"><b>SCHEDA ANAGRAFICA MANUFATTO</b></h4>
       <h4 v-else-if="qualeScheda === 'dettaglio'"><b>SCHEDA ANAGRAFICA DETTAGLIO</b></h4>
-      <h4 v-else-if="qualeScheda === 'statua'"><b>SCHEDA ANAGRAFICA STATUA</b></h4>
+      <h4 v-else-if="qualeScheda === 'statua'"><b>SCHEDA ANAGRAFICA STATUARIA</b></h4>
+      <h4 v-else-if="qualeScheda === 'coperture'"><b>SCHEDA ANAGRAFICA COPERTURA</b></h4>
       <h4 v-else><b>SCHEDA ANAGRAFICA</b></h4>
     </div>
 
@@ -327,6 +328,359 @@
       </table>
     </div>
 
+    <!-- Campi Coperture -->
+    <div v-else-if="qualeScheda === 'coperture'">
+      <table class="form-table">
+        <tr>
+          <th><label><b>Descrizione copertura in rapporto con l'edificio</b></label></th>
+          <td><select v-model="stateModuloAnagraficaCoperture.descrizione_copertura_rapporti" class="float-dx">
+            <option value=""></option>
+            <option v-for="rapp in datiEnum.descrizione_copertura_rapporti" :key="rapp" :value="rapp">{{ rapp }}</option>
+          </select></td>
+        </tr>
+        <tr>
+          <th><label><b>Annotazioni</b></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.descrizione_copertura_rapporti_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th>
+            <label><b>Estensione complessiva (mq)</b></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Indicare l'estensione complessiva della superficie della copertura</i></p>
+          </th>
+          <td><input type="number" v-model="stateModuloAnagraficaCoperture.estensione_compl"></td>
+        </tr>
+        <tr>
+          <th><label><b>L'estensione indicata è:</b></label></th>
+          <td><select v-model="stateModuloAnagraficaCoperture.estensione_compl_comment" class="float-dx">
+            <option value=""></option>
+            <option v-for="est in datiEnum.estensione_compl_comment" :key="est" :value="est">{{ est }}</option>
+          </select></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th>
+            <label><b>Descrizione generale della copertura</b></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Descrivere in sintesi i caratteri salienti della copertura, con riferimento ai caratteri morfologici, all'eventuale articolazione in falde, alla presenza di sistemi composti</i></p>
+          </th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.descrizione_copertura_gen" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th>
+            <label><b>Cronologia</b></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Cenni sintetici a eventuali stratificazioni e/o trasformazioni del sistema di copertura, che ne abbiano per esempio modificato la concezione / lo schema strutturale</i></p>
+          </th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.cronologia_cop" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr class="section-title-row">
+          <td colspan="2"><b>MANTO</b></td>
+        </tr>
+        <tr>
+          <th><label><b>Tipo di manto</b></label></th>
+          <td><select v-model="stateModuloAnagraficaCoperture.tipo_manto" class="float-dx">
+            <option value=""></option>
+            <option v-for="mnt in datiEnum.tipo_manto" :key="mnt" :value="mnt">{{ mnt }}</option>
+          </select></td>
+        </tr>
+        <tr>
+          <th><label><b>Annotazioni</b></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.tipo_manto_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto" class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto == 'Lastre di pietra'">
+          <th><label><i>Materiale</i></label></th>
+          <td><select v-model="stateModuloAnagraficaCoperture.materiale_manto_pietra" class="float-dx">
+            <option value=""></option>
+            <option v-for="mat in datiEnum.materiale_manto_pietra" :key="mat" :value="mat">{{ mat }}</option>
+          </select></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto == 'Elementi di cotto/laterizio'">
+          <th><label><i>Materiale</i></label></th>
+          <td><select v-model="stateModuloAnagraficaCoperture.materiale_manto_later" class="float-dx">
+            <option value=""></option>
+            <option v-for="mat in datiEnum.materiale_manto_later" :key="mat" :value="mat">{{ mat }}</option>
+          </select></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto">
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.materiale_manto_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto" class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto == 'Lastre di pietra'">
+          <th><label><i>Tipo di elementi</i></label></th>
+          <td><select v-model="stateModuloAnagraficaCoperture.tipo_elementi_manto_pietra" class="float-dx">
+            <option value=""></option>
+            <option v-for="tp in datiEnum.tipo_elementi_manto_pietra" :key="tp" :value="tp">{{ tp }}</option>
+          </select></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto == 'Elementi di cotto/laterizio'">
+          <th><label><i>Tipo di elementi</i></label></th>
+          <td><select v-model="stateModuloAnagraficaCoperture.tipo_elementi_manto_later" class="float-dx">
+            <option value=""></option>
+            <option v-for="tp in datiEnum.tipo_elementi_manto_later" :key="tp" :value="tp">{{ tp }}</option>
+          </select></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto">
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.tipo_elementi_manto_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto" class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto == 'Lastre di pietra'">
+          <th><label><i>Tecnica di esecuzione / sistema di posa</i></label></th>
+          <td><select v-model="stateModuloAnagraficaCoperture.tecnica_esec_posa_manto_pietra" class="float-dx">
+            <option value=""></option>
+            <option v-for="tp in datiEnum.tecnica_esec_posa_manto_pietra" :key="tp" :value="tp">{{ tp }}</option>
+          </select></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto == 'Elementi di cotto/laterizio'">
+          <th><label><i>Tecnica di esecuzione / sistema di posa</i></label></th>
+          <td><select v-model="stateModuloAnagraficaCoperture.tecnica_esec_posa_manto_later" class="float-dx">
+            <option value=""></option>
+            <option v-for="tp in datiEnum.tecnica_esec_posa_manto_later" :key="tp" :value="tp">{{ tp }}</option>
+          </select></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaCoperture.tipo_manto">
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.tecnica_esec_posa_manto_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr class="section-title-row">
+          <td colspan="2"><b>ELEMENTI CONNOTANTI</b></td>
+        </tr>
+        <tr>
+          <th><label>Colmo</label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.colmo_sist_descrizione" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th>
+            <label><i>Glossario / denominazione</i></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
+          </th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.colmo_sist_gloss" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th><label><i>Descrizione / annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.colmo_sist_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label>Displuvi</label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.displuvi_sist_descrizione" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th>
+            <label><i>Glossario / denominazione</i></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
+          </th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.displuvi_sist_gloss" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th><label><i>Descrizione / annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.displuvi_sist_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label>Corsi di gronda</label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.gronda_sist_descrizione" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th>
+            <label><i>Glossario / denominazione</i></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
+          </th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.gronda_sist_gloss" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th><label><i>Descrizione / annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.gronda_sist_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label><b>Elementi e/o strati funzionali accessori</b></label></th>
+          <td>
+            <div v-for="strat in datiEnum.el_strati_funz_acc" :key="strat">
+              <input :id="`el-funz-strat-cbx-${strat}`" :value="strat" v-model="stateModuloAnagraficaCoperture.el_strati_funz_acc" type="checkbox">
+              <label :for="`el-funz-strat-cbx-${strat}`">{{ strat }}</label>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th><label for="el-aggiunto-cbx"><b>Elemento aggiunto</b></label></th>
+          <td><input type="checkbox" id="el-aggiunto-cbx" v-model="stateModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto"></td>
+        </tr>
+        <tr>
+          <th>
+            <label><i>Glossario / denominazione</i></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
+          </th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.el_strati_funz_acc_gloss" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th><label><i>Descrizione / annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.el_strati_funz_acc_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr class="section-title-row">
+          <td colspan="2"><b>ORDITURA LIGNEA</b></td>
+        </tr>
+        <tr>
+          <th><label><b>Materiale</b></label></th>
+          <td><select v-model="stateModuloAnagraficaCoperture.materiale_cop_str" class="float-dx">
+            <option value=""></option>
+            <option v-for="mat in datiEnum.materiale_cop_str" :key="mat" :value="mat">{{ mat }}</option>
+          </select></td>
+        </tr>
+        <tr>
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.materiale_cop_strutt_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label>Stuttura portante (grossa orditura)</label></th>
+          <!-- <td><textarea v-model="stateModuloAnagraficaCoperture.grossa_orditura_el" style="height: 20px;"></textarea></td> -->
+          <td>
+            <div v-for="el in datiEnum.grossa_orditura_el" :key="el.id">
+              <input :id="`grossa-orditura-el-cbx-${el.id}`" :value="el.sigla" v-model="stateModuloAnagraficaCoperture.grossa_orditura_el" type="checkbox">
+              <label :for="`grossa-orditura-el-cbx-${el.id}`">{{ el.nome }}</label>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.grossa_orditura_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label>Stuttura secondaria (media orditura)</label></th>
+          <!-- <td><textarea v-model="stateModuloAnagraficaCoperture.media_orditura_el" style="height: 20px;"></textarea></td> -->
+          <td>
+            <div v-for="el in datiEnum.media_orditura_el" :key="el.id">
+              <input :id="`media-orditura-el-cbx-${el.id}`" :value="el.sigla" v-model="stateModuloAnagraficaCoperture.media_orditura_el" type="checkbox">
+              <label :for="`media-orditura-el-cbx-${el.id}`">{{ el.nome }}</label>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.media_orditura_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label>Piccola orditura di supporto al manto</label></th>
+          <!-- <td><textarea v-model="stateModuloAnagraficaCoperture.piccola_orditura_el" style="height: 20px;"></textarea></td> -->
+          <td>
+            <div v-for="el in datiEnum.piccola_orditura_el" :key="el.id">
+              <input :id="`piccola-orditura-el-cbx-${el.id}`" :value="el.sigla" v-model="stateModuloAnagraficaCoperture.piccola_orditura_el" type="checkbox">
+              <label :for="`piccola-orditura-el-cbx-${el.id}`">{{ el.nome }}</label>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.piccola_orditura_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label>Elementi specifici delle giunzioni</label></th>
+          <!-- <td><textarea v-model="stateModuloAnagraficaCoperture.el_giunzioni" style="height: 20px;"></textarea></td> -->
+          <td>
+            <div v-for="el in datiEnum.el_giunzioni" :key="el.id">
+              <input :id="`el-giunzioni-cbx-${el.id}`" :value="el.sigla" v-model="stateModuloAnagraficaCoperture.el_giunzioni" type="checkbox">
+              <label :for="`el-giunzioni-cbx-${el.id}`">{{ el.nome }}</label>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.el_giunzioni_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr class="section-title-row">
+          <td colspan="2"><b>DOCUMENTAZIONE GENERALE</b></td>
+        </tr>
+        <tr>
+          <th><label><b>Epoca</b></label></th>
+          <td><input v-model="stateModuloAnagraficaCoperture.epoca"></td>
+        </tr>
+        <tr>
+          <th><label><b>Fonti</b></label></th>
+          <td><input v-model="stateModuloAnagraficaCoperture.fonti"></td>
+        </tr>
+        <tr>
+          <th><label><b>Autore</b></label></th>
+          <td><input v-model="stateModuloAnagraficaCoperture.autore"></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th>
+            <label for="coperture-access-cbx"><b>Accessibilità</b></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>I beni si considerano accessibili se ad altezza uomo o raggiungibili con l'ausilio di piccoli trabattelli o scale</i></p>
+          </th>
+          <td><input type="checkbox" id="coperture-access-cbx" v-model="stateModuloAnagraficaCoperture.accessibilità"></td>
+        </tr>
+        <tr>
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.accessibilità_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th>
+            <label for="coperture-ispez-cbx"><b>Ispezionabilità</b></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Ispezionabilità del sottotetto</i></p>
+          </th>
+          <td><input type="checkbox" id="coperture-ispez-cbx" v-model="stateModuloAnagraficaCoperture.ispezionabilità_sottotetto"></td>
+        </tr>
+        <tr>
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.ispezionabilità_sottotetto_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label><b>Note</b></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.note" style="height: 20px;"></textarea></td>
+        </tr>
+      </table>
+    </div>
+
     <!-- Campi Default -->
     <div v-else>
       <table class="form-table">
@@ -395,7 +749,7 @@
 
 <script>
 import { inject, toRefs, computed, ref, onMounted, reactive, watch } from 'vue';
-import {dataCorta, dataInteger, trattaStringArray} from '../js/shared';
+import {dataCorta, dataInteger, trattaStringArray, filtraOpzioniLivelli} from '../js/shared';
 import {compilaScheda, leggiEnumServizio, leggiVistaDB} from '../js/richieste';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
@@ -408,14 +762,18 @@ export default {
   },
   setup() {
     const store = inject('store');
+    const store_globale = inject('store_globale');
+    const state_globale = store_globale.state_globale;
     const stateAnagrafica = inject('stateAnagrafica');
     const stateGalleria = inject('stateGalleria');
     const stateModuloAnagrafica = inject('stateModuloAnagrafica');
     const stateModuloAnagraficaStatua = inject('stateModuloAnagraficaStatua');
+    const stateModuloAnagraficaCoperture = inject('stateModuloAnagraficaCoperture');
     const stateDocumenti = inject('stateDocumenti');
     const stateArtifact = inject('stateArtifact');
     const loadingDati = ref(false);
     const datiEnum = reactive({
+      // statua
       materiale_statua: [],
       materiale_armatura: [],
       materiale_supporto: [],
@@ -424,6 +782,22 @@ export default {
       materiale_ancoraggio_parete: [],
       materiale_ancoraggio_pavimento: [],
       pellicola_pittorica_tecnica_e_mat: {},
+      // copertura
+      descrizione_copertura_rapporti: [],
+      estensione_compl_comment: [],
+      tipo_manto: [],
+      materiale_manto_pietra: [],
+      materiale_manto_later: [],
+      tipo_elementi_manto_pietra: [],
+      tipo_elementi_manto_later: [],
+      tecnica_esec_posa_manto_pietra: [],
+      tecnica_esec_posa_manto_later: [],
+      el_strati_funz_acc: [],
+      materiale_cop_str: [],
+      grossa_orditura_el: [],
+      media_orditura_el: [],
+      piccola_orditura_el: [],
+      el_giunzioni: [],
     });
 
     const files = reactive([
@@ -477,6 +851,38 @@ export default {
       );
     });
 
+    const schedaVuotaCoperture = computed(() => {
+      return !(
+        stateModuloAnagraficaCoperture.descrizione_copertura_rapporti || stateModuloAnagraficaCoperture.descrizione_copertura_rapporti_annotazioni
+        || stateModuloAnagraficaCoperture.estensione_compl || stateModuloAnagraficaCoperture.estensione_compl_comment
+        || stateModuloAnagraficaCoperture.descrizione_copertura_gen || stateModuloAnagraficaCoperture.cronologia_cop
+        || stateModuloAnagraficaCoperture.tipo_manto || stateModuloAnagraficaCoperture.tipo_manto_annotazioni
+        || stateModuloAnagraficaCoperture.materiale_manto_pietra || stateModuloAnagraficaCoperture.materiale_manto_later
+        || stateModuloAnagraficaCoperture.materiale_manto_annotazioni
+        || stateModuloAnagraficaCoperture.tipo_elementi_manto_pietra || stateModuloAnagraficaCoperture.tipo_elementi_manto_later
+        || stateModuloAnagraficaCoperture.tipo_elementi_manto_annotazioni
+        || stateModuloAnagraficaCoperture.tecnica_esec_posa_manto_pietra || stateModuloAnagraficaCoperture.tecnica_esec_posa_manto_later
+        || stateModuloAnagraficaCoperture.tecnica_esec_posa_manto_annotazioni
+        || stateModuloAnagraficaCoperture.colmo_sist_descrizione || stateModuloAnagraficaCoperture.colmo_sist_gloss
+        || stateModuloAnagraficaCoperture.colmo_sist_annotazioni
+        || stateModuloAnagraficaCoperture.displuvi_sist_descrizione || stateModuloAnagraficaCoperture.displuvi_sist_gloss
+        || stateModuloAnagraficaCoperture.displuvi_sist_annotazioni
+        || stateModuloAnagraficaCoperture.gronda_sist_descrizione || stateModuloAnagraficaCoperture.gronda_sist_gloss
+        || stateModuloAnagraficaCoperture.gronda_sist_annotazioni
+        || stateModuloAnagraficaCoperture.el_strati_funz_acc || stateModuloAnagraficaCoperture.el_strati_funz_acc_gloss
+        || stateModuloAnagraficaCoperture.el_strati_funz_acc_annotazioni || stateModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto
+        || stateModuloAnagraficaCoperture.materiale_cop_str || stateModuloAnagraficaCoperture.materiale_cop_strutt_annotazioni
+        || stateModuloAnagraficaCoperture.grossa_orditura_el || stateModuloAnagraficaCoperture.grossa_orditura_annotazioni
+        || stateModuloAnagraficaCoperture.media_orditura_el || stateModuloAnagraficaCoperture.media_orditura_annotazioni
+        || stateModuloAnagraficaCoperture.piccola_orditura_el || stateModuloAnagraficaCoperture.piccola_orditura_annotazioni
+        || stateModuloAnagraficaCoperture.el_giunzioni || stateModuloAnagraficaCoperture.el_giunzioni_annotazioni
+        || stateModuloAnagraficaCoperture.epoca || stateModuloAnagraficaCoperture.fonti || stateModuloAnagraficaCoperture.autore
+        || stateModuloAnagraficaCoperture.accessibilità || stateModuloAnagraficaCoperture.accessibilità_annotazioni
+        || stateModuloAnagraficaCoperture.ispezionabilità_sottotetto || stateModuloAnagraficaCoperture.ispezionabilità_sottotetto_annotazioni
+        || stateModuloAnagraficaCoperture.note
+      );
+    });
+
     const qualeScheda = computed(() => {
       let scheda;
       switch (stateArtifact.selectElemento) {
@@ -492,6 +898,10 @@ export default {
           scheda = 'statua';
           break;
 
+        case 'elementi':
+          scheda = 'coperture';
+          break;
+
         default:
           scheda = 'altro';
           break;
@@ -501,6 +911,7 @@ export default {
 
     onMounted(async () => {
       loadingDati.value = true;
+      // statua
       const lsMatStat = await leggiEnumServizio('stat_mat'); // materiale statua
       const lsMatArm = await leggiEnumServizio('stat_arm_mat'); // materiale armatura
       const lsMatSupp = await leggiEnumServizio('stat_supp_mat'); // materiale supporto
@@ -509,13 +920,27 @@ export default {
       const lsMatAncPar = await leggiEnumServizio('stat_anc_par_mat'); // materiale ancoraggio parete
       const lsMatAncPav = await leggiEnumServizio('stat_anc_pav_mat'); // materiale ancoraggio pavimento
       const lsMatPellStat = await leggiVistaDB('vw_stat_pell_pitt_valori', true); // type composito pellicola pittorica statua
-      datiEnum.materiale_statua = lsMatStat.map(mat => mat.unnest);
-      datiEnum.materiale_armatura = lsMatArm.map(mat => mat.unnest);
-      datiEnum.materiale_supporto = lsMatSupp.map(mat => mat.unnest);
-      datiEnum.elementi_accessori_monili = lsElAccMonl.map(mat => mat.unnest);
-      datiEnum.materiale_elementi_accessori_monili = lsMatElAccMonl.map(mat => mat.unnest);
-      datiEnum.materiale_ancoraggio_parete = lsMatAncPar.map(mat => mat.unnest);
-      datiEnum.materiale_ancoraggio_pavimento = lsMatAncPav.map(mat => mat.unnest);
+      // copertura
+      const lsDescCopRap = await leggiEnumServizio('cop_rapporti'); // descrizione copertura rapporti
+      const lsEstCopComm = await leggiEnumServizio('cop_estens_comment'); // commento estensione copertura
+      const lsTipoManto = await leggiEnumServizio('cop_manto_tipo'); // tipo manto
+      const lsMatMantoPietra = await leggiEnumServizio('cop_manto_mat_pietra'); // materiale manto pietra
+      const lsMatMantoLater = await leggiEnumServizio('cop_manto_mat_later'); // materiale manto laterizio
+      const lsTipoElMantoPietra = await leggiEnumServizio('cop_manto_pietra_el'); // tipo elementi manto pietra
+      const lsTipoElMantoLater = await leggiEnumServizio('cop_manto_later_el'); // tipo elementi manto laterizio
+      const lsTecnEsecMantoPietra = await leggiEnumServizio('cop_manto_pietra_tecnica'); // tecnica esecuzione manto pietra
+      const lsTecnEsecMantoLater = await leggiEnumServizio('cop_manto_later_tecnica'); // tecnica esecuzione manto laterizio
+      const lsStratiFunzAcc = await leggiEnumServizio('cop_strati_funz_acc'); // strati funzionali accessori
+      const lsMatCopStr = await leggiEnumServizio('cop_str_legno_mat'); // materiale struttura copertura
+
+      // statua
+      datiEnum.materiale_statua = lsMatStat.map(type => type.unnest);
+      datiEnum.materiale_armatura = lsMatArm.map(type => type.unnest);
+      datiEnum.materiale_supporto = lsMatSupp.map(type => type.unnest);
+      datiEnum.elementi_accessori_monili = lsElAccMonl.map(type => type.unnest);
+      datiEnum.materiale_elementi_accessori_monili = lsMatElAccMonl.map(type => type.unnest);
+      datiEnum.materiale_ancoraggio_parete = lsMatAncPar.map(type => type.unnest);
+      datiEnum.materiale_ancoraggio_pavimento = lsMatAncPav.map(type => type.unnest);
       lsMatPellStat.forEach(type => {
         // array string -> array object
         if (type.valori
@@ -528,7 +953,32 @@ export default {
         // array di oggetti -> oggetto con array
         datiEnum.pellicola_pittorica_tecnica_e_mat[type.tecnica] = type.valori;
       });
-      console.log("da datiEnum:\n", datiEnum.pellicola_pittorica_tecnica_e_mat);
+      // copertura
+      datiEnum.descrizione_copertura_rapporti = lsDescCopRap.map(type => type.unnest);
+      datiEnum.estensione_compl_comment = lsEstCopComm.map(type => type.unnest);
+      datiEnum.tipo_manto = lsTipoManto.map(type => type.unnest);
+      datiEnum.materiale_manto_pietra = lsMatMantoPietra.map(type => type.unnest);
+      datiEnum.materiale_manto_later = lsMatMantoLater.map(type => type.unnest);
+      datiEnum.tipo_elementi_manto_pietra = lsTipoElMantoPietra.map(type => type.unnest);
+      datiEnum.tipo_elementi_manto_later = lsTipoElMantoLater.map(type => type.unnest);
+      datiEnum.tecnica_esec_posa_manto_pietra = lsTecnEsecMantoPietra.map(type => type.unnest);
+      datiEnum.tecnica_esec_posa_manto_later = lsTecnEsecMantoLater.map(type => type.unnest);
+      datiEnum.el_strati_funz_acc = lsStratiFunzAcc.map(type => type.unnest);
+      datiEnum.materiale_cop_str = lsMatCopStr.map(type => type.unnest);
+      const liv2str = filtraOpzioniLivelli(state_globale.gerarchia_classi_elementi, "strutture", "livello_2");
+      const liv2cop = filtraOpzioniLivelli(state_globale.gerarchia_classi_elementi, "coperture", "livello_2");
+      const liv3str_incl = filtraOpzioniLivelli(liv2str, "str_inclinate", "livello_3");
+      const liv3mant = filtraOpzioniLivelli(liv2cop, "manto", "livello_3");
+      const liv4grossa_ord = filtraOpzioniLivelli(liv3str_incl, "grossa_orditura", "livello_4");
+      const liv4media_ord = filtraOpzioniLivelli(liv3str_incl, "media_orditura", "livello_4");
+      const liv4piccola_ord = filtraOpzioniLivelli(liv3mant, "piccola_ordit", "livello_4");
+      const liv4el_giunz = filtraOpzioniLivelli(liv3str_incl, "giunzioni", "livello_4");
+      datiEnum.grossa_orditura_el = liv4grossa_ord;
+      datiEnum.media_orditura_el = liv4media_ord;
+      datiEnum.piccola_orditura_el = liv4piccola_ord;
+      datiEnum.el_giunzioni = liv4el_giunz;
+
+      console.log("da datiEnum:\n", datiEnum);
       loadingDati.value = false;
     });
 
@@ -538,6 +988,7 @@ export default {
         if (
           qualeScheda.value == 'altro' && schedaVuota.value
           || qualeScheda.value == 'statua' && schedaVuotaStatua.value
+          || qualeScheda.value == 'coperture' && schedaVuotaCoperture.value
         ) {
           store.methods.setAlert('Non è possibile salvare una scheda vuota');
           return;
@@ -547,6 +998,7 @@ export default {
         let qualeState;
         if (qualeScheda.value === 'altro') qualeState = stateModuloAnagrafica;
         else if (qualeScheda.value === 'statua') qualeState = stateModuloAnagraficaStatua;
+        else if (qualeScheda.value === 'coperture') qualeState = stateModuloAnagraficaCoperture;
 
         if (files && files.length > 0) {
           files.forEach(fl => {
@@ -630,6 +1082,63 @@ export default {
           stateModuloAnagraficaStatua.autore_ultima_mod = null;
           break;
 
+        case 'coperture':
+          stateModuloAnagraficaCoperture.codice = '';
+          stateModuloAnagraficaCoperture.descrizione_copertura_rapporti = ''; // enum
+          stateModuloAnagraficaCoperture.descrizione_copertura_rapporti_annotazioni = '';
+          stateModuloAnagraficaCoperture.estensione_compl = null; // double
+          stateModuloAnagraficaCoperture.estensione_compl_comment = ''; // enum
+          stateModuloAnagraficaCoperture.descrizione_copertura_gen = '';
+          stateModuloAnagraficaCoperture.cronologia_cop = '';
+          stateModuloAnagraficaCoperture.tipo_manto = ''; // enum
+          stateModuloAnagraficaCoperture.tipo_manto_annotazioni = '';
+          stateModuloAnagraficaCoperture.materiale_manto_pietra = ''; // enum
+          stateModuloAnagraficaCoperture.materiale_manto_later = ''; // enum
+          stateModuloAnagraficaCoperture.materiale_manto_annotazioni = '';
+          stateModuloAnagraficaCoperture.tipo_elementi_manto_pietra = ''; // enum
+          stateModuloAnagraficaCoperture.tipo_elementi_manto_later = ''; // enum
+          stateModuloAnagraficaCoperture.tipo_elementi_manto_annotazioni = '';
+          stateModuloAnagraficaCoperture.tecnica_esec_posa_manto_pietra = ''; // enum
+          stateModuloAnagraficaCoperture.tecnica_esec_posa_manto_later = ''; // enum
+          stateModuloAnagraficaCoperture.tecnica_esec_posa_manto_annotazioni = '';
+          stateModuloAnagraficaCoperture.colmo_sist_descrizione = '';
+          stateModuloAnagraficaCoperture.colmo_sist_gloss = '';
+          stateModuloAnagraficaCoperture.colmo_sist_annotazioni = '';
+          stateModuloAnagraficaCoperture.displuvi_sist_descrizione = '';
+          stateModuloAnagraficaCoperture.displuvi_sist_gloss = '';
+          stateModuloAnagraficaCoperture.displuvi_sist_annotazioni = '';
+          stateModuloAnagraficaCoperture.gronda_sist_descrizione = '';
+          stateModuloAnagraficaCoperture.gronda_sist_gloss = '';
+          stateModuloAnagraficaCoperture.gronda_sist_annotazioni = '';
+          stateModuloAnagraficaCoperture.el_strati_funz_acc = []; // enum[]
+          stateModuloAnagraficaCoperture.el_strati_funz_acc_gloss = '';
+          stateModuloAnagraficaCoperture.el_strati_funz_acc_annotazioni = '';
+          stateModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto = false; // bool
+          stateModuloAnagraficaCoperture.materiale_cop_str = ''; // enum
+          stateModuloAnagraficaCoperture.materiale_cop_strutt_annotazioni = '';
+          stateModuloAnagraficaCoperture.grossa_orditura_el = []; // liv4_strutt[]
+          stateModuloAnagraficaCoperture.grossa_orditura_annotazioni = '';
+          stateModuloAnagraficaCoperture.media_orditura_el = []; // liv4_strutt[]
+          stateModuloAnagraficaCoperture.media_orditura_annotazioni = '';
+          stateModuloAnagraficaCoperture.piccola_orditura_el = []; // liv4_cop[]
+          stateModuloAnagraficaCoperture.piccola_orditura_annotazioni = '';
+          stateModuloAnagraficaCoperture.el_giunzioni = []; // liv4_strutt[]
+          stateModuloAnagraficaCoperture.el_giunzioni_annotazioni = '';
+          stateModuloAnagraficaCoperture.epoca = '';
+          stateModuloAnagraficaCoperture.fonti = '';
+          stateModuloAnagraficaCoperture.autore = '';
+          stateModuloAnagraficaCoperture.accessibilità = false; // bool
+          stateModuloAnagraficaCoperture.accessibilità_annotazioni = '';
+          stateModuloAnagraficaCoperture.ispezionabilità_sottotetto = false; // bool
+          stateModuloAnagraficaCoperture.ispezionabilità_sottotetto_annotazioni = '';
+          stateModuloAnagraficaCoperture.note = '';
+          stateModuloAnagraficaCoperture.id_anagr = null;
+          stateModuloAnagraficaCoperture.data_registrazione = null;
+          stateModuloAnagraficaCoperture.data_ultima_mod = null;
+          stateModuloAnagraficaCoperture.autore_scheda = null;
+          stateModuloAnagraficaCoperture.autore_ultima_mod = null;
+          break;
+
         case 'altro':
           stateModuloAnagrafica.descrizione_sistema = '';
           stateModuloAnagrafica.descrizione_subsistema = '';
@@ -670,7 +1179,11 @@ export default {
         case 'statua':
           modulo = stateModuloAnagraficaStatua;
           break;
-        
+
+        case 'coperture':
+          modulo = stateModuloAnagraficaCoperture;
+          break;
+
         case 'altro':
           modulo = stateModuloAnagrafica;
           break;
@@ -725,6 +1238,10 @@ export default {
           nomeTabella = 'scheda_anagrafica_statua';
           break;
 
+        case 'elementi':
+          nomeTabella = 'scheda_anagrafica_copertura';
+          break;
+
         default:
           nomeTabella = 'scheda_anagrafica';
           break;
@@ -763,6 +1280,7 @@ export default {
       loadingDati,
       ...toRefs(stateModuloAnagrafica),
       stateModuloAnagraficaStatua,
+      stateModuloAnagraficaCoperture,
       stateDocumenti,
       datiEnum,
       files,

@@ -261,6 +261,11 @@ app.get('/anagrafica/artifact-viewer/interroga/:id', async (req, res) => {
             risposta = await interrogaAnagraficaStatua(id, ambito);
             break;
 
+        case 'elementi': // TEMP, DA RISOLVERE -> quando "elementi" saranno creati correttamente
+            console.log('richiesta elementi');
+            risposta = await interrogaAnagraficaCopertura(id, ambito);
+            break;
+
         // ALTRIMENTI, se LOD4:
         default:
             risposta = await interrogaAnagraficaLOD4(id, ambito);
@@ -968,7 +973,55 @@ async function interrogaAnagraficaStatua(id, ambito) {
                                                 );
 
         const full_res = {...result_st.rows[0], ...result_anagr.rows[0]};
-        return [full_res];
+        return [full_res][0];
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function interrogaAnagraficaCopertura(id, ambito) {
+    try {
+        const result_anagr = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore",
+                                                     sa.descrizione_copertura_rapporti AS "Descrizione copertura rapporti", sa.descrizione_copertura_rapporti_annotazioni AS "Descrizione copertura rapporti annotazioni",
+                                                     sa.estensione_compl AS "Estensione complessiva", sa.estensione_compl_comment AS "Estensione desunta da",
+                                                     sa.descrizione_copertura_gen AS "Descrizione generale copertura", sa.cronologia_cop AS "Cronologia",
+                                                     sa.tipo_manto AS "Tipo manto", sa.tipo_manto_annotazioni AS "Tipo manto annotazioni",
+                                                     sa.materiale_manto_pietra AS "Materiale manto pietra", sa.materiale_manto_later AS "Materiale manto laterizio", sa.materiale_manto_annotazioni AS "Materiale manto annotazioni",
+                                                     sa.tipo_elementi_manto_pietra AS "Tipo elementi manto pietra", sa.tipo_elementi_manto_later AS "Tipo elementi manto laterizio", sa.tipo_elementi_manto_annotazioni AS "Tipo elementi manto annotazioni",
+                                                     sa.tecnica_esec_posa_manto_pietra AS "Tecnica di esecuzione posa manto pietra", sa.tecnica_esec_posa_manto_later AS "Tecnica di esecuzione posa manto laterizio", sa.tecnica_esec_posa_manto_annotazioni AS "Tecnica di esecuzione posa manto annotazioni",
+                                                     sa.colmo_sist_descrizione AS "Sistema colmo descrizione", sa.colmo_sist_gloss AS "Sistema colmo glossario", sa.colmo_sist_annotazioni AS "Sistema colmo annotazioni",
+                                                     sa.displuvi_sist_descrizione AS "Sistema displuvi descrizione", sa.displuvi_sist_gloss AS "Sistema displuvi glossario", sa.displuvi_sist_annotazioni AS "Sistema displuvi annotazioni",
+                                                     sa.gronda_sist_descrizione AS "Sistema gronda descrizione", sa.gronda_sist_gloss AS "Sistema gronda glossario", sa.gronda_sist_annotazioni AS "Sistema gronda annotazioni",
+                                                     sa.el_strati_funz_acc AS "Strati funzionali accessori", sa.el_strati_funz_acc_gloss AS "Strati funzionali accessori glossario", sa.el_strati_funz_acc_annotazioni AS "Strati funzionali accessori annotazioni", sa.el_strati_funz_acc_aggiunto AS "Strati funzionali accessori aggiunto",
+                                                     sa.materiale_cop_str AS "Materiale copertura", sa.materiale_cop_strutt_annotazioni AS "Materiale copertura annotazioni",
+                                                     sa.grossa_orditura_el AS "Elementi grossa orditura", sa.grossa_orditura_annotazioni AS "Elementi grossa orditura annotazioni",
+                                                     sa.media_orditura_el AS "Elementi media orditura", sa.media_orditura_annotazioni AS "Elementi media orditura annotazioni",
+                                                     sa.piccola_orditura_el AS "Elementi piccola orditura", sa.piccola_orditura_annotazioni AS "Elementi piccola orditura annotazioni",
+                                                     sa.el_giunzioni AS "Elementi di giunzione", sa.el_giunzioni_annotazioni AS "Elementi di giunzione annotazioni",
+                                                     sa.epoca AS "Epoca", sa.fonti AS "Fonti",
+                                                     sa.autore AS "Autore",
+                                                     sa."accessibilità" AS "Accessibilità", sa."accessibilità_annotazioni" AS "Accessibilità annotazioni",
+                                                     sa."ispezionabilità_sottotetto" AS "Ispezionabilità sottotetto", sa."ispezionabilità_sottotetto_annotazioni" AS "Ispezionabilità sottotetto annotazioni",
+                                                     sa.note AS "Note", sa.docs AS "Documenti"
+                                                     FROM ${data_schema}.scheda_anagrafica_copertura AS sa
+                                                     WHERE sa.id_main10ance = $1 AND sa.ambito = $2
+                                                     ORDER BY id_anagr DESC
+                                                     LIMIT 1;`,
+                                                     [id, ambito]
+                                                   );
+
+        const result_cop = await clientM10a.query(`SELECT codice AS "Codice copertura"
+                                                  FROM ${data_schema}.elementi
+                                                  WHERE id_main10ance = $1 AND ambito = $2
+                                                  ORDER BY id DESC
+                                                  LIMIT 1;`,
+                                                  [id, ambito]
+                                                );
+
+        const full_res = {...result_anagr.rows[0], ...result_cop.rows[0]};
+        return [full_res][0];
     }
     catch(e) {
         console.log(e);

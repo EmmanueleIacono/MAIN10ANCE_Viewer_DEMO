@@ -75,7 +75,7 @@
 
 <script>
 import { computed, inject, onMounted, ref, watch } from "vue";
-import { dataInteger } from "../../js/shared";
+import { dataInteger, filtraOpzioniLivelli } from "../../js/shared";
 import MainPanel from '../elementi/MainPanel.vue';
 import Explorer from '../elementi/Explorer.vue';
 import Details from '../elementi/Details.vue';
@@ -189,12 +189,6 @@ export default {
     //   const lista_elem_filtrata = lista_elem.filter(el => el.cl_ogg === state_anagrafica.selezione.select_classe);
     //   state_anagrafica.selezione.lista_elem_filtrata = lista_elem_filtrata;
     // }
-
-    function filtraOpzioniLivelli(parentArray, selectedSigla, childKey) {
-      if (!selectedSigla || !parentArray || parentArray.length === 0) return [];
-      const parentObj = parentArray.find(def => def.sigla === selectedSigla);
-      return parentObj ? (parentObj[childKey] || []) : [];
-    }
 
     return {
       state_globale,
