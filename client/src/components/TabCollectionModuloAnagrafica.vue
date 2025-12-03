@@ -479,7 +479,7 @@
           <td><textarea v-model="stateModuloAnagraficaCoperture.colmo_sist_descrizione" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
-          <th><label><i>Glossario / denominazione</i></label></th>
+          <th><label><i>Terminologie locali / denominazione</i></label></th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.colmo_sist_gloss" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
@@ -494,12 +494,28 @@
           <td><textarea v-model="stateModuloAnagraficaCoperture.displuvi_sist_descrizione" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
-          <th><label><i>Glossario / denominazione</i></label></th>
+          <th><label><i>Terminologie locali / denominazione</i></label></th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.displuvi_sist_gloss" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
           <th><label><i>Descrizione / annotazioni</i></label></th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.displuvi_sist_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label>Impluvi</label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.impluvi_sist_descrizione" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th><label><i>Terminologie locali / denominazione</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.impluvi_sist_gloss" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th><label><i>Descrizione / annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.impluvi_sist_annotazioni" style="height: 20px;"></textarea></td>
         </tr>
         <tr class="divider-row">
           <td colspan="2"><hr /></td>
@@ -509,7 +525,7 @@
           <td><textarea v-model="stateModuloAnagraficaCoperture.gronda_sist_descrizione" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
-          <th><label><i>Glossario / denominazione</i></label></th>
+          <th><label><i>Terminologie locali / denominazione</i></label></th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.gronda_sist_gloss" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
@@ -533,7 +549,7 @@
           <td><input type="checkbox" v-model="stateModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto"></td>
         </tr>
         <tr>
-          <th><label><i>Glossario / denominazione</i></label></th>
+          <th><label><i>Terminologie locali / denominazione</i></label></th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.el_strati_funz_acc_gloss" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
@@ -1069,6 +1085,9 @@ export default {
           stateModuloAnagraficaCoperture.displuvi_sist_descrizione = '';
           stateModuloAnagraficaCoperture.displuvi_sist_gloss = '';
           stateModuloAnagraficaCoperture.displuvi_sist_annotazioni = '';
+          stateModuloAnagraficaCoperture.impluvi_sist_descrizione = '';
+          stateModuloAnagraficaCoperture.impluvi_sist_gloss = '';
+          stateModuloAnagraficaCoperture.impluvi_sist_annotazioni = '';
           stateModuloAnagraficaCoperture.gronda_sist_descrizione = '';
           stateModuloAnagraficaCoperture.gronda_sist_gloss = '';
           stateModuloAnagraficaCoperture.gronda_sist_annotazioni = '';
