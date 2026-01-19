@@ -12,7 +12,8 @@
       </div>
       <h4 v-if="qualeScheda === 'manufatto'"><b>SCHEDA ANAGRAFICA MANUFATTO</b></h4>
       <h4 v-else-if="qualeScheda === 'dettaglio'"><b>SCHEDA ANAGRAFICA DETTAGLIO</b></h4>
-      <h4 v-else-if="qualeScheda === 'statua'"><b>SCHEDA ANAGRAFICA STATUA</b></h4>
+      <h4 v-else-if="qualeScheda === 'statua'"><b>SCHEDA ANAGRAFICA STATUARIA</b></h4>
+      <h4 v-else-if="qualeScheda === 'coperture'"><b>SCHEDA ANAGRAFICA COPERTURA</b></h4>
       <h4 v-else><b>SCHEDA ANAGRAFICA</b></h4>
     </div>
 
@@ -364,7 +365,10 @@
           <td colspan="2"><hr /></td>
         </tr>
         <tr>
-          <th><label><b>Estensione complessiva (mq)</b></label></th>
+          <th>
+            <label><b>Estensione complessiva (mq)</b></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Indicare l'estensione complessiva della superficie della copertura</i></p>
+          </th>
           <td><input type="number" v-model="stateModuloAnagraficaCoperture.estensione_compl"></td>
         </tr>
         <tr>
@@ -378,14 +382,20 @@
           <td colspan="2"><hr /></td>
         </tr>
         <tr>
-          <th><label><b>Descrizione generale della copertura</b></label></th>
+          <th>
+            <label><b>Descrizione generale della copertura</b></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Descrivere in sintesi i caratteri salienti della copertura, con riferimento ai caratteri morfologici, all'eventuale articolazione in falde, alla presenza di sistemi composti</i></p>
+          </th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.descrizione_copertura_gen" style="height: 20px;"></textarea></td>
         </tr>
         <tr class="divider-row">
           <td colspan="2"><hr /></td>
         </tr>
         <tr>
-          <th><label><b>Cronologia</b></label></th>
+          <th>
+            <label><b>Cronologia</b></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Cenni sintetici a eventuali stratificazioni e/o trasformazioni del sistema di copertura, che ne abbiano per esempio modificato la concezione / lo schema strutturale</i></p>
+          </th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.cronologia_cop" style="height: 20px;"></textarea></td>
         </tr>
         <tr class="divider-row">
@@ -479,7 +489,10 @@
           <td><textarea v-model="stateModuloAnagraficaCoperture.colmo_sist_descrizione" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
-          <th><label><i>Terminologie locali / denominazione</i></label></th>
+          <th>
+            <label><i>Terminologie locali / denominazione</i></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
+          </th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.colmo_sist_gloss" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
@@ -494,7 +507,10 @@
           <td><textarea v-model="stateModuloAnagraficaCoperture.displuvi_sist_descrizione" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
-          <th><label><i>Terminologie locali / denominazione</i></label></th>
+          <th>
+            <label><i>Terminologie locali / denominazione</i></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
+          </th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.displuvi_sist_gloss" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
@@ -525,7 +541,10 @@
           <td><textarea v-model="stateModuloAnagraficaCoperture.gronda_sist_descrizione" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
-          <th><label><i>Terminologie locali / denominazione</i></label></th>
+          <th>
+            <label><i>Terminologie locali / denominazione</i></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
+          </th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.gronda_sist_gloss" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
@@ -545,11 +564,14 @@
           </td>
         </tr>
         <tr>
-          <th><label><b>Elemento aggiunto</b></label></th>
-          <td><input type="checkbox" v-model="stateModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto"></td>
+          <th><label for="el-aggiunto-cbx"><b>Elemento aggiunto</b></label></th>
+          <td><input type="checkbox" id="el-aggiunto-cbx" v-model="stateModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto"></td>
         </tr>
         <tr>
-          <th><label><i>Terminologie locali / denominazione</i></label></th>
+          <th>
+            <label><i>Terminologie locali / denominazione</i></label>
+            <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
+          </th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.el_strati_funz_acc_gloss" style="height: 20px;"></textarea></td>
         </tr>
         <tr>
@@ -578,7 +600,13 @@
         </tr>
         <tr>
           <th><label>Stuttura portante (grossa orditura)</label></th>
-          <td><textarea v-model="stateModuloAnagraficaCoperture.grossa_orditura_el" style="height: 20px;"></textarea></td>
+          <!-- <td><textarea v-model="stateModuloAnagraficaCoperture.grossa_orditura_el" style="height: 20px;"></textarea></td> -->
+          <td>
+            <div v-for="el in datiEnum.grossa_orditura_el" :key="el.id">
+              <input :id="`grossa-orditura-el-cbx-${el.id}`" :value="el.sigla" v-model="stateModuloAnagraficaCoperture.grossa_orditura_el" type="checkbox">
+              <label :for="`grossa-orditura-el-cbx-${el.id}`">{{ el.nome }}</label>
+            </div>
+          </td>
         </tr>
         <tr>
           <th><label><i>Annotazioni</i></label></th>
@@ -589,7 +617,13 @@
         </tr>
         <tr>
           <th><label>Stuttura secondaria (media orditura)</label></th>
-          <td><textarea v-model="stateModuloAnagraficaCoperture.media_orditura_el" style="height: 20px;"></textarea></td>
+          <!-- <td><textarea v-model="stateModuloAnagraficaCoperture.media_orditura_el" style="height: 20px;"></textarea></td> -->
+          <td>
+            <div v-for="el in datiEnum.media_orditura_el" :key="el.id">
+              <input :id="`media-orditura-el-cbx-${el.id}`" :value="el.sigla" v-model="stateModuloAnagraficaCoperture.media_orditura_el" type="checkbox">
+              <label :for="`media-orditura-el-cbx-${el.id}`">{{ el.nome }}</label>
+            </div>
+          </td>
         </tr>
         <tr>
           <th><label><i>Annotazioni</i></label></th>
@@ -600,7 +634,13 @@
         </tr>
         <tr>
           <th><label>Piccola orditura di supporto al manto</label></th>
-          <td><textarea v-model="stateModuloAnagraficaCoperture.piccola_orditura_el" style="height: 20px;"></textarea></td>
+          <!-- <td><textarea v-model="stateModuloAnagraficaCoperture.piccola_orditura_el" style="height: 20px;"></textarea></td> -->
+          <td>
+            <div v-for="el in datiEnum.piccola_orditura_el" :key="el.id">
+              <input :id="`piccola-orditura-el-cbx-${el.id}`" :value="el.sigla" v-model="stateModuloAnagraficaCoperture.piccola_orditura_el" type="checkbox">
+              <label :for="`piccola-orditura-el-cbx-${el.id}`">{{ el.nome }}</label>
+            </div>
+          </td>
         </tr>
         <tr>
           <th><label><i>Annotazioni</i></label></th>
@@ -611,7 +651,13 @@
         </tr>
         <tr>
           <th><label>Elementi specifici delle giunzioni</label></th>
-          <td><textarea v-model="stateModuloAnagraficaCoperture.el_giunzioni" style="height: 20px;"></textarea></td>
+          <!-- <td><textarea v-model="stateModuloAnagraficaCoperture.el_giunzioni" style="height: 20px;"></textarea></td> -->
+          <td>
+            <div v-for="el in datiEnum.el_giunzioni" :key="el.id">
+              <input :id="`el-giunzioni-cbx-${el.id}`" :value="el.sigla" v-model="stateModuloAnagraficaCoperture.el_giunzioni" type="checkbox">
+              <label :for="`el-giunzioni-cbx-${el.id}`">{{ el.nome }}</label>
+            </div>
+          </td>
         </tr>
         <tr>
           <th><label><i>Annotazioni</i></label></th>
@@ -640,10 +686,10 @@
         </tr>
         <tr>
           <th>
-            <label><b>Accessibilità</b></label>
+            <label for="coperture-access-cbx"><b>Accessibilità</b></label>
             <p style="font-size: smaller; font-weight: normal;"><i>I beni si considerano accessibili se ad altezza uomo o raggiungibili con l'ausilio di piccoli trabattelli o scale</i></p>
           </th>
-          <td><input type="checkbox" v-model="stateModuloAnagraficaCoperture.accessibilità"></td>
+          <td><input type="checkbox" id="coperture-access-cbx" v-model="stateModuloAnagraficaCoperture.accessibilità"></td>
         </tr>
         <tr>
           <th><label><i>Annotazioni</i></label></th>
@@ -651,10 +697,10 @@
         </tr>
         <tr>
           <th>
-            <label><b>Ispezionabilità</b></label>
+            <label for="coperture-ispez-cbx"><b>Ispezionabilità</b></label>
             <p style="font-size: smaller; font-weight: normal;"><i>Ispezionabilità del sottotetto</i></p>
           </th>
-          <td><input type="checkbox" v-model="stateModuloAnagraficaCoperture.ispezionabilità_sottotetto"></td>
+          <td><input type="checkbox" id="coperture-ispez-cbx" v-model="stateModuloAnagraficaCoperture.ispezionabilità_sottotetto"></td>
         </tr>
         <tr>
           <th><label><i>Annotazioni</i></label></th>
@@ -738,7 +784,7 @@
 
 <script>
 import { inject, toRefs, computed, ref, onMounted, reactive, watch } from 'vue';
-import {dataCorta, dataInteger, trattaStringArray} from '../js/shared';
+import {dataCorta, dataInteger, trattaStringArray, filtraOpzioniLivelli} from '../js/shared';
 import {compilaScheda, leggiEnumServizio, leggiVistaDB} from '../js/richieste';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
@@ -751,6 +797,8 @@ export default {
   },
   setup() {
     const store = inject('store');
+    const store_globale = inject('store_globale');
+    const state_globale = store_globale.state_globale;
     const stateAnagrafica = inject('stateAnagrafica');
     const stateGalleria = inject('stateGalleria');
     const stateModuloAnagrafica = inject('stateModuloAnagrafica');
@@ -782,6 +830,10 @@ export default {
       tecnica_esec_posa_manto_later: [],
       el_strati_funz_acc: [],
       materiale_cop_str: [],
+      grossa_orditura_el: [],
+      media_orditura_el: [],
+      piccola_orditura_el: [],
+      el_giunzioni: [],
     });
 
     const files = reactive([
@@ -953,6 +1005,18 @@ export default {
       datiEnum.tecnica_esec_posa_manto_later = lsTecnEsecMantoLater.map(type => type.unnest);
       datiEnum.el_strati_funz_acc = lsStratiFunzAcc.map(type => type.unnest);
       datiEnum.materiale_cop_str = lsMatCopStr.map(type => type.unnest);
+      const liv2str = filtraOpzioniLivelli(state_globale.gerarchia_classi_elementi, "strutture", "livello_2");
+      const liv2cop = filtraOpzioniLivelli(state_globale.gerarchia_classi_elementi, "coperture", "livello_2");
+      const liv3str_incl = filtraOpzioniLivelli(liv2str, "str_inclinate", "livello_3");
+      const liv3mant = filtraOpzioniLivelli(liv2cop, "manto", "livello_3");
+      const liv4grossa_ord = filtraOpzioniLivelli(liv3str_incl, "grossa_orditura", "livello_4");
+      const liv4media_ord = filtraOpzioniLivelli(liv3str_incl, "media_orditura", "livello_4");
+      const liv4piccola_ord = filtraOpzioniLivelli(liv3mant, "piccola_ordit", "livello_4");
+      const liv4el_giunz = filtraOpzioniLivelli(liv3str_incl, "giunzioni", "livello_4");
+      datiEnum.grossa_orditura_el = liv4grossa_ord;
+      datiEnum.media_orditura_el = liv4media_ord;
+      datiEnum.piccola_orditura_el = liv4piccola_ord;
+      datiEnum.el_giunzioni = liv4el_giunz;
 
       console.log("da datiEnum:\n", datiEnum);
       loadingDati.value = false;
@@ -1062,6 +1126,7 @@ export default {
           break;
 
         case 'coperture':
+          stateModuloAnagraficaCoperture.codice = '';
           stateModuloAnagraficaCoperture.descrizione_copertura_rapporti = ''; // enum
           stateModuloAnagraficaCoperture.descrizione_copertura_rapporti_annotazioni = '';
           stateModuloAnagraficaCoperture.estensione_compl = null; // double
@@ -1097,13 +1162,13 @@ export default {
           stateModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto = false; // bool
           stateModuloAnagraficaCoperture.materiale_cop_str = ''; // enum
           stateModuloAnagraficaCoperture.materiale_cop_strutt_annotazioni = '';
-          stateModuloAnagraficaCoperture.grossa_orditura_el = '';
+          stateModuloAnagraficaCoperture.grossa_orditura_el = []; // liv4_strutt[]
           stateModuloAnagraficaCoperture.grossa_orditura_annotazioni = '';
-          stateModuloAnagraficaCoperture.media_orditura_el = '';
+          stateModuloAnagraficaCoperture.media_orditura_el = []; // liv4_strutt[]
           stateModuloAnagraficaCoperture.media_orditura_annotazioni = '';
-          stateModuloAnagraficaCoperture.piccola_orditura_el = '';
+          stateModuloAnagraficaCoperture.piccola_orditura_el = []; // liv4_cop[]
           stateModuloAnagraficaCoperture.piccola_orditura_annotazioni = '';
-          stateModuloAnagraficaCoperture.el_giunzioni = '';
+          stateModuloAnagraficaCoperture.el_giunzioni = []; // liv4_strutt[]
           stateModuloAnagraficaCoperture.el_giunzioni_annotazioni = '';
           stateModuloAnagraficaCoperture.epoca = '';
           stateModuloAnagraficaCoperture.fonti = '';

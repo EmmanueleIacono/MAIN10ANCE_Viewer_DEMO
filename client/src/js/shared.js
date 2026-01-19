@@ -168,7 +168,7 @@ export function trattaStringArray(sqlArrayString) {
     // rimuovo graffe iniziale e finale
     const trimmedString = sqlArrayString.trim();
     if (!trimmedString.startsWith('{') || !trimmedString.endsWith('}')) {
-        console.warn(`Unexpected format: "${sqlArrayString}". Returning as is.`);
+        console.warn(`Formato inaspettato: "${sqlArrayString}". Return inalterato.`);
         return sqlArrayString;
     }
 
@@ -190,4 +190,11 @@ export function trattaStringArray(sqlArrayString) {
         }
         return trimmedElement;
     });
+}
+
+// PER FILTRARE LIVELLI 1, 2, 3, 4 CATEGORIE ELEMENTI
+export function filtraOpzioniLivelli(parentArray, selectedSigla, childKey) {
+    if (!selectedSigla || !parentArray || parentArray.length === 0) return [];
+    const parentObj = parentArray.find(def => def.sigla === selectedSigla);
+    return parentObj ? (parentObj[childKey] || []) : [];
 }
