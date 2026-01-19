@@ -6,7 +6,10 @@
       <div class="col-lg-12 loading-wrapper">
         <LoadingScreen :caricamento="caricamento" />
         <div v-if="stateGalleria.listaImmagini.length" class="image-grid">
-          <img @click="isSelected(url.percorso)" v-for="(url) in stateGalleria.listaImmagini" :key="url.percorso" :src="url.object" :class="percorsiSelezionati.includes(url.percorso) ? 'bordo-verde' : ''">
+          <div v-for="(url) in stateGalleria.listaImmagini" :key="url.percorso" class="thumb-wrapper">
+            <img @click="isSelected(url.percorso)" :src="url.object" :class="percorsiSelezionati.includes(url.percorso) ? 'bordo-verde' : ''" />
+            <div class="thumb-caption">{{ url.info ? (url.info.Codice + ' - ' + (url.info.Nome || 'N/A')) : '' }}</div>
+          </div>
         </div>
         <div v-else><i>Nessuna immagine presente a questo percorso</i></div>
       </div>
@@ -123,15 +126,25 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
   grid-gap: 2rem;
 }
-.image-grid > img {
+.thumb-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.thumb-wrapper img {
   width: 100%;
   height: 20rem;
   object-fit: cover;
   border-radius: 0.75rem;
+  cursor: pointer;
 }
-.image-grid > img:hover {
+.thumb-wrapper img:hover {
   opacity: 0.7;
-  /* border: .25rem solid var(--verdeMain10anceTrasparenza); */
+}
+.thumb-caption {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-weight: 600;
 }
 .bordo-verde {
   border: 1rem solid var(--verdeMain10ance);

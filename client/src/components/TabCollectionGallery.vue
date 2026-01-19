@@ -19,8 +19,8 @@
   </div>
   <div v-if="stateGalleria.listaImmagini.length" class="contenitore-colonne mt40">
     <div class="colonna">
-      <p v-if="datiImmagine.Nome"><b>Nome: </b>{{datiImmagine["Nome"]}}</p>
-      <p v-else><b>Nome: </b><i>N/A</i></p>
+      <p v-if="datiImmagine.Nome"><b>Soggetto: </b>{{datiImmagine["Nome"]}}</p>
+      <p v-else><b>Soggetto: </b><i>N/A</i></p>
       <p v-if="datiImmagine.Artista"><b>Artista: </b>{{datiImmagine["Artista"]}}</p>
       <p v-else><b>Artista: </b><i>N/A</i></p>
       <p v-if="datiImmagine.Datazione"><b>Datazione: </b>{{datiImmagine["Datazione"]}}</p>

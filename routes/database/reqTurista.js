@@ -220,7 +220,7 @@ async function downloadImmagini(percorsoFile) {
 async function getInfoImmagine(percorsoFile, tabella) {
     const schema = percorsoFile.startsWith('loc-pdiff') ? utility_schema : data_schema;
     try {
-        const result = await clientM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "id_main10ance" FROM ${schema}.${tabella} WHERE "immagine" = ($1);`, [percorsoFile]);
+        const result = await clientM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "codice" AS "Codice", "id_main10ance" FROM ${schema}.${tabella} WHERE "immagine" = ($1);`, [percorsoFile]);
         return result.rows;
     }
     catch(e) {

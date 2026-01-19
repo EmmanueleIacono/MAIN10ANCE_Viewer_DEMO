@@ -136,9 +136,11 @@
         <tr class="divider-row">
           <td colspan="2"><hr /></td>
         </tr>
+        
         <tr class="section-title-row">
           <td colspan="2"><b>ANCORAGGI</b></td>
         </tr>
+        
         <tr>
           <th><label><b>A parete</b></label></th>
           <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete"></td>
@@ -154,6 +156,7 @@
           <th><label><i>Annotazioni</i></label></th>
           <td><textarea v-model="stateModuloAnagraficaStatua.ancoraggio_parete_annotazioni" style="height: 20px;"></textarea></td>
         </tr>
+
         <tr>
           <th><label><b>A pavimento</b></label></th>
           <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento"></td>
@@ -168,6 +171,22 @@
         <tr v-if="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento">
           <th><label><i>Annotazioni</i></label></th>
           <td><textarea v-model="stateModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+
+        <tr>
+          <th><label><b>A soffitto</b></label></th>
+          <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_soffitto"></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_soffitto">
+          <th><label><i>Materiale</i></label></th>
+          <td><select v-model="stateModuloAnagraficaStatua.materiale_ancoraggio_soffitto" class="float-dx">
+            <option value=""></option>
+            <option v-for="mat in datiEnum.materiale_ancoraggio_soffitto" :key="mat" :value="mat">{{ mat }}</option>
+          </select></td>
+        </tr>
+        <tr v-if="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_soffitto">
+          <th><label><i>Annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaStatua.ancoraggio_soffitto_annotazioni" style="height: 20px;"></textarea></td>
         </tr>
         <tr class="divider-row">
           <td colspan="2"><hr /></td>
@@ -471,7 +490,7 @@
         </tr>
         <tr>
           <th>
-            <label><i>Glossario / denominazione</i></label>
+            <label><i>Terminologie locali / denominazione</i></label>
             <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
           </th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.colmo_sist_gloss" style="height: 20px;"></textarea></td>
@@ -489,7 +508,7 @@
         </tr>
         <tr>
           <th>
-            <label><i>Glossario / denominazione</i></label>
+            <label><i>Terminologie locali / denominazione</i></label>
             <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
           </th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.displuvi_sist_gloss" style="height: 20px;"></textarea></td>
@@ -497,6 +516,22 @@
         <tr>
           <th><label><i>Descrizione / annotazioni</i></label></th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.displuvi_sist_annotazioni" style="height: 20px;"></textarea></td>
+        </tr>
+        
+        <tr class="divider-row">
+          <td colspan="2"><hr /></td>
+        </tr>
+        <tr>
+          <th><label>Impluvi</label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.impluvi_sist_descrizione" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th><label><i>Terminologie locali / denominazione</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.impluvi_sist_gloss" style="height: 20px;"></textarea></td>
+        </tr>
+        <tr>
+          <th><label><i>Descrizione / annotazioni</i></label></th>
+          <td><textarea v-model="stateModuloAnagraficaCoperture.impluvi_sist_annotazioni" style="height: 20px;"></textarea></td>
         </tr>
         <tr class="divider-row">
           <td colspan="2"><hr /></td>
@@ -507,7 +542,7 @@
         </tr>
         <tr>
           <th>
-            <label><i>Glossario / denominazione</i></label>
+            <label><i>Terminologie locali / denominazione</i></label>
             <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
           </th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.gronda_sist_gloss" style="height: 20px;"></textarea></td>
@@ -534,7 +569,7 @@
         </tr>
         <tr>
           <th>
-            <label><i>Glossario / denominazione</i></label>
+            <label><i>Terminologie locali / denominazione</i></label>
             <p style="font-size: smaller; font-weight: normal;"><i>Note per la compilazione: compilare nel caso di specifiche denominazioni locali in uso per indicare il tipo di lavorazione/posa che si è consolidato in modi risolutivi ricorrenti e concorrenti a caratterizzare l'immagine dei manufatti</i></p>
           </th>
           <td><textarea v-model="stateModuloAnagraficaCoperture.el_strati_funz_acc_gloss" style="height: 20px;"></textarea></td>
@@ -781,6 +816,7 @@ export default {
       materiale_elementi_accessori_monili: [],
       materiale_ancoraggio_parete: [],
       materiale_ancoraggio_pavimento: [],
+      materiale_ancoraggio_soffitto: [],
       pellicola_pittorica_tecnica_e_mat: {},
       // copertura
       descrizione_copertura_rapporti: [],
@@ -919,6 +955,7 @@ export default {
       const lsMatElAccMonl = await leggiEnumServizio('stat_el_acc_monil_mat'); // materiale elementi accessori monili
       const lsMatAncPar = await leggiEnumServizio('stat_anc_par_mat'); // materiale ancoraggio parete
       const lsMatAncPav = await leggiEnumServizio('stat_anc_pav_mat'); // materiale ancoraggio pavimento
+      const lsMatAncSoff = await leggiEnumServizio('stat_anc_sof_mat');
       const lsMatPellStat = await leggiVistaDB('vw_stat_pell_pitt_valori', true); // type composito pellicola pittorica statua
       // copertura
       const lsDescCopRap = await leggiEnumServizio('cop_rapporti'); // descrizione copertura rapporti
@@ -941,6 +978,9 @@ export default {
       datiEnum.materiale_elementi_accessori_monili = lsMatElAccMonl.map(type => type.unnest);
       datiEnum.materiale_ancoraggio_parete = lsMatAncPar.map(type => type.unnest);
       datiEnum.materiale_ancoraggio_pavimento = lsMatAncPav.map(type => type.unnest);
+      if (lsMatAncSoff) {
+        datiEnum.materiale_ancoraggio_soffitto = lsMatAncSoff.map(type => type.unnest);
+      }
       lsMatPellStat.forEach(type => {
         // array string -> array object
         if (type.valori
@@ -1070,6 +1110,9 @@ export default {
           stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento = false; // bool
           stateModuloAnagraficaStatua.materiale_ancoraggio_pavimento = ''; // enum
           stateModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni = '';
+          stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_soffitto = false;
+          stateModuloAnagraficaStatua.materiale_ancoraggio_soffitto = '';
+          stateModuloAnagraficaStatua.ancoraggio_soffitto_annotazioni = '';
           stateModuloAnagraficaStatua.epoca = '';
           stateModuloAnagraficaStatua.fonti = '';
           stateModuloAnagraficaStatua.autore = '';
@@ -1107,6 +1150,9 @@ export default {
           stateModuloAnagraficaCoperture.displuvi_sist_descrizione = '';
           stateModuloAnagraficaCoperture.displuvi_sist_gloss = '';
           stateModuloAnagraficaCoperture.displuvi_sist_annotazioni = '';
+          stateModuloAnagraficaCoperture.impluvi_sist_descrizione = '';
+          stateModuloAnagraficaCoperture.impluvi_sist_gloss = '';
+          stateModuloAnagraficaCoperture.impluvi_sist_annotazioni = '';
           stateModuloAnagraficaCoperture.gronda_sist_descrizione = '';
           stateModuloAnagraficaCoperture.gronda_sist_gloss = '';
           stateModuloAnagraficaCoperture.gronda_sist_annotazioni = '';
