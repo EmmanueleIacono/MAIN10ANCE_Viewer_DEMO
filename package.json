@@ -5,9 +5,9 @@
   "main": "start.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node start.js",
-    "server": "nodemon start.js --ignore client/",
-    "build": "npm install --prefix client && npm run build --prefix client"
+    "start": "bun start.js",
+    "server": "bun --watch start.js",
+    "build": "bun install --cwd client && bun run --cwd client build"
   },
   "author": "Emmanuele Iacono",
   "license": "MIT",
@@ -21,7 +21,11 @@
     "forge-apis": "^0.9.10",
     "pg": "^8.7.1"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.15"
-  }
+  "trustedDependencies": [
+    "bcrypt",
+    "bufferutil",
+    "es5-ext",
+    "forge-apis",
+    "utf-8-validate"
+  ]
 }

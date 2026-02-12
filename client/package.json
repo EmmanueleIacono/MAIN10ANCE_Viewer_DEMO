@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "open": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --open",
-    "serve": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
-    "build": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
-    "lint": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service lint",
+    "open": "bunx vue-cli-service serve --open",
+    "serve": "bunx vue-cli-service serve",
+    "build": "bunx vue-cli-service build",
+    "lint": "bunx vue-cli-service lint",
     "vca": "vca --dir src --port 6060"
   },
   "dependencies": {
@@ -50,5 +50,10 @@
     "> 1%",
     "last 2 versions",
     "not dead"
+  ],
+  "trustedDependencies": [
+    "core-js",
+    "ejs",
+    "yorkie"
   ]
 }
