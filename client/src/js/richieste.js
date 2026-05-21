@@ -1,13 +1,11 @@
+import {apiRequest, jsonHeaders} from './apiRequest';
+
 export async function prendiLOD(lod) {
-    const risultato = await fetch('/t/LOD/TabelleLOD', {method: "GET", headers: {"content-type": "application/json", "lod": lod}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    return apiRequest('/t/LOD/TabelleLOD', {headers: jsonHeaders({lod})});
 }
 
 export async function getTabelleGIS() {
-    const tabelleGIS = await fetch("/t/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} });
-    const resp_tabelleGIS = await tabelleGIS.json();
-    return resp_tabelleGIS;
+    return apiRequest('/t/LOD/TabelleGIS');
 }
 
 export async function leggiDBMarkerLoc() {
@@ -71,39 +69,27 @@ export async function leggiDBMarkerLocPdiff() {
 }
 
 export async function getGIS(tabella, geometria, colonneUtili) {
-    const oggettiGIS = await fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": tabella, "geometria": geometria, "colonneUtili": colonneUtili} });
-    const resp_oggettiGIS = await oggettiGIS.json();
-    return resp_oggettiGIS;
+    return apiRequest('/t/Main10ance_DB/GIS', {headers: jsonHeaders({tabella, geometria, colonneUtili})});
 }
 
 export async function getObjects(bucketId = '#') {
-    const objectsRaw = await fetch(`/api/forge/oss/buckets?id=${bucketId}`);
-    const objects = await objectsRaw.json();
-    return objects;
+    return apiRequest(`/api/forge/oss/buckets?id=${bucketId}`);
 }
 
 export async function prendiSchedeAnagrafica() {
-    const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-anagrafica', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    return apiRequest('/o/Main10ance_DB/tabellaDB/schede-anagrafica');
 }
 
 export async function prendiSchedeControllo() {
-    const risultato = await fetch('/o/schede-controllo-2', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    return apiRequest('/o/schede-controllo-2');
 }
 
 export async function prendiSchedeManReg() {
-    const risultato = await fetch('/o/schede-manutenzione-regolare', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    return apiRequest('/o/schede-manutenzione-regolare');
 }
 
 export async function prendiSchedeManCorr() {
-    const risultato = await fetch('/o/schede-manutenzione-correttiva', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    return apiRequest('/o/schede-manutenzione-correttiva');
 }
 
 export async function prendiSchedeManStr() {
@@ -129,9 +115,7 @@ export async function prendiSigleLocalitàAmbito() {
 
 export async function leggiEnum(nomeEnum) {
     try {
-        const risultato = await fetch('/o/enum', {method: "GET", headers: {"content-type": "application/json", "nomeEnum": nomeEnum} });
-        const listaEnum = await risultato.json();
-        return listaEnum;
+        return apiRequest('/o/enum', {headers: jsonHeaders({nomeEnum})});
     }
     catch(e) {
         console.log('Errore nella lettura delle Enumeration');
@@ -141,9 +125,7 @@ export async function leggiEnum(nomeEnum) {
 
 export async function leggiEnumServizio(nomeEnum) {
     try {
-        const risultato = await fetch('/o/enum-servizio', {method: "GET", headers: {"content-type": "application/json", "nomeEnum": nomeEnum} });
-        const listaEnum = await risultato.json();
-        return listaEnum;
+        return apiRequest('/o/enum-servizio', {headers: jsonHeaders({nomeEnum})});
     }
     catch(e) {
         console.log('Errore nella lettura delle Enumeration');
@@ -160,16 +142,10 @@ export async function leggiEnumServizio(nomeEnum) {
 
 export async function compilaScheda(dati) {
     try {
-        const fetch_opts = {method: "POST"};
         if (dati instanceof FormData) {
-            fetch_opts.body = dati;
-        } else {
-            fetch_opts.headers = {"content-type": "application/json"};
-            fetch_opts.body = JSON.stringify(dati);
+            return apiRequest('/o/schede/nuova', {method: 'POST', body: dati});
         }
-        const resp = await fetch(`/o/schede/nuova`, fetch_opts);
-        const respData = await resp.json();
-        return respData;
+        return apiRequest('/o/schede/nuova', {method: 'POST', json: dati});
     }
     catch(e) {
         console.log(e);
@@ -177,16 +153,12 @@ export async function compilaScheda(dati) {
 }
 
 export async function prendiLOD3e4() {
-    const risultato = await fetch('/o/DB_Servizio/LOD/3e4', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    return apiRequest('/o/DB_Servizio/LOD/3e4');
 }
 
 export async function leggiGlossDegradi() {
     try {
-        const risultato = await fetch('/o/Main10ance_DB/tabellaDB/glossario/degradi', {method: "GET", headers: {"content-type": "application/json"} });
-        const listaGloss = await risultato.json();
-        return listaGloss;
+        return apiRequest('/o/Main10ance_DB/tabellaDB/glossario/degradi');
     }
     catch(e) {
         console.log('Errore nella lettura del glossario');
@@ -195,15 +167,11 @@ export async function leggiGlossDegradi() {
 }
 
 export async function prendiSigleEdifici() {
-    const risultato = await fetch('/g/sigle-edifici', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    return apiRequest('/g/sigle-edifici');
 }
 
 export async function prendiFrasiDiRischio() {
-    const risultato = await fetch('/g/frasi-rischio', {method: "GET", headers: {"content-type": "application/json"}});
-    const risTradotto = await risultato.json();
-    return risTradotto;
+    return apiRequest('/g/frasi-rischio');
 }
 
 export async function getEntitàDaClOgg(cl_ogg) {

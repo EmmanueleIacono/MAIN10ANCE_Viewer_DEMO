@@ -5,48 +5,17 @@ app.use(express.static("public"));
 
 const {clientM10a} = require('./connessioni');
 const {utility_schema} = require('./schemi');
+const {jsonRoute, successRoute} = require('../security/http');
 
 //////////          RICHIESTE          //////////
 
-// per testare la richiesta:
-// fetch("/a/utenti", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/utenti', async (req, res) => {
-    const users = await getUtenti();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(users));
-});
+app.get('/utenti', jsonRoute(() => getUtenti()));
 
-// per testare la richiesta
-// fetch("/a/ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/ruoli', async (req, res) => {
-    const ruoli = await getListaRuoli();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(ruoli));
-});
+app.get('/ruoli', jsonRoute(() => getListaRuoli()));
 
-app.patch('/ruoli/nuovo-ruolo', async (req, res) => {
-    let result = {}
-    try {
-        const reqJson = req.body;
-        await updateRuoloUtente(reqJson);
-        result.success = true;
-    }
-    catch(e) {
-        result.success = false;
-    }
-    finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+app.patch('/ruoli/nuovo-ruolo', successRoute(req => updateRuoloUtente(req.body).then(() => true)));
 
-// per testare la richiesta
-// fetch("/a/conteggio-ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/conteggio-ruoli', async (req, res) => {
-    const ruoli = await conteggioRuoli();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(ruoli));
-});
+app.get('/conteggio-ruoli', jsonRoute(() => conteggioRuoli()));
 
 //////////          QUERY          //////////
 

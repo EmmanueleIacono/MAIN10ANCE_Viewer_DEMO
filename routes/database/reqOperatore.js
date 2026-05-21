@@ -9,6 +9,7 @@ const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
 const {assertIdentifier, quoteIdentifier, qualifiedName} = require('../security/sql');
 const {uploadMiddlewareOptions, asSingleFile, validateFile, safeStoragePath} = require('../security/upload');
+const {ACTIVITY_TABLES} = require('./metadata');
 
 app.use(fileupload(uploadMiddlewareOptions));
 
@@ -665,12 +666,12 @@ async function leggiAttivitàProgOperatore() {
 }
 
 async function registraAttivitàEsecuzione(dati, all_files, ambito) {
-    const stringaContr = 'scheda_controllo';
-    const stringaManReg = 'scheda_manutenzione_regolare';
-    const stringaManCorr = 'scheda_manutenzione_correttiva';
-    const stringaManStr = 'scheda_manutenzione_straordinaria';
-    const stringaRestauro = 'scheda_restauro';
-    const stringaDiagnosi = 'danno_alterazione_degrado';
+    const stringaContr = ACTIVITY_TABLES.CONTR;
+    const stringaManReg = ACTIVITY_TABLES.MAN_REG;
+    const stringaManCorr = ACTIVITY_TABLES.MAN_COR;
+    const stringaManStr = ACTIVITY_TABLES.MAN_STR;
+    const stringaRestauro = ACTIVITY_TABLES.REST;
+    const stringaDiagnosi = ACTIVITY_TABLES.DIAGN;
     const docsArray = dati.doc;
     try {
         await withTransaction(async (clientM10a) => {

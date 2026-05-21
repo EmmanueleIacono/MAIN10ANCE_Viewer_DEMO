@@ -9,6 +9,8 @@ const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
 const {qualifiedName, parseJsonArray} = require('../security/sql');
 const {uploadMiddlewareOptions, asSingleFile, validateFile, safeStoragePath} = require('../security/upload');
+const {ACTIVITY_TABLES, getImageEntity} = require('./metadata');
+const {jsonRoute, successRoute} = require('../security/http');
 
 app.use(fileupload(uploadMiddlewareOptions));
 
@@ -105,38 +107,9 @@ app.get('/Main10ance_DB/lista-identificativi', async (req, res) => {
     res.send(JSON.stringify(frasi));
 });
 
-app.post('/pianificazione', async (req, res) => {
-    const ambito = req.signedCookies.ambito;
-    const result = {};
-    try {
-        const reqJson = req.body;
-        const res = await creaAttProgControllo(reqJson, ambito);
-        result.success = res;
-    }
-    catch(e) {
-        result.success = false;
-    }
-    finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+app.post('/pianificazione', successRoute(req => creaAttProgControllo(req.body, req.signedCookies.ambito)));
 
-app.post('/Main10ance_DB/programmazione/nuovi-controlli', async (req, res) => {
-    let result = {}
-    try {
-        const reqJson = req.body;
-        const res = await registraNuoviControlli(reqJson);
-        result.success = res;
-    }
-    catch(e) {
-        result.success = false;
-    }
-    finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+app.post('/Main10ance_DB/programmazione/nuovi-controlli', successRoute(req => registraNuoviControlli(req.body)));
 
 app.get('/integrazione/attivita-per-integrazione', async (req, res) => {
     const ambito = req.signedCookies.ambito;
@@ -147,22 +120,7 @@ app.get('/integrazione/attivita-per-integrazione', async (req, res) => {
     res.send(JSON.stringify(resp));
 });
 
-app.patch('/integrazione/integrazione-attivita', async (req, res) => {
-    const ambito = req.signedCookies.ambito;
-    const result = {};
-    try {
-        const reqJson = req.body;
-        const res = await integraAtt(reqJson, ambito);
-        result.success = res;
-    }
-    catch(e) {
-        result.success = false;
-    }
-    finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+app.patch('/integrazione/integrazione-attivita', successRoute(req => integraAtt(req.body, req.signedCookies.ambito)));
 
 app.post('/LOD4/nuovo', async (req, res) => {
     const ambito = req.signedCookies.ambito;
@@ -182,110 +140,35 @@ app.post('/LOD4/nuovo', async (req, res) => {
     }
 });
 
-app.delete('/LOD4/elimina', async (req, res) => {
-    const ambito = req.signedCookies.ambito;
-    const result = {};
-    try {
-        const reqJson = req.body;
-        const res = await eliminaImmagini(reqJson, ambito);
-        result.success = res;
-    }
-    catch(e) {
-        result.success = false;
-    }
-    finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+app.delete('/LOD4/elimina', successRoute(req => eliminaImmagini(req.body, req.signedCookies.ambito)));
 
 // NUOVO PUNTO SU LIVELLO GIS LOCALITÀ MATERIALI
-app.post('/DB_Servizio/loc-pdiff/nuovo', async (req, res) => {
-    const result = {};
-    try {
-        const reqJson = req.body;
-        const res = await creaNuovoLocPdiff(reqJson);
-        result.success = res;
-    }
-    catch(e) {
-        result.success = false;
-    }
-    finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+app.post('/DB_Servizio/loc-pdiff/nuovo', successRoute(req => creaNuovoLocPdiff(req.body)));
 
 // NUOVO PUNTO SU AMBITO UTENTE
-app.post('/DB_Servizio/mk-ambito/nuovo', async (req, res) => {
-    const result = {};
-    try {
-        const reqJson = req.body;
-        const res = await creaNuovoMarkerAmbito(reqJson);
-        result.success = res;
-    }
-    catch(e) {
-        result.success = false;
-    }
-    finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+app.post('/DB_Servizio/mk-ambito/nuovo', successRoute(req => creaNuovoMarkerAmbito(req.body)));
 
 // REGISTRAZIONE ATTIVITÀ PRECEDENTI
-app.post('/programmazione/att-precedenti', async (req, res) => {
-    let result = {}
-    try {
-        const reqJson = req.body;
-        const res = await registraAttPrecedenti(reqJson);
-        result.success = res;
-    }
-    catch(e) {
-        result.success = false;
-    }
-    finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+app.post('/programmazione/att-precedenti', successRoute(req => registraAttPrecedenti(req.body)));
 
 // REGISTRAZIONE PUNTEGGI LAVORI SU EDIFICI
-app.post('/edifici/punteggi-lavori', async (req, res) => {
-    const ambito = req.signedCookies.ambito;
-    const autore = req.signedCookies.user_id;
-    const result = {};
-    try {
-        const reqJson = req.body;
-        const res = await registraScoreLavori(reqJson, ambito, autore);
-        result.success = res;
-    } catch(e) {
-        result.success = false;
-    } finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+app.post('/edifici/punteggi-lavori', successRoute(req => registraScoreLavori(req.body, req.signedCookies.ambito, req.signedCookies.user_id)));
 
 // RECUPERO PUNTEGGI LAVORI ---RECENTI--- SU EDIFICI
-app.get('/edifici/punteggi-lavori-recenti', async (req, res) => {
+app.get('/edifici/punteggi-lavori-recenti', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const ambito = req.signedCookies.ambito;
     const loc = JSON.parse(reqJson.loc);
-    const resp = await leggiScoreUltimiLavori(loc, ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(resp));
-});
+    return leggiScoreUltimiLavori(loc, ambito);
+}));
 
 // RECUPERO PUNTEGGI LAVORI SU EDIFICI
-app.get('/edifici/punteggi-lavori', async (req, res) => {
+app.get('/edifici/punteggi-lavori', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const ambito = req.signedCookies.ambito;
     const loc = JSON.parse(reqJson.loc);
-    const resp = await leggiScoreLavori(loc, ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(resp));
-});
+    return leggiScoreLavori(loc, ambito);
+}));
 
 //////////          QUERY          //////////
 
@@ -486,12 +369,12 @@ async function integraAtt(jsonAtt, ambito) {
         await withTransaction(async (clientM10a) => {
             await clientM10a.query(`UPDATE ${data_schema}."attività_prog" SET ${strSet}, "da_integrare" = FALSE WHERE "id_att_prog" = ${ultimoNum};`, values);
             const datiInsert = jsonAtt.dati_inserimento;
-            const stringaContr = 'scheda_controllo';
-            const stringaManReg = 'scheda_manutenzione_regolare';
-            const stringaManCorr = 'scheda_manutenzione_correttiva';
-            const stringaManStr = 'scheda_manutenzione_straordinaria';
-            const stringaRestauro = 'scheda_restauro';
-            const stringaDiagnosi = 'danno_alterazione_degrado';
+            const stringaContr = ACTIVITY_TABLES.CONTR;
+            const stringaManReg = ACTIVITY_TABLES.MAN_REG;
+            const stringaManCorr = ACTIVITY_TABLES.MAN_COR;
+            const stringaManStr = ACTIVITY_TABLES.MAN_STR;
+            const stringaRestauro = ACTIVITY_TABLES.REST;
+            const stringaDiagnosi = ACTIVITY_TABLES.DIAGN;
             for (const tab of datiInsert.tabelle) {
                 switch (tab) {
                     case stringaContr: {
@@ -530,30 +413,20 @@ async function uploadImmagine(files, dati, ambito) {
     const percorso = safeStoragePath(datiJson.percorso);
     const percorsoFile = safeStoragePath(percorso, safeName);
     const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.codice, datiJson.artista, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, percorsoFile];
-    const idMap = {
-        arredo: 'id_arr',
-        dipinto_murale: 'id_dipmur',
-        pavimento_decorativo: 'id_pd',
-        quadro: 'id_quadro',
-        statua: 'id_statua',
-        manufatto: 'id_man',
-        dettaglio: 'id_dett',
-        elementi: 'id'
-    };
-    if (!idMap[datiJson.entità]) throw new Error('Entità non consentita');
+    const entityMeta = getImageEntity(datiJson.entità);
     try {
         await withTransaction(async (clientM10a) => { // QUI CONDIZIONI DA RISISTEMARE COME QUELLE IN REQTURISTA DOWNLOADIMMAGINI, GETINFOIMMAGINE
             if (datiJson.id_main10ance.startsWith('loc-pdiff')) {
                 const rid_loc_pdiff = datiJson.id_main10ance.split('|')[1];
                 // query con dati
-                await clientM10a.query(`INSERT INTO ${qualifiedName(utility_schema, datiJson.entità)} ("${idMap[datiJson.entità]}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, rid_loc_pdiff]);
+                await clientM10a.query(`INSERT INTO ${qualifiedName(utility_schema, datiJson.entità)} ("${entityMeta.idColumn}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, rid_loc_pdiff]);
                 // caricamento immagine supabase
                 const {error} = await supabase.storage.from("generale").upload(percorsoFile, file.data, fileOptions);
                 if (error) throw error;
             }
             else {
                 // query con dati
-                await clientM10a.query(`INSERT INTO ${qualifiedName(data_schema, datiJson.entità)} ("${idMap[datiJson.entità]}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, ambito]); // e "codice"?
+                await clientM10a.query(`INSERT INTO ${qualifiedName(data_schema, datiJson.entità)} ("${entityMeta.idColumn}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, ambito]); // e "codice"?
                 // caricamento immagine supabase
                 const {error} = await supabase.storage.from("elementi").upload(safeStoragePath(ambito, percorsoFile), file.data, fileOptions);
                 if (error) throw error;
@@ -570,8 +443,9 @@ async function uploadImmagine(files, dati, ambito) {
 async function eliminaImmagini(jsonDati, ambito) {
     const listaImmagini = jsonDati.immagini.map(img => safeStoragePath(img));
     const listaImmaginiSupa = ambito ? listaImmagini.map(img => safeStoragePath(ambito, img)) : listaImmagini;
-    const bucket = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? 'generale' : 'elementi';
-    const schema = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? utility_schema : data_schema;
+    const entityMeta = getImageEntity(jsonDati.entità);
+    const bucket = entityMeta.bucket;
+    const schema = entityMeta.schema === 'utility' ? utility_schema : data_schema;
     try {
         await withTransaction(async (clientM10a) => {
             // query elimina record
@@ -612,12 +486,12 @@ async function registraNuoviControlli(listaReqJson) {
 
 // REGISTRAZIONE ATTIVITÀ PRECEDENTI
 async function registraAttPrecedenti(reqJson) {
-    const stringaContr = 'scheda_controllo';
-    const stringaManReg = 'scheda_manutenzione_regolare';
-    const stringaManCorr = 'scheda_manutenzione_correttiva';
-    const stringaManStr = 'scheda_manutenzione_straordinaria';
-    const stringaRestauro = 'scheda_restauro';
-    const stringaDiagnosi = 'danno_alterazione_degrado';
+    const stringaContr = ACTIVITY_TABLES.CONTR;
+    const stringaManReg = ACTIVITY_TABLES.MAN_REG;
+    const stringaManCorr = ACTIVITY_TABLES.MAN_COR;
+    const stringaManStr = ACTIVITY_TABLES.MAN_STR;
+    const stringaRestauro = ACTIVITY_TABLES.REST;
+    const stringaDiagnosi = ACTIVITY_TABLES.DIAGN;
     try {
         await withTransaction(async (clientM10a) => {
             console.log(reqJson);

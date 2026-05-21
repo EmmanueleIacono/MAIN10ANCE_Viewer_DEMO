@@ -8,6 +8,7 @@ const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
 const {quoteIdentifier, qualifiedName, parseCsvIdentifiers} = require('../security/sql');
 const {safeStoragePath} = require('../security/upload');
+const {jsonRoute, sendJson} = require('../security/http');
 
 //////////          RICHIESTE          //////////
 
@@ -28,29 +29,11 @@ app.get('/MarkerLoc', async (req, res) => {
     res.send(JSON.stringify(markerLocalità));
 });
 
-// per testare la richiesta:
-// fetch("/t/MarkerEdif", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/MarkerEdif', async (req, res) => {
-    const markerEdifici = await leggiMarkerEdif();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(markerEdifici));
-});
+app.get('/MarkerEdif', jsonRoute(() => leggiMarkerEdif()));
 
-// per testare la richiesta:
-// fetch("/t/MarkerLocPdiff", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/MarkerLocPdiff', async (req, res) => {
-    const markerLocPdiff = await leggiMarkerLocPdiff();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(markerLocPdiff));
-});
+app.get('/MarkerLocPdiff', jsonRoute(() => leggiMarkerLocPdiff()));
 
-// per testare la richiesta:
-// fetch("/t/LOD/TabelleGIS", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/LOD/TabelleGIS', async (req, res) => {
-    const tabelleGIS = await leggiListaTabelleGIS();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(tabelleGIS));
-});
+app.get('/LOD/TabelleGIS', jsonRoute(() => leggiListaTabelleGIS()));
 
 // per testare la richiesta:
 // fetch("/t/LOD/TabelleLOD", {method: "GET", headers: {"content-type": "application/json", lod: 5} }).then(a => a.json()).then(console.log)
@@ -83,8 +66,7 @@ app.get('/storage/img-download', async (req, res) => {
     }
     catch(e) {
         // console.log(e);
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify({errMsg: 'Nessun file presente'}));
+        sendJson(res, {errMsg: 'Nessun file presente'});
     }
 });
 
@@ -97,11 +79,7 @@ app.get('/Main10ance_DB/LOD4/info', async (req, res) => {
     res.send(JSON.stringify(datiLOD4));
 });
 
-app.get('/definizioni_classi', async (req, res) => {
-    const definizioni = await getDefinizioniClassiElementi();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(definizioni));
-});
+app.get('/definizioni_classi', jsonRoute(() => getDefinizioniClassiElementi()));
 
 //////////          QUERY          //////////
 
