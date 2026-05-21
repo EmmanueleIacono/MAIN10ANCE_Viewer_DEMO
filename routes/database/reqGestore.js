@@ -4,7 +4,7 @@ const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
 
-const {clientM10a} = require('./connessioni');
+const {clientM10a, withTransaction} = require('./connessioni');
 const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
 const {qualifiedName, parseJsonArray} = require('../security/sql');
@@ -411,8 +411,7 @@ async function getIdentificativiDaEntità(entità, id) {
 
 async function creaAttProgControllo(listaAtt, ambito) {
     try {
-        await clientM10a.query("BEGIN;");
-        try {
+        await withTransaction(async (clientM10a) => {
             for (const att of listaAtt) {
                 const tipo_att = att.data_prog_mr && att.freq_mr ? ['manutenzione regolare'] : ['controllo'];
                 const data_prog = att.data_prog_mr ? att.data_prog_mr : att.data_prog_c;
@@ -420,45 +419,34 @@ async function creaAttProgControllo(listaAtt, ambito) {
                 const valuesArray = [att.id_att_prog, tipo_att, att.cl_ogg, att.rid_fr_risc, freq, data_prog, att.id_group, att.elementi, att.data_ins, att.data_ins, att.loc_estesa, true, ambito];
                 await clientM10a.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins", "data_ultima_mod", "località_estesa", "da_integrare", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, valuesArray);
             }
-        }
-        catch(e) {
-            throw e;
-        }
-        await clientM10a.query("COMMIT;");
+        });
         return true;
     }
     catch(er) {
         console.log(`Errore: ${er}`);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
 
 async function creaNuovoLocPdiff(reqJson) {
     try {
-        await clientM10a.query("BEGIN;");
-        try {
+        await withTransaction(async (clientM10a) => {
             const coord = reqJson.coord;
             const nome = reqJson.nome;
             const sigla = reqJson.id_marker;
             const valuesArray = [[coord.lat, coord.lng], nome, sigla];
             await clientM10a.query(`INSERT INTO ${utility_schema}."dati_loc_pdiff" ("coord", "nome", "sigla") VALUES (($1), ($2), ($3))`, valuesArray);
-        } catch (e) {
-            throw e;
-        }
-        await clientM10a.query("COMMIT;");
+        });
         return true;
     } catch (er) {
         console.log(`Errore: ${er}`);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
 
 async function creaNuovoMarkerAmbito(reqJson) {
     try {
-        await clientM10a.query("BEGIN;");
-        try {
+        await withTransaction(async (clientM10a) => {
             const coord = reqJson.coord;
             const nome = reqJson.nome;
             const sigla = reqJson.sigla;
@@ -469,14 +457,10 @@ async function creaNuovoMarkerAmbito(reqJson) {
             const ambito = reqJson.ambito;
             const valuesArray = [[coord.lat, coord.lng], nome, sigla, descrizione, numero, edificio, edif_nome_menu, ambito];
             await clientM10a.query(`INSERT INTO ${data_schema}."dati_edifici" ("coord", "nome", "sigla", "descrizione", "numero", "edificio", "edif_nome_menu", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8))`, valuesArray);
-        } catch (e) {
-            throw e;
-        }
-        await clientM10a.query("COMMIT;");
+        });
         return true;
     } catch (er) {
         console.log(`Errore: ${er}`);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
@@ -499,8 +483,7 @@ async function integraAtt(jsonAtt, ambito) {
     values.push(jsonAtt['id_att_prog']);
     const strSet = entriesFiltr.map((e, i) => `"${e[0]}" = ($${i+1})`).join(', ');
     try {
-        await clientM10a.query('BEGIN;');
-        try {
+        await withTransaction(async (clientM10a) => {
             await clientM10a.query(`UPDATE ${data_schema}."attività_prog" SET ${strSet}, "da_integrare" = FALSE WHERE "id_att_prog" = ${ultimoNum};`, values);
             const datiInsert = jsonAtt.dati_inserimento;
             const stringaContr = 'scheda_controllo';
@@ -532,16 +515,11 @@ async function integraAtt(jsonAtt, ambito) {
                     default: throw new Error('ERRORE: La richiesta non è andata a buon fine.');
                 }
             }
-        }
-        catch(err) {
-            throw err;
-        }
-        await clientM10a.query('COMMIT;');
+        });
         return true;
     }
     catch(e) {
         console.log(`Errore: ${e}`);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
@@ -564,8 +542,7 @@ async function uploadImmagine(files, dati, ambito) {
     };
     if (!idMap[datiJson.entità]) throw new Error('Entità non consentita');
     try {
-        await clientM10a.query('BEGIN;');
-        try { // QUI CONDIZIONI DA RISISTEMARE COME QUELLE IN REQTURISTA DOWNLOADIMMAGINI, GETINFOIMMAGINE
+        await withTransaction(async (clientM10a) => { // QUI CONDIZIONI DA RISISTEMARE COME QUELLE IN REQTURISTA DOWNLOADIMMAGINI, GETINFOIMMAGINE
             if (datiJson.id_main10ance.startsWith('loc-pdiff')) {
                 const rid_loc_pdiff = datiJson.id_main10ance.split('|')[1];
                 // query con dati
@@ -581,16 +558,11 @@ async function uploadImmagine(files, dati, ambito) {
                 const {error} = await supabase.storage.from("elementi").upload(safeStoragePath(ambito, percorsoFile), file.data, fileOptions);
                 if (error) throw error;
             }
-        }
-        catch(err) {
-            throw err;
-        }
-        await clientM10a.query('COMMIT;');
+        });
         return true;
     }
     catch(e) {
         console.log(e);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
@@ -601,8 +573,7 @@ async function eliminaImmagini(jsonDati, ambito) {
     const bucket = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? 'generale' : 'elementi';
     const schema = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? utility_schema : data_schema;
     try {
-        await clientM10a.query('BEGIN;');
-        try {
+        await withTransaction(async (clientM10a) => {
             // query elimina record
             for await (const img of listaImmagini) {
                 await clientM10a.query(`DELETE FROM ${qualifiedName(schema, jsonDati.entità)} WHERE "immagine" IN (($1)) AND "ambito" = ($2);`, [img, ambito]);
@@ -611,16 +582,11 @@ async function eliminaImmagini(jsonDati, ambito) {
             // eliminazione immagine supabase
             const {error} = await supabase.storage.from(bucket).remove(listaImmaginiSupa);
             if (error) throw error;
-        }
-        catch(err) {
-            throw err;
-        }
-        await clientM10a.query('COMMIT;');
+        });
         return true;
     }
     catch(e) {
         console.log(e);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
@@ -628,25 +594,18 @@ async function eliminaImmagini(jsonDati, ambito) {
 ///////////// QUESTA DA ELIMINARE FORSE, O DA RIUTILIZZARE PER FASE 2 PROG CONTROLLI ////////////////
 async function registraNuoviControlli(listaReqJson) {
     try {
-        await clientM10a.query("BEGIN;");
-        try {
+        await withTransaction(async (clientM10a) => {
             for (const reqJson of listaReqJson) {
                 await clientM10a.query(`INSERT INTO ${data_schema}."scheda_controllo" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "data_ins", "id_main10ance", "rid_fr_risc", "freq") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, [reqJson.id_contr, reqJson.cl_ogg, reqJson.controllo, reqJson.data_con, reqJson.data_ins, reqJson.id_main10ance, reqJson.rid_fr_risc, reqJson.frequenza]);
                 if (reqJson.dati_manutenzione) {
                     await clientM10a.query(`INSERT INTO ${data_schema}."scheda_manutenzione_regolare" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "data_ins", "id_main10ance") VALUES (($1), ($2), ($3), ($4), ($5), ($6));`, [reqJson.dati_manutenzione.id_mn_reg, reqJson.dati_manutenzione.cl_ogg, reqJson.dati_manutenzione.azione, reqJson.dati_manutenzione.data_ese, reqJson.dati_manutenzione.data_ins, reqJson.dati_manutenzione.id_main10ance]);
                 }
             }
-        }
-        catch(e) {
-            throw e;
-        }
-
-        await clientM10a.query("COMMIT;");
+        });
         return true;
     }
     catch (ex) {
         console.log(`Errore: ${ex}`);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
@@ -660,9 +619,8 @@ async function registraAttPrecedenti(reqJson) {
     const stringaRestauro = 'scheda_restauro';
     const stringaDiagnosi = 'danno_alterazione_degrado';
     try {
-        await clientM10a.query("BEGIN;");
-        console.log(reqJson);
-        try {
+        await withTransaction(async (clientM10a) => {
+            console.log(reqJson);
             switch (reqJson.metadati.tabella) {
                 case stringaContr:
                     for (const edificio of reqJson.edifici) {
@@ -714,25 +672,19 @@ async function registraAttPrecedenti(reqJson) {
                     console.log(reqJson.metadati.tabella);
                     break;
             }
-        }
-        catch(e) {
-            throw e;
-        }
-
-        await clientM10a.query("COMMIT;");
+        });
         return true;
     }
     catch (ex) {
         console.log(`Errore: ${ex}`);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
 
 async function registraScoreLavori(reqJson, ambito, autore) {
     try {
-        await clientM10a.query("BEGIN;");
-        for (const lavoro of reqJson) {
+        await withTransaction(async (clientM10a) => {
+            for (const lavoro of reqJson) {
             const queryTxt = `
                 INSERT INTO main10ance."a_temp" (
                     "località", edificio,
@@ -765,12 +717,11 @@ async function registraScoreLavori(reqJson, ambito, autore) {
             ];
 
             await clientM10a.query(queryTxt, listaValori);
-        }
-        await clientM10a.query("COMMIT;");
+            }
+        });
         return true;
     } catch (e) {
         console.log(`Errore: ${e}`);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }

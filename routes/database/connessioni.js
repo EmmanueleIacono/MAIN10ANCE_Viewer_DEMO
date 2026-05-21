@@ -32,4 +32,26 @@ async function connect(client, nomeDb) {
     }
 }
 
-module.exports = {clientM10a, poolM10a}
+async function withTransaction(work) {
+    const client = await poolM10a.connect();
+    try {
+        await client.query('BEGIN;');
+        const result = await work(client);
+        await client.query('COMMIT;');
+        return result;
+    }
+    catch(e) {
+        try {
+            await client.query('ROLLBACK;');
+        }
+        catch(rollbackErr) {
+            console.error('Errore durante ROLLBACK:', rollbackErr);
+        }
+        throw e;
+    }
+    finally {
+        client.release();
+    }
+}
+
+module.exports = {clientM10a, poolM10a, withTransaction}

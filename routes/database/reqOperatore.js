@@ -4,7 +4,7 @@ const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
 
-const {clientM10a, poolM10a} = require('./connessioni');
+const {clientM10a, poolM10a, withTransaction} = require('./connessioni');
 const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
 const {assertIdentifier, quoteIdentifier, qualifiedName} = require('../security/sql');
@@ -487,11 +487,10 @@ async function leggiEnumServizio(nomeEnum) {
 
 async function transazioneScheda(listaStrVals, all_files, docs_array, ambito) {
     try {
-        await clientM10a.query("BEGIN;");
-        try {
+        await withTransaction(async (tx) => {
             let ls_counter = 0;
             for (const sv of listaStrVals) {
-                await clientM10a.query(sv[0], sv[1]);
+                await tx.query(sv[0], sv[1]);
 
                 // FILE UPLOAD
                 if (Object.entries(all_files).length > 0) {
@@ -510,18 +509,12 @@ async function transazioneScheda(listaStrVals, all_files, docs_array, ambito) {
                 }
                 ls_counter++;
             }
-        }
-        catch(e) {
-            throw e;
-        }
-
-        await clientM10a.query("COMMIT;");
+        });
         return true;
     }
     catch (ex) {
         console.log(`Errore: ${ex}`);
         console.log(ex);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
@@ -628,6 +621,9 @@ async function leggiTabelleLOD3e4() {
 //         return [];
 //     }
 // }
+async function leggiDatiControlloProg() { // TEMP HACK-FIX B4 DEL, da rivedere
+    return [];
+}
 
 async function leggiAttivitàProg() {
     try {
@@ -677,8 +673,8 @@ async function registraAttivitàEsecuzione(dati, all_files, ambito) {
     const stringaDiagnosi = 'danno_alterazione_degrado';
     const docsArray = dati.doc;
     try {
-        await clientM10a.query('BEGIN;');
-        switch (dati.tabella) {
+        await withTransaction(async (clientM10a) => {
+            switch (dati.tabella) {
             case stringaContr: {
                 if (dati.nuovo_record) {
                     const arrayInsertContr = [dati.nuovo_id, dati.data_con, dati.data_ultima_mod, dati.data_ultima_mod, dati.strumentaz, dati.id_main10ance, dati.cl_racc, dati.st_cons, dati.liv_urg, dati.estensione, dati.commenti, dati.doc, dati.autore_ultima_mod, dati.id_contr, true, ambito];
@@ -829,31 +825,27 @@ async function registraAttivitàEsecuzione(dati, all_files, ambito) {
                 // NOTE:
                 // registrare campo "eseguito" come TRUE
                 console.log('MANUTENZIONE STRAORDINARIA');
-                await clientM10a.query('ROLLBACK;');
-                break;
+                throw new Error('Manutenzione straordinaria non ancora implementata');
             }
             case stringaRestauro: {
                 // NOTE:
                 // registrare campo "eseguito" come TRUE
                 console.log('RESTAURO');
-                await clientM10a.query('ROLLBACK;');
-                break;
+                throw new Error('Restauro non ancora implementato');
             }
             case stringaDiagnosi: {
                 // NOTE:
                 // registrare campo "eseguito" come TRUE
                 console.log('DIAGNOSI');
-                await clientM10a.query('ROLLBACK;');
-                break;
+                throw new Error('Diagnosi non ancora implementata');
             }
             default: throw new Error('ERRORE: La richiesta non è andata a buon fine.');
         }
-        await clientM10a.query('COMMIT;');
+        });
         return true;
     }
     catch(e) {
         console.log(`Errore: ${e}`);
-        await clientM10a.query("ROLLBACK;");
         return false;
     }
 }
@@ -909,7 +901,7 @@ async function leggiSchedeStoricoControllo(ambito) {
 
 async function leggiSchedeStoricoManReg(ambito) {
     try {
-        const result = await clientM10a.query(`SELECT mr.data_ese AS "Data intervento", ap."località_estesa" AS "Località", (string_to_array(mr.id_main10ance[1], '|'))[2] AS "Edificio", mr.cl_ogg_fr AS "Classe oggetti", mr.azione AS "Tipo di intervento", mr.strumentaz AS "Strumentazione", mr.materiale AS "Materiale", mr.costo AS "Costo effettivo (€)", mr.ore AS "Ore effettive", mr.esecutori AS "Operatore", mr.doc AS "Documenti", mr.commenti AS "Note", mr.id_mn_reg AS "Codice scheda manutenzione regolare", mr.id_main10ance AS "Elementi interessati", mr.data_ins AS "Data programmazione attività" FROM ${data_schema}.scheda_manutenzione_regolare AS mr JOIN ${data_schema}.attività_prog AS ap ON mr.rid_att_prog = ap.id_att_prog WHERE mr.eseguito = TRUE AND mc.ambito LIKE ($1) ORDER BY mr.data_ins;`, [ambito]);
+        const result = await clientM10a.query(`SELECT mr.data_ese AS "Data intervento", ap."località_estesa" AS "Località", (string_to_array(mr.id_main10ance[1], '|'))[2] AS "Edificio", mr.cl_ogg_fr AS "Classe oggetti", mr.azione AS "Tipo di intervento", mr.strumentaz AS "Strumentazione", mr.materiale AS "Materiale", mr.costo AS "Costo effettivo (€)", mr.ore AS "Ore effettive", mr.esecutori AS "Operatore", mr.doc AS "Documenti", mr.commenti AS "Note", mr.id_mn_reg AS "Codice scheda manutenzione regolare", mr.id_main10ance AS "Elementi interessati", mr.data_ins AS "Data programmazione attività" FROM ${data_schema}.scheda_manutenzione_regolare AS mr JOIN ${data_schema}.attività_prog AS ap ON mr.rid_att_prog = ap.id_att_prog WHERE mr.eseguito = TRUE AND mr.ambito LIKE ($1) ORDER BY mr.data_ins;`, [ambito]);
         return result.rows;
     }
     catch(e) {
@@ -1035,7 +1027,7 @@ async function interrogaAnagraficaCopertura(id, ambito) {
 
 async function interrogaAnagraficaManufatto(id) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.epoca AS "Epoca", sa.autore AS "Autore", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.documenti AS "Documenti", sa.iter_autorizzativo AS "Iter autorizzativo" FROM ${utility_schema}.anagrafica_manufatto AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}' ORDER BY sa.id_anagr DESC;`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.epoca AS "Epoca", sa.autore AS "Autore", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.documenti AS "Documenti", sa.iter_autorizzativo AS "Iter autorizzativo" FROM ${utility_schema}.anagrafica_manufatto AS sa WHERE sa.id_main10ance = '${id}' ORDER BY sa.id_anagr DESC;`);
         return result.rows;
     }
     catch(e) {
@@ -1046,7 +1038,7 @@ async function interrogaAnagraficaManufatto(id) {
 
 async function interrogaAnagraficaDettaglio(id) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.epoca AS "Epoca", sa.documenti AS "Documenti", sa.autore AS "Autore", sa.data AS "Data" FROM ${utility_schema}.anagrafica_dettaglio AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}' ORDER BY sa.id_anagr DESC;`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.epoca AS "Epoca", sa.documenti AS "Documenti", sa.autore AS "Autore", sa.data AS "Data" FROM ${utility_schema}.anagrafica_dettaglio AS sa WHERE sa.id_main10ance = '${id}' ORDER BY sa.id_anagr DESC;`);
         return result.rows;
     }
     catch(e) {
@@ -1262,8 +1254,9 @@ async function leggiIdDocEsistenti(ambito) {
     } catch (err) {
         console.error(err);
         return [];
+    } finally {
+        client.release();
     }
-    client.release();
 }
 
 //////////          ALTRE FUNZIONI          //////////
