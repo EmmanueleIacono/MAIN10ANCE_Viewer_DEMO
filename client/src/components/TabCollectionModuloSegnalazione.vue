@@ -18,23 +18,12 @@
       <p class="user-field float-dx">{{dataCorta()}}</p>
       <br />
       <br />
-      <p><b>Condizioni ambientali:</b></p>
-      <label><b>METEO</b></label>
-      <input v-model="meteo" :disabled="schedaRegistrata">
-      <br />
-      <label><b>TEMPERATURA</b></label>
-      <input v-model="temperatura" :disabled="schedaRegistrata">
-      <br />
-      <label><b>SETTIMANA PRECEDENTE</b></label>
-      <input v-model="condizioni_sett_precedente" :disabled="schedaRegistrata">
-      <br />
-      <br />
-      <label><b>DESCRIZIONE</b></label>
-      <textarea v-model="descrizione" :disabled="schedaRegistrata" style="height: 20px;"></textarea>
-      <br />
-      <label><b>INTERVENTO URGENTE</b></label>
-      <textarea v-model="intervento_urgenza" :disabled="schedaRegistrata" style="height: 20px;"></textarea>
-      <br />
+      <SchemaForm
+        :fields="segnalazioneFields"
+        :model="stateModuloSegnalazione"
+        :disabled="schedaRegistrata"
+        @update-field="setSchemaField"
+      />
     </div>
   </div>
 </div>
@@ -44,12 +33,15 @@
 import { inject, toRefs, computed, ref } from 'vue';
 import {dataCorta, dataInteger} from '../js/shared';
 import {compilaScheda} from '../js/richieste';
+import {SEGNALAZIONE_FIELDS, isSchemaEmpty, resetSchemaState} from '../js/formSchemas';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
+import SchemaForm from './elementi/SchemaForm.vue';
 
 export default {
   name: 'TabCollectionModuloSegnalazione',
   components: {
     BtnBIM,
+    SchemaForm,
   },
   setup() {
     const store = inject('store');
@@ -57,10 +49,9 @@ export default {
     const stateGalleria = inject('stateGalleria');
     const stateModuloSegnalazione = inject('stateModuloSegnalazione');
     const schedaRegistrata = ref(false);
+    const segnalazioneFields = SEGNALAZIONE_FIELDS;
 
-    const schedaVuota = computed(() => {
-      return !(stateModuloSegnalazione.meteo || stateModuloSegnalazione.temperatura || stateModuloSegnalazione.condizioni_sett_precedente || stateModuloSegnalazione.descrizione || stateModuloSegnalazione.intervento_urgenza);
-    });
+    const schedaVuota = computed(() => isSchemaEmpty(segnalazioneFields, stateModuloSegnalazione));
 
     async function salvaScheda() {
       console.log('salva scheda');
@@ -93,11 +84,7 @@ export default {
     }
 
     function resetState() { // QUESTA MAGARI SI PUÒ SPOSTARE SU TABCOLLECTION
-      stateModuloSegnalazione.meteo = '';
-      stateModuloSegnalazione.temperatura = '';
-      stateModuloSegnalazione.condizioni_sett_precedente = '';
-      stateModuloSegnalazione.descrizione = '';
-      stateModuloSegnalazione.intervento_urgenza = '';
+      resetSchemaState(segnalazioneFields, stateModuloSegnalazione);
       stateModuloSegnalazione.id_segnalazione = null;
       stateModuloSegnalazione.data_registrazione = null;
       stateModuloSegnalazione.data_ultima_mod = null;
@@ -138,13 +125,20 @@ export default {
       return listaOgg;
     }
 
+    function setSchemaField(key, value) {
+      stateModuloSegnalazione[key] = value;
+    }
+
     return {
       store,
       schedaRegistrata,
+      stateModuloSegnalazione,
+      segnalazioneFields,
       ...toRefs(stateModuloSegnalazione),
       salvaScheda,
       resetState,
       chiudiScheda,
+      setSchemaField,
       dataCorta,
     }
   }

@@ -27,78 +27,20 @@
 
     <!-- Campi Manufatto -->
     <div v-if="qualeScheda === 'manufatto'">
-      <table class="form-table">
-        <tr>
-          <th><label>DEFINIZIONE</label></th>
-          <td><input v-model="definizione"></td>
-        </tr>
-        <tr>
-          <th><label>EPOCA</label></th>
-          <td><input v-model="epoca"></td>
-        </tr>
-        <tr>
-          <th><label><b>AUTORE</b></label></th>
-          <td><input v-model="autore"></td>
-        </tr>
-        <tr>
-          <th><label><b>DESCRIZIONE</b></label></th>
-          <td><input v-model="descrizione"></td>
-        </tr>
-        <tr>
-          <th><label><b>MATERIALE/I</b></label></th>
-          <td><input v-model="materiale"></td>
-        </tr>
-        <tr>
-          <th><label><b>TECNICHE</b></label></th>
-          <td><input v-model="tecniche"></td>
-        </tr>
-        <tr>
-          <th><label><b>DOCUMENTI</b></label></th>
-          <td><input v-model="documenti"></td>
-        </tr>
-        <tr>
-          <th><label><b>ITER AUTORIZZATIVO</b></label></th>
-          <td><input v-model="iter_autorizzativo"></td>
-        </tr>
-      </table>
+      <SchemaForm
+        :fields="anagraficaSimpleFields"
+        :model="stateModuloAnagrafica"
+        @update-field="setAnagraficaSimpleField"
+      />
     </div>
 
     <!-- Campi Dettaglio -->
     <div v-else-if="qualeScheda === 'dettaglio'">
-      <table class="form-table">
-        <tr>
-          <th><label><b>DEFINIZIONE</b></label></th>
-          <td><input v-model="definizione"></td>
-        </tr>
-        <tr>
-          <th><label><b>DESCRIZIONE</b></label></th>
-          <td><input v-model="descrizione"></td>
-        </tr>
-        <tr>
-          <th><label><b>MATERIALE/I</b></label></th>
-          <td><input v-model="materiale"></td>
-        </tr>
-        <tr>
-          <th><label><b>TECNICHE</b></label></th>
-          <td><input v-model="tecniche"></td>
-        </tr>
-        <tr>
-          <th><label><b>EPOCA</b></label></th>
-          <td><input v-model="epoca"></td>
-        </tr>
-        <tr>
-          <th><label><b>DOCUMENTI</b></label></th>
-          <td><input v-model="documenti"></td>
-        </tr>
-        <tr>
-          <th><label><b>AUTORE</b></label></th>
-          <td><input v-model="autore"></td>
-        </tr>
-        <tr>
-          <th><label><b>DATA</b></label></th>
-          <td><input v-model="data"></td>
-        </tr>
-      </table>
+      <SchemaForm
+        :fields="anagraficaSimpleFields"
+        :model="stateModuloAnagrafica"
+        @update-field="setAnagraficaSimpleField"
+      />
     </div>
 
     <!-- Campi Statua -->
@@ -718,40 +660,11 @@
 
     <!-- Campi Default -->
     <div v-else>
-      <table class="form-table">
-        <tr>
-          <th><label><b>DESCRIZIONE SISTEMA</b></label></th>
-          <td><textarea v-model="descrizione_sistema" style="height: 20px;"></textarea></td>
-        </tr>
-        <tr>
-          <th><label><b>DESCRIZIONE SUBSISTEMA</b></label></th>
-          <td><textarea v-model="descrizione_subsistema" style="height: 20px;"></textarea></td>
-        </tr>
-        <tr>
-          <th><label><b>TECNICA COSTRUTTIVA</b></label></th>
-          <td><input v-model="tecnica_costruttiva"></td>
-        </tr>
-        <tr>
-          <th><label><b>DIMENSIONI</b></label></th>
-          <td><input v-model="dimensioni"></td>
-        </tr>
-        <tr>
-          <th><label><b>MATERIALE/I</b></label></th>
-          <td><input v-model="materiale"></td>
-        </tr>
-        <tr>
-          <th><label><b>EPOCA</b></label></th>
-          <td><input v-model="epoca"></td>
-        </tr>
-        <tr>
-          <th><label><b>ISPEZIONABILITÀ</b></label></th>
-          <td><input v-model="ispezionabilità"></td>
-        </tr>
-        <tr>
-          <th><label><b>FONTI</b></label></th>
-          <td><input v-model="fonti"></td>
-        </tr>
-      </table>
+      <SchemaForm
+        :fields="anagraficaSimpleFields"
+        :model="stateModuloAnagrafica"
+        @update-field="setAnagraficaSimpleField"
+      />
     </div>
 
     <!-- DOCUMENTI -->
@@ -786,14 +699,17 @@
 import { inject, toRefs, computed, ref, onMounted, reactive, watch } from 'vue';
 import {dataCorta, dataInteger, trattaStringArray, filtraOpzioniLivelli} from '../js/shared';
 import {compilaScheda, leggiEnumServizio, leggiVistaDB} from '../js/richieste';
+import {ANAGRAFICA_DEFAULT_FIELDS, ANAGRAFICA_DETTAGLIO_FIELDS, ANAGRAFICA_MANUFATTO_FIELDS, isSchemaEmpty, resetSchemaState} from '../js/formSchemas';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
+import SchemaForm from './elementi/SchemaForm.vue';
 
 export default {
   name: 'TabCollectionModuloAnagrafica',
   components: {
     LoadingScreen,
     BtnBIM,
+    SchemaForm,
   },
   setup() {
     const store = inject('store');
@@ -854,18 +770,7 @@ export default {
       deep: true
     });
 
-    const schedaVuota = computed(() => {
-      return !(
-        stateModuloAnagrafica.descrizione_sistema || stateModuloAnagrafica.descrizione_subsistema
-        || stateModuloAnagrafica.tecnica_costruttiva || stateModuloAnagrafica.dimensioni
-        || stateModuloAnagrafica.materiale || stateModuloAnagrafica.epoca
-        || stateModuloAnagrafica.ispezionabilità || stateModuloAnagrafica.fonti
-        || stateModuloAnagrafica.definizione || stateModuloAnagrafica.autore
-        || stateModuloAnagrafica.descrizione || stateModuloAnagrafica.tecniche
-        || stateModuloAnagrafica.documenti || stateModuloAnagrafica.iter_autorizzativo
-        || stateModuloAnagrafica.data
-      );
-    });
+    const schedaVuota = computed(() => isSchemaEmpty(anagraficaSimpleFields.value, stateModuloAnagrafica));
 
     const schedaVuotaStatua = computed(() => {
       return !(
@@ -943,6 +848,19 @@ export default {
           break;
       }
       return scheda;
+    });
+
+    const isSchedaAnagraficaSemplice = computed(() => ['manufatto', 'dettaglio', 'altro'].includes(qualeScheda.value));
+
+    const anagraficaSimpleFields = computed(() => {
+      switch (qualeScheda.value) {
+        case 'manufatto':
+          return ANAGRAFICA_MANUFATTO_FIELDS;
+        case 'dettaglio':
+          return ANAGRAFICA_DETTAGLIO_FIELDS;
+        default:
+          return ANAGRAFICA_DEFAULT_FIELDS;
+      }
     });
 
     onMounted(async () => {
@@ -1026,7 +944,7 @@ export default {
       console.log('salva scheda');
       if (stateGalleria.idImgSelezionate) {
         if (
-          qualeScheda.value == 'altro' && schedaVuota.value
+          isSchedaAnagraficaSemplice.value && schedaVuota.value
           || qualeScheda.value == 'statua' && schedaVuotaStatua.value
           || qualeScheda.value == 'coperture' && schedaVuotaCoperture.value
         ) {
@@ -1036,7 +954,7 @@ export default {
         impostaMetadati();
         let jsonReq;
         let qualeState;
-        if (qualeScheda.value === 'altro') qualeState = stateModuloAnagrafica;
+        if (isSchedaAnagraficaSemplice.value) qualeState = stateModuloAnagrafica;
         else if (qualeScheda.value === 'statua') qualeState = stateModuloAnagraficaStatua;
         else if (qualeScheda.value === 'coperture') qualeState = stateModuloAnagraficaCoperture;
 
@@ -1185,22 +1103,12 @@ export default {
           stateModuloAnagraficaCoperture.autore_ultima_mod = null;
           break;
 
+        case 'manufatto':
+        case 'dettaglio':
         case 'altro':
-          stateModuloAnagrafica.descrizione_sistema = '';
-          stateModuloAnagrafica.descrizione_subsistema = '';
-          stateModuloAnagrafica.tecnica_costruttiva = '';
-          stateModuloAnagrafica.dimensioni = '';
-          stateModuloAnagrafica.materiale = '';
-          stateModuloAnagrafica.epoca = '';
-          stateModuloAnagrafica.ispezionabilità = '';
-          stateModuloAnagrafica.fonti = '';
-          stateModuloAnagrafica.definizione = '';
-          stateModuloAnagrafica.autore = '';
-          stateModuloAnagrafica.descrizione = '';
-          stateModuloAnagrafica.tecniche = '';
-          stateModuloAnagrafica.documenti = '';
-          stateModuloAnagrafica.iter_autorizzativo = '';
-          stateModuloAnagrafica.data = '';
+          [ANAGRAFICA_MANUFATTO_FIELDS, ANAGRAFICA_DETTAGLIO_FIELDS, ANAGRAFICA_DEFAULT_FIELDS]
+            .forEach(schema => resetSchemaState(schema, stateModuloAnagrafica));
+          stateModuloAnagrafica.docs = [];
           stateModuloAnagrafica.id_anagr = null;
           stateModuloAnagrafica.data_registrazione = null;
           stateModuloAnagrafica.data_ultima_mod = null;
@@ -1230,6 +1138,8 @@ export default {
           modulo = stateModuloAnagraficaCoperture;
           break;
 
+        case 'manufatto':
+        case 'dettaglio':
         case 'altro':
           modulo = stateModuloAnagrafica;
           break;
@@ -1321,9 +1231,14 @@ export default {
       fileInputs.splice(ind, 1);
     }
 
+    function setAnagraficaSimpleField(key, value) {
+      stateModuloAnagrafica[key] = value;
+    }
+
     return {
       store,
       loadingDati,
+      stateModuloAnagrafica,
       ...toRefs(stateModuloAnagrafica),
       stateModuloAnagraficaStatua,
       stateModuloAnagraficaCoperture,
@@ -1332,13 +1247,15 @@ export default {
       files,
       fileInputs,
       qualeScheda,
+      anagraficaSimpleFields,
       salvaScheda,
       resetState,
       chiudiScheda,
       scegliFile,
       gestisciFileUpload,
       aggiungiFile,
-      rimuoviFile
+      rimuoviFile,
+      setAnagraficaSimpleField
     }
   }
 }
