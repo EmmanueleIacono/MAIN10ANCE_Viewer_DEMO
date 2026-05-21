@@ -6,6 +6,8 @@ app.use(express.static("public"));
 const {clientM10a} = require('./connessioni');
 const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
+const {quoteIdentifier, qualifiedName, parseCsvIdentifiers} = require('../security/sql');
+const {safeStoragePath} = require('../security/upload');
 
 //////////          RICHIESTE          //////////
 
@@ -105,7 +107,10 @@ app.get('/definizioni_classi', async (req, res) => {
 
 async function leggiGIS(tabella, geometria, colonneUtili) {
     try {
-        const result = await clientM10a.query(`SELECT ST_AsGeoJSON(${geometria}) AS "geom", CONCAT_WS(', ', ${colonneUtili}) AS "info" FROM ${data_schema}.${tabella};`);
+        const geomIdent = quoteIdentifier(geometria, 'colonna geometria');
+        const infoColumns = parseCsvIdentifiers(colonneUtili, 'colonne GIS').join(', ');
+        const tableName = qualifiedName(data_schema, tabella);
+        const result = await clientM10a.query(`SELECT ST_AsGeoJSON(${geomIdent}) AS "geom", CONCAT_WS(', ', ${infoColumns}) AS "info" FROM ${tableName};`);
         return result.rows;
     }
     catch(e) {
@@ -164,6 +169,7 @@ async function leggiListaTabelleLOD(LOD) {
 }
 
 async function leggiListaImmagini(percorso) {
+    percorso = safeStoragePath(percorso);
     const is_pdiff = percorso.startsWith('loc-pdiff');
     const bucket = is_pdiff ? 'generale' : 'elementi';
     try {
@@ -190,6 +196,7 @@ async function leggiListaImmagini(percorso) {
 }
 
 async function downloadImmagini(percorsoFile) {
+    percorsoFile = safeStoragePath(percorsoFile);
     const is_pdiff = percorsoFile.startsWith('loc-pdiff');
     const bucket = is_pdiff ? 'generale' : 'elementi';
     try {
@@ -218,9 +225,11 @@ async function downloadImmagini(percorsoFile) {
 }
 
 async function getInfoImmagine(percorsoFile, tabella) {
+    percorsoFile = safeStoragePath(percorsoFile);
     const schema = percorsoFile.startsWith('loc-pdiff') ? utility_schema : data_schema;
     try {
-        const result = await clientM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "codice" AS "Codice", "id_main10ance" FROM ${schema}.${tabella} WHERE "immagine" = ($1);`, [percorsoFile]);
+        const tableName = qualifiedName(schema, tabella);
+        const result = await clientM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "codice" AS "Codice", "id_main10ance" FROM ${tableName} WHERE "immagine" = ($1);`, [percorsoFile]);
         return result.rows;
     }
     catch(e) {

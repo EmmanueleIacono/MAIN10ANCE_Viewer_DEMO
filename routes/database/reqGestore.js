@@ -3,11 +3,14 @@ const fileupload = require('express-fileupload');
 const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
-app.use(fileupload());
 
 const {clientM10a} = require('./connessioni');
 const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
+const {qualifiedName, parseJsonArray} = require('../security/sql');
+const {uploadMiddlewareOptions, asSingleFile, validateFile, safeStoragePath} = require('../security/upload');
+
+app.use(fileupload(uploadMiddlewareOptions));
 
 //////////          RICHIESTE          //////////
 
@@ -287,8 +290,8 @@ app.get('/edifici/punteggi-lavori', async (req, res) => {
 //////////          QUERY          //////////
 
 async function leggiNumeroOggetti(listaTabelle) {
-    const listaTabs = JSON.parse(listaTabelle);
-    const listaStringhe = listaTabs.map(tab => `SELECT COUNT(*) FROM ${data_schema}."${tab}"`);
+    const listaTabs = parseJsonArray(listaTabelle, 'lista tabelle');
+    const listaStringhe = listaTabs.map(tab => `SELECT COUNT(*) FROM ${qualifiedName(data_schema, tab)}`);
     const stringheJoin = listaStringhe.join(' UNION ');
     try {
         const result = await clientM10a.query(`SELECT SUM(count) FROM (${stringheJoin}) AS tabelle;`);
@@ -300,12 +303,12 @@ async function leggiNumeroOggetti(listaTabelle) {
 }
 
 async function conteggioElementi(listaTabelle, listaAlias) {
-    const listaTabs = JSON.parse(listaTabelle);
+    const listaTabs = parseJsonArray(listaTabelle, 'lista tabelle');
     const listaAls = JSON.parse(listaAlias);
     const listaAlsReplaced = listaAls.map(a => a.replace("'", "''"));
     let listaStringhe = [];
     for (let i=0; i<listaTabs.length; i++) {
-        const stringa = `SELECT COUNT(*), '${listaAlsReplaced[i]}' AS nome_tabella FROM ${data_schema}."${listaTabs[i]}"`;
+        const stringa = `SELECT COUNT(*), '${listaAlsReplaced[i]}' AS nome_tabella FROM ${qualifiedName(data_schema, listaTabs[i])}`;
         listaStringhe.push(stringa);
     }
     const stringheJoin = listaStringhe.join(' UNION ');
@@ -398,8 +401,7 @@ async function getEntitàDaClOgg(cl_ogg) {
 
 async function getIdentificativiDaEntità(entità, id) {
     try {
-        // QUESTO FUNZIONA, MA CAPIRE COME FARE MEGLIO LIKE '${}%' USANDO ($1) ECC.
-        const results = await clientM10a.query(`SELECT "id_main10ance" FROM ${data_schema}."${entità}" WHERE "id_main10ance" LIKE '${id}%';`);
+        const results = await clientM10a.query(`SELECT "id_main10ance" FROM ${qualifiedName(data_schema, entità)} WHERE "id_main10ance" LIKE $1;`, [`${id}%`]);
         return results.rows;
     }
     catch(e) {
@@ -545,10 +547,11 @@ async function integraAtt(jsonAtt, ambito) {
 }
 
 async function uploadImmagine(files, dati, ambito) {
-    const file = files.file;
+    const {file, safeName, options: fileOptions} = validateFile(asSingleFile(files), ['image/']);
     const datiJson = JSON.parse(dati.dati);
-    const percorso = datiJson.percorso;
-    const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.codice, datiJson.artista, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, `${percorso}/${file.name}`];
+    const percorso = safeStoragePath(datiJson.percorso);
+    const percorsoFile = safeStoragePath(percorso, safeName);
+    const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.codice, datiJson.artista, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, percorsoFile];
     const idMap = {
         arredo: 'id_arr',
         dipinto_murale: 'id_dipmur',
@@ -559,23 +562,23 @@ async function uploadImmagine(files, dati, ambito) {
         dettaglio: 'id_dett',
         elementi: 'id'
     };
-    const fileOptions = {contentType: file.mimetype};
+    if (!idMap[datiJson.entità]) throw new Error('Entità non consentita');
     try {
         await clientM10a.query('BEGIN;');
         try { // QUI CONDIZIONI DA RISISTEMARE COME QUELLE IN REQTURISTA DOWNLOADIMMAGINI, GETINFOIMMAGINE
             if (datiJson.id_main10ance.startsWith('loc-pdiff')) {
                 const rid_loc_pdiff = datiJson.id_main10ance.split('|')[1];
                 // query con dati
-                await clientM10a.query(`INSERT INTO ${utility_schema}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, rid_loc_pdiff]);
+                await clientM10a.query(`INSERT INTO ${qualifiedName(utility_schema, datiJson.entità)} ("${idMap[datiJson.entità]}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, rid_loc_pdiff]);
                 // caricamento immagine supabase
-                const {error} = await supabase.storage.from("generale").upload(`${percorso}/${file.name}`, file.data, fileOptions);
+                const {error} = await supabase.storage.from("generale").upload(percorsoFile, file.data, fileOptions);
                 if (error) throw error;
             }
             else {
                 // query con dati
-                await clientM10a.query(`INSERT INTO ${data_schema}."${datiJson.entità}" ("${idMap[datiJson.entità]}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, ambito]); // e "codice"?
+                await clientM10a.query(`INSERT INTO ${qualifiedName(data_schema, datiJson.entità)} ("${idMap[datiJson.entità]}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, ambito]); // e "codice"?
                 // caricamento immagine supabase
-                const {error} = await supabase.storage.from("elementi").upload(`${ambito}/${percorso}/${file.name}`, file.data, fileOptions);
+                const {error} = await supabase.storage.from("elementi").upload(safeStoragePath(ambito, percorsoFile), file.data, fileOptions);
                 if (error) throw error;
             }
         }
@@ -593,8 +596,8 @@ async function uploadImmagine(files, dati, ambito) {
 }
 
 async function eliminaImmagini(jsonDati, ambito) {
-    const listaImmagini = jsonDati.immagini;
-    const listaImmaginiSupa = ambito ? listaImmagini.map(img => `${ambito}/${img}`) : listaImmagini;
+    const listaImmagini = jsonDati.immagini.map(img => safeStoragePath(img));
+    const listaImmaginiSupa = ambito ? listaImmagini.map(img => safeStoragePath(ambito, img)) : listaImmagini;
     const bucket = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? 'generale' : 'elementi';
     const schema = (jsonDati.entità === 'manufatto' || jsonDati.entità === 'dettaglio') ? utility_schema : data_schema;
     try {
@@ -602,7 +605,7 @@ async function eliminaImmagini(jsonDati, ambito) {
         try {
             // query elimina record
             for await (const img of listaImmagini) {
-                await clientM10a.query(`DELETE FROM ${schema}.${jsonDati.entità} WHERE "immagine" IN (($1)) AND "ambito" = ($2);`, [img, ambito]);
+                await clientM10a.query(`DELETE FROM ${qualifiedName(schema, jsonDati.entità)} WHERE "immagine" IN (($1)) AND "ambito" = ($2);`, [img, ambito]);
             }
 
             // eliminazione immagine supabase

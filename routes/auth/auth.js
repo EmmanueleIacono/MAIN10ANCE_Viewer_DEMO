@@ -4,10 +4,16 @@ const router = express.Router();
 router.use(express.json());
 
 const {clientM10a} = require('../database/connessioni');
+const {authCookieOptions} = require('../security/cookies');
+const {createRateLimiter} = require('../security/rateLimit');
 
-const scadenza = new Date(Date.now() + 1000*60*60*24*365);
+const authLimiter = createRateLimiter({
+    windowMs: parseInt(process.env.AUTH_RATE_LIMIT_WINDOW_MS || `${15 * 60 * 1000}`, 10),
+    max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || '20', 10),
+    keyPrefix: 'auth',
+});
 
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', authLimiter, async (req, res, next) => {
     if (validazioneUsers(req.body)) {
         const datiUtente = await getUtenteByNome(req.body.username);
         // se non trovo nessun nome utente, ricevo "undefined"
@@ -38,7 +44,7 @@ router.post('/signup', async (req, res, next) => {
     }
 });
 
-router.post('/login', async (req, res, next) => {
+router.post('/login', authLimiter, async (req, res, next) => {
     if (validazioneUsers(req.body)) {
         // controlla se utente è presente in db
         const datiUtente = await getUtenteByNome(req.body.username);
@@ -50,24 +56,10 @@ router.post('/login', async (req, res, next) => {
             if (comp) {
                 const roleSettings = await getSettingsByRuolo(datiUtente.role);
                 const ambitoSettings = await getSettingsByAmbito(datiUtente.ambito);
-                res.cookie('user_id', datiUtente.username, {
-                    httpOnly: true,
-                    secure: (!process.env.DEV_PLACEHOLDER),
-                    signed: true,
-                    expires: scadenza
-                });
-                res.cookie('role', datiUtente.role, {
-                    httpOnly: true,
-                    secure: (!process.env.DEV_PLACEHOLDER),
-                    signed: true,
-                    expires: scadenza
-                });
-                res.cookie('ambito', datiUtente.ambito, {
-                    httpOnly: true,
-                    secure: (!process.env.DEV_PLACEHOLDER),
-                    signed: true,
-                    expires: scadenza
-                });
+                const cookieOptions = authCookieOptions();
+                res.cookie('user_id', datiUtente.username, cookieOptions);
+                res.cookie('role', datiUtente.role, cookieOptions);
+                res.cookie('ambito', datiUtente.ambito, cookieOptions);
                 res.json({
                     message: 'Login completato',
                     id: datiUtente.username,
@@ -93,9 +85,10 @@ router.post('/login', async (req, res, next) => {
 });
 
 router.get('/logout', (req, res) => {
-    res.clearCookie('user_id');
-    res.clearCookie('role');
-    res.clearCookie('ambito');
+    const cookieOptions = authCookieOptions();
+    res.clearCookie('user_id', cookieOptions);
+    res.clearCookie('role', cookieOptions);
+    res.clearCookie('ambito', cookieOptions);
     res.json({
         message: 'Logout avvenuto con successo'
     });

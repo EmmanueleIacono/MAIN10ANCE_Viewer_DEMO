@@ -3,11 +3,14 @@ const fileupload = require('express-fileupload');
 const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
-app.use(fileupload());
 
 const {clientM10a, poolM10a} = require('./connessioni');
 const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
+const {assertIdentifier, quoteIdentifier, qualifiedName} = require('../security/sql');
+const {uploadMiddlewareOptions, asSingleFile, validateFile, safeStoragePath} = require('../security/upload');
+
+app.use(fileupload(uploadMiddlewareOptions));
 
 //////////          RICHIESTE          //////////
 
@@ -422,7 +425,8 @@ app.get('/docs/ids', async (req, res) => {
 
 async function leggiColonneTabella(nomeTab) {
     try {
-        const result = await clientM10a.query(`SELECT * FROM information_schema.columns WHERE table_schema = '${data_schema}' AND table_name = ($1);`, [nomeTab]);
+        assertIdentifier(nomeTab, 'tabella');
+        const result = await clientM10a.query(`SELECT * FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2;`, [data_schema, nomeTab]);
         return result.rows;
     }
     catch(e) {
@@ -432,7 +436,7 @@ async function leggiColonneTabella(nomeTab) {
 
 async function leggiTabellaDB(nomeTab) {
     try {
-        const result = await clientM10a.query(`SELECT * FROM ${data_schema}."${nomeTab}" ORDER BY "id_main10ance";`);
+        const result = await clientM10a.query(`SELECT * FROM ${qualifiedName(data_schema, nomeTab)} ORDER BY "id_main10ance";`);
         return result.rows;
     }
     catch(e) {
@@ -463,7 +467,7 @@ async function leggiTabellaGlossarioDegradi() {
 
 async function leggiEnum(nomeEnum) {
     try {
-        const result = await clientM10a.query(`SELECT unnest(enum_range(null::${data_schema}.${nomeEnum}));`); // SANIFICARE INPUT
+        const result = await clientM10a.query(`SELECT unnest(enum_range(null::${quoteIdentifier(data_schema)}.${quoteIdentifier(nomeEnum)}));`);
         return result.rows;
     }
     catch(e) {
@@ -473,7 +477,7 @@ async function leggiEnum(nomeEnum) {
 
 async function leggiEnumServizio(nomeEnum) {
     try {
-        const result = await clientM10a.query(`SELECT unnest(enum_range(null::${utility_schema}.${nomeEnum}));`); // SANIFICARE INPUT
+        const result = await clientM10a.query(`SELECT unnest(enum_range(null::${quoteIdentifier(utility_schema)}.${quoteIdentifier(nomeEnum)}));`);
         return result.rows;
     }
     catch(e) {
@@ -1086,7 +1090,7 @@ async function leggiMarkerEdifAmbito(ambito_edif) {
 async function downloadDocumento(percorsoFile, ambito) {
     const bucket = 'documenti-schede';
     try {
-        const {data, error} = await supabase.storage.from(bucket).download(`${ambito}/${percorsoFile}`);
+        const {data, error} = await supabase.storage.from(bucket).download(safeStoragePath(ambito, percorsoFile));
 
         if (error) throw error;
 
@@ -1103,7 +1107,7 @@ async function downloadDocumento(percorsoFile, ambito) {
 async function leggiVistaDB(nome_vista, utility = false) {
     const schema = utility ? utility_schema : data_schema;
     try {
-        const results = await clientM10a.query(`SELECT * FROM ${schema}."${nome_vista}";`);
+        const results = await clientM10a.query(`SELECT * FROM ${qualifiedName(schema, nome_vista)};`);
         return results.rows;
     }
     catch(e) {
@@ -1159,15 +1163,13 @@ async function leggiListaElementi() {
 async function caricaDocumento(dati, files, ambito, utente) {
     console.log(dati);
     console.log(files);
-    const file = files.file;
+    const {file, safeName, options: fileOpts} = validateFile(asSingleFile(files));
     const meta = JSON.parse(dati.metadata);
 
     if (!file || !meta) throw new Error('File o metadati assenti');
 
-    const percorso = `${ambito}/${meta.cartella_tipo}/${meta.id_doc}`;
-    const nomeFile = file.name ? file.name : '---';
-    const fileFullPath = `${percorso}/${nomeFile}`;
-    const fileOpts = { contentType: file.mimetype };
+    const percorso = safeStoragePath(ambito, meta.cartella_tipo, meta.id_doc);
+    const fileFullPath = safeStoragePath(percorso, safeName);
 
     const id_doc = normalizzaValoriVuoti(meta.id_doc);
     const data_doc = normalizzaValoriVuoti(meta.data_doc);

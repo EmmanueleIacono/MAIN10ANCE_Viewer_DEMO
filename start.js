@@ -5,6 +5,10 @@ function main() {
     // const cors = require('cors');
 
     const PORT = process.env.PORT || 3000;
+    if (!process.env.COOKIE_SECRET) {
+        console.error('COOKIE_SECRET mancante.');
+        return;
+    }
     const config = require('./config');
     if (config.credentials.client_id == null || config.credentials.client_secret == null) {
         console.error('Credenziali AUTODESK FORGE mancanti.');
@@ -39,7 +43,11 @@ function main() {
     // handler errori
     app.use((err, req, res, next) => {
         console.error(err);
-        res.status(err.statusCode).json(err);
+        const statusCode = err.statusCode || err.status || 500;
+        const message = statusCode >= 500 && process.env.NODE_ENV === 'production'
+            ? 'Errore interno del server'
+            : err.message || 'Errore interno del server';
+        res.status(statusCode).json({message});
     });
 
     app.listen(PORT, () => { console.log(`Server in ascolto sulla porta ${PORT}`); });
