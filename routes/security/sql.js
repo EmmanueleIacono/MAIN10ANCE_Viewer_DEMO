@@ -1,4 +1,4 @@
-const IDENTIFIER_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const IDENTIFIER_RE = /^[\p{L}_][\p{L}\p{N}_]*$/u;
 
 function assertIdentifier(value, label = 'identificatore') {
     if (typeof value !== 'string' || !IDENTIFIER_RE.test(value)) {

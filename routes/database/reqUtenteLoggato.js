@@ -5,17 +5,14 @@ app.use(express.static("public"));
 
 const {clientM10a} = require('./connessioni');
 const {utility_schema} = require('./schemi');
+const {jsonRoute} = require('../security/http');
 
 //////////          RICHIESTE          //////////
 
-// per testare la richiesta:
-// fetch("l//utenti/mario", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get(`/utenti/:username`, async (req, res) => {
+app.get(`/utenti/:username`, jsonRoute(async (req) => {
     const username = req.params.username;
-    const risp = await getInfoUtenteByNome(username);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(risp));
-});
+    return getInfoUtenteByNome(username);
+}));
 
 //////////          QUERY          //////////
 

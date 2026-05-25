@@ -9,6 +9,30 @@ const ACTIVITY_TABLES = Object.freeze({
 
 const ACTIVITY_TABLE_LIST = Object.freeze(Object.values(ACTIVITY_TABLES));
 
+const DATA_FORM_TABLES = Object.freeze({
+    ANAGRAFICA: 'scheda_anagrafica',
+    ANAGRAFICA_STATUA: 'scheda_anagrafica_statua',
+    ANAGRAFICA_COPERTURA: 'scheda_anagrafica_copertura'
+});
+
+const SERVICE_FORM_TABLES = Object.freeze({
+    ANAGRAFICA_MANUFATTO: 'anagrafica_manufatto',
+    ANAGRAFICA_DETTAGLIO: 'anagrafica_dettaglio',
+    SEGNALAZIONE: 'segnalazione'
+});
+
+const DATA_FORM_TABLE_LIST = Object.freeze([
+    ...Object.values(DATA_FORM_TABLES),
+    ...ACTIVITY_TABLE_LIST
+]);
+
+const SERVICE_FORM_TABLE_LIST = Object.freeze(Object.values(SERVICE_FORM_TABLES));
+
+const FORM_TABLE_LIST = Object.freeze([
+    ...DATA_FORM_TABLE_LIST,
+    ...SERVICE_FORM_TABLE_LIST
+]);
+
 const IMAGE_ENTITIES = Object.freeze({
     arredo: {idColumn: 'id_arr', bucket: 'elementi', schema: 'data'},
     dipinto_murale: {idColumn: 'id_dipmur', bucket: 'elementi', schema: 'data'},
@@ -26,4 +50,14 @@ function getImageEntity(entity) {
     return metadata;
 }
 
-module.exports = {ACTIVITY_TABLES, ACTIVITY_TABLE_LIST, IMAGE_ENTITIES, getImageEntity};
+module.exports = {
+    ACTIVITY_TABLES,
+    ACTIVITY_TABLE_LIST,
+    DATA_FORM_TABLES,
+    DATA_FORM_TABLE_LIST,
+    SERVICE_FORM_TABLES,
+    SERVICE_FORM_TABLE_LIST,
+    FORM_TABLE_LIST,
+    IMAGE_ENTITIES,
+    getImageEntity
+};

@@ -7,65 +7,38 @@ app.use(express.static("public"));
 const {clientM10a, poolM10a, withTransaction} = require('./connessioni');
 const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
-const {assertIdentifier, quoteIdentifier, qualifiedName} = require('../security/sql');
+const {assertIdentifier, assertOneOf, quoteIdentifier, qualifiedName} = require('../security/sql');
 const {uploadMiddlewareOptions, asSingleFile, validateFile, safeStoragePath} = require('../security/upload');
-const {ACTIVITY_TABLES} = require('./metadata');
+const {ACTIVITY_TABLES, FORM_TABLE_LIST, SERVICE_FORM_TABLE_LIST} = require('./metadata');
+const {jsonRoute, sendJson} = require('../security/http');
 
 app.use(fileupload(uploadMiddlewareOptions));
 
 //////////          RICHIESTE          //////////
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/colonne", {method: "GET", headers: {"content-type": "application/json", tab: "catena"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/colonne', async (req, res) => {
+app.get('/Main10ance_DB/colonne', jsonRoute(async (req) => {
     const reqJson = req.headers;
-    const risposta = await leggiColonneTabella(reqJson.tab);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiColonneTabella(reqJson.tab);
+}));
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB", {method: "GET", headers: {"content-type": "application/json", tab: "catena"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB', async (req, res) => {
+app.get('/Main10ance_DB/tabellaDB', jsonRoute(async (req) => {
     const reqJson = req.headers;
-    const risposta = await leggiTabellaDB(reqJson.tab);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiTabellaDB(reqJson.tab);
+}));
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/glossario", {method: "GET", headers: {"content-type": "application/json", tab: "glossario"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/glossario', async (req, res) => {
-    const risposta = await leggiTabellaGlossario();
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+app.get('/Main10ance_DB/tabellaDB/glossario', jsonRoute(() => leggiTabellaGlossario()));
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/glossario/degradi", {method: "GET", headers: {"content-type": "application/json", tab: "glossario"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/glossario/degradi', async (req, res) => {
-    const risposta = await leggiTabellaGlossarioDegradi();
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+app.get('/Main10ance_DB/tabellaDB/glossario/degradi', jsonRoute(() => leggiTabellaGlossarioDegradi()));
 
-// per testare la richiesta:
-// fetch("/o/enum", {method: "GET", headers: {"content-type": "application/json", nomeenum: "cl_ogg_fr"} }).then(a => a.json()).then(console.log)
-app.get('/enum', async (req, res) => {
+app.get('/enum', jsonRoute(async (req) => {
     const reqJson = req.headers;
-    const risposta = await leggiEnum(reqJson.nomeenum);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiEnum(reqJson.nomeenum);
+}));
 
-// per testare la richiesta:
-// fetch("/o/enum-servizio", {method: "GET", headers: {"content-type": "application/json", nomeenum: "cl_ogg_fr"} }).then(a => a.json()).then(console.log)
-app.get('/enum-servizio', async (req, res) => {
+app.get('/enum-servizio', jsonRoute(async (req) => {
     const reqJson = req.headers;
-    const risposta = await leggiEnumServizio(reqJson.nomeenum);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiEnumServizio(reqJson.nomeenum);
+}));
 
 app.post('/schede/nuova', async (req, res) => {
     const ambito = req.signedCookies.ambito;
@@ -94,86 +67,44 @@ app.post('/schede/nuova', async (req, res) => {
     }
 });
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/schede-anagrafica", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/schede-anagrafica', async (req, res) => {
-    const risposta = await leggiSchedeAnagrafica();
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+app.get('/Main10ance_DB/tabellaDB/schede-anagrafica', jsonRoute(() => leggiSchedeAnagrafica()));
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/schede-controllo", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/schede-controllo', async (req, res) => {
-    const risposta = await leggiSchedeControllo();
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+app.get('/Main10ance_DB/tabellaDB/schede-controllo', jsonRoute(() => leggiSchedeControllo()));
 
-app.get('/schede-controllo-2', async (req, res) => {
+app.get('/schede-controllo-2', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
-    const risposta = await leggiSchedeControllo2(ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiSchedeControllo2(ambito);
+}));
 
-app.get('/schede-manutenzione-regolare', async (req, res) => {
+app.get('/schede-manutenzione-regolare', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
-    const risposta = await leggiSchedeManReg(ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiSchedeManReg(ambito);
+}));
 
-app.get('/schede-manutenzione-correttiva', async (req, res) => {
+app.get('/schede-manutenzione-correttiva', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
-    const risposta = await leggiSchedeManCorr(ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiSchedeManCorr(ambito);
+}));
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/tabellaDB/schede-restauro", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/tabellaDB/schede-restauro', async (req, res) => {
-    const risposta = await leggiSchedeRestauro();
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+app.get('/Main10ance_DB/tabellaDB/schede-restauro', jsonRoute(() => leggiSchedeRestauro()));
 
-// per testare la richiesta:
-// fetch("/o/DB_Servizio/LOD/UrnEdifici", {method: "GET", headers: {"content-type": "application/json", sm: 'SMV', capp: '38'} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/LOD/UrnEdifici', async (req, res) => {
+app.get('/DB_Servizio/LOD/UrnEdifici', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const urn = await recuperaUrnLOD3(reqJson.sm, reqJson.capp);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(urn[0]));
-});
+    return urn[0];
+}));
 
-// per testare la richiesta:
-// fetch("/o/DB_Servizio/LOD/UrnLoc", {method: "GET", headers: {"content-type": "application/json", sm: 'SMV', capp: '38'} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/LOD/UrnLoc', async (req, res) => {
+app.get('/DB_Servizio/LOD/UrnLoc', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const urn = await recuperaUrnLOD2(reqJson.loc);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(urn[0]));
-});
+    return urn[0];
+}));
 
-// per testare la richiesta:
-// fetch("/o/DB_Servizio/LOD/3e4", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/LOD/3e4', async (req, res) => {
-    const lod = await leggiTabelleLOD3e4();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(lod));
-});
+app.get('/DB_Servizio/LOD/3e4', jsonRoute(() => leggiTabelleLOD3e4()));
 
-// per testare la richiesta:
-// fetch("/o/Main10ance_DB/controlli-programmati", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/controlli-programmati', async (req, res) => {
-    const contr = await leggiDatiControlloProg();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(contr));
-});
+app.get('/Main10ance_DB/controlli-programmati', jsonRoute(() => leggiDatiControlloProg()));
 
-app.get('/Main10ance_DB/attivita-programmate', async (req, res) => {
+app.get('/Main10ance_DB/attivita-programmate', jsonRoute(async (req) => {
     const cookies = req.signedCookies;
     let resp;
     if (cookies.role === 'operatore') {
@@ -182,9 +113,8 @@ app.get('/Main10ance_DB/attivita-programmate', async (req, res) => {
     else {
         resp = await leggiAttivitàProg();
     }
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(resp));
-});
+    return resp;
+}));
 
 app.patch('/esecuzione/nuova-attivita', async (req, res) => {
     const ambito = req.signedCookies.ambito;
@@ -205,41 +135,27 @@ app.patch('/esecuzione/nuova-attivita', async (req, res) => {
     }
 });
 
-app.get('/esecuzione/frequenza', async (req, res) => {
+app.get('/esecuzione/frequenza', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const resp = await recuperaFrequenzaAttProg(reqJson.id, reqJson.tabella);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(resp[0]));
-});
+    return resp[0];
+}));
 
-// per testare la richiesta:
-// fetch("/o/schede-storico-controllo").then(a => a.json()).then(console.log)
-app.get('/schede-storico-controllo', async (req, res) => {
+app.get('/schede-storico-controllo', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
-    const risposta = await leggiSchedeStoricoControllo(ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiSchedeStoricoControllo(ambito);
+}));
 
-// per testare la richiesta:
-// fetch("/o/schede-storico-manutenzione-regolare").then(a => a.json()).then(console.log)
-app.get('/schede-storico-manutenzione-regolare', async (req, res) => {
+app.get('/schede-storico-manutenzione-regolare', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
-    const risposta = await leggiSchedeStoricoManReg(ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiSchedeStoricoManReg(ambito);
+}));
 
-// per testare la richiesta:
-// fetch("/o/schede-storico-manutenzione-correttiva").then(a => a.json()).then(console.log)
-app.get('/schede-storico-manutenzione-correttiva', async (req, res) => {
+app.get('/schede-storico-manutenzione-correttiva', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
-    const risposta = await leggiSchedeStoricoManCorr(ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiSchedeStoricoManCorr(ambito);
+}));
 
-// per testare la richiesta:
 app.get('/anagrafica/artifact-viewer/interroga/:id', async (req, res) => {
     const id = req.params.id;
     const categoria = JSON.parse(req.headers.categoria);
@@ -327,8 +243,7 @@ app.get('/storage/docs-download', async (req, res) => {
     }
     catch(e) {
         // console.log(e);
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify({errMsg: 'Nessun file presente'}));
+        sendJson(res, {errMsg: 'Nessun file presente'});
     }
 });
 
@@ -852,11 +767,17 @@ async function registraAttivitàEsecuzione(dati, all_files, ambito) {
 }
 
 async function recuperaFrequenzaAttProg(id, tabella) {
-    const id_tab = tabella === 'scheda_controllo' ? 'id_contr' : 'id_mn_reg';
-    const stringaSelectIdGroup = `SELECT "id_group" FROM ${data_schema}.${tabella} WHERE "${id_tab}" = ${id}`;
-    const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM ${data_schema}.${tabella} WHERE "${id_tab}" = ${id}`;
     try {
-        const results = await clientM10a.query(`SELECT "frequenza" FROM ${data_schema}.attività_prog WHERE id_att_prog = (${stringaSelectRidAttProg}) AND id_group = (${stringaSelectIdGroup});`);
+        const tabellaValida = assertOneOf(tabella, [ACTIVITY_TABLES.CONTR, ACTIVITY_TABLES.MAN_REG], 'tabella attivita programmata');
+        const id_tab = tabellaValida === ACTIVITY_TABLES.CONTR ? 'id_contr' : 'id_mn_reg';
+        const tableName = qualifiedName(data_schema, tabellaValida);
+        const results = await clientM10a.query(
+            `SELECT "frequenza"
+             FROM ${data_schema}."attività_prog"
+             WHERE id_att_prog = (SELECT "rid_att_prog" FROM ${tableName} WHERE ${quoteIdentifier(id_tab)} = $1)
+               AND id_group = (SELECT "id_group" FROM ${tableName} WHERE ${quoteIdentifier(id_tab)} = $1);`,
+            [id]
+        );
         return results.rows;
     }
     catch(e) {
@@ -865,12 +786,14 @@ async function recuperaFrequenzaAttProg(id, tabella) {
 }
 
 async function cercaAttProgPerRiallineamento(id, nomeId, nomeTabella) {
-    const stringaSelectRidContr = `SELECT "rid_contr" FROM ${data_schema}.${nomeTabella} WHERE "${nomeId}" = ${id}`;
-    const stringaSelectIdAttCiclica = `SELECT id_att_ciclica FROM ${data_schema}.scheda_controllo WHERE id_contr = (${stringaSelectRidContr})`;
     try {
-        const res = await clientM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "id_main10ance", "id_group", "tipo_attività", "da_integrare", "necessaria_revisione", "rid_att_ciclica_prec" FROM ${data_schema}.attività_prog WHERE "rid_att_ciclica_prec" = (${stringaSelectIdAttCiclica}) AND 'controllo' = ANY("tipo_attività") AND ("necessaria_revisione" IS NULL OR "necessaria_revisione" = FALSE) ORDER BY "id_att_prog" ASC LIMIT 1;`);
+        const tabellaValida = assertOneOf(nomeTabella, [ACTIVITY_TABLES.MAN_COR], 'tabella riallineamento');
+        const idCol = assertOneOf(nomeId, ['id_mn_gu'], 'colonna riallineamento');
+        const tableName = qualifiedName(data_schema, tabellaValida);
+        const idAttCiclicaSql = `(SELECT id_att_ciclica FROM ${data_schema}."scheda_controllo" WHERE id_contr = (SELECT "rid_contr" FROM ${tableName} WHERE ${quoteIdentifier(idCol)} = $1))`;
+        const res = await clientM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "id_main10ance", "id_group", "tipo_attività", "da_integrare", "necessaria_revisione", "rid_att_ciclica_prec" FROM ${data_schema}."attività_prog" WHERE "rid_att_ciclica_prec" = ${idAttCiclicaSql} AND 'controllo' = ANY("tipo_attività") AND ("necessaria_revisione" IS NULL OR "necessaria_revisione" = FALSE) ORDER BY "id_att_prog" ASC LIMIT 1;`, [id]);
         if (res.rowCount) return res.rows[0];
-        const resTrue = await clientM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "id_main10ance", "id_group", "tipo_attività", "da_integrare", "necessaria_revisione", "rid_att_ciclica_prec" FROM ${data_schema}.attività_prog WHERE "rid_att_ciclica_prec" = (${stringaSelectIdAttCiclica}) AND 'controllo' = ANY("tipo_attività") AND "necessaria_revisione" = TRUE ORDER BY "id_att_prog" ASC LIMIT 1;`);
+        const resTrue = await clientM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "id_main10ance", "id_group", "tipo_attività", "da_integrare", "necessaria_revisione", "rid_att_ciclica_prec" FROM ${data_schema}."attività_prog" WHERE "rid_att_ciclica_prec" = ${idAttCiclicaSql} AND 'controllo' = ANY("tipo_attività") AND "necessaria_revisione" = TRUE ORDER BY "id_att_prog" ASC LIMIT 1;`, [id]);
         return resTrue.rows[0];
     }
     catch(e) {
@@ -881,7 +804,9 @@ async function cercaAttProgPerRiallineamento(id, nomeId, nomeTabella) {
 
 async function cercaAttEsecPerRiallineamento(id, nomeId, nomeTabella) {
     try {
-        const res = await clientM10a.query(`SELECT "${nomeId}" FROM ${data_schema}.${nomeTabella} WHERE "rid_att_prog" = ${id} LIMIT 1;`);
+        const tabellaValida = assertOneOf(nomeTabella, [ACTIVITY_TABLES.CONTR], 'tabella attivita eseguita');
+        const idCol = assertOneOf(nomeId, ['id_contr'], 'colonna attivita eseguita');
+        const res = await clientM10a.query(`SELECT ${quoteIdentifier(idCol)} FROM ${qualifiedName(data_schema, tabellaValida)} WHERE "rid_att_prog" = $1 LIMIT 1;`, [id]);
         return res.rows[0];
     }
     catch(e) {
@@ -923,7 +848,7 @@ async function leggiSchedeStoricoManCorr(ambito) {
 
 async function interrogaAnagraficaLOD4(id, ambito) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_sistema AS "Descrizione sistema", sa.descrizione_subsistema AS "Descrizione subsistema", sa.tecnica_costruttiva AS "Tecnica costruttiva", sa.dimensioni AS "Dimensioni", sa.materiale AS "Materiale/i", sa.epoca AS "Epoca", sa.ispezionabilità AS "Ispezionabilità", sa.fonti AS "Fonti" FROM ${data_schema}.scheda_anagrafica AS sa WHERE sa.id_main10ance = '${id}' AND sa.ambito = '${ambito}';`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.descrizione_sistema AS "Descrizione sistema", sa.descrizione_subsistema AS "Descrizione subsistema", sa.tecnica_costruttiva AS "Tecnica costruttiva", sa.dimensioni AS "Dimensioni", sa.materiale AS "Materiale/i", sa.epoca AS "Epoca", sa.ispezionabilità AS "Ispezionabilità", sa.fonti AS "Fonti" FROM ${data_schema}.scheda_anagrafica AS sa WHERE sa.id_main10ance = $1 AND sa.ambito = $2;`, [id, ambito]);
         return result.rows;
     }
     catch(e) {
@@ -1028,7 +953,7 @@ async function interrogaAnagraficaCopertura(id, ambito) {
 
 async function interrogaAnagraficaManufatto(id) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.epoca AS "Epoca", sa.autore AS "Autore", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.documenti AS "Documenti", sa.iter_autorizzativo AS "Iter autorizzativo" FROM ${utility_schema}.anagrafica_manufatto AS sa WHERE sa.id_main10ance = '${id}' ORDER BY sa.id_anagr DESC;`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.epoca AS "Epoca", sa.autore AS "Autore", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.documenti AS "Documenti", sa.iter_autorizzativo AS "Iter autorizzativo" FROM ${utility_schema}.anagrafica_manufatto AS sa WHERE sa.id_main10ance = $1 ORDER BY sa.id_anagr DESC;`, [id]);
         return result.rows;
     }
     catch(e) {
@@ -1039,7 +964,7 @@ async function interrogaAnagraficaManufatto(id) {
 
 async function interrogaAnagraficaDettaglio(id) {
     try {
-        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.epoca AS "Epoca", sa.documenti AS "Documenti", sa.autore AS "Autore", sa.data AS "Data" FROM ${utility_schema}.anagrafica_dettaglio AS sa WHERE sa.id_main10ance = '${id}' ORDER BY sa.id_anagr DESC;`);
+        const result = await clientM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore", sa.definizione AS "Definizione", sa.descrizione AS "Descrizione", sa.materiale AS "Materiale/i", sa.tecniche AS "Tecniche", sa.epoca AS "Epoca", sa.documenti AS "Documenti", sa.autore AS "Autore", sa.data AS "Data" FROM ${utility_schema}.anagrafica_dettaglio AS sa WHERE sa.id_main10ance = $1 ORDER BY sa.id_anagr DESC;`, [id]);
         return result.rows;
     }
     catch(e) {
@@ -1050,7 +975,7 @@ async function interrogaAnagraficaDettaglio(id) {
 
 async function interrogaSegnalazione(id) {
     try {
-        const result = await clientM10a.query(`SELECT sg.autore_ultima_mod AS "Operatore", sg.meteo AS "Meteo", sg.temperatura AS "Temperatura", sg.condizioni_sett_precedente AS "Condizioni sett. precedente", sg.descrizione AS "Descrizione", sg.intervento_urgenza AS "Intervento di urgenza" FROM ${utility_schema}.segnalazione AS sg WHERE sg.id_main10ance = '${id}' ORDER BY sg.id_segnalazione DESC;`);
+        const result = await clientM10a.query(`SELECT sg.autore_ultima_mod AS "Operatore", sg.meteo AS "Meteo", sg.temperatura AS "Temperatura", sg.condizioni_sett_precedente AS "Condizioni sett. precedente", sg.descrizione AS "Descrizione", sg.intervento_urgenza AS "Intervento di urgenza" FROM ${utility_schema}.segnalazione AS sg WHERE sg.id_main10ance = $1 ORDER BY sg.id_segnalazione DESC;`, [id]);
         return result.rows;
     }
     catch(e) {
@@ -1267,7 +1192,9 @@ function gestisciStringheSchede(listaOggetti, ambito) {
 
     listaOggetti.forEach(jsn => {
         // target schema
-        const schema = (jsn.tabella === 'anagrafica_manufatto' || jsn.tabella === 'anagrafica_dettaglio' || jsn.tabella === 'segnalazione') ? utility_schema : data_schema;
+        const tableName = assertOneOf(jsn.tabella, FORM_TABLE_LIST, 'tabella scheda');
+        const schema = SERVICE_FORM_TABLE_LIST.includes(tableName) ? utility_schema : data_schema;
+        const qualifiedTableName = qualifiedName(schema, tableName);
 
         // costruzione degli INSERT
         const cols = []; // lista colonne
@@ -1294,10 +1221,10 @@ function gestisciStringheSchede(listaOggetti, ambito) {
                     pellicola.su_terracotta ?? null,
                     pellicola.altro ?? null
                 );
-                cols.push(col);
+                cols.push(quoteIdentifier(col, 'colonna scheda'));
                 p += 4; // ho usato 4 parametri
             } else { // tutte le altre colonne "normali/singole"
-                cols.push(col);
+                cols.push(quoteIdentifier(col, 'colonna scheda'));
                 placeholders.push(`$${p}`);
                 vals.push(jsn.valori[idx]);
                 p += 1;
@@ -1305,13 +1232,13 @@ function gestisciStringheSchede(listaOggetti, ambito) {
         });
 
         // append sempre la colonna AMBITO
-        cols.push('ambito');
+        cols.push(quoteIdentifier('ambito'));
         placeholders.push(`$${p}`);
         vals.push(ambito);
 
         // stringa SQL finale
         const sql =
-            `INSERT INTO ${schema}.${jsn.tabella} (${cols.join(', ')}) ` +
+            `INSERT INTO ${qualifiedTableName} (${cols.join(', ')}) ` +
             `VALUES (${placeholders.join(', ')});`;
         
         listaStringheEValori.push([sql, vals]);

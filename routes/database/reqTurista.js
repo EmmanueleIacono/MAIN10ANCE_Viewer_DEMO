@@ -12,22 +12,13 @@ const {jsonRoute, sendJson} = require('../security/http');
 
 //////////          RICHIESTE          //////////
 
-// per testare la richiesta:
-// fetch("/t/Main10ance_DB/GIS", {method: "GET", headers: {"content-type": "application/json", "tabella": "bosco", "geometria": "geom_pol", "colonneUtili": ["bosco_gov", "bosco_ty"]} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/GIS', async (req, res) => {
+app.get('/Main10ance_DB/GIS', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const rispostaGIS = await leggiGIS(reqJson.tabella, reqJson.geometria, reqJson.colonneutili); //N.B.: scrivo "colonneutili" tutto minuscolo perché arriva così dagli headers della richiesta
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(rispostaGIS));
-});
+    return rispostaGIS;
+}));
 
-// per testare la richiesta:
-// fetch("/t/MarkerLoc", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/MarkerLoc', async (req, res) => {
-    const markerLocalità = await leggiMarkerLoc();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(markerLocalità));
-});
+app.get('/MarkerLoc', jsonRoute(() => leggiMarkerLoc()));
 
 app.get('/MarkerEdif', jsonRoute(() => leggiMarkerEdif()));
 
@@ -35,21 +26,17 @@ app.get('/MarkerLocPdiff', jsonRoute(() => leggiMarkerLocPdiff()));
 
 app.get('/LOD/TabelleGIS', jsonRoute(() => leggiListaTabelleGIS()));
 
-// per testare la richiesta:
-// fetch("/t/LOD/TabelleLOD", {method: "GET", headers: {"content-type": "application/json", lod: 5} }).then(a => a.json()).then(console.log)
-app.get('/LOD/TabelleLOD', async (req, res) => {
+app.get('/LOD/TabelleLOD', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const tabelleLOD = await leggiListaTabelleLOD(reqJson.lod);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(tabelleLOD));
-});
+    return tabelleLOD;
+}));
 
-app.get('/storage/img-list', async (req, res) => {
+app.get('/storage/img-list', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const listaImmagini = await leggiListaImmagini(reqJson.path);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(listaImmagini));
-});
+    return listaImmagini;
+}));
 
 app.get('/storage/img-download', async (req, res) => {
     try {
@@ -70,14 +57,13 @@ app.get('/storage/img-download', async (req, res) => {
     }
 });
 
-app.get('/Main10ance_DB/LOD4/info', async (req, res) => {
+app.get('/Main10ance_DB/LOD4/info', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const percorso = JSON.parse(reqJson.percorso);
     const tabella = JSON.parse(reqJson.tabella);
     const datiLOD4 = await getInfoImmagine(percorso, tabella);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(datiLOD4));
-});
+    return datiLOD4;
+}));
 
 app.get('/definizioni_classi', jsonRoute(() => getDefinizioniClassiElementi()));
 

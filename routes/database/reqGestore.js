@@ -16,129 +16,69 @@ app.use(fileupload(uploadMiddlewareOptions));
 
 //////////          RICHIESTE          //////////
 
-// per testare la richiesta:
-// fetch("/g/Main10ance_DB/dashboard/numero-oggetti", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/dashboard/numero-oggetti', async (req, res) => {
+app.get('/Main10ance_DB/dashboard/numero-oggetti', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const listaTabelle = reqJson.tabelle;
-    const risposta = await leggiNumeroOggetti(listaTabelle);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return leggiNumeroOggetti(listaTabelle);
+}));
 
-// per testare la richiesta:
-// fetch("/g/Main10ance_DB/dashboard/conteggio-elementi", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/dashboard/conteggio-elementi', async (req, res) => {
+app.get('/Main10ance_DB/dashboard/conteggio-elementi', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const listaTabelle = reqJson.tabelle;
     const listaAlias = reqJson.alias;
-    const risposta = await conteggioElementi(listaTabelle, listaAlias);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return conteggioElementi(listaTabelle, listaAlias);
+}));
 
-// per testare la richiesta
-// fetch("/g/Main10ance_DB/dashboard/conteggio-ruoli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/dashboard/conteggio-ruoli', async (req, res) => {
-    const ruoli = await conteggioRuoliAmbito();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(ruoli));
-});
+app.get('/Main10ance_DB/dashboard/conteggio-ruoli', jsonRoute(() => conteggioRuoliAmbito()));
 
-// per testare la richiesta:
-// fetch("/g/DB_Servizio/LOD/TabelleBIM", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/LOD/TabelleBIM', async (req, res) => {
-    const tabelleBIM = await leggiListaTabelleBIM();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(tabelleBIM));
-});
+app.get('/DB_Servizio/LOD/TabelleBIM', jsonRoute(() => leggiListaTabelleBIM()));
 
-// per testare la richiesta:
-// fetch("/g/DB_Servizio/lista-localita", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/lista-localita', async (req, res) => {
-    const località = await getSigleSacriMonti();
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(località));
-});
+app.get('/DB_Servizio/lista-localita', jsonRoute(() => getSigleSacriMonti()));
 
-// per testare la richiesta:
-// fetch("/g/Main10ance_DB/dashboard/conteggio-modelli", {method: "GET", headers: {"content-type": "application/json"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/dashboard/conteggio-modelli', async (req, res) => {
+app.get('/Main10ance_DB/dashboard/conteggio-modelli', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const listaLocalità = reqJson.nomi;
     const listaSigle = reqJson.sigle;
-    const risposta = await conteggioModelli(listaLocalità, listaSigle);
-    res.setHeader('content-type', 'application/json');
-    res.send(risposta);
-});
+    return conteggioModelli(listaLocalità, listaSigle);
+}));
 
-app.get('/sigle-edifici', async (req, res) => {
+app.get('/sigle-edifici', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
-    const edifici = await getSigleEdifici(ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(edifici));
-});
+    return getSigleEdifici(ambito);
+}));
 
-app.get('/frasi-rischio', async (req, res) => {
+app.get('/frasi-rischio', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
-    const frasi = await getFrasiDiRischio(ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(frasi));
-});
+    return getFrasiDiRischio(ambito);
+}));
 
-// per testare la richiesta:
-// fetch("/g/DB_Servizio/entita-oggetti", {method: "GET", headers: {"content-type": "application/json", "cl_ogg": "3.1 superfici interne"} }).then(a => a.json()).then(console.log)
-app.get('/DB_Servizio/entita-oggetti', async (req, res) => {
+app.get('/DB_Servizio/entita-oggetti', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const cl_ogg = reqJson.cl_ogg;
-    const entità = await getEntitàDaClOgg(cl_ogg);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(entità));
-});
+    return getEntitàDaClOgg(cl_ogg);
+}));
 
-// per testare la richiesta:
-// fetch("/g/Main10ance_DB/lista-identificativi", {method: "GET", headers: {"content-type": "application/json", "entità": "tetto", "id_parziale": "SMV|16-24|tetto|"} }).then(a => a.json()).then(console.log)
-app.get('/Main10ance_DB/lista-identificativi', async (req, res) => {
+app.get('/Main10ance_DB/lista-identificativi', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const ent = reqJson.entita;
     const id = reqJson.id_parziale;
-    const frasi = await getIdentificativiDaEntità(ent, id);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(frasi));
-});
+    return getIdentificativiDaEntità(ent, id);
+}));
 
 app.post('/pianificazione', successRoute(req => creaAttProgControllo(req.body, req.signedCookies.ambito)));
 
 app.post('/Main10ance_DB/programmazione/nuovi-controlli', successRoute(req => registraNuoviControlli(req.body)));
 
-app.get('/integrazione/attivita-per-integrazione', async (req, res) => {
+app.get('/integrazione/attivita-per-integrazione', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
     const reqJson = req.headers;
     const bool = JSON.parse(reqJson.bool);
-    const resp = await leggiAttProgPerIntegrazione(bool, ambito);
-    res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(resp));
-});
+    return leggiAttProgPerIntegrazione(bool, ambito);
+}));
 
 app.patch('/integrazione/integrazione-attivita', successRoute(req => integraAtt(req.body, req.signedCookies.ambito)));
 
-app.post('/LOD4/nuovo', async (req, res) => {
-    const ambito = req.signedCookies.ambito;
-    const result = {};
-    try {
-        const reqJson = req.body;
-        const reqFiles = req.files;
-        const res = await uploadImmagine(reqFiles, reqJson, ambito);
-        result.success = res;
-    }
-    catch(e) {
-        result.success = false;
-    }
-    finally {
-        res.setHeader('content-type', 'application/json');
-        res.send(JSON.stringify(result));
-    }
-});
+app.post('/LOD4/nuovo', successRoute(req => uploadImmagine(req.files, req.body, req.signedCookies.ambito)));
 
 app.delete('/LOD4/elimina', successRoute(req => eliminaImmagini(req.body, req.signedCookies.ambito)));
 
@@ -188,15 +128,17 @@ async function leggiNumeroOggetti(listaTabelle) {
 async function conteggioElementi(listaTabelle, listaAlias) {
     const listaTabs = parseJsonArray(listaTabelle, 'lista tabelle');
     const listaAls = JSON.parse(listaAlias);
-    const listaAlsReplaced = listaAls.map(a => a.replace("'", "''"));
+    const listaAlsReplaced = listaAls.map(a => a.replaceAll('_', ' '));
     let listaStringhe = [];
+    let values = [];
     for (let i=0; i<listaTabs.length; i++) {
-        const stringa = `SELECT COUNT(*), '${listaAlsReplaced[i]}' AS nome_tabella FROM ${qualifiedName(data_schema, listaTabs[i])}`;
+        const stringa = `SELECT COUNT(*), $${i + 1} AS nome_tabella FROM ${qualifiedName(data_schema, listaTabs[i])}`;
         listaStringhe.push(stringa);
+        values.push(listaAlsReplaced[i]);
     }
     const stringheJoin = listaStringhe.join(' UNION ');
     try {
-        const result = await clientM10a.query(`${stringheJoin} ORDER BY nome_tabella;`);
+        const result = await clientM10a.query(`${stringheJoin} ORDER BY nome_tabella;`, values);
         return result.rows;
     }
     catch(e) {
@@ -238,13 +180,16 @@ async function conteggioModelli(listaLocalità, listaSigle) {
     const listaLocs = JSON.parse(listaLocalità);
     const listaSigs = JSON.parse(listaSigle);
     let listaStringhe = [];
+    let values = [];
     for (let i=0; i<listaLocs.length; i++) {
-        const stringa = `SELECT COUNT(DISTINCT "urn"), '${listaLocs[i]}' AS nome_tabella FROM ${data_schema}."dati_edifici" WHERE "località" = '${listaSigs[i]}'`;
+        const p = i * 2 + 1;
+        const stringa = `SELECT COUNT(DISTINCT "urn"), $${p} AS nome_tabella FROM ${data_schema}."dati_edifici" WHERE "località" = $${p + 1}`;
         listaStringhe.push(stringa);
+        values.push(listaLocs[i], listaSigs[i]);
     }
     const stringheJoin = listaStringhe.join(' UNION ');
     try {
-        const results = await clientM10a.query(`${stringheJoin} ORDER BY "nome_tabella";`);
+        const results = await clientM10a.query(`${stringheJoin} ORDER BY "nome_tabella";`, values);
         return results.rows;
     }
     catch(e) {
