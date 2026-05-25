@@ -3,7 +3,7 @@ const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
 
-const {clientM10a} = require('./connessioni');
+const {poolM10a} = require('./connessioni');
 const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
 const {quoteIdentifier, qualifiedName, parseCsvIdentifiers} = require('../security/sql');
@@ -74,7 +74,7 @@ async function leggiGIS(tabella, geometria, colonneUtili) {
         const geomIdent = quoteIdentifier(geometria, 'colonna geometria');
         const infoColumns = parseCsvIdentifiers(colonneUtili, 'colonne GIS').join(', ');
         const tableName = qualifiedName(data_schema, tabella);
-        const result = await clientM10a.query(`SELECT ST_AsGeoJSON(${geomIdent}) AS "geom", CONCAT_WS(', ', ${infoColumns}) AS "info" FROM ${tableName};`);
+        const result = await poolM10a.query(`SELECT ST_AsGeoJSON(${geomIdent}) AS "geom", CONCAT_WS(', ', ${infoColumns}) AS "info" FROM ${tableName};`);
         return result.rows;
     }
     catch(e) {
@@ -84,7 +84,7 @@ async function leggiGIS(tabella, geometria, colonneUtili) {
 
 async function leggiMarkerLoc() {
     try {
-        const results = await clientM10a.query(`SELECT * FROM ${data_schema}."dati_località" ORDER BY "nome";`);
+        const results = await poolM10a.query(`SELECT * FROM ${data_schema}."dati_località" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {
@@ -94,7 +94,7 @@ async function leggiMarkerLoc() {
 
 async function leggiMarkerEdif() {
     try {
-        const results = await clientM10a.query(`SELECT * FROM ${data_schema}."dati_edifici" ORDER BY CAST("numero" AS INTEGER);`);
+        const results = await poolM10a.query(`SELECT * FROM ${data_schema}."dati_edifici" ORDER BY CAST("numero" AS INTEGER);`);
         return results.rows;
     }
     catch(e) {
@@ -104,7 +104,7 @@ async function leggiMarkerEdif() {
 
 async function leggiMarkerLocPdiff() {
     try {
-        const results = await clientM10a.query(`SELECT "dati_loc_pdiff".*, 'loc-pdiff' AS "località" FROM ${utility_schema}."dati_loc_pdiff" ORDER BY "nome";`);
+        const results = await poolM10a.query(`SELECT "dati_loc_pdiff".*, 'loc-pdiff' AS "località" FROM ${utility_schema}."dati_loc_pdiff" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {
@@ -114,7 +114,7 @@ async function leggiMarkerLocPdiff() {
 
 async function leggiListaTabelleGIS() {
     try {
-        const results = await clientM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias", "geometria", "colonne_utili" AS "colonneUtili" FROM ${utility_schema}."lod" WHERE "BIM-GIS" = 'GIS' ORDER BY "alias";`);
+        const results = await poolM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias", "geometria", "colonne_utili" AS "colonneUtili" FROM ${utility_schema}."lod" WHERE "BIM-GIS" = 'GIS' ORDER BY "alias";`);
         return results.rows;
     }
     catch(e) {
@@ -124,7 +124,7 @@ async function leggiListaTabelleGIS() {
 
 async function leggiListaTabelleLOD(LOD) {
     try {
-        const results = await clientM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM ${utility_schema}."lod" WHERE "LOD" = ($1) ORDER BY "alias";`, [LOD]);
+        const results = await poolM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias" FROM ${utility_schema}."lod" WHERE "LOD" = ($1) ORDER BY "alias";`, [LOD]);
         return results.rows;
     }
     catch(e) {
@@ -193,7 +193,7 @@ async function getInfoImmagine(percorsoFile, tabella) {
     const schema = percorsoFile.startsWith('loc-pdiff') ? utility_schema : data_schema;
     try {
         const tableName = qualifiedName(schema, tabella);
-        const result = await clientM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "codice" AS "Codice", "id_main10ance" FROM ${tableName} WHERE "immagine" = ($1);`, [percorsoFile]);
+        const result = await poolM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "codice" AS "Codice", "id_main10ance" FROM ${tableName} WHERE "immagine" = ($1);`, [percorsoFile]);
         return result.rows;
     }
     catch(e) {
@@ -204,7 +204,7 @@ async function getInfoImmagine(percorsoFile, tabella) {
 
 async function getDefinizioniClassiElementi() {
     try {
-        const result = await clientM10a.query(`SELECT full_hierarchy FROM ${utility_schema}.vw_definizioni_classificazione_elementi_json;`);
+        const result = await poolM10a.query(`SELECT full_hierarchy FROM ${utility_schema}.vw_definizioni_classificazione_elementi_json;`);
         return result.rows[0]["full_hierarchy"];
     }
     catch(e) {
@@ -217,7 +217,7 @@ async function getDefinizioniClassiElementi() {
 
 async function getAmbitoPerLoc(sigla_loc) {
     try {
-        const results = await clientM10a.query(`SELECT sigla, ambito FROM ${data_schema}."dati_località" WHERE sigla = $1;`, [sigla_loc]);
+        const results = await poolM10a.query(`SELECT sigla, ambito FROM ${data_schema}."dati_località" WHERE sigla = $1;`, [sigla_loc]);
         return results.rows;
     } catch(e) {
         console.log('Errore nella lettura delle sigle località:\n', e);

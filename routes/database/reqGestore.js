@@ -4,7 +4,7 @@ const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
 
-const {clientM10a, withTransaction} = require('./connessioni');
+const {poolM10a, withTransaction} = require('./connessioni');
 const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
 const {qualifiedName, parseJsonArray} = require('../security/sql');
@@ -117,7 +117,7 @@ async function leggiNumeroOggetti(listaTabelle) {
     const listaStringhe = listaTabs.map(tab => `SELECT COUNT(*) FROM ${qualifiedName(data_schema, tab)}`);
     const stringheJoin = listaStringhe.join(' UNION ');
     try {
-        const result = await clientM10a.query(`SELECT SUM(count) FROM (${stringheJoin}) AS tabelle;`);
+        const result = await poolM10a.query(`SELECT SUM(count) FROM (${stringheJoin}) AS tabelle;`);
         return result.rows[0];
     }
     catch(e) {
@@ -138,7 +138,7 @@ async function conteggioElementi(listaTabelle, listaAlias) {
     }
     const stringheJoin = listaStringhe.join(' UNION ');
     try {
-        const result = await clientM10a.query(`${stringheJoin} ORDER BY nome_tabella;`, values);
+        const result = await poolM10a.query(`${stringheJoin} ORDER BY nome_tabella;`, values);
         return result.rows;
     }
     catch(e) {
@@ -148,7 +148,7 @@ async function conteggioElementi(listaTabelle, listaAlias) {
 
 async function conteggioRuoliAmbito() {
     try {
-        const result = await clientM10a.query(`SELECT "ruolo", COUNT(ruolo) FROM ${utility_schema}."utenti" GROUP BY "ruolo";`);
+        const result = await poolM10a.query(`SELECT "ruolo", COUNT(ruolo) FROM ${utility_schema}."utenti" GROUP BY "ruolo";`);
         return result.rows;
     }
     catch(e) {
@@ -158,7 +158,7 @@ async function conteggioRuoliAmbito() {
 
 async function leggiListaTabelleBIM() {
     try {
-        const results = await clientM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias", "LOD" FROM ${utility_schema}."lod" WHERE "BIM-GIS" = 'BIM' ORDER BY "tabella";`);
+        const results = await poolM10a.query(`SELECT "entità_db_m10a" AS "tabella", "nome_esteso" AS "alias", "LOD" FROM ${utility_schema}."lod" WHERE "BIM-GIS" = 'BIM' ORDER BY "tabella";`);
         return results.rows;
     }
     catch(e) {
@@ -168,7 +168,7 @@ async function leggiListaTabelleBIM() {
 
 async function getSigleSacriMonti() {
     try {
-        const results = await clientM10a.query(`SELECT "nome", "sigla" FROM ${data_schema}."dati_località" ORDER BY "nome";`);
+        const results = await poolM10a.query(`SELECT "nome", "sigla" FROM ${data_schema}."dati_località" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {
@@ -189,7 +189,7 @@ async function conteggioModelli(listaLocalità, listaSigle) {
     }
     const stringheJoin = listaStringhe.join(' UNION ');
     try {
-        const results = await clientM10a.query(`${stringheJoin} ORDER BY "nome_tabella";`, values);
+        const results = await poolM10a.query(`${stringheJoin} ORDER BY "nome_tabella";`, values);
         return results.rows;
     }
     catch(e) {
@@ -199,7 +199,7 @@ async function conteggioModelli(listaLocalità, listaSigle) {
 
 async function getSigleEdifici(ambito) {
     try {
-        const results = await clientM10a.query(`SELECT DISTINCT "edificio", "località", "edif_nome_menu" FROM ${data_schema}."dati_edifici" WHERE "ambito" LIKE ($1) ORDER BY "edificio";`, [ambito]);
+        const results = await poolM10a.query(`SELECT DISTINCT "edificio", "località", "edif_nome_menu" FROM ${data_schema}."dati_edifici" WHERE "ambito" LIKE ($1) ORDER BY "edificio";`, [ambito]);
         return results.rows;
     }
     catch(e) {
@@ -209,7 +209,7 @@ async function getSigleEdifici(ambito) {
 
 async function getFrasiDiRischio(ambito) {
     try {
-        const results = await clientM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec", "entità", "aggregatori", "temi", "materiali" FROM ${utility_schema}."frase_di_rischio" WHERE ($1 = '%' OR $1 = ANY(ambiti)) ORDER BY "id_fr_risc";`, [ambito]);
+        const results = await poolM10a.query(`SELECT "id_fr_risc", "cl_ogg_fr", "fr_risc", "controllo", "mn_reg", "mn_nec", "entità", "aggregatori", "temi", "materiali" FROM ${utility_schema}."frase_di_rischio" WHERE ($1 = '%' OR $1 = ANY(ambiti)) ORDER BY "id_fr_risc";`, [ambito]);
         return results.rows;
     }
     catch(e) {
@@ -219,7 +219,7 @@ async function getFrasiDiRischio(ambito) {
 
 async function getEntitàDaClOgg(cl_ogg) {
     try {
-        const results = await clientM10a.query(`SELECT "entità_db_m10a" FROM ${utility_schema}."lod" WHERE ($1)=ANY("cl_ogg_fr");`, [cl_ogg]);
+        const results = await poolM10a.query(`SELECT "entità_db_m10a" FROM ${utility_schema}."lod" WHERE ($1)=ANY("cl_ogg_fr");`, [cl_ogg]);
         return results.rows;
     }
     catch(e) {
@@ -229,7 +229,7 @@ async function getEntitàDaClOgg(cl_ogg) {
 
 async function getIdentificativiDaEntità(entità, id) {
     try {
-        const results = await clientM10a.query(`SELECT "id_main10ance" FROM ${qualifiedName(data_schema, entità)} WHERE "id_main10ance" LIKE $1;`, [`${id}%`]);
+        const results = await poolM10a.query(`SELECT "id_main10ance" FROM ${qualifiedName(data_schema, entità)} WHERE "id_main10ance" LIKE $1;`, [`${id}%`]);
         return results.rows;
     }
     catch(e) {
@@ -239,13 +239,13 @@ async function getIdentificativiDaEntità(entità, id) {
 
 async function creaAttProgControllo(listaAtt, ambito) {
     try {
-        await withTransaction(async (clientM10a) => {
+        await withTransaction(async (tx) => {
             for (const att of listaAtt) {
                 const tipo_att = att.data_prog_mr && att.freq_mr ? ['manutenzione regolare'] : ['controllo'];
                 const data_prog = att.data_prog_mr ? att.data_prog_mr : att.data_prog_c;
                 const freq = att.freq_mr ? att.freq_mr : att.freq_c;
                 const valuesArray = [att.id_att_prog, tipo_att, att.cl_ogg, att.rid_fr_risc, freq, data_prog, att.id_group, att.elementi, att.data_ins, att.data_ins, att.loc_estesa, true, ambito];
-                await clientM10a.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins", "data_ultima_mod", "località_estesa", "da_integrare", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, valuesArray);
+                await tx.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins", "data_ultima_mod", "località_estesa", "da_integrare", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, valuesArray);
             }
         });
         return true;
@@ -258,12 +258,12 @@ async function creaAttProgControllo(listaAtt, ambito) {
 
 async function creaNuovoLocPdiff(reqJson) {
     try {
-        await withTransaction(async (clientM10a) => {
+        await withTransaction(async (tx) => {
             const coord = reqJson.coord;
             const nome = reqJson.nome;
             const sigla = reqJson.id_marker;
             const valuesArray = [[coord.lat, coord.lng], nome, sigla];
-            await clientM10a.query(`INSERT INTO ${utility_schema}."dati_loc_pdiff" ("coord", "nome", "sigla") VALUES (($1), ($2), ($3))`, valuesArray);
+            await tx.query(`INSERT INTO ${utility_schema}."dati_loc_pdiff" ("coord", "nome", "sigla") VALUES (($1), ($2), ($3))`, valuesArray);
         });
         return true;
     } catch (er) {
@@ -274,7 +274,7 @@ async function creaNuovoLocPdiff(reqJson) {
 
 async function creaNuovoMarkerAmbito(reqJson) {
     try {
-        await withTransaction(async (clientM10a) => {
+        await withTransaction(async (tx) => {
             const coord = reqJson.coord;
             const nome = reqJson.nome;
             const sigla = reqJson.sigla;
@@ -284,7 +284,7 @@ async function creaNuovoMarkerAmbito(reqJson) {
             const edif_nome_menu = reqJson.edif_nome_menu;
             const ambito = reqJson.ambito;
             const valuesArray = [[coord.lat, coord.lng], nome, sigla, descrizione, numero, edificio, edif_nome_menu, ambito];
-            await clientM10a.query(`INSERT INTO ${data_schema}."dati_edifici" ("coord", "nome", "sigla", "descrizione", "numero", "edificio", "edif_nome_menu", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8))`, valuesArray);
+            await tx.query(`INSERT INTO ${data_schema}."dati_edifici" ("coord", "nome", "sigla", "descrizione", "numero", "edificio", "edif_nome_menu", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8))`, valuesArray);
         });
         return true;
     } catch (er) {
@@ -295,7 +295,7 @@ async function creaNuovoMarkerAmbito(reqJson) {
 
 async function leggiAttProgPerIntegrazione(bool, ambito) {
     try {
-        const resp = await clientM10a.query(`SELECT a."id_att_prog", a."rid_fr_risc", a."data_prog", to_json(a."id_main10ance") AS "id_main10ance", a."id_group", a."località_estesa", a."cl_ogg_fr", to_json(a."tipo_attività") AS "tipo_attività", a."data_ins", a."data_ultima_mod", a."frequenza", a."da_integrare", a."necessaria_revisione", a."costo", a."ore", a."esecutori", a."strumentaz" AS "strumentazione", a."commenti", a."liv_priorità", a."rid_contr", a."rid_dad", a."rid_att_ciclica_prec", f."fr_risc", f."controllo", f."mn_reg" AS "manutenzione regolare", f."mn_nec" AS "manutenzione correttiva" FROM ${data_schema}."attività_prog" AS "a" JOIN ${utility_schema}."frase_di_rischio" AS "f" ON a."rid_fr_risc" = f."id_fr_risc" WHERE a."da_integrare" = ($1) AND a."ambito" LIKE ($2) ORDER BY "id_att_prog";`, [bool, ambito]);
+        const resp = await poolM10a.query(`SELECT a."id_att_prog", a."rid_fr_risc", a."data_prog", to_json(a."id_main10ance") AS "id_main10ance", a."id_group", a."località_estesa", a."cl_ogg_fr", to_json(a."tipo_attività") AS "tipo_attività", a."data_ins", a."data_ultima_mod", a."frequenza", a."da_integrare", a."necessaria_revisione", a."costo", a."ore", a."esecutori", a."strumentaz" AS "strumentazione", a."commenti", a."liv_priorità", a."rid_contr", a."rid_dad", a."rid_att_ciclica_prec", f."fr_risc", f."controllo", f."mn_reg" AS "manutenzione regolare", f."mn_nec" AS "manutenzione correttiva" FROM ${data_schema}."attività_prog" AS "a" JOIN ${utility_schema}."frase_di_rischio" AS "f" ON a."rid_fr_risc" = f."id_fr_risc" WHERE a."da_integrare" = ($1) AND a."ambito" LIKE ($2) ORDER BY "id_att_prog";`, [bool, ambito]);
         return resp.rows;
     }
     catch(e) {
@@ -311,8 +311,8 @@ async function integraAtt(jsonAtt, ambito) {
     values.push(jsonAtt['id_att_prog']);
     const strSet = entriesFiltr.map((e, i) => `"${e[0]}" = ($${i+1})`).join(', ');
     try {
-        await withTransaction(async (clientM10a) => {
-            await clientM10a.query(`UPDATE ${data_schema}."attività_prog" SET ${strSet}, "da_integrare" = FALSE WHERE "id_att_prog" = ${ultimoNum};`, values);
+        await withTransaction(async (tx) => {
+            await tx.query(`UPDATE ${data_schema}."attività_prog" SET ${strSet}, "da_integrare" = FALSE WHERE "id_att_prog" = ${ultimoNum};`, values);
             const datiInsert = jsonAtt.dati_inserimento;
             const stringaContr = ACTIVITY_TABLES.CONTR;
             const stringaManReg = ACTIVITY_TABLES.MAN_REG;
@@ -324,19 +324,19 @@ async function integraAtt(jsonAtt, ambito) {
                 switch (tab) {
                     case stringaContr: {
                         const arrayInsertContr = [datiInsert.id_att, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaContr)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, datiInsert.rid_fr_risc, jsonAtt.id_att_prog, datiInsert.id_group, datiInsert.id_att, false, ambito];
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "id_att_ciclica", "eseguito", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));`, arrayInsertContr);
+                        await tx.query(`INSERT INTO ${data_schema}."${stringaContr}" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "id_att_ciclica", "eseguito", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));`, arrayInsertContr);
                         break;
                     }
 
                     case stringaManReg: {
                         const arrayInsertManReg = [datiInsert.id_att, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaManReg)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, datiInsert.rid_fr_risc, jsonAtt.id_att_prog, datiInsert.id_group, false, ambito];
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManReg}" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "eseguito", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertManReg);
+                        await tx.query(`INSERT INTO ${data_schema}."${stringaManReg}" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "eseguito", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, arrayInsertManReg);
                         break;
                     }
 
                     case stringaManCorr: {
                         const arrayInsertManCorr = [datiInsert.id_att, datiInsert.rid_contr, datiInsert.cl_ogg_fr, datiInsert.descrizione[datiInsert.tabelle.indexOf(stringaManCorr)], datiInsert.data_azione, jsonAtt.esecutori, jsonAtt.strumentaz, jsonAtt.data_ultima_mod, datiInsert.id_main10ance, datiInsert.rid_fr_risc, jsonAtt.id_att_prog, datiInsert.id_group, false, ambito];
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManCorr}" ("id_mn_gu", "rid_contr", "cl_ogg_fr", "azione", "data_ese", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "eseguito", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));`, arrayInsertManCorr);
+                        await tx.query(`INSERT INTO ${data_schema}."${stringaManCorr}" ("id_mn_gu", "rid_contr", "cl_ogg_fr", "azione", "data_ese", "esecutori", "strumentaz", "data_ins", "id_main10ance", "rid_fr_risc", "rid_att_prog", "id_group", "eseguito", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));`, arrayInsertManCorr);
                         break;
                     }
 
@@ -360,18 +360,18 @@ async function uploadImmagine(files, dati, ambito) {
     const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.codice, datiJson.artista, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, percorsoFile];
     const entityMeta = getImageEntity(datiJson.entità);
     try {
-        await withTransaction(async (clientM10a) => { // QUI CONDIZIONI DA RISISTEMARE COME QUELLE IN REQTURISTA DOWNLOADIMMAGINI, GETINFOIMMAGINE
+        await withTransaction(async (tx) => { // QUI CONDIZIONI DA RISISTEMARE COME QUELLE IN REQTURISTA DOWNLOADIMMAGINI, GETINFOIMMAGINE
             if (datiJson.id_main10ance.startsWith('loc-pdiff')) {
                 const rid_loc_pdiff = datiJson.id_main10ance.split('|')[1];
                 // query con dati
-                await clientM10a.query(`INSERT INTO ${qualifiedName(utility_schema, datiJson.entità)} ("${entityMeta.idColumn}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, rid_loc_pdiff]);
+                await tx.query(`INSERT INTO ${qualifiedName(utility_schema, datiJson.entità)} ("${entityMeta.idColumn}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, rid_loc_pdiff]);
                 // caricamento immagine supabase
                 const {error} = await supabase.storage.from("generale").upload(percorsoFile, file.data, fileOptions);
                 if (error) throw error;
             }
             else {
                 // query con dati
-                await clientM10a.query(`INSERT INTO ${qualifiedName(data_schema, datiJson.entità)} ("${entityMeta.idColumn}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, ambito]); // e "codice"?
+                await tx.query(`INSERT INTO ${qualifiedName(data_schema, datiJson.entità)} ("${entityMeta.idColumn}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, ambito]); // e "codice"?
                 // caricamento immagine supabase
                 const {error} = await supabase.storage.from("elementi").upload(safeStoragePath(ambito, percorsoFile), file.data, fileOptions);
                 if (error) throw error;
@@ -392,10 +392,10 @@ async function eliminaImmagini(jsonDati, ambito) {
     const bucket = entityMeta.bucket;
     const schema = entityMeta.schema === 'utility' ? utility_schema : data_schema;
     try {
-        await withTransaction(async (clientM10a) => {
+        await withTransaction(async (tx) => {
             // query elimina record
             for await (const img of listaImmagini) {
-                await clientM10a.query(`DELETE FROM ${qualifiedName(schema, jsonDati.entità)} WHERE "immagine" IN (($1)) AND "ambito" = ($2);`, [img, ambito]);
+                await tx.query(`DELETE FROM ${qualifiedName(schema, jsonDati.entità)} WHERE "immagine" IN (($1)) AND "ambito" = ($2);`, [img, ambito]);
             }
 
             // eliminazione immagine supabase
@@ -413,11 +413,11 @@ async function eliminaImmagini(jsonDati, ambito) {
 ///////////// QUESTA DA ELIMINARE FORSE, O DA RIUTILIZZARE PER FASE 2 PROG CONTROLLI ////////////////
 async function registraNuoviControlli(listaReqJson) {
     try {
-        await withTransaction(async (clientM10a) => {
+        await withTransaction(async (tx) => {
             for (const reqJson of listaReqJson) {
-                await clientM10a.query(`INSERT INTO ${data_schema}."scheda_controllo" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "data_ins", "id_main10ance", "rid_fr_risc", "freq") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, [reqJson.id_contr, reqJson.cl_ogg, reqJson.controllo, reqJson.data_con, reqJson.data_ins, reqJson.id_main10ance, reqJson.rid_fr_risc, reqJson.frequenza]);
+                await tx.query(`INSERT INTO ${data_schema}."scheda_controllo" ("id_contr", "cl_ogg_fr", "controllo", "data_con", "data_ins", "id_main10ance", "rid_fr_risc", "freq") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, [reqJson.id_contr, reqJson.cl_ogg, reqJson.controllo, reqJson.data_con, reqJson.data_ins, reqJson.id_main10ance, reqJson.rid_fr_risc, reqJson.frequenza]);
                 if (reqJson.dati_manutenzione) {
-                    await clientM10a.query(`INSERT INTO ${data_schema}."scheda_manutenzione_regolare" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "data_ins", "id_main10ance") VALUES (($1), ($2), ($3), ($4), ($5), ($6));`, [reqJson.dati_manutenzione.id_mn_reg, reqJson.dati_manutenzione.cl_ogg, reqJson.dati_manutenzione.azione, reqJson.dati_manutenzione.data_ese, reqJson.dati_manutenzione.data_ins, reqJson.dati_manutenzione.id_main10ance]);
+                    await tx.query(`INSERT INTO ${data_schema}."scheda_manutenzione_regolare" ("id_mn_reg", "cl_ogg_fr", "azione", "data_ese", "data_ins", "id_main10ance") VALUES (($1), ($2), ($3), ($4), ($5), ($6));`, [reqJson.dati_manutenzione.id_mn_reg, reqJson.dati_manutenzione.cl_ogg, reqJson.dati_manutenzione.azione, reqJson.dati_manutenzione.data_ese, reqJson.dati_manutenzione.data_ins, reqJson.dati_manutenzione.id_main10ance]);
                 }
             }
         });
@@ -438,13 +438,13 @@ async function registraAttPrecedenti(reqJson) {
     const stringaRestauro = ACTIVITY_TABLES.REST;
     const stringaDiagnosi = ACTIVITY_TABLES.DIAGN;
     try {
-        await withTransaction(async (clientM10a) => {
+        await withTransaction(async (tx) => {
             console.log(reqJson);
             switch (reqJson.metadati.tabella) {
                 case stringaContr:
                     for (const edificio of reqJson.edifici) {
                         const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaContr}"
+                        await tx.query(`INSERT INTO ${data_schema}."${stringaContr}"
                         ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "st_cons", "liv_urg", "cl_racc", "data_ins", "autore_ultima_mod", "id_main10ance")
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15));`,
                         [(reqJson.metadati.id_scheda + reqJson.edifici.indexOf(edificio)), reqJson.cl_ogg, reqJson.dati.descrizioneContr, reqJson.dati.esecutori, reqJson.dati.strumentazione, reqJson.dati.note, reqJson.dati.costo, reqJson.dati.dataInizio, reqJson.dati.dataFine, reqJson.dati.st_cons, reqJson.dati.liv_urg, reqJson.dati.cl_racc, reqJson.metadati.data_ins, reqJson.metadati.autore, [id_main10ance]]);
@@ -453,7 +453,7 @@ async function registraAttPrecedenti(reqJson) {
                 case stringaManReg:
                     for (const edificio of reqJson.edifici) {
                         const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManReg}"
+                        await tx.query(`INSERT INTO ${data_schema}."${stringaManReg}"
                         ("id_mn_reg", "cl_ogg_fr", "azione", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
                         [(reqJson.metadati.id_scheda + reqJson.edifici.indexOf(edificio)), reqJson.cl_ogg, reqJson.dati.descrizioneManReg, reqJson.dati.esecutori, reqJson.dati.strumentazione, reqJson.dati.note, reqJson.dati.costo, reqJson.dati.dataInizio, reqJson.dati.dataFine, reqJson.metadati.data_ins, reqJson.metadati.autore, [id_main10ance]]);
@@ -462,7 +462,7 @@ async function registraAttPrecedenti(reqJson) {
                 case stringaManCorr:
                     for (const edificio of reqJson.edifici) {
                         const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManCorr}"
+                        await tx.query(`INSERT INTO ${data_schema}."${stringaManCorr}"
                         ("id_mn_gu", "cl_ogg_fr", "azione", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
                         [(reqJson.metadati.id_scheda + reqJson.edifici.indexOf(edificio)), reqJson.cl_ogg, reqJson.dati.descrizioneManCorr, reqJson.dati.esecutori, reqJson.dati.strumentazione, reqJson.dati.note, reqJson.dati.costo, reqJson.dati.dataInizio, reqJson.dati.dataFine, reqJson.metadati.data_ins, reqJson.metadati.autore, [id_main10ance]]);
@@ -471,7 +471,7 @@ async function registraAttPrecedenti(reqJson) {
                 case stringaManStr:
                     for (const edificio of reqJson.edifici) {
                         const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaManStr}"
+                        await tx.query(`INSERT INTO ${data_schema}."${stringaManStr}"
                         ("id_mn_str", "cl_ogg_fr", "azione", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
                         [(reqJson.metadati.id_scheda + reqJson.edifici.indexOf(edificio)), reqJson.cl_ogg, reqJson.dati.descrizioneManStr, reqJson.dati.esecutori, reqJson.dati.strumentazione, reqJson.dati.note, reqJson.dati.costo, reqJson.dati.dataInizio, reqJson.dati.dataFine, reqJson.metadati.data_ins, reqJson.metadati.autore, [id_main10ance]]);
@@ -480,7 +480,7 @@ async function registraAttPrecedenti(reqJson) {
                 case stringaRestauro:
                     for (const edificio of reqJson.edifici) {
                         const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
-                        await clientM10a.query(`INSERT INTO ${data_schema}."${stringaRestauro}"
+                        await tx.query(`INSERT INTO ${data_schema}."${stringaRestauro}"
                         ("id_restaur", "cl_ogg_fr", "descriz", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
                         [(reqJson.metadati.id_scheda + reqJson.edifici.indexOf(edificio)), reqJson.cl_ogg, reqJson.dati.descrizioneRestauro, reqJson.dati.esecutori, reqJson.dati.strumentazione, reqJson.dati.note, reqJson.dati.costo, reqJson.dati.dataInizio, reqJson.dati.dataFine, reqJson.metadati.data_ins, reqJson.metadati.autore, [id_main10ance]]);
@@ -502,7 +502,7 @@ async function registraAttPrecedenti(reqJson) {
 
 async function registraScoreLavori(reqJson, ambito, autore) {
     try {
-        await withTransaction(async (clientM10a) => {
+        await withTransaction(async (tx) => {
             for (const lavoro of reqJson) {
             const queryTxt = `
                 INSERT INTO main10ance."a_temp" (
@@ -535,7 +535,7 @@ async function registraScoreLavori(reqJson, ambito, autore) {
                 lavoro.id_interno
             ];
 
-            await clientM10a.query(queryTxt, listaValori);
+            await tx.query(queryTxt, listaValori);
             }
         });
         return true;
@@ -575,7 +575,7 @@ async function leggiScoreUltimiLavori(località, ambito) {
             ON lpe.edificio = de.edificio
             ORDER BY lpe.edificio;
         `;
-        const resp = await clientM10a.query(queryTxt, [località, ambito]);
+        const resp = await poolM10a.query(queryTxt, [località, ambito]);
         return resp.rows;
     }
     catch(e) {
@@ -605,7 +605,7 @@ async function leggiScoreLavori(località, ambito) {
             AND tp.ambito = $2
             ORDER BY id_interno, tp.edificio;
         `;
-        const resp = await clientM10a.query(queryTxt, [località, ambito]);
+        const resp = await poolM10a.query(queryTxt, [località, ambito]);
         return resp.rows;
     }
     catch(e) {

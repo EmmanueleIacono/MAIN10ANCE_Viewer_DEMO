@@ -1,34 +1,25 @@
-const { Client, Pool } = require('pg');
+const {Pool} = require('pg');
 
-const clientM10a = new Client({
-    connectionString: process.env.MAIN10ANCE_DB,
-});
 const poolM10a = new Pool({
     connectionString: process.env.MAIN10ANCE_DB,
 });
 
 //////////          AVVIO SERVER          //////////
 
-start();
-
 poolM10a.on('error', (err) => {
     console.error('Errore inaspettato del client PG', err);
     process.exit(-1);
 })
 
-console.log('Connessione pool al database Main10ance riuscita');
+start();
 
 async function start() {
-    await connect(clientM10a, 'Main10ance');
-}
-
-async function connect(client, nomeDb) {
     try {
-        await client.connect();
-        console.log(`Connessione al database ${nomeDb} riuscita`);
+        await poolM10a.query('SELECT 1;');
+        console.log('Connessione pool al database Main10ance riuscita');
     }
     catch(e) {
-        console.error(`Connessione al database ${nomeDb} fallita: ${e}`);
+        console.error(`Connessione pool al database Main10ance fallita: ${e}`);
     }
 }
 
@@ -54,4 +45,4 @@ async function withTransaction(work) {
     }
 }
 
-module.exports = {clientM10a, poolM10a, withTransaction}
+module.exports = {poolM10a, withTransaction};

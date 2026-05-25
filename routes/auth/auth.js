@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 router.use(express.json());
 
-const {clientM10a} = require('../database/connessioni');
+const {poolM10a} = require('../database/connessioni');
 const {authCookieOptions} = require('../security/cookies');
 const {createRateLimiter} = require('../security/rateLimit');
 
@@ -107,7 +107,7 @@ function validazioneUsers(user) {
 
 async function getUtenteByNome(nome) {
     try {
-        const results = await clientM10a.query(`SELECT "user" AS "username", "pw", "ruolo" AS "role", "ambito" FROM servizio."utenti" WHERE "user" = ($1);`, [nome]);
+        const results = await poolM10a.query(`SELECT "user" AS "username", "pw", "ruolo" AS "role", "ambito" FROM servizio."utenti" WHERE "user" = ($1);`, [nome]);
         return results.rows[0];
     }
     catch(e) {
@@ -117,7 +117,7 @@ async function getUtenteByNome(nome) {
 
 async function insertNuovoUtente(user) {
     try {
-        await clientM10a.query(`INSERT INTO servizio."utenti" ("user", "pw", "ruolo", "email") VALUES (($1), ($2), 'turista', ($3));`, [user.username, user.pw, user.email]);
+        await poolM10a.query(`INSERT INTO servizio."utenti" ("user", "pw", "ruolo", "email") VALUES (($1), ($2), 'turista', ($3));`, [user.username, user.pw, user.email]);
         return true;
     }
     catch(e) {
@@ -128,7 +128,7 @@ async function insertNuovoUtente(user) {
 
 async function getSettingsByRuolo(ruolo) {
     try {
-        const results = await clientM10a.query(`SELECT "bim_vw_sets", "elementi_visibili" AS "usr_vw" FROM servizio."ruoli" WHERE "ruolo" = ($1);`, [ruolo]);
+        const results = await poolM10a.query(`SELECT "bim_vw_sets", "elementi_visibili" AS "usr_vw" FROM servizio."ruoli" WHERE "ruolo" = ($1);`, [ruolo]);
         return results.rows[0];
     }
     catch(e) {
@@ -138,7 +138,7 @@ async function getSettingsByRuolo(ruolo) {
 
 async function getSettingsByAmbito(ambito) {
     try {
-        const results = await clientM10a.query(`SELECT "ambito", "ambito_full_name", "buckets", "schema", "storage" FROM servizio."ambiti" WHERE "ambito" = ($1);`, [ambito]);
+        const results = await poolM10a.query(`SELECT "ambito", "ambito_full_name", "buckets", "schema", "storage" FROM servizio."ambiti" WHERE "ambito" = ($1);`, [ambito]);
         return results.rows[0];
     }
     catch(e) {
