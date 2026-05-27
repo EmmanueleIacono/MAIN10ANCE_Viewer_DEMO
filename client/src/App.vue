@@ -129,10 +129,10 @@ export default {
     }
 
     async function popolaMappa() {
-      const localitàJson = await leggiDBMarkerLoc();
+      const localitaJson = await leggiDBMarkerLoc();
       const edificiJson = await leggiDBMarkerEdif();
       const locPdiffJson = await leggiDBMarkerLocPdiff();
-      store.methods.setMarkerLoc(localitàJson);
+      store.methods.setMarkerLoc(localitaJson);
       store.methods.setMarkerEdif(edificiJson);
       store.methods.setMarkerLocPdiff(locPdiffJson);
     }

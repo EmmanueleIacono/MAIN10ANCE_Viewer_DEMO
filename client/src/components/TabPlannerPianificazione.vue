@@ -1,12 +1,12 @@
 <template>
 <Card>
-  <Details summary="PIANIFICAZIONE CONTROLLI E MANUTENZIONE ORDINARIA" :open="false" class="loading-wrapper">
+  <Details summary="PIANIFICAZIONE CONTROLLI E MANUTENZIONI" :open="false" class="loading-wrapper">
     <LoadingScreen :caricamento="caricamento" />
     <button @click="programmaControlli" class="bottone-main10ance bottone-prog">Salva</button>
       <br />
     <div class="main-container">
-      <label for="select-località-prog">Località</label>
-      <select v-model="selectLocalità" id="select-località-prog">
+      <label for="select-localita-prog">Località</label>
+      <select v-model="selectLocalita" id="select-localita-prog">
         <option value=""></option>
         <option v-for="loc in store.statePlanner.listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
       </select>
@@ -14,14 +14,88 @@
       <br />
       <div><b>Edificio</b></div>
       <div id="div-edificio-prog">
+        <div class="checkbox-edifici checkbox-edifici-tutti">
+          <input v-model="tuttiEdificiSelezionati" id="check-edif-prog-tutti" type="checkbox">
+          <label for="check-edif-prog-tutti">Completa (seleziona tutti)</label>
+        </div>
         <div v-for="s in listaSigleEdificiFiltrata" :key="s.edificio" class="checkbox-edifici">
           <input v-model="listaSigleEdificiSelezionati" :id="`check-edif-prog-${s.edificio}`" :value="s.edificio" type="checkbox">
           <label :for="`check-edif-prog-${s.edificio}`">{{s.edif_nome_menu}}</label>
         </div>
       </div>
       <br />
+      <div class="ambito-wrapper">
+        <div><b>Ambito</b></div>
+        <div class="opzioni-ambito">
+          <button
+            v-for="ambito in listaAmbiti"
+            :key="`btn-${ambito.id}`"
+            type="button"
+            class="opzione-ambito"
+            :class="{'opzione-ambito-selezionata': selectAmbito === ambito.id}"
+            @click="selezionaAmbito(ambito.id)"
+          >
+            <span>{{ambito.nome}}</span>
+            <span class="pallino-ambito" :style="{backgroundColor: ambito.colore}"></span>
+          </button>
+        </div>
+      </div>
+      <br />
+      <div v-if="selectAmbito" class="ambito-wrapper">
+        <div><b>Necessità supporto</b></div>
+        <div class="opzioni-ambito">
+          <button
+            v-for="ambito in listaAmbitiSupporto"
+            :key="`btn-supporto-${ambito.id}`"
+            type="button"
+            class="opzione-ambito"
+            :class="{'opzione-ambito-selezionata': selectAmbitoSupporto === ambito.id}"
+            @click="selezionaAmbitoSupporto(ambito.id)"
+          >
+            <span>{{ambito.nome}}</span>
+            <span class="pallino-ambito" :style="{backgroundColor: ambito.colore}"></span>
+          </button>
+        </div>
+      </div>
+      <br v-if="selectAmbito" />
+      <table class="tabella-prog-controlli tabella-attivita-cicliche">
+        <caption class="caption-prog-controlli"><b>Pianificazione attività cicliche</b></caption>
+        <tr>
+          <th><b>Attività</b></th>
+          <th><b>Frequenza (mesi)</b></th>
+          <th><b>Inizio ciclo</b></th>
+          <th><b>Durata prevista (gg - 5gg/sett)</b></th>
+        </tr>
+        <tr v-for="(attivita, ind) in datiAttivitaCicliche" :key="attivita.id">
+          <td><b>{{attivita.nome}}</b></td>
+          <td>
+            <input
+              v-model="datiAttivitaCicliche[ind].freq_mesi"
+              type="number"
+              min="1"
+              step="1"
+              inputmode="numeric"
+              @input="normalizzaIntero(datiAttivitaCicliche[ind], 'freq_mesi')"
+            >
+          </td>
+          <td>
+            <input v-model="datiAttivitaCicliche[ind].data_inizio" type="date">
+          </td>
+          <td>
+            <input
+              v-model="datiAttivitaCicliche[ind].durata_prevista_gg"
+              type="number"
+              min="1"
+              step="1"
+              inputmode="numeric"
+              @input="normalizzaIntero(datiAttivitaCicliche[ind], 'durata_prevista_gg')"
+            >
+          </td>
+        </tr>
+      </table>
+      <br />
       <!-- SELECT ENTITA' -->
-      <div class="select-wrapper">
+      <!-- <div class="select-wrapper">
         <input type="checkbox" id="cbx-cl-ogg" v-model="stateCheckBx.clOgg">
         <label for="cbx-cl-ogg">Classe oggetti</label>
         <select v-model="selectClOgg" id="select-cl-ogg">
@@ -29,9 +103,9 @@
           <option v-for="cl in store.statePlanner.listaClOgg" :key="cl.unnest" :value="cl.unnest">{{cl.unnest}}</option>
         </select>
       </div>
-      <br />
+      <br /> -->
       <!-- SELECT ENTITA' -->
-      <div class="select-wrapper">
+      <!-- <div class="select-wrapper">
         <input type="checkbox" id="cbx-entita" v-model="stateCheckBx.Ent">
         <label for="cbx-entita">Entità</label>
         <select v-model="selectEntità" id="select-entita">
@@ -39,42 +113,42 @@
           <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option>
         </select>
       </div>
-      <br />
+      <br /> -->
       <!-- SELECT AGGREGATORI -->
-      <div class="select-wrapper">
+      <!-- <div class="select-wrapper">
         <input type="checkbox" id="cbx-aggr" v-model="stateCheckBx.Aggr">
         <label for="cbx-aggr">Aggregatori</label>
         <select v-model="selectAggregatori" id="select-aggr">
-          <option value=""></option>
+          <option value=""></option> -->
           <!-- TO DO -->
           <!-- <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option> -->
-        </select>
+        <!-- </select>
       </div>
-      <br />
+      <br /> -->
       <!-- SELECT TEMI -->
-      <div class="select-wrapper">
+      <!-- <div class="select-wrapper">
         <input type="checkbox" id="cbx-temi" v-model="stateCheckBx.Temi">
         <label for="cbx-temi">Temi</label>
         <select v-model="selectTemi" id="select-temi">
-          <option value=""></option>
+          <option value=""></option> -->
           <!-- TO DO -->
           <!-- <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option> -->
-        </select>
+        <!-- </select>
       </div>
-      <br />
+      <br /> -->
       <!-- SELECT MATERIALI -->
-      <div class="select-wrapper">
+      <!-- <div class="select-wrapper">
         <input type="checkbox" id="cbx-mat" v-model="stateCheckBx.Mat">
         <label for="cbx-mat">Materiali</label>
         <select v-model="selectMateriali" id="select-mat">
-          <option value=""></option>
+          <option value=""></option> -->
           <!-- TO DO -->
           <!-- <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option> -->
-        </select>
+        <!-- </select>
       </div>
-      <br />
-      <br />
-      <table v-if="selectClOgg" class="tabella-prog-controlli">
+      <br /> -->
+      <!-- <br /> -->
+      <!-- <table v-if="selectClOgg" class="tabella-prog-controlli">
         <caption class="caption-prog-controlli"><b>Pianificazione attività cicliche</b></caption>
         <tr>
           <th><b>Frase di rischio</b></th>
@@ -105,8 +179,8 @@
             <input v-if="fr.mn_reg" v-model="datiFrasiDiRischioFiltrate[ind].data_mr" type="date">
           </td>
         </tr>
-      </table>
-      <br>
+      </table> -->
+      <!-- <br> -->
     </div>
   </Details>
 </Card>
@@ -114,8 +188,7 @@
 
 <script>
 import {reactive, toRefs, watch, inject, computed} from 'vue';
-import {getEntitàDaClOgg, getElementiDaEntità, creaAttProgControllo} from '../js/richieste';
-import {dataInteger, dataCorta} from '../js/shared';
+import {registraPianificazioneControlliManutenzioni} from '../js/richieste';
 import Details from './elementi/Details.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 import Card from './elementi/Card.vue';
@@ -138,162 +211,159 @@ export default {
         Temi: false,
         Mat: false,
       },
-      selectLocalità: '',
+      selectLocalita: '',
       selectClOgg: '',
       selectEntità: '', // []
       selectAggregatori: '', // []
       selectTemi: '', // []
       selectMateriali: '', // []
+      selectAmbito: '',
+      selectAmbitoSupporto: '',
+      listaAmbiti: [
+        {id: 'cops', nome: 'Coperture e Sistemi di regimazione delle acque', colore: '#9b51e0'},
+        {id: 'app_dec', nome: 'Apparati decorativi', colore: '#2f80ed'},
+        {id: 'pavs', nome: 'Sentieri, pavimentazioni esterne, muretti', colore: '#707070'},
+      ],
       listaSigleEdificiFiltrata: [],
       listaSigleEdificiSelezionati: [],
       listaFrasiDiRischioFiltrate: [],
       datiFrasiDiRischioFiltrate: [],
+      datiAttivitaCicliche: [
+        {id: 'co', nome: 'CO - Controllo', freq_mesi: '', data_inizio: '', durata_prevista_gg: ''},
+        {id: 'mo', nome: 'MO - Manutenzione ordinaria', freq_mesi: '', data_inizio: '', durata_prevista_gg: ''},
+        {id: 'ms', nome: 'MS - Manutenzione straordinaria', freq_mesi: '', data_inizio: '', durata_prevista_gg: ''},
+      ],
     });
 
-    const nomeLocalità = computed(() => {
-      if (state.selectLocalità) return store.statePlanner.listaSigleLoc.filter(loc => loc.sigla === state.selectLocalità)[0].nome;
-      return '';
+    const tuttiEdificiSelezionati = computed({
+      get() {
+        return !!state.listaSigleEdificiFiltrata.length && state.listaSigleEdificiSelezionati.length === state.listaSigleEdificiFiltrata.length;
+      },
+      set(selezionaTutti) {
+        state.listaSigleEdificiSelezionati = selezionaTutti ? state.listaSigleEdificiFiltrata.map(s => s.edificio) : [];
+      },
     });
 
-    watch(() => state.selectLocalità, newVal => {
-      const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.località === newVal);
+    const ambitoSelezionato = computed(() => state.listaAmbiti.find(ambito => ambito.id === state.selectAmbito));
+    const listaAmbitiSupporto = computed(() => state.listaAmbiti.filter(ambito => ambito.id !== state.selectAmbito));
+
+    const datiPianificazioneAmbito = computed(() => ({
+      localita: state.selectLocalita,
+      edifici: [...state.listaSigleEdificiSelezionati],
+      ambito_operativo: state.selectAmbito,
+      necessita_supporto: state.selectAmbitoSupporto || null,
+      attivita: state.datiAttivitaCicliche.filter(attivitaCompleta).map(attivita => ({
+        tipo_attivita: attivita.id,
+        descrizione_attivita: attivita.nome,
+        frequenza_mesi: Number(attivita.freq_mesi),
+        data_inizio: attivita.data_inizio,
+        durata_prevista_gg: Number(attivita.durata_prevista_gg),
+      })),
+    }));
+
+    watch(() => state.selectAmbito, newVal => {
+      if (!newVal || state.selectAmbitoSupporto === newVal) state.selectAmbitoSupporto = '';
+    });
+
+    watch(() => state.selectLocalita, newVal => {
+      const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.localita === newVal);
       state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
       state.listaSigleEdificiSelezionati = [];
     });
 
-    watch(() => state.selectClOgg, newVal => {
-      const listaFrasiDiRischioFiltrate = store.statePlanner.listaFrasiDiRischio.filter(fr => fr.cl_ogg_fr === newVal);
-      state.listaFrasiDiRischioFiltrate = listaFrasiDiRischioFiltrate;
-      const listaIdFrRiscFiltrati = listaFrasiDiRischioFiltrate.map(fr => ({id_fr_risc: fr.id_fr_risc, freq: null, data: null, man_reg: !!fr.mn_reg}));
-      state.datiFrasiDiRischioFiltrate = listaIdFrRiscFiltrati;
-    });
-
     async function programmaControlli() {
-      if (controllaSelezioni() && controllaCampiCompilati()) {
-        state.caricamento = true;
-        try {
-          const dati = await raccogliDati();
-          if (!dati) return;
-          const res = await creaAttProgControllo(dati);
-          if (res.success) {
-            store.methods.setAlert('Programmazione andata a buon fine');
-            emit('pianificazioneAggiornata');
-          }
-          else {
-            store.methods.setAlert('ATTENZIONE: Si è verificato un errore durante la registrazione dei dati');
-          }
+      if (!controllaSelezioni()) {
+        store.methods.setAlert('Dati incompleti: è necessario selezionare una località, almeno un edificio, e un ambito operativo.');
+        return;
+      }
+
+      const attivitaComplete = state.datiAttivitaCicliche.filter(attivitaCompleta);
+      if (!attivitaComplete.length) {
+        store.methods.setAlert('Dati incompleti: è necessario pianificare almeno una tipologia di attività.');
+        return;
+      }
+
+      azzeraAttivitaIncomplete();
+      state.caricamento = true;
+      try {
+        const res = await registraPianificazioneControlliManutenzioni(raccogliDatiPianificazione(attivitaComplete));
+        if (res.success) {
+          store.methods.setAlert('Programmazione andata a buon fine');
+          emit('pianificazioneAggiornata');
         }
-        catch(e) {
-          store.methods.setAlert(e);
-        }
-        finally {
-          state.caricamento = false;
+        else {
+          store.methods.setAlert('ATTENZIONE: Si è verificato un errore durante la registrazione dei dati');
         }
       }
-      else {
-        store.methods.setAlert('ATTENZIONE: Informazioni non sufficienti');
+      catch(e) {
+        store.methods.setAlert(e);
+      }
+      finally {
+        state.caricamento = false;
       }
     }
 
     function controllaSelezioni() {
-      return state.selectLocalità && state.selectClOgg && !!state.listaSigleEdificiSelezionati.length;
+      return state.selectLocalita && !!state.listaSigleEdificiSelezionati.length && state.selectAmbito;
     }
 
-    function controllaCampiCompilati() {
-      return state.datiFrasiDiRischioFiltrate && !!state.datiFrasiDiRischioFiltrate.length && state.datiFrasiDiRischioFiltrate.every(dato => dato.freq_c && dato.data_c && (dato.man_reg ? dato.freq_mr && dato.data_mr : true));
+    function valoreInteroValido(valore) {
+      return Number.isInteger(Number(valore)) && Number(valore) > 0;
     }
 
-    async function raccogliDati() {
-      const datiProgrammazione = state.datiFrasiDiRischioFiltrate;
-      const listaEdifici = state.listaSigleEdificiSelezionati;
-      const località = state.selectLocalità;
-      const listaEntità = await getEntitàDaClOgg(state.selectClOgg);
-      if (!listaEntità.length) throw new Error('ERRORE: Nessuna entità corrispondente alla classe corrente.');
-      const listaIdM10a = await compilaIdM10a(listaEdifici, listaEntità, località);
-      if (listaIdM10a.some(id => !id.elementi.length)) {
-        const continuare = await store.methods.setConfirm('ATTENZIONE: Uno o più edifici non hanno entità corrispondenti per la classe corrente. Sarà generato un identificativo generico.\nContinuare?');
-        if (!continuare) return;
-        else {
-          listaIdM10a.forEach(id => {
-            const loc = località;
-            const ed = id.edificio;
-            listaEntità.forEach(ent => {
-              const id_m10a_generico = `${loc}|${ed}|${ent}|*`;
-              id.elementi.push(id_m10a_generico);
-            });
-          });
-        }
-      }
-      const listaAttività = [];
-      datiProgrammazione.forEach(dato => {
-        listaIdM10a.forEach(id => {
-          const oggAtt = {};
-          oggAtt['cl_ogg'] = state.selectClOgg;
-          oggAtt['rid_fr_risc'] = dato.id_fr_risc;
-          oggAtt['man_reg'] = dato.man_reg;
-          oggAtt['freq_c'] = dato.freq_c;
-          oggAtt['data_prog_c'] = dato.data_c;
-          oggAtt['edificio'] = id.edificio;
-          oggAtt['elementi'] = id.elementi;
-          oggAtt['loc_estesa'] = nomeLocalità.value;
-          listaAttività.push(oggAtt);
-          if (dato.freq_mr) {
-            const oggAttMr = {};
-            oggAttMr['cl_ogg'] = state.selectClOgg;
-            oggAttMr['rid_fr_risc'] = dato.id_fr_risc;
-            oggAttMr['man_reg'] = dato.man_reg;
-            oggAttMr['freq_mr'] = dato.freq_mr;
-            oggAttMr['data_prog_mr'] = dato.data_mr;
-            oggAttMr['edificio'] = id.edificio;
-            oggAttMr['elementi'] = id.elementi;
-            oggAttMr['loc_estesa'] = nomeLocalità.value;
-            listaAttività.push(oggAttMr);
-          }
-        });
-      });
-      const metadati = creaMetadati();
-      listaAttività.forEach((att, ind) => {
-        att['id_att_prog'] = metadati.idUnivoco + ind;
-        att['id_group'] = metadati.id_group;
-        att['data_ins'] = metadati.data_ins;
-      });
-      return listaAttività;
+    function attivitaCompleta(attivita) {
+      return valoreInteroValido(attivita.freq_mesi) && !!attivita.data_inizio && valoreInteroValido(attivita.durata_prevista_gg);
     }
 
-    async function compilaIdM10a(edifici, entità, sm) {
-      const listaElementi = [];
-      for (const ed of edifici) {
-        const idOgg = {};
-        idOgg.edificio = ed;
-        idOgg.elementi = [];
-        for (const en of entità) {
-          if (en === 'grata') {
-            const numeri = ed.split('-');
-            for (const n of numeri) {
-              const elementi = await getElementiDaEntità(sm, n, en);
-              idOgg.elementi.push(...elementi);
-            }
-          }
-          else {
-            const elementi = await getElementiDaEntità(sm, ed, en);
-            idOgg.elementi.push(...elementi);
-          }
-        }
-        listaElementi.push(idOgg);
-      }
-      return listaElementi;
+    function azzeraAttivita(attivita) {
+      attivita.freq_mesi = '';
+      attivita.data_inizio = '';
+      attivita.durata_prevista_gg = '';
     }
 
-    function creaMetadati() {
-      const idUnivoco = dataInteger();
-      const data_ins = dataCorta();
-      const id_group = `${state.selectClOgg.split(' ')[0]}_${idUnivoco}`;
-      return {id_group, idUnivoco, data_ins}
+    function azzeraAttivitaIncomplete() {
+      state.datiAttivitaCicliche.filter(attivita => !attivitaCompleta(attivita)).forEach(azzeraAttivita);
+    }
+
+    function raccogliDatiPianificazione(attivitaComplete) {
+      return {
+        localita: state.selectLocalita,
+        edifici: [...state.listaSigleEdificiSelezionati],
+        ambito_operativo: state.selectAmbito,
+        necessita_supporto: state.selectAmbitoSupporto || null,
+        attivita: attivitaComplete.map(attivita => ({
+          tipo_attivita: attivita.id,
+          descrizione_attivita: attivita.nome,
+          frequenza_mesi: Number(attivita.freq_mesi),
+          data_inizio: attivita.data_inizio,
+          durata_prevista_gg: Number(attivita.durata_prevista_gg),
+        })),
+      };
+    }
+
+    function normalizzaIntero(oggetto, campo) {
+      const valore = String(oggetto[campo]).split(/[.,eE+-]/)[0].replace(/\D/g, '');
+      oggetto[campo] = valore ? Number(valore) : '';
+    }
+
+    function selezionaAmbito(idAmbito) {
+      state.selectAmbito = state.selectAmbito === idAmbito ? '' : idAmbito;
+    }
+
+    function selezionaAmbitoSupporto(idAmbito) {
+      state.selectAmbitoSupporto = state.selectAmbitoSupporto === idAmbito ? '' : idAmbito;
     }
 
     return {
       store,
       ...toRefs(state),
+      tuttiEdificiSelezionati,
+      ambitoSelezionato,
+      listaAmbitiSupporto,
+      datiPianificazioneAmbito,
+      normalizzaIntero,
+      selezionaAmbito,
+      selezionaAmbitoSupporto,
       programmaControlli,
     }
   }
@@ -391,10 +461,56 @@ tr:nth-child(odd) {
 .checkbox-edifici {
   flex: 0 0 25%;
 }
+.checkbox-edifici-tutti {
+  flex-basis: 100%;
+  font-weight: bold;
+  margin-bottom: 0.35rem;
+}
 #div-edificio-prog {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+}
+.ambito-wrapper {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.ambito-wrapper > div:first-child {
+  flex: 0 0 9rem;
+}
+.opzioni-ambito {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  flex: 1 1 22rem;
+}
+.opzione-ambito {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+  border: 1px solid var(--verdeMain10anceTrasparenza);
+  border-radius: 3px;
+  padding: 0.2rem 0.45rem;
+  min-height: 2rem;
+  color: inherit;
+  background-color: transparent;
+  cursor: pointer;
+}
+.opzione-ambito-selezionata,
+.opzione-ambito:hover {
+  background-color: var(--verdeMain10anceTrasparenza2);
+}
+.pallino-ambito {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  flex: 0 0 0.9rem;
+}
+.tabella-attivita-cicliche td:first-child {
+  text-align: left;
 }
 .caption-prog-controlli {
   color: unset;

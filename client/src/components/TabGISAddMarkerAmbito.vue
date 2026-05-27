@@ -14,10 +14,10 @@
   <br />
   <div v-if="tabella === 'dati_località'">
     <label class="nome" for="input-loc-nome">Nome:</label>
-    <input class="valore" id="input-loc-nome" v-model="datiLocalità.nome" placeholder="Nome" />
+    <input class="valore" id="input-loc-nome" v-model="datiLocalita.nome" placeholder="Nome" />
     <br />
     <label class="nome" for="input-sigla">Sigla:</label>
-    <input class="valore" id="input-sigla" v-model="datiLocalità.sigla" placeholder="Sigla" />
+    <input class="valore" id="input-sigla" v-model="datiLocalita.sigla" placeholder="Sigla" />
     <br />
   </div>
   <div v-if="tabella === 'dati_edifici'">
@@ -59,12 +59,12 @@ export default {
     const nuovoMarker = inject('nuovoMarker');
     const coordMarker = inject('coordMarker');
     const state = reactive({
-      datiLocalità: {
+      datiLocalita: {
         nome: '',
         sigla: '',
       },
       datiEdificio: {
-        località: '',
+        localita: '',
         nome: '', // se un solo edificio, potrebbe essere uguale a "edif_nome_menu"
         sigla: '',
         descrizione: '',
@@ -164,7 +164,7 @@ export default {
     }
 
     function isDatiLocalitàValidi() {
-      return state.datiLocalità.nome && state.datiLocalità.sigla;
+      return state.datiLocalita.nome && state.datiLocalita.sigla;
     }
 
     return {

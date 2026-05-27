@@ -11,8 +11,8 @@ export async function getTabelleGIS() {
 export async function leggiDBMarkerLoc() {
     try {
         const risultato = await fetch(`/t/MarkerLoc`, {method: "GET", headers: {"content-type": "application/json"}});
-        const localitàJson = await risultato.json();
-        return localitàJson;
+        const localitaJson = await risultato.json();
+        return localitaJson;
     }
     catch(e) {
         console.log('Errore nella lettura dei marker delle località');
@@ -23,8 +23,8 @@ export async function leggiDBMarkerLoc() {
 export async function leggiDBMarkerLocAmbito() {
     try {
         const risultato = await fetch(`/o/MarkerLoc`, {method: "GET", headers: {"content-type": "application/json"}});
-        const localitàJson = await risultato.json();
-        return localitàJson;
+        const localitaJson = await risultato.json();
+        return localitaJson;
     }
     catch(e) {
         console.log('Errore nella lettura dei marker delle località');
@@ -107,7 +107,7 @@ export async function prendiSchedeRestauro() {
 }
 
 /////           ATTENZIONE: QUESTA UGUALE A FUNZIONE "leggiDBMarkerLocAmbito" ------> DA RISOLVERE
-export async function prendiSigleLocalitàAmbito() {
+export async function prendiSigleLocalitaAmbito() {
     const risultato = await fetch('/o/MarkerLoc', {method: "GET", headers: {"content-type": "application/json"}});
     const risTradotto = await risultato.json();
     return risTradotto;
@@ -207,8 +207,20 @@ export async function creaAttProgControllo(listaAtt) {
     return resJson;
 }
 
+export async function registraPianificazioneControlliManutenzioni(datiPianificazione) {
+    const res = await fetch('/g/pianificazione/controlli-manutenzioni', {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(datiPianificazione)});
+    const resJson = await res.json();
+    return resJson;
+}
+
 export async function leggiAttivitàProg() {
     const res = await fetch('/o/Main10ance_DB/attivita-programmate');
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function leggiPianificazioniControlliManutenzioni() {
+    const res = await fetch('/o/pianificazione/controlli-manutenzioni');
     const resJson = await res.json();
     return resJson;
 }
@@ -376,9 +388,9 @@ export async function conteggioRuoli() {
 
 export async function conteggioModelli() {
     const località = await fetch('/g/DB_Servizio/lista-localita', {method: "GET", headers: {"content-type": "application/json"}});
-    const localitàJson = await località.json();
-    const listaNomi = localitàJson.map(tab => tab.nome);
-    const listaSigle = localitàJson.map(tab => tab.sigla);
+    const localitaJson = await località.json();
+    const listaNomi = localitaJson.map(tab => tab.nome);
+    const listaSigle = localitaJson.map(tab => tab.sigla);
     const risultato = await fetch('/g/Main10ance_DB/dashboard/conteggio-modelli', {method: "GET", headers: {"content-type": "application/json", nomi: JSON.stringify(listaNomi), sigle: JSON.stringify(listaSigle)}});
     const risTradotto = await risultato.json();
     const modelli= risTradotto.map(element => (element.count));
@@ -473,14 +485,14 @@ export async function registraScoreLavori(reqJson) {
     return resJson;
 }
 
-export async function leggiScoreUltimiLavori(sigla_località) {
-    const res = await fetch('/g/edifici/punteggi-lavori-recenti', {method: "GET", headers: {"content-type": "application/json", loc: JSON.stringify(sigla_località)}});
+export async function leggiScoreUltimiLavori(sigla_localita) {
+    const res = await fetch('/g/edifici/punteggi-lavori-recenti', {method: "GET", headers: {"content-type": "application/json", loc: JSON.stringify(sigla_localita)}});
     const resJson = await res.json();
     return resJson;
 }
 
-export async function leggiScoreLavori(sigla_località) {
-    const res = await fetch('/g/edifici/punteggi-lavori', {method: "GET", headers: {"content-type": "application/json", loc: JSON.stringify(sigla_località)}});
+export async function leggiScoreLavori(sigla_localita) {
+    const res = await fetch('/g/edifici/punteggi-lavori', {method: "GET", headers: {"content-type": "application/json", loc: JSON.stringify(sigla_localita)}});
     const resJson = await res.json();
     return resJson;
 }
@@ -491,7 +503,7 @@ export async function leggiVistaDB(nome_vista, utility = false) {
     return resJson;
 }
 
-export async function leggiListaLocalità() {
+export async function leggiListaLocalita() {
     const res = await fetch(`/o/lista_loc`, {method: "GET", headers: {"content-type": "application/json"}});
     const resJson = await res.json();
     return resJson;

@@ -1,5 +1,6 @@
 const express = require('express');
 const fileupload = require('express-fileupload');
+const {randomUUID} = require('crypto');
 const app = express.Router();
 app.use(express.json());
 app.use(express.static("public"));
@@ -37,9 +38,9 @@ app.get('/DB_Servizio/lista-localita', jsonRoute(() => getSigleSacriMonti()));
 
 app.get('/Main10ance_DB/dashboard/conteggio-modelli', jsonRoute(async (req) => {
     const reqJson = req.headers;
-    const listaLocalità = reqJson.nomi;
+    const listaLocalita = reqJson.nomi;
     const listaSigle = reqJson.sigle;
-    return conteggioModelli(listaLocalità, listaSigle);
+    return conteggioModelli(listaLocalita, listaSigle);
 }));
 
 app.get('/sigle-edifici', jsonRoute(async (req) => {
@@ -67,6 +68,8 @@ app.get('/Main10ance_DB/lista-identificativi', jsonRoute(async (req) => {
 
 app.post('/pianificazione', successRoute(req => creaAttProgControllo(req.body, req.signedCookies.ambito)));
 
+app.post('/pianificazione/controlli-manutenzioni', successRoute(req => registraPianificazioneControlliManutenzioni(req.body, req.signedCookies.ambito, req.signedCookies.user_id)));
+
 app.post('/Main10ance_DB/programmazione/nuovi-controlli', successRoute(req => registraNuoviControlli(req.body)));
 
 app.get('/integrazione/attivita-per-integrazione', jsonRoute(async (req) => {
@@ -82,7 +85,7 @@ app.post('/LOD4/nuovo', successRoute(req => uploadImmagine(req.files, req.body, 
 
 app.delete('/LOD4/elimina', successRoute(req => eliminaImmagini(req.body, req.signedCookies.ambito)));
 
-// NUOVO PUNTO SU LIVELLO GIS LOCALITÀ MATERIALI
+// NUOVO PUNTO SU LIVELLO GIS LOCALITA MATERIALI
 app.post('/DB_Servizio/loc-pdiff/nuovo', successRoute(req => creaNuovoLocPdiff(req.body)));
 
 // NUOVO PUNTO SU AMBITO UTENTE
@@ -176,14 +179,14 @@ async function getSigleSacriMonti() {
     }
 }
 
-async function conteggioModelli(listaLocalità, listaSigle) {
-    const listaLocs = JSON.parse(listaLocalità);
+async function conteggioModelli(listaLocalita, listaSigle) {
+    const listaLocs = JSON.parse(listaLocalita);
     const listaSigs = JSON.parse(listaSigle);
     let listaStringhe = [];
     let values = [];
     for (let i=0; i<listaLocs.length; i++) {
         const p = i * 2 + 1;
-        const stringa = `SELECT COUNT(DISTINCT "urn"), $${p} AS nome_tabella FROM ${data_schema}."dati_edifici" WHERE "località" = $${p + 1}`;
+        const stringa = `SELECT COUNT(DISTINCT urn), $${p} AS nome_tabella FROM ${data_schema}.dati_edifici WHERE localita = $${p + 1}`;
         listaStringhe.push(stringa);
         values.push(listaLocs[i], listaSigs[i]);
     }
@@ -199,7 +202,7 @@ async function conteggioModelli(listaLocalità, listaSigle) {
 
 async function getSigleEdifici(ambito) {
     try {
-        const results = await poolM10a.query(`SELECT DISTINCT "edificio", "località", "edif_nome_menu" FROM ${data_schema}."dati_edifici" WHERE "ambito" LIKE ($1) ORDER BY "edificio";`, [ambito]);
+        const results = await poolM10a.query(`SELECT DISTINCT edificio, localita, edif_nome_menu FROM ${data_schema}.dati_edifici WHERE ambito LIKE ($1) ORDER BY edificio;`, [ambito]);
         return results.rows;
     }
     catch(e) {
@@ -254,6 +257,77 @@ async function creaAttProgControllo(listaAtt, ambito) {
         console.log(`Errore: ${er}`);
         return false;
     }
+}
+
+async function registraPianificazioneControlliManutenzioni(reqJson, ambito, nome_utente) {
+    const localita = reqJson.localita;
+    const edifici = Array.isArray(reqJson.edifici) ? reqJson.edifici : [];
+    const ambitoOperativo = reqJson.ambito_operativo;
+    const necessitaSupporto = reqJson.necessita_supporto || null;
+    const attivita = Array.isArray(reqJson.attivita) ? reqJson.attivita.filter(attivitaPianificazioneValida) : [];
+    const dataPianificazione = new Date().toISOString().slice(0, 10);
+    const idPianificazione = `pian_${Date.now()}_${randomUUID().slice(0, 8)}`;
+
+    if (!localita || !edifici.length || !ambitoOperativo || !attivita.length) return false;
+
+    try {
+        await withTransaction(async (tx) => {
+            for (const edificio of edifici) {
+                for (const att of attivita) {
+                    const valuesArray = [
+                        randomUUID(),
+                        idPianificazione,
+                        nome_utente,
+                        dataPianificazione,
+                        localita,
+                        edificio,
+                        ambitoOperativo,
+                        necessitaSupporto,
+                        att.tipo_attivita,
+                        att.descrizione_attivita,
+                        Number(att.frequenza_mesi),
+                        att.data_inizio,
+                        Number(att.durata_prevista_gg),
+                        ambito
+                    ];
+                    await tx.query(`
+                        INSERT INTO ${data_schema}."pianificazione_controlli_manutenzioni" (
+                            "uuid",
+                            "id_pianificazione",
+                            "autore_pianificazione",
+                            "data_pianificazione",
+                            "localita",
+                            "edificio",
+                            "ambito_operativo",
+                            "necessita_supporto",
+                            "tipo_attivita",
+                            "descrizione_attivita",
+                            "frequenza_mesi",
+                            "data_inizio",
+                            "durata_prevista_gg",
+                            "ambito"
+                        )
+                        VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));
+                    `, valuesArray);
+                }
+            }
+        });
+        return true;
+    }
+    catch(er) {
+        console.log(`Errore: ${er}`);
+        return false;
+    }
+}
+
+function attivitaPianificazioneValida(att) {
+    return att
+        && att.tipo_attivita
+        && Number.isInteger(Number(att.frequenza_mesi))
+        && Number(att.frequenza_mesi) > 0
+        && att.data_inizio
+        && Number.isInteger(Number(att.durata_prevista_gg))
+        && Number(att.durata_prevista_gg) > 0;
 }
 
 async function creaNuovoLocPdiff(reqJson) {
@@ -443,7 +517,7 @@ async function registraAttPrecedenti(reqJson) {
             switch (reqJson.metadati.tabella) {
                 case stringaContr:
                     for (const edificio of reqJson.edifici) {
-                        const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
+                        const id_main10ance = `${reqJson.localita}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
                         await tx.query(`INSERT INTO ${data_schema}."${stringaContr}"
                         ("id_contr", "cl_ogg_fr", "controllo", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "st_cons", "liv_urg", "cl_racc", "data_ins", "autore_ultima_mod", "id_main10ance")
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14), ($15));`,
@@ -452,7 +526,7 @@ async function registraAttPrecedenti(reqJson) {
                     break;
                 case stringaManReg:
                     for (const edificio of reqJson.edifici) {
-                        const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
+                        const id_main10ance = `${reqJson.localita}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
                         await tx.query(`INSERT INTO ${data_schema}."${stringaManReg}"
                         ("id_mn_reg", "cl_ogg_fr", "azione", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
@@ -461,7 +535,7 @@ async function registraAttPrecedenti(reqJson) {
                     break;
                 case stringaManCorr:
                     for (const edificio of reqJson.edifici) {
-                        const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
+                        const id_main10ance = `${reqJson.localita}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
                         await tx.query(`INSERT INTO ${data_schema}."${stringaManCorr}"
                         ("id_mn_gu", "cl_ogg_fr", "azione", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
@@ -470,7 +544,7 @@ async function registraAttPrecedenti(reqJson) {
                     break;
                 case stringaManStr:
                     for (const edificio of reqJson.edifici) {
-                        const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
+                        const id_main10ance = `${reqJson.localita}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
                         await tx.query(`INSERT INTO ${data_schema}."${stringaManStr}"
                         ("id_mn_str", "cl_ogg_fr", "azione", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
@@ -479,7 +553,7 @@ async function registraAttPrecedenti(reqJson) {
                     break;
                 case stringaRestauro:
                     for (const edificio of reqJson.edifici) {
-                        const id_main10ance = `${reqJson.località}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
+                        const id_main10ance = `${reqJson.localita}|${edificio}|${reqJson.categoria ? reqJson.categoria : '*'}|${reqJson.elemento ? reqJson.elemento : '*'}`; // si potrebbe parametrizzare anche terzo parametro, ma per ora va bene così
                         await tx.query(`INSERT INTO ${data_schema}."${stringaRestauro}"
                         ("id_restaur", "cl_ogg_fr", "descriz", "esecutori", "strumentaz", "commenti", "costo", "data_inizio", "data_fine", "data_ins", "autore_ultima_mod", "id_main10ance")
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`,
@@ -506,7 +580,7 @@ async function registraScoreLavori(reqJson, ambito, autore) {
             for (const lavoro of reqJson) {
             const queryTxt = `
                 INSERT INTO main10ance."a_temp" (
-                    "località", edificio,
+                    localita, edificio,
                     tetti, "umidità", statica, interni, esterni,
                     ambito, data_ins, autore_ins,
                     anno_tetti, "anno_umidità", anno_statica, anno_interni, anno_esterni,
@@ -517,7 +591,7 @@ async function registraScoreLavori(reqJson, ambito, autore) {
             `;
 
             const listaValori = [
-                lavoro.edificio.località,
+                lavoro.edificio.localita,
                 lavoro.edificio.edificio, // questo è lo stesso campo "edificio" di "dati_edifici"
                 lavoro.score_tetti?.score_interno || null,
                 lavoro.score_umidità?.score_interno || null,
@@ -545,13 +619,13 @@ async function registraScoreLavori(reqJson, ambito, autore) {
     }
 }
 
-async function leggiScoreUltimiLavori(località, ambito) {
+async function leggiScoreUltimiLavori(localita, ambito) {
     try {
         const queryTxt = `
             WITH distinct_edifici AS (
                 SELECT DISTINCT edificio, edif_nome_menu
                 FROM ${data_schema}.dati_edifici
-                WHERE "località" = $1
+                WHERE localita = $1
                 AND ambito = $2
             ),
             latest_per_edificio AS (
@@ -561,7 +635,7 @@ async function leggiScoreUltimiLavori(località, ambito) {
                     tp.anno_tetti, tp."anno_umidità", tp.anno_statica, tp.anno_interni, tp.anno_esterni,
                     tp.edificio
                 FROM ${data_schema}."a_temp" AS tp
-                WHERE tp."località" = $1
+                WHERE tp.localita = $1
                 AND tp.ambito = $2
                 ORDER BY tp.edificio, tp.id_interno DESC
             )
@@ -575,7 +649,7 @@ async function leggiScoreUltimiLavori(località, ambito) {
             ON lpe.edificio = de.edificio
             ORDER BY lpe.edificio;
         `;
-        const resp = await poolM10a.query(queryTxt, [località, ambito]);
+        const resp = await poolM10a.query(queryTxt, [localita, ambito]);
         return resp.rows;
     }
     catch(e) {
@@ -584,13 +658,13 @@ async function leggiScoreUltimiLavori(località, ambito) {
     }
 }
 
-async function leggiScoreLavori(località, ambito) {
+async function leggiScoreLavori(localita, ambito) {
     try {
         const queryTxt = `
             WITH distinct_edifici AS (
                 SELECT DISTINCT edificio, edif_nome_menu
                 FROM ${data_schema}.dati_edifici
-                WHERE "località" = $1
+                WHERE localita = $1
                 AND ambito = $2
             )
             SELECT 
@@ -601,11 +675,11 @@ async function leggiScoreLavori(località, ambito) {
             FROM ${data_schema}."a_temp" AS tp
             JOIN distinct_edifici AS de
             ON tp.edificio = de.edificio
-            WHERE tp."località" = $1
+            WHERE tp.localita = $1
             AND tp.ambito = $2
             ORDER BY id_interno, tp.edificio;
         `;
-        const resp = await poolM10a.query(queryTxt, [località, ambito]);
+        const resp = await poolM10a.query(queryTxt, [localita, ambito]);
         return resp.rows;
     }
     catch(e) {

@@ -73,7 +73,7 @@ export default {
     const stateArtifact = inject('stateArtifact');
 
     const codice_pulito = computed(() => state.codice.trim().replaceAll(/(\s|\|)/g, '_'));
-    const id_main10ance = computed(() => `${stateArtifact.selectLocalità}|${stateArtifact.selectEdificio}|${stateArtifact.selectElemento}|${codice_pulito.value}`);
+    const id_main10ance = computed(() => `${stateArtifact.selectLocalita}|${stateArtifact.selectEdificio}|${stateArtifact.selectElemento}|${codice_pulito.value}`);
 
     function annulla() {
       emit('annullaCaricamentoImmagine');

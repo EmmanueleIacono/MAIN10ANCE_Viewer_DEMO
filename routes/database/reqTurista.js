@@ -94,7 +94,7 @@ async function leggiMarkerLoc() {
 
 async function leggiMarkerEdif() {
     try {
-        const results = await poolM10a.query(`SELECT * FROM ${data_schema}."dati_edifici" ORDER BY CAST("numero" AS INTEGER);`);
+        const results = await poolM10a.query(`SELECT * FROM ${data_schema}.dati_edifici ORDER BY CAST(numero AS INTEGER);`);
         return results.rows;
     }
     catch(e) {

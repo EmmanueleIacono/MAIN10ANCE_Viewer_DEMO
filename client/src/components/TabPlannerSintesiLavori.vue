@@ -6,13 +6,13 @@
         <br />
       <div class="main-container">
         <label for="select-località-prog">Località</label>
-        <select v-model="selectLocalità" id="select-località-prog">
+        <select v-model="selectLocalita" id="select-località-prog">
           <option value=""></option>
           <option v-for="loc in store.statePlanner.listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
         </select>
         <br />
         <br />
-        <table v-if="selectLocalità" class="tabella-sintesi-lavori">
+        <table v-if="selectLocalita" class="tabella-sintesi-lavori">
         <caption class="caption-sintesi-lavori"><b>Valutazione sintetica stato conservativo</b></caption>
         <tr>
           <th><b>Edificio</b></th>
@@ -98,7 +98,7 @@
       </table>
       </div>
       <br>
-      <TabPlannerSintesiLavoriVisualizzazione :state-località="selectLocalità" :score-lavori="scoreLavori" />
+      <TabPlannerSintesiLavoriVisualizzazione :state-localita="selectLocalita" :score-lavori="scoreLavori" />
     </Details>
   </Card>
 </template>
@@ -124,7 +124,7 @@ export default {
     const store = inject('store');
     const state = reactive({
       caricamento: false,
-      selectLocalità: '',
+      selectLocalita: '',
       listaSigleEdificiFiltrata: [],
       listaSigleEdificiSelezionati: [],
       datiLavori: {
@@ -150,9 +150,9 @@ export default {
       {stato: 'Lavori eseguiti', score: 5, score_interno: 6},
     ];
 
-    watch(() => state.selectLocalità, async newVal => {
+    watch(() => state.selectLocalita, async newVal => {
       state.caricamento = true;
-      const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.località === newVal);
+      const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.localita === newVal);
       state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
       console.log(listaSigleEdificiFiltrata);
       state.listaSigleEdificiSelezionati = [];
@@ -223,7 +223,7 @@ export default {
         if (res.success) {
           store.methods.setAlert('Registrazione andata a buon fine');
           resetDatiLavori();
-          state.selectLocalità = '';
+          state.selectLocalita = '';
         }
         else {
           store.methods.setAlert('ATTENZIONE: Si è verificato un errore durante la registrazione dei dati');

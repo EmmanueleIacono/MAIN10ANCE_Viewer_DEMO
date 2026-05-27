@@ -12,7 +12,7 @@
       <div v-if="moduloVisibile" class="contesto">
         <div class="contenitore-colonne">
           <label for="località" class="colonna">Località:</label>
-          <select v-model="selectLocalità" id="località" class="colonna">
+          <select v-model="selectLocalita" id="località" class="colonna">
             <option value=""></option>
             <option v-for="loc in store.statePlanner.listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
           </select>
@@ -102,7 +102,7 @@ export default {
     const store = inject('store');
     const state = reactive({
       moduloVisibile: 'contr',
-      selectLocalità: '',
+      selectLocalita: '',
       selectClOgg: '',
       listaSigleEdificiFiltrata: [],
       listaSigleEdificiSelezionati: [],
@@ -126,7 +126,7 @@ export default {
       },
     });
 
-    watch(() => state.selectLocalità, newVal => {
+    watch(() => state.selectLocalita, newVal => {
       const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.località === newVal);
       state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
       state.listaSigleEdificiSelezionati = [];
@@ -141,7 +141,7 @@ export default {
       switch (state.moduloVisibile) {
         case 'contr': {
           console.log(state.datiContrStr);
-          console.log(state.selectLocalità);
+          console.log(state.selectLocalita);
           console.log(state.selectClOgg);
           console.log(state.listaSigleEdificiSelezionati);
           break;
@@ -158,7 +158,7 @@ export default {
     }
 
     function resetDati() {
-      state.selectLocalità = '';
+      state.selectLocalita = '';
       state.selectClOgg = '';
       state.listaSigleEdificiFiltrata = [];
       state.listaSigleEdificiSelezionati = [];

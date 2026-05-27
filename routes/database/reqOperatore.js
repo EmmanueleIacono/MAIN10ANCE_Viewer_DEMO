@@ -116,6 +116,11 @@ app.get('/Main10ance_DB/attivita-programmate', jsonRoute(async (req) => {
     return resp;
 }));
 
+app.get('/pianificazione/controlli-manutenzioni', jsonRoute(async (req) => {
+    const ambito = req.signedCookies.ambito;
+    return leggiPianificazioniControlliManutenzioni(ambito);
+}));
+
 app.patch('/esecuzione/nuova-attivita', async (req, res) => {
     const ambito = req.signedCookies.ambito;
     const result = {};
@@ -214,9 +219,9 @@ app.get('/segnalazione/artifact-viewer/interroga/:id', async (req, res) => {
 // diversa da quella equivalente per turista, qui richiedo dati associati ad ambito specifico utente
 app.get('/MarkerLoc', async (req, res) => {
     const ambito_loc = req.signedCookies.ambito;
-    const markerLocalità = await leggiMarkerLocAmbito(ambito_loc);
+    const markerLocalita = await leggiMarkerLocAmbito(ambito_loc);
     res.setHeader('content-type', 'application/json');
-    res.send(JSON.stringify(markerLocalità));
+    res.send(JSON.stringify(markerLocalita));
 });
 
 // diversa da quella equivalente per turista, qui richiedo dati associati ad ambito specifico utente
@@ -258,7 +263,7 @@ app.get('/viste', async (req, res) => {
 app.get('/lista_loc', async (req, res) => {
     try {
         const ambito = req.signedCookies.ambito;
-        const risposta = await leggiListaLocalità(ambito);
+        const risposta = await leggiListaLocalita(ambito);
         res.setHeader('content-type', 'application/json');
         res.send(risposta);
     } catch(e) {
@@ -498,7 +503,7 @@ async function leggiSchedeRestauro() {
 
 async function recuperaUrnLOD3(sm, capp) {
     try {
-        const results = await poolM10a.query(`SELECT "urn" FROM ${data_schema}."dati_edifici" WHERE "località" = ($1) AND "numero" = ($2);`, [sm, capp]);
+        const results = await poolM10a.query(`SELECT urn FROM ${data_schema}.dati_edifici WHERE localita = ($1) AND numero = ($2);`, [sm, capp]);
         return results.rows;
     }
     catch(e) {
@@ -577,6 +582,50 @@ async function leggiAttivitàProgOperatore() {
     catch(e) {
         console.log(e);
         return []
+    }
+}
+
+async function leggiPianificazioniControlliManutenzioni(ambito) {
+    try {
+        const results = await poolM10a.query(`
+            SELECT
+                pcm.id_pianificazione,
+                MIN(pcm.data_inizio) AS data_inizio,
+                pcm.localita,
+                COALESCE(MAX(loc.nome), pcm.localita) AS localita_estesa,
+                pcm.ambito_operativo,
+                pcm.necessita_supporto,
+                pcm.stato,
+                ARRAY_AGG(DISTINCT pcm.edificio ORDER BY pcm.edificio) AS edifici,
+                ARRAY_AGG(DISTINCT pcm.tipo_attivita ORDER BY pcm.tipo_attivita) AS tipi_attivita,
+                JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'tipo_attivita', pcm.tipo_attivita,
+                        'descrizione_attivita', pcm.descrizione_attivita,
+                        'frequenza_mesi', pcm.frequenza_mesi,
+                        'data_inizio', pcm.data_inizio,
+                        'durata_prevista_gg', pcm.durata_prevista_gg
+                    )
+                    ORDER BY pcm.data_inizio, pcm.tipo_attivita
+                ) AS attivita
+            FROM ${data_schema}."pianificazione_controlli_manutenzioni" AS pcm
+            LEFT JOIN ${data_schema}."dati_località" AS loc
+                ON loc.sigla = pcm.localita
+                AND loc.ambito LIKE pcm.ambito
+            WHERE pcm.ambito LIKE $1
+            GROUP BY
+                pcm.id_pianificazione,
+                pcm.localita,
+                pcm.ambito_operativo,
+                pcm.necessita_supporto,
+                pcm.stato
+            ORDER BY MIN(pcm.data_inizio), pcm.id_pianificazione;
+        `, [ambito]);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
     }
 }
 
@@ -996,7 +1045,7 @@ async function leggiMarkerLocAmbito(ambito_loc) {
 
 async function leggiMarkerEdifAmbito(ambito_edif) {
     try {
-        const results = await poolM10a.query(`SELECT * FROM ${data_schema}."dati_edifici" WHERE "ambito" LIKE ($1) ORDER BY CAST("numero" AS INTEGER);`, [ambito_edif]);
+        const results = await poolM10a.query(`SELECT * FROM ${data_schema}.dati_edifici WHERE ambito LIKE ($1) ORDER BY CAST(numero AS INTEGER);`, [ambito_edif]);
         return results.rows;
     }
     catch(e) {
@@ -1034,7 +1083,7 @@ async function leggiVistaDB(nome_vista, utility = false) {
     }
 }
 
-async function leggiListaLocalità(ambito) {
+async function leggiListaLocalita(ambito) {
     try {
         const results = await poolM10a.query(`SELECT sigla, nome FROM ${data_schema}."v_elenco_località" WHERE ambito LIKE $1;`, [ambito]);
         return results.rows;
@@ -1047,7 +1096,7 @@ async function leggiListaLocalità(ambito) {
 
 async function leggiListaEdifici(ambito) {
     try {
-        const results = await poolM10a.query(`SELECT "località", edificio, edif_nome_menu FROM ${data_schema}."v_elenco_edifici" WHERE ambito LIKE $1;`, [ambito]);
+        const results = await poolM10a.query(`SELECT localita, edificio, edif_nome_menu FROM ${data_schema}.v_elenco_edifici WHERE ambito LIKE $1;`, [ambito]);
         return results.rows;
     }
     catch(e) {

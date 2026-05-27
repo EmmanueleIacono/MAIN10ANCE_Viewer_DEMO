@@ -1,7 +1,7 @@
 <template>
   <Details class="loading-wrapper" summary="FILTRI ESECUZIONE" :open="false">
-    <input v-model="filtri.cbxTipoScheda" type="checkbox" id="check-tipo-scheda">
-    <label for="check-tipo-scheda">Scheda</label>
+    <input v-model="filtri.cbxTipoScheda" type="checkbox" id="check-tipo-scheda-es">
+    <label for="check-tipo-scheda-es">Scheda</label>
     <select v-model="filtri.selectTipoScheda">
       <option value="controllo">Scheda di controllo</option>
       <option value="manutenzione regolare">Scheda di manutenzione ordinaria</option>
@@ -11,26 +11,26 @@
       <option value="diagnosi">Scheda di di diagnosi</option>
     </select>
     <br>
-    <input v-model="filtri.cbxLocalità" type="checkbox" id="check-località">
-    <label for="check-località">Località</label>
-    <select v-model="filtri.selectLocalità">
+    <input v-model="filtri.cbxLocalita" type="checkbox" id="check-localita-es">
+    <label for="check-localita-es">Località</label>
+    <select v-model="filtri.selectLocalita">
       <option v-for="loc in store.statePlanner.listaSigleLoc" :key="loc.uuid" :value="loc.sigla">{{loc.nome}}</option>
     </select>
     <br>
-    <input :disabled="!filtri.cbxLocalità" v-model="filtri.cbxEdificio" type="checkbox" id="check-edificio">
-    <label for="check-edificio">Edificio</label>
+    <input :disabled="!filtri.cbxLocalita" v-model="filtri.cbxEdificio" type="checkbox" id="check-edificio-es">
+    <label for="check-edificio-es">Edificio</label>
     <select v-model="filtri.selectEdificio">
       <option v-for="edif in listaEdifFiltrata" :key="edif.uuid" :value="edif.edificio">{{edif.nome}}</option>
     </select>
     <br>
-    <input v-model="filtri.cbxElemento" type="checkbox" id="check-elemento">
-    <label for="check-elemento">Elemento</label>
+    <input v-model="filtri.cbxElemento" type="checkbox" id="check-elemento-es">
+    <label for="check-elemento-es">Elemento</label>
     <select v-model="filtri.selectElemento">
       <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option>
     </select>
     <br>
-    <input v-model="filtri.cbxData" type="checkbox" id="check-data">
-    <label for="check-data">Data</label>
+    <input v-model="filtri.cbxData" type="checkbox" id="check-data-es">
+    <label for="check-data-es">Data</label>
     <label for="input-data-da">Da</label>
     <input v-model="filtri.selectDataDa" type="date">
     <label for="input-data-a">A</label>
@@ -53,12 +53,12 @@ export default {
     const state = reactive({
       filtri: {
         cbxTipoScheda: false,
-        cbxLocalità: false,
+        cbxLocalita: false,
         cbxEdificio: false,
         cbxElemento: false,
         cbxData: false,
         selectTipoScheda: 'controllo',
-        selectLocalità: '',
+        selectLocalita: '',
         selectEdificio: '',
         selectElemento: '',
         selectDataDa: '',
@@ -71,20 +71,20 @@ export default {
       if (newVal) inizializzaSelect();
     });
 
-    watch(() => state.filtri.selectLocalità, async newVal => {
-      const listaEdifFiltrata = store.statePlanner.listaEdif.filter(ed => ed.località === newVal);
+    watch(() => state.filtri.selectLocalita, async newVal => {
+      const listaEdifFiltrata = store.statePlanner.listaEdif.filter(ed => ed.localita === newVal);
       state.listaEdifFiltrata = listaEdifFiltrata;
       if (listaEdifFiltrata[0]) state.filtri.selectEdificio = listaEdifFiltrata[0].edificio;
     });
 
-    watch(() => state.filtri.cbxLocalità, newLocCbx => {
+    watch(() => state.filtri.cbxLocalita, newLocCbx => {
       if (newLocCbx === false) state.filtri.cbxEdificio = false;
     });
 
     watch(() => state.filtri, (newFiltri) => {
       resetFiltroSchede();
       if (newFiltri.cbxTipoScheda) filtraTipoScheda(newFiltri.selectTipoScheda);
-      if (newFiltri.cbxLocalità) filtraLocEdifElemScheda(newFiltri.selectLocalità, 0);
+      if (newFiltri.cbxLocalita) filtraLocEdifElemScheda(newFiltri.selectLocalita, 0);
       if (newFiltri.cbxEdificio) filtraLocEdifElemScheda(newFiltri.selectEdificio, 1);
       if (newFiltri.cbxElemento) filtraLocEdifElemScheda(newFiltri.selectElemento, 2);
       if (newFiltri.cbxData) filtraDataScheda(newFiltri.selectDataDa, newFiltri.selectDataA);
@@ -93,7 +93,7 @@ export default {
     });
 
     function inizializzaSelect() {
-      if (store.statePlanner.listaSigleLoc.length) state.filtri.selectLocalità = store.statePlanner.listaSigleLoc[0].sigla;
+      if (store.statePlanner.listaSigleLoc.length) state.filtri.selectLocalita = store.statePlanner.listaSigleLoc[0].sigla;
       if (store.statePlanner.listaElementi.length) state.filtri.selectElemento = store.statePlanner.listaElementi[0].tabella;
     }
 

@@ -115,14 +115,14 @@
                           <legend><h6>Relazione #{{ ridx+1 }}</h6></legend>
                           <label>
                             Località:
-                            <select v-model="rel.località" @change="onLocalitaChanged(rel)">
+                            <select v-model="rel.localita" @change="onLocalitaChanged(rel)">
                               <option value=""></option>
-                              <option v-for="l in relOptions.località" :key="l.sigla" :value="l.sigla">{{ l.nome }}</option>
+                              <option v-for="l in relOptions.localita" :key="l.sigla" :value="l.sigla">{{ l.nome }}</option>
                             </select>
                           </label>
                           <label>
                             Edificio:
-                            <select v-model="rel.edificio" :disabled="!rel.località">
+                            <select v-model="rel.edificio" :disabled="!rel.localita">
                               <option value=""></option>
                               <option v-for="e in getFilteredEdifici(rel)" :key="e.edificio" :value="e.edificio">{{ e.edif_nome_menu }}</option>
                             </select>
@@ -170,7 +170,7 @@
 
 <script>
 import { reactive, toRefs, inject, /*provide,*/ computed, onMounted } from 'vue';
-import { leggiEnumServizio, leggiListaLocalità, leggiListaEdifici, leggiListaElementi, caricaDocumento, leggiIdDocEsistenti } from "../js/richieste";
+import { leggiEnumServizio, leggiListaLocalita, leggiListaEdifici, leggiListaElementi, caricaDocumento, leggiIdDocEsistenti } from "../js/richieste";
 // import TreeNode from './elementi/TreeNode.vue';
 
 export default {
@@ -199,7 +199,7 @@ export default {
     });
 
     const relOptions = reactive({
-      località: [],
+      localita: [],
       edificio: [],
       classe: [],
       elemento: [],
@@ -240,7 +240,7 @@ export default {
       const temiDocsRaw = await leggiEnumServizio('temi');
       const sistCompDocsRaw = await leggiEnumServizio('sistemi_composti');
       const clOggRaw = await leggiEnumServizio('cl_ogg');
-      const listaLoc = await leggiListaLocalità();
+      const listaLoc = await leggiListaLocalita();
       const listaEdif = await leggiListaEdifici();
       const listaElems = await leggiListaElementi();
       const idDocEsistenti = await leggiIdDocEsistenti();
@@ -254,7 +254,7 @@ export default {
       tipiDocs.tipi = tpDocs;
       tipiDocs.temi = temiDocs;
       tipiDocs.sist_comp = sistCompDocs;
-      relOptions.località = listaLoc;
+      relOptions.localita = listaLoc;
       relOptions.edificio = listaEdif;
       relOptions.classe = clOgg;
       relOptions.elemento = listaElems;
@@ -266,7 +266,7 @@ export default {
 
     function creaRelazione() {
       return {
-        località: '',
+        localita: '',
         edificio: '',
         classe: '',
         elemento: '',
@@ -417,8 +417,8 @@ export default {
     }
 
     function getFilteredEdifici(rel) {
-      if (!rel.località) return [];
-      return relOptions.edificio.filter(ed => ed.località === rel.località);
+      if (!rel.localita) return [];
+      return relOptions.edificio.filter(ed => ed.localita === rel.localita);
     }
 
     function onLocalitaChanged(rel) {
@@ -449,7 +449,7 @@ export default {
             temi: doc.temi,
             sist_composto: doc.sist_comp,
             relazioni: doc.relazioni.map(r => ({
-              località: r.località,
+              localita: r.localita,
               edificio: r.edificio,
               classe: r.classe,
               elemento: r.elemento,

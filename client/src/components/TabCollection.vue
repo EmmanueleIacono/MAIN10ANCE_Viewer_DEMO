@@ -100,7 +100,7 @@ export default {
       },
       datiNavigazione: {
         caricamento: false,
-        selectLocalità: '',
+        selectLocalita: '',
         selectEdificio: '',
         selectElemento: '',
         listaSigleLoc: [],
@@ -272,8 +272,8 @@ export default {
     provide('stateDocumenti', state.datiDocumenti);
     provide('stateModuloSegnalazione', state.datiModuloSegnalazione);
 
-    const percorsoCartella = computed(() => `${state.datiNavigazione.selectLocalità}/${state.datiNavigazione.selectEdificio}/${state.datiNavigazione.selectElemento}`);
-    const id_main10ance = computed(() => `${state.datiNavigazione.selectLocalità}|${state.datiNavigazione.selectEdificio}|${state.datiNavigazione.selectElemento}|${state.datiCaricamento.idImmagine}`);
+    const percorsoCartella = computed(() => `${state.datiNavigazione.selectLocalita}/${state.datiNavigazione.selectEdificio}/${state.datiNavigazione.selectElemento}`);
+    const id_main10ance = computed(() => `${state.datiNavigazione.selectLocalita}|${state.datiNavigazione.selectEdificio}|${state.datiNavigazione.selectElemento}|${state.datiCaricamento.idImmagine}`);
 
     function mostraGalleria() {
       state.datiGalleria.galleriaVisibile = !state.datiGalleria.galleriaVisibile;

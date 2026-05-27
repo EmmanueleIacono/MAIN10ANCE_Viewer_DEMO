@@ -2,14 +2,14 @@
 <div class="loading-wrapper">
   <LoadingScreen :caricamento="caricamento" />
   <label class="nome" for="check-località">Località</label>
-  <select class="valore" v-model="selectLocalità">
+  <select class="valore" v-model="selectLocalita">
     <option v-for="loc in listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
     <option value="" disabled>----------</option>
     <option value="loc-pdiff">Patrimonio diffuso</option>
   </select>
   <br>
-  <label class="nome" for="check-edificio">{{selectLocalità === 'loc-pdiff' ? 'Punto' : 'Edificio'}}</label>
-  <select v-if="selectLocalità === 'loc-pdiff'" class="valore" v-model="selectEdificio">
+  <label class="nome" for="check-edificio">{{selectLocalita === 'loc-pdiff' ? 'Punto' : 'Edificio'}}</label>
+  <select v-if="selectLocalita === 'loc-pdiff'" class="valore" v-model="selectEdificio">
     <option v-for="edif in listaEdifFiltrata" :key="edif.sigla" :value="edif.sigla">{{edif.nome}}</option>
   </select>
   <select v-else class="valore" v-model="selectEdificio">
@@ -17,7 +17,7 @@
   </select>
   <br>
   <label class="nome" for="check-elemento">Categoria elemento</label>
-  <select v-if="selectLocalità === 'loc-pdiff'" class="valore" v-model="selectElemento">
+  <select v-if="selectLocalita === 'loc-pdiff'" class="valore" v-model="selectElemento">
     <option value="manufatto">Manufatto</option>
     <option value="dettaglio">Dettaglio</option>
   </select>
@@ -30,7 +30,7 @@
 
 <script>
 import { onMounted, toRefs, watch, inject} from 'vue';
-import {prendiSigleLocalitàAmbito, leggiDBMarkerEdifAmbito, prendiLOD, leggiDBMarkerLocPdiff} from '../js/richieste';
+import {prendiSigleLocalitaAmbito, leggiDBMarkerEdifAmbito, prendiLOD, leggiDBMarkerLocPdiff} from '../js/richieste';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 
 export default {
@@ -41,8 +41,8 @@ export default {
   setup() {
     const statePercorso = inject('stateArtifact');
 
-    watch(() => statePercorso.selectLocalità, async newVal => {
-      const listaEdifFiltrata = statePercorso.listaEdif.filter(ed => ed.località === newVal);
+    watch(() => statePercorso.selectLocalita, async newVal => {
+      const listaEdifFiltrata = statePercorso.listaEdif.filter(ed => ed.localita === newVal);
       statePercorso.listaEdifFiltrata = listaEdifFiltrata;
       if (listaEdifFiltrata[0] && listaEdifFiltrata[0].numero) statePercorso.selectEdificio = listaEdifFiltrata[0].numero;
       else if (listaEdifFiltrata[0] && listaEdifFiltrata[0].sigla) statePercorso.selectEdificio = listaEdifFiltrata[0].sigla;
@@ -53,7 +53,7 @@ export default {
 
     onMounted(async () => {
       statePercorso.caricamento = true;
-      const listaSigleLoc = await prendiSigleLocalitàAmbito();
+      const listaSigleLoc = await prendiSigleLocalitaAmbito();
       const listaEdif = await leggiDBMarkerEdifAmbito();
       // const listaEdif = await leggiDBMarkerEdif();
       const listaLocPdiff = await leggiDBMarkerLocPdiff();
@@ -61,7 +61,7 @@ export default {
       statePercorso.listaSigleLoc = listaSigleLoc;
       statePercorso.listaEdif = [...listaEdif, ...listaLocPdiff];
       statePercorso.listaElementi = listaElementi;
-      statePercorso.selectLocalità = listaSigleLoc[0].sigla;
+      statePercorso.selectLocalita = listaSigleLoc[0].sigla;
       statePercorso.selectElemento = listaElementi[0].tabella;
       statePercorso.caricamento = false;
       console.log(statePercorso.listaEdif);

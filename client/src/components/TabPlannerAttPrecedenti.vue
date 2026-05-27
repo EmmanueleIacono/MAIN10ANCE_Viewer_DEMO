@@ -16,7 +16,7 @@
       <div v-if="moduloVisibile" class="contesto">
         <div class="contenitore-colonne">
           <label for="località" class="colonna">Località:</label>
-          <select v-model="selectLocalità" id="località" class="colonna">
+          <select v-model="selectLocalita" id="località" class="colonna">
             <option value=""></option>
             <option v-for="loc in store.statePlanner.listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
           </select>
@@ -224,7 +224,7 @@ export default {
     const store = inject('store');
     const state = reactive({
       moduloVisibile: 'scheda_controllo',
-      selectLocalità: '',
+      selectLocalita: '',
       selectClOgg: '',
       selectCategoria: '',
       inputElemento: '',
@@ -287,7 +287,7 @@ export default {
       selectClRaccOpzioniBloccate: [2, 3] // per bloccare opzioni non selezionabili
     });
 
-    watch(() => state.selectLocalità, newVal => {
+    watch(() => state.selectLocalita, newVal => {
       const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.località === newVal);
       state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
       state.listaSigleEdificiSelezionati = [];
@@ -352,7 +352,7 @@ export default {
 
     async function salva() {
       const jsonReq = {};
-      jsonReq.località = state.selectLocalità;
+      jsonReq.località = state.selectLocalita;
       jsonReq.cl_ogg = state.selectClOgg;
       jsonReq.edifici = state.listaSigleEdificiSelezionati;
       jsonReq.categoria = state.selectCategoria;
@@ -402,7 +402,7 @@ export default {
     }
 
     function resetDati() {
-      state.selectLocalità = '';
+      state.selectLocalita = '';
       state.selectClOgg = '';
       state.selectCategoria = '';
       state.inputElemento = '';

@@ -1,8 +1,8 @@
 import { reactive, readonly } from 'vue';
-import { leggiListaLocalità, leggiListaEdifici, /*leggiListaClassiOggetto, leggiListaElementi,*/ leggiDefinizioniClassiElementi } from '../js/richieste';
+import { leggiListaLocalita, leggiListaEdifici, /*leggiListaClassiOggetto, leggiListaElementi,*/ leggiDefinizioniClassiElementi } from '../js/richieste';
 
 const state_globale = reactive({
-  lista_località: [],
+  lista_localita: [],
   lista_edifici: [],
   // lista_cl_ogg: [],
   // lista_elementi: [],
@@ -11,12 +11,12 @@ const state_globale = reactive({
 
 const methods = {
   async popolaStoreGlobale() {
-    const lista_località = await leggiListaLocalità();
+    const lista_localita = await leggiListaLocalita();
     const lista_edifici = await leggiListaEdifici();
     // const lista_cl_ogg = await leggiListaClassiOggetto();
     // const lista_elementi = await leggiListaElementi();
     const definizioni_classi = await leggiDefinizioniClassiElementi();
-    state_globale.lista_località = lista_località;
+    state_globale.lista_localita = lista_localita;
     state_globale.lista_edifici = lista_edifici;
     // state_globale.lista_cl_ogg = lista_cl_ogg;
     // state_globale.lista_elementi = lista_elementi;

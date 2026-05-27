@@ -52,7 +52,7 @@ export default {
     LoadingScreen,
   },
   props: {
-    stateLocalità: String,
+    stateLocalita: String,
     scoreLavori: Object,
   },
   setup(props) {
@@ -88,7 +88,7 @@ export default {
       }
     });
 
-    watch(() => props.stateLocalità, async newVal => {
+    watch(() => props.stateLocalita, async newVal => {
       if (!newVal) {
         state.records = [];
         return;
