@@ -579,11 +579,11 @@ async function registraScoreLavori(reqJson, ambito, autore) {
         await withTransaction(async (tx) => {
             for (const lavoro of reqJson) {
             const queryTxt = `
-                INSERT INTO main10ance."a_temp" (
+                INSERT INTO ${data_schema}.sintesi_lavori (
                     localita, edificio,
-                    tetti, "umidità", statica, interni, esterni,
+                    tetti, umidita, statica, interni, esterni,
                     ambito, data_ins, autore_ins,
-                    anno_tetti, "anno_umidità", anno_statica, anno_interni, anno_esterni,
+                    anno_tetti, anno_umidita, anno_statica, anno_interni, anno_esterni,
                     id_interno
                 ) VALUES (
                     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
@@ -594,7 +594,7 @@ async function registraScoreLavori(reqJson, ambito, autore) {
                 lavoro.edificio.localita,
                 lavoro.edificio.edificio, // questo è lo stesso campo "edificio" di "dati_edifici"
                 lavoro.score_tetti?.score_interno || null,
-                lavoro.score_umidità?.score_interno || null,
+                lavoro.score_umidita?.score_interno || null,
                 lavoro.score_statica?.score_interno || null,
                 lavoro.score_interni?.score_interno || null,
                 lavoro.score_esterni?.score_interno || null,
@@ -602,7 +602,7 @@ async function registraScoreLavori(reqJson, ambito, autore) {
                 lavoro.data,
                 autore,
                 lavoro.anno_tetti || null,
-                lavoro.anno_umidità || null,
+                lavoro.anno_umidita || null,
                 lavoro.anno_statica || null,
                 lavoro.anno_interni || null,
                 lavoro.anno_esterni || null,
@@ -629,20 +629,20 @@ async function leggiScoreUltimiLavori(localita, ambito) {
                 AND ambito = $2
             ),
             latest_per_edificio AS (
-                SELECT DISTINCT ON (tp.edificio)
-                    tp.data_ins, tp.id_interno,
-                    tp.tetti, tp."umidità", tp.statica, tp.interni, tp.esterni,
-                    tp.anno_tetti, tp."anno_umidità", tp.anno_statica, tp.anno_interni, tp.anno_esterni,
-                    tp.edificio
-                FROM ${data_schema}."a_temp" AS tp
-                WHERE tp.localita = $1
-                AND tp.ambito = $2
-                ORDER BY tp.edificio, tp.id_interno DESC
+                SELECT DISTINCT ON (sl.edificio)
+                    sl.data_ins, sl.id_interno,
+                    sl.tetti, sl.umidita, sl.statica, sl.interni, sl.esterni,
+                    sl.anno_tetti, sl.anno_umidita, sl.anno_statica, sl.anno_interni, sl.anno_esterni,
+                    sl.edificio
+                FROM ${data_schema}.sintesi_lavori AS sl
+                WHERE sl.localita = $1
+                AND sl.ambito = $2
+                ORDER BY sl.edificio, sl.id_interno DESC
             )
             SELECT
                 lpe.data_ins, lpe.id_interno,
-                lpe.tetti, lpe."umidità", lpe.statica, lpe.interni, lpe.esterni,
-                lpe.anno_tetti, lpe."anno_umidità", lpe.anno_statica, lpe.anno_interni, lpe.anno_esterni,
+                lpe.tetti, lpe.umidita, lpe.statica, lpe.interni, lpe.esterni,
+                lpe.anno_tetti, lpe.anno_umidita, lpe.anno_statica, lpe.anno_interni, lpe.anno_esterni,
                 de.edif_nome_menu
             FROM latest_per_edificio AS lpe
             JOIN distinct_edifici AS de
@@ -668,16 +668,16 @@ async function leggiScoreLavori(localita, ambito) {
                 AND ambito = $2
             )
             SELECT 
-                tp.data_ins, tp.id_interno,
-                tp.tetti, tp."umidità", tp.statica, tp.interni, tp.esterni,
-                tp.anno_tetti, tp."anno_umidità", tp.anno_statica, tp.anno_interni, tp.anno_esterni,
+                sl.data_ins, sl.id_interno,
+                sl.tetti, sl.umidita, sl.statica, sl.interni, sl.esterni,
+                sl.anno_tetti, sl.anno_umidita, sl.anno_statica, sl.anno_interni, sl.anno_esterni,
                 de.edif_nome_menu
-            FROM ${data_schema}."a_temp" AS tp
+            FROM ${data_schema}."sintesi_lavori" AS sl
             JOIN distinct_edifici AS de
-            ON tp.edificio = de.edificio
-            WHERE tp.localita = $1
-            AND tp.ambito = $2
-            ORDER BY id_interno, tp.edificio;
+            ON sl.edificio = de.edificio
+            WHERE sl.localita = $1
+            AND sl.ambito = $2
+            ORDER BY id_interno, sl.edificio;
         `;
         const resp = await poolM10a.query(queryTxt, [localita, ambito]);
         return resp.rows;

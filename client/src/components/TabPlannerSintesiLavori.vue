@@ -40,14 +40,14 @@
           </td>
           <!-- umidità -->
           <td>
-            <select v-model="datiLavori.listaScoreUmidità[ind]" id="umidita" class="sct-tabella">
+            <select v-model="datiLavori.listaScoreUmidita[ind]" id="umidita" class="sct-tabella">
               <option value=""></option>
               <option v-for="score in scoreLavori" :key="score.stato" :value="score">{{ score.stato }}</option>
             </select>
             <br />
             <input
-              v-if="datiLavori.listaScoreUmidità[ind]?.stato === 'Lavori eseguiti'"
-              v-model="datiLavori.listaAnnoUmidità[ind]"
+              v-if="datiLavori.listaScoreUmidita[ind]?.stato === 'Lavori eseguiti'"
+              v-model="datiLavori.listaAnnoUmidita[ind]"
               type="number"
               placeholder="Anno"
             >
@@ -130,8 +130,8 @@ export default {
       datiLavori: {
         listaScoreTetti: [],
         listaAnnoTetti: [],
-        listaScoreUmidità: [],
-        listaAnnoUmidità: [],
+        listaScoreUmidita: [],
+        listaAnnoUmidita: [],
         listaScoreStatica: [],
         listaAnnoStatica: [],
         listaScoreInterni: [],
@@ -192,8 +192,8 @@ export default {
         state.datiLavori.listaAnnoTetti[idx] = rec.anno_tetti;
 
         // umidità
-        state.datiLavori.listaScoreUmidità[idx] = scoreObj(rec["umidità"]);
-        state.datiLavori.listaAnnoUmidità[idx] = rec.anno_umidità;
+        state.datiLavori.listaScoreUmidita[idx] = scoreObj(rec.umidita);
+        state.datiLavori.listaAnnoUmidita[idx] = rec.anno_umidita;
 
         // statica
         state.datiLavori.listaScoreStatica[idx] = scoreObj(rec.statica);
@@ -243,8 +243,8 @@ export default {
           edificio: edf, // questo è lo stesso campo "edificio" di "dati_edifici"
           score_tetti: state.datiLavori.listaScoreTetti[ind],
           anno_tetti: state.datiLavori.listaAnnoTetti[ind],
-          score_umidità: state.datiLavori.listaScoreUmidità[ind],
-          anno_umidità: state.datiLavori.listaAnnoUmidità[ind],
+          score_umidita: state.datiLavori.listaScoreUmidita[ind],
+          anno_umidita: state.datiLavori.listaAnnoUmidita[ind],
           score_statica: state.datiLavori.listaScoreStatica[ind],
           anno_statica: state.datiLavori.listaAnnoStatica[ind],
           score_interni: state.datiLavori.listaScoreInterni[ind],
@@ -258,7 +258,7 @@ export default {
     }
 
     function controllaAnno(dati) {
-      const catLavori = ['tetti', 'umidità', 'statica', 'interni', 'esterni'];
+      const catLavori = ['tetti', 'umidita', 'statica', 'interni', 'esterni'];
       for (const lavoro of dati) {
         for (const cat of catLavori) {
           if (lavoro[`score_${cat}`]?.score_interno === 6 && !lavoro[`anno_${cat}`]) {
@@ -273,7 +273,7 @@ export default {
       return datiLavori.filter(lavoro => {
         return (
           lavoro.score_tetti?.score_interno || 
-          lavoro.score_umidità?.score_interno || 
+          lavoro.score_umidita?.score_interno || 
           lavoro.score_statica?.score_interno || 
           lavoro.score_interni?.score_interno || 
           lavoro.score_esterni?.score_interno
@@ -285,8 +285,8 @@ export default {
       state.datiLavori = {
         listaScoreTetti: [],
         listaAnnoTetti: [],
-        listaScoreUmidità: [],
-        listaAnnoUmidità: [],
+        listaScoreUmidita: [],
+        listaAnnoUmidita: [],
         listaScoreStatica: [],
         listaAnnoStatica: [],
         listaScoreInterni: [],

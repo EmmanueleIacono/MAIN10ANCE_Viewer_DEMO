@@ -31,7 +31,7 @@
           <td>{{ rec.data_ins }}</td>
           <td>{{ rec.edif_nome_menu }}</td>
           <td :style="cellStyle(trovaVoceDaScore(rec.tetti, 'score'))">{{ trovaVoceDaScore(rec.tetti, 'stato') ?? '-' }}{{ rec.anno_tetti ? `\n${rec.anno_tetti}` : '' }}</td>
-          <td :style="cellStyle(trovaVoceDaScore(rec.umidità, 'score'))">{{ trovaVoceDaScore(rec.umidità, 'stato') ?? '-' }}{{ rec.anno_umidità ? `\n${rec.anno_umidità}` : '' }}</td>
+          <td :style="cellStyle(trovaVoceDaScore(rec.umidita, 'score'))">{{ trovaVoceDaScore(rec.umidita, 'stato') ?? '-' }}{{ rec.anno_umidita ? `\n${rec.anno_umidita}` : '' }}</td>
           <td :style="cellStyle(trovaVoceDaScore(rec.statica, 'score'))">{{ trovaVoceDaScore(rec.statica, 'stato') ?? '-' }}{{ rec.anno_statica ? `\n${rec.anno_statica}` : '' }}</td>
           <td :style="cellStyle(trovaVoceDaScore(rec.interni, 'score'))">{{ trovaVoceDaScore(rec.interni, 'stato') ?? '-' }}{{ rec.anno_interni ? `\n${rec.anno_interni}` : '' }}</td>
           <td :style="cellStyle(trovaVoceDaScore(rec.esterni, 'score'))">{{ trovaVoceDaScore(rec.esterni, 'stato') ?? '-' }}{{ rec.anno_esterni ? `\n${rec.anno_esterni}` : '' }}</td>
