@@ -1,12 +1,12 @@
 <template>
 <div>
-  <img :src="source" alt="Anteprima">
+  <img :src="props.source" alt="Anteprima">
   <br />
   <div class="wrapper-info">
     <div class="contenitore">
       <label for="percorso" class="colonna1">Percorso di destinazione:</label>
       <p id="percorso" class="colonna2">
-        <b v-if="verificaPercorso(percorso)">{{percorso}}</b>
+        <b v-if="verificaPercorso(props.percorso)">{{props.percorso}}</b>
         <i v-else>Percorso non valido</i>
       </p>
     </div>
@@ -16,27 +16,27 @@
     </div>
     <div class="contenitore">
       <label for="nome" class="colonna1">Nome/Soggetto</label>
-      <input v-model="nome" id="nome" class="colonna2">
+      <input v-model="state.nome" id="nome" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="codice" class="colonna1">Codice</label>
-      <input v-model="codice" id="codice" class="colonna2">
+      <input v-model="state.codice" id="codice" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="artista" class="colonna1">Artista/Autore</label>
-      <input v-model="artista" id="artista" class="colonna2">
+      <input v-model="state.artista" id="artista" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="datazione" class="colonna1">Datazione</label>
-      <input v-model="datazione" id="datazione" class="colonna2">
+      <input v-model="state.datazione" id="datazione" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="dimensioni" class="colonna1">Dimensioni</label>
-      <input v-model="dimensioni" id="dimensioni" class="colonna2">
+      <input v-model="state.dimensioni" id="dimensioni" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="commenti" class="colonna1">Note</label>
-      <textarea v-model="commenti" id="commenti" class="colonna2"></textarea>
+      <textarea v-model="state.commenti" id="commenti" class="colonna2"></textarea>
     </div>
   </div>
   <div class="wrapper-bottoni flt-dx">
@@ -46,52 +46,39 @@
 </div>
 </template>
 
-<script>
-import {inject, reactive, toRefs, computed} from 'vue';
+<script setup>
+import {inject, reactive, computed} from 'vue';
 import {verificaPercorso} from '../js/shared';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 
-export default {
-  name: 'TabCollectionUploadImage',
-  components: {
-    BtnBIM,
-  },
-  props: {
-    source: String,
-    percorso: String,
-  },
-  setup(props, {emit}) {
-    const state = reactive({
-      codice: '',
-      nome: '',
-      artista: '',
-      datazione: '',
-      dimensioni: '',
-      commenti: '',
-    });
+const props = defineProps({
+  source: String,
+  percorso: String,
+});
 
-    const stateArtifact = inject('stateArtifact');
+const emit = defineEmits(['annullaCaricamentoImmagine', 'salvaCaricamentoImmagine']);
 
-    const codice_pulito = computed(() => state.codice.trim().replaceAll(/(\s|\|)/g, '_'));
-    const id_main10ance = computed(() => `${stateArtifact.selectLocalita}|${stateArtifact.selectEdificio}|${stateArtifact.selectElemento}|${codice_pulito.value}`);
+const state = reactive({
+  codice: '',
+  nome: '',
+  artista: '',
+  datazione: '',
+  dimensioni: '',
+  commenti: '',
+});
 
-    function annulla() {
-      emit('annullaCaricamentoImmagine');
-    }
+const stateArtifact = inject('stateArtifact');
 
-    function salva() {
-      const dati_completi = {...state, id_main10ance: id_main10ance.value};
-      emit('salvaCaricamentoImmagine', dati_completi);
-    }
+const codice_pulito = computed(() => state.codice.trim().replaceAll(/(\s|\|)/g, '_'));
+const id_main10ance = computed(() => `${stateArtifact.selectLocalita}|${stateArtifact.selectEdificio}|${stateArtifact.selectElemento}|${codice_pulito.value}`);
 
-    return {
-      ...toRefs(state),
-      id_main10ance,
-      verificaPercorso,
-      annulla,
-      salva,
-    }
-  }
+function annulla() {
+  emit('annullaCaricamentoImmagine');
+}
+
+function salva() {
+  const dati_completi = {...state, id_main10ance: id_main10ance.value};
+  emit('salvaCaricamentoImmagine', dati_completi);
 }
 </script>
 

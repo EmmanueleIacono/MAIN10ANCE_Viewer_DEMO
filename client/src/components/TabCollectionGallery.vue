@@ -37,46 +37,28 @@
 </Card>
 </template>
 
-<script>
+<script setup>
 import {computed, inject, ref, watch} from 'vue';
 import Card from './elementi/Card.vue';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 
-export default {
-  name: 'TabCollectionGallery',
-  components: {
-    Card,
-    BtnBIM,
-  },
-  setup() {
-    const stateGalleria = inject('stateGalleria');
-    const indiceImmagineCorrente = ref(0);
-    const nomeImmagine = computed(() => stateGalleria.listaImmagini[indiceImmagineCorrente.value].percorso.split('/').pop());
-    const datiImmagine = computed(() => stateGalleria.listaImmagini[indiceImmagineCorrente.value].info);
+const stateGalleria = inject('stateGalleria');
+const indiceImmagineCorrente = ref(0);
+const nomeImmagine = computed(() => stateGalleria.listaImmagini[indiceImmagineCorrente.value].percorso.split('/').pop());
+const datiImmagine = computed(() => stateGalleria.listaImmagini[indiceImmagineCorrente.value].info);
 
-    watch(() => stateGalleria.listaImmagini, () => {
-      indiceImmagineCorrente.value = 0;
-    });
+watch(() => stateGalleria.listaImmagini, () => {
+  indiceImmagineCorrente.value = 0;
+});
 
-    function indietro() {
-      if (indiceImmagineCorrente.value > 0) indiceImmagineCorrente.value -= 1;
-      else indiceImmagineCorrente.value = stateGalleria.listaImmagini.length - 1;
-    }
+function indietro() {
+  if (indiceImmagineCorrente.value > 0) indiceImmagineCorrente.value -= 1;
+  else indiceImmagineCorrente.value = stateGalleria.listaImmagini.length - 1;
+}
 
-    function avanti() {
-      if (indiceImmagineCorrente.value < stateGalleria.listaImmagini.length - 1) indiceImmagineCorrente.value += 1;
-      else indiceImmagineCorrente.value = 0;
-    }
-
-    return {
-      stateGalleria,
-      indiceImmagineCorrente,
-      nomeImmagine,
-      datiImmagine,
-      indietro,
-      avanti,
-    }
-  }
+function avanti() {
+  if (indiceImmagineCorrente.value < stateGalleria.listaImmagini.length - 1) indiceImmagineCorrente.value += 1;
+  else indiceImmagineCorrente.value = 0;
 }
 </script>
 

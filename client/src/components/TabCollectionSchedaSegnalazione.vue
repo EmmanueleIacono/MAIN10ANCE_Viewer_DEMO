@@ -22,30 +22,17 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import { inject } from 'vue';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 
-export default {
-  name: 'TabCollectionModuloSegnalazione',
-  components: {
-    BtnBIM,
-  },
-  setup() {
-    const store = inject('store');
-    const stateSegnalazione = inject('stateSegnalazione');
+defineExpose({chiudiScheda});
 
-    function chiudiScheda() {
-      stateSegnalazione.schedaSegnalazioneVisibile = false;
-      stateSegnalazione.schedaSegnalazione = null;
-    }
+const stateSegnalazione = inject('stateSegnalazione');
 
-    return {
-      store,
-      stateSegnalazione: stateSegnalazione,
-      chiudiScheda,
-    }
-  }
+function chiudiScheda() {
+  stateSegnalazione.schedaSegnalazioneVisibile = false;
+  stateSegnalazione.schedaSegnalazione = null;
 }
 </script>
 

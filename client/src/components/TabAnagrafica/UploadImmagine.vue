@@ -1,12 +1,12 @@
 <template>
 <div>
-  <img :src="source" alt="Anteprima">
+  <img :src="props.source" alt="Anteprima">
   <br />
   <div class="wrapper-info">
     <div class="contenitore">
       <label for="percorso" class="colonna1">Percorso di destinazione:</label>
       <p id="percorso" class="colonna2">
-        <b v-if="verificaPercorso(percorso)">{{percorso}}</b>
+        <b v-if="verificaPercorso(props.percorso)">{{props.percorso}}</b>
         <i v-else>Percorso non valido</i>
       </p>
     </div>
@@ -16,27 +16,27 @@
     </div>
     <div class="contenitore">
       <label for="nome" class="colonna1">Nome/Soggetto</label>
-      <input v-model="nome" id="nome" class="colonna2">
+      <input v-model="state_elemento.nome" id="nome" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="codice" class="colonna1">Codice</label>
-      <input v-model="codice" id="codice" class="colonna2">
+      <input v-model="state_elemento.codice" id="codice" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="artista" class="colonna1">Artista/Autore</label>
-      <input v-model="artista" id="artista" class="colonna2">
+      <input v-model="state_elemento.artista" id="artista" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="datazione" class="colonna1">Datazione</label>
-      <input v-model="datazione" id="datazione" class="colonna2">
+      <input v-model="state_elemento.datazione" id="datazione" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="dimensioni" class="colonna1">Dimensioni</label>
-      <input v-model="dimensioni" id="dimensioni" class="colonna2">
+      <input v-model="state_elemento.dimensioni" id="dimensioni" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="commenti" class="colonna1">Note</label>
-      <textarea v-model="commenti" id="commenti" class="colonna2"></textarea>
+      <textarea v-model="state_elemento.commenti" id="commenti" class="colonna2"></textarea>
     </div>
   </div>
   <div class="wrapper-bottoni flt-dx">
@@ -46,45 +46,32 @@
 </div>
 </template>
 
-<script>
-import { inject, toRefs, computed } from 'vue';
+<script setup>
+import { inject, computed } from 'vue';
 import { verificaPercorso } from '../../js/shared';
 import BtnBIM from '../elementi/BottoneBIMExplorer.vue';
 
-export default {
-  name: 'TabCollectionUploadImage',
-  components: {
-    BtnBIM,
-  },
-  props: {
-    source: String,
-    percorso: String,
-  },
-  setup(props, {emit}) {
-    const store_anagrafica = inject('store_anagrafica');
-    const state_anagrafica = store_anagrafica.state_anagrafica;
-    const state_elemento = state_anagrafica.dati_elemento;
+const props = defineProps({
+  source: String,
+  percorso: String,
+});
 
-    const codice_pulito = computed(() => state_elemento.codice.trim().replaceAll(/(\s|\|)/g, '_'));
-    const id_main10ance = computed(() => `${state_anagrafica.selezione.select_loc}|${state_anagrafica.selezione.select_edif}|${state_anagrafica.selezione.select_elem}|${codice_pulito.value}`);
+const emit = defineEmits(['annullaCaricamento', 'salvaCaricamento']);
 
-    function annulla() {
-      emit('annullaCaricamento');
-    }
+const store_anagrafica = inject('store_anagrafica');
+const state_anagrafica = store_anagrafica.state_anagrafica;
+const state_elemento = state_anagrafica.dati_elemento;
 
-    function salva() {
-      const dati_completi = {...state_elemento, id_main10ance: id_main10ance.value};
-      emit('salvaCaricamento', dati_completi);
-    }
+const codice_pulito = computed(() => state_elemento.codice.trim().replaceAll(/(\s|\|)/g, '_'));
+const id_main10ance = computed(() => `${state_anagrafica.selezione.select_loc}|${state_anagrafica.selezione.select_edif}|${state_anagrafica.selezione.select_elem}|${codice_pulito.value}`);
 
-    return {
-      ...toRefs(state_elemento),
-      id_main10ance,
-      verificaPercorso,
-      annulla,
-      salva,
-    }
-  }
+function annulla() {
+  emit('annullaCaricamento');
+}
+
+function salva() {
+  const dati_completi = {...state_elemento, id_main10ance: id_main10ance.value};
+  emit('salvaCaricamento', dati_completi);
 }
 </script>
 

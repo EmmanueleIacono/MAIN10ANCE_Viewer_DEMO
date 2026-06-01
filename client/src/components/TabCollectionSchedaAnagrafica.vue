@@ -25,56 +25,43 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import { inject } from 'vue';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 import { downloadDocumentiSchede } from '../js/richieste';
 
-export default {
-  name: 'TabCollectionModuloAnagrafica',
-  components: {
-    BtnBIM,
-  },
-  setup() {
-    const store = inject('store');
-    const stateAnagrafica = inject('stateAnagrafica');
-    console.log('stateAnagrafica: ', stateAnagrafica);
-    console.log('schedaAnagrafica: ', stateAnagrafica.schedaAnagrafica);
-    console.log('Documenti: ', stateAnagrafica.schedaAnagrafica['Documenti']);
+defineExpose({chiudiScheda});
 
-    async function scarica_doc(nome_documento) {
-      try {
-        const doc_blob = await downloadDocumentiSchede(nome_documento);
-        console.log(doc_blob);
-        const blobUrl = URL.createObjectURL(doc_blob);
+const store = inject('store');
+const stateAnagrafica = inject('stateAnagrafica');
+console.log('stateAnagrafica: ', stateAnagrafica);
+console.log('schedaAnagrafica: ', stateAnagrafica.schedaAnagrafica);
+console.log('Documenti: ', stateAnagrafica.schedaAnagrafica['Documenti']);
 
-        const link = document.createElement('a'); // creazione di un <a> nascosto dove inserire l'URL del documento
-        link.href = blobUrl;
-        const nome_doc_pulito = nome_documento.split('/').pop();
-        link.download = nome_doc_pulito; // impostazione del nome del documento
-        document.body.appendChild(link); // simulo un click per avviare il download
-        link.click();
+async function scarica_doc(nome_documento) {
+  try {
+    const doc_blob = await downloadDocumentiSchede(nome_documento);
+    console.log(doc_blob);
+    const blobUrl = URL.createObjectURL(doc_blob);
 
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-      } catch (err) {
-        console.error('Errore nello scaricamento del documento:', err);
-        store.methods.setAlert('Errore nello scaricamento del documento');
-      }
-    }
+    const link = document.createElement('a'); // creazione di un <a> nascosto dove inserire l'URL del documento
+    link.href = blobUrl;
+    const nome_doc_pulito = nome_documento.split('/').pop();
+    link.download = nome_doc_pulito; // impostazione del nome del documento
+    document.body.appendChild(link); // simulo un click per avviare il download
+    link.click();
 
-    function chiudiScheda() {
-      stateAnagrafica.schedaAnagraficaVisibile = false;
-      stateAnagrafica.schedaAnagrafica = null;
-    }
-
-    return {
-      store,
-      stateAnagrafica,
-      scarica_doc,
-      chiudiScheda,
-    }
+    document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl);
+  } catch (err) {
+    console.error('Errore nello scaricamento del documento:', err);
+    store.methods.setAlert('Errore nello scaricamento del documento');
   }
+}
+
+function chiudiScheda() {
+  stateAnagrafica.schedaAnagraficaVisibile = false;
+  stateAnagrafica.schedaAnagrafica = null;
 }
 </script>
 

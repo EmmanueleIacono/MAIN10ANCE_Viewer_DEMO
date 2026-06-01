@@ -4,10 +4,10 @@
     <Details summary="IMMAGINI" :open="true">
       <br>
       <div class="col-lg-12 loading-wrapper">
-        <LoadingScreen :caricamento="caricamento" />
+        <LoadingScreen :caricamento="state.caricamento" />
         <div v-if="stateGalleria.listaImmagini.length" class="image-grid">
           <div v-for="(url) in stateGalleria.listaImmagini" :key="url.percorso" class="thumb-wrapper">
-            <img @click="isSelected(url.percorso)" :src="url.object" :class="percorsiSelezionati.includes(url.percorso) ? 'bordo-verde' : ''" />
+            <img @click="isSelected(url.percorso)" :src="url.object" :class="state.percorsiSelezionati.includes(url.percorso) ? 'bordo-verde' : ''" />
             <div class="thumb-caption">{{ url.info ? (url.info.Codice + ' - ' + (url.info.Nome || 'N/A')) : '' }}</div>
           </div>
         </div>
@@ -18,104 +18,93 @@
 </div>
 </template>
 
-<script>
-import {reactive, watch, toRefs, inject} from 'vue';
+<script setup>
+import {reactive, watch, inject} from 'vue';
 import { getListaImmagini, downloadImmagini, getInfoImmagine } from '../js/richieste';
 import {verificaPercorso} from '../js/shared';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 import Details from './elementi/Details.vue';
 import Card from './elementi/Card.vue';
 
-export default {
-  name: 'TabCollectionDownloadImage',
-  components: {
-    LoadingScreen,
-    Details,
-    Card,
-  },
-  props: {
-    percorsoCartella: String,
-  },
-  setup(props, {emit}) {
-    const state = reactive({
-      caricamento: false,
-      filePaths: [],
-      percorsiSelezionati: [],
-    });
-    const stateGalleria = inject('stateGalleria');
-    const stateAnagrafica = inject('stateAnagrafica');
-    const stateArtifact = inject('stateArtifact');
+defineExpose({
+  deselectImage,
+  aggiornaFilePaths,
+  getPercorsiSelezionati,
+});
 
-    watch(() => props.percorsoCartella, async newpath => {
-      if (verificaPercorso(props.percorsoCartella)) {
-        const filePaths = await getListaImmagini(newpath);
-        aggiornaFilePaths(filePaths);
-      }
-      else {
-        aggiornaFilePaths([]);
-      }
-    });
+const props = defineProps({
+  percorsoCartella: String,
+});
 
-    watch(() => state.filePaths, async newFilePaths => {
-      stateGalleria.listaImmagini.forEach(img => URL.revokeObjectURL(img.object));
-      stateGalleria.listaImmagini = [];
-      if (verificaPercorso(props.percorsoCartella)) {
-        state.caricamento = true;
-        stateArtifact.caricamento = true;
+const emit = defineEmits(['nuovaSelezione']);
 
-        await Promise.all(newFilePaths.map(async path => {
-          const fileImmagine = await downloadImmagini(path);
-          const infoImmagine = await getInfoImmagine(path, stateArtifact.selectElemento);
+const state = reactive({
+  caricamento: false,
+  filePaths: [],
+  percorsiSelezionati: [],
+});
+const stateGalleria = inject('stateGalleria');
+const stateAnagrafica = inject('stateAnagrafica');
+const stateArtifact = inject('stateArtifact');
 
-          if (fileImmagine.errMsg) {
-            console.log(fileImmagine.errMsg);
-            state.caricamento = false;
-            stateArtifact.caricamento = false;
-            return;
-          }
+watch(() => props.percorsoCartella, async newpath => {
+  if (verificaPercorso(props.percorsoCartella)) {
+    const filePaths = await getListaImmagini(newpath);
+    aggiornaFilePaths(filePaths);
+  }
+  else {
+    aggiornaFilePaths([]);
+  }
+});
 
-          stateGalleria.listaImmagini.push({ object: URL.createObjectURL(fileImmagine), percorso: path, info: infoImmagine[0] });
-        }));
-  
+watch(() => state.filePaths, async newFilePaths => {
+  stateGalleria.listaImmagini.forEach(img => URL.revokeObjectURL(img.object));
+  stateGalleria.listaImmagini = [];
+  if (verificaPercorso(props.percorsoCartella)) {
+    state.caricamento = true;
+    stateArtifact.caricamento = true;
+
+    await Promise.all(newFilePaths.map(async path => {
+      const fileImmagine = await downloadImmagini(path);
+      const infoImmagine = await getInfoImmagine(path, stateArtifact.selectElemento);
+
+      if (fileImmagine.errMsg) {
+        console.log(fileImmagine.errMsg);
         state.caricamento = false;
         stateArtifact.caricamento = false;
+        return;
       }
-    });
 
-    watch(() => state.percorsiSelezionati, async newPercorsi => {
-      emit('nuovaSelezione', newPercorsi);
-    }, {deep: true});
-
-    function isSelected(percorsoFile) {
-      if (!state.percorsiSelezionati.includes(percorsoFile)) state.percorsiSelezionati.push(percorsoFile);
-      else state.percorsiSelezionati.splice(state.percorsiSelezionati.indexOf(percorsoFile), 1);
-
-      if (stateAnagrafica.moduloAnagraficaVisibile && state.percorsiSelezionati.length !== 1) stateAnagrafica.moduloAnagraficaVisibile = false;
-    }
-
-    function deselectImage() {
-      state.percorsiSelezionati = [];
-    }
-
-    function aggiornaFilePaths(listaFilePaths) {
-      deselectImage();
-      state.filePaths = listaFilePaths;
-    }
-
-    function getPercorsiSelezionati() {
-      return state.percorsiSelezionati;
-    }
-
-    return {
-      ...toRefs(state),
-      stateGalleria,
-      isSelected,
-      deselectImage,
-      downloadImmagini,
-      aggiornaFilePaths,
-      getPercorsiSelezionati,
-    }
+      stateGalleria.listaImmagini.push({ object: URL.createObjectURL(fileImmagine), percorso: path, info: infoImmagine[0] });
+    }));
+  
+    state.caricamento = false;
+    stateArtifact.caricamento = false;
   }
+});
+
+watch(() => state.percorsiSelezionati, async newPercorsi => {
+  emit('nuovaSelezione', newPercorsi);
+}, {deep: true});
+
+function isSelected(percorsoFile) {
+  if (!state.percorsiSelezionati.includes(percorsoFile)) state.percorsiSelezionati.push(percorsoFile);
+  else state.percorsiSelezionati.splice(state.percorsiSelezionati.indexOf(percorsoFile), 1);
+
+  if (stateAnagrafica.moduloAnagraficaVisibile && state.percorsiSelezionati.length !== 1) stateAnagrafica.moduloAnagraficaVisibile = false;
+}
+
+function deselectImage() {
+  state.percorsiSelezionati = [];
+}
+
+function aggiornaFilePaths(listaFilePaths) {
+  deselectImage();
+  state.filePaths = listaFilePaths;
+}
+
+function getPercorsiSelezionati() {
+  return state.percorsiSelezionati;
 }
 </script>
 
