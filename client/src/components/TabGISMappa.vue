@@ -6,105 +6,93 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import {onMounted, inject, watch, onActivated} from 'vue';
 import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaLocalità, iconaEdifici, addLocPdiff, addMarkerAmbito, creaMarkerLocPdiff} from '../js/GIS';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 
-export default {
-  name: 'TabGISMappa',
-  setup(props, {emit}) {
-    const store = inject('store');
+defineExpose({resetMap});
 
-    const posOrigine = [45.61422, 8.410177];
+const emit = defineEmits(['newMarker']);
+const store = inject('store');
 
-    onMounted(() => {
-      creaMappa('mappa', posOrigine);
+const posOrigine = [45.61422, 8.410177];
 
-      const gruppoMarkerLocalità = L.layerGroup();
-      const gruppoMarkerEdifici = L.layerGroup();
-      // const gruppoMarkerLocPdiff = L.layerGroup();
-      const clusterMarkerLocPdiff = L.markerClusterGroup(); // per opzioni, L.markerClusterGroup({...})
+onMounted(() => {
+  creaMappa('mappa', posOrigine);
 
-      mappaGlb.on('zoomend', () => {
-        const zoomComune = 17;
-        if (mappaGlb.getZoom() <= 5) {
-          rimuoviLayer(gruppoMarkerLocalità, mappaGlb);
-          rimuoviLayer(gruppoMarkerEdifici, mappaGlb);
-        }
-        else if (mappaGlb.getZoom() < zoomComune && mappaGlb.getZoom() > 5) {
-          aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
-          rimuoviLayer(gruppoMarkerEdifici, mappaGlb);
-        }
-        else if (mappaGlb.getZoom() > zoomComune) {
-          aggiungiLayer(gruppoMarkerEdifici, mappaGlb);
-          rimuoviLayer(gruppoMarkerLocalità, mappaGlb);
-        }
-        else {
-          aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
-          aggiungiLayer(gruppoMarkerEdifici, mappaGlb);
-        }
-      });
+  const gruppoMarkerLocalità = L.layerGroup();
+  const gruppoMarkerEdifici = L.layerGroup();
+  const clusterMarkerLocPdiff = L.markerClusterGroup(); // per opzioni, L.markerClusterGroup({...})
 
-      mappaGlb.on('click', e => {
-        const markerPdiff = addLocPdiff(e);
-        const markerEdifAmbito = addMarkerAmbito(e);
-        if (markerPdiff) {
-          emit('newMarker', markerPdiff);
-        }
-        else if (markerEdifAmbito) {
-          emit('newMarker', markerEdifAmbito);
-        }
-      });
-
+  mappaGlb.on('zoomend', () => {
+    const zoomComune = 17;
+    if (mappaGlb.getZoom() <= 5) {
+      rimuoviLayer(gruppoMarkerLocalità, mappaGlb);
+      rimuoviLayer(gruppoMarkerEdifici, mappaGlb);
+    }
+    else if (mappaGlb.getZoom() < zoomComune && mappaGlb.getZoom() > 5) {
       aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
-      // aggiungiLayer(gruppoMarkerLocPdiff, mappaGlb);
-      aggiungiLayer(clusterMarkerLocPdiff, mappaGlb);
+      rimuoviLayer(gruppoMarkerEdifici, mappaGlb);
+    }
+    else if (mappaGlb.getZoom() > zoomComune) {
+      aggiungiLayer(gruppoMarkerEdifici, mappaGlb);
+      rimuoviLayer(gruppoMarkerLocalità, mappaGlb);
+    }
+    else {
+      aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
+      aggiungiLayer(gruppoMarkerEdifici, mappaGlb);
+    }
+  });
 
-      watch(() => [store.stateGIS.markerLoc, store.stateGIS.markerEdif, store.stateGIS.markerLocPdiff], () => {
-        if (store.stateGIS.markerLoc) {
-          gruppoMarkerLocalità.clearLayers();
-          store.stateGIS.markerLoc.forEach(loc => {
-            const markerSM = creaMarker(loc, iconaLocalità);
-            markerSM.addTo(gruppoMarkerLocalità);
-          });
-        }
-        if (store.stateGIS.markerEdif) {
-          gruppoMarkerEdifici.clearLayers();
-          store.stateGIS.markerEdif.forEach(edif => {
-            const markerCapp = creaMarker(edif, iconaEdifici);
-            markerCapp.addTo(gruppoMarkerEdifici);
-          });
-        }
-        if (store.stateGIS.markerLocPdiff) {
-          // gruppoMarkerLocPdiff.clearLayers();
-          clusterMarkerLocPdiff.clearLayers();
-          store.stateGIS.markerLocPdiff.forEach(lpd => {
-            const markerLocPdiff = creaMarkerLocPdiff(lpd);
-            // markerLocPdiff.addTo(gruppoMarkerLocPdiff);
-            markerLocPdiff.addTo(clusterMarkerLocPdiff);
-          });
-        }
+  mappaGlb.on('click', e => {
+    const markerPdiff = addLocPdiff(e);
+    const markerEdifAmbito = addMarkerAmbito(e);
+    if (markerPdiff) {
+      emit('newMarker', markerPdiff);
+    }
+    else if (markerEdifAmbito) {
+      emit('newMarker', markerEdifAmbito);
+    }
+  });
+
+  aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
+  aggiungiLayer(clusterMarkerLocPdiff, mappaGlb);
+
+  watch(() => [store.stateGIS.markerLoc, store.stateGIS.markerEdif, store.stateGIS.markerLocPdiff], () => {
+    if (store.stateGIS.markerLoc) {
+      gruppoMarkerLocalità.clearLayers();
+      store.stateGIS.markerLoc.forEach(loc => {
+        const markerSM = creaMarker(loc, iconaLocalità);
+        markerSM.addTo(gruppoMarkerLocalità);
       });
-    });
-
-    onActivated(() => {
-      setTimeout(() => {
-        mappaGlb.invalidateSize();
-      }, 100);
-    });
-
-    function resetMap() {
-      setVistaMappa(mappaGlb, posOrigine, 8);
     }
-
-    return {
-      props,
-      store,
-      resetMap,
+    if (store.stateGIS.markerEdif) {
+      gruppoMarkerEdifici.clearLayers();
+      store.stateGIS.markerEdif.forEach(edif => {
+        const markerCapp = creaMarker(edif, iconaEdifici);
+        markerCapp.addTo(gruppoMarkerEdifici);
+      });
     }
-  }
+    if (store.stateGIS.markerLocPdiff) {
+      clusterMarkerLocPdiff.clearLayers();
+      store.stateGIS.markerLocPdiff.forEach(lpd => {
+        const markerLocPdiff = creaMarkerLocPdiff(lpd);
+        markerLocPdiff.addTo(clusterMarkerLocPdiff);
+      });
+    }
+  });
+});
+
+onActivated(() => {
+  setTimeout(() => {
+    mappaGlb.invalidateSize();
+  }, 100);
+});
+
+function resetMap() {
+  setVistaMappa(mappaGlb, posOrigine, 8);
 }
 </script>
 

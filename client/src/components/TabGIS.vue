@@ -52,8 +52,8 @@
 </div>
 </template>
 
-<script>
-import {ref, inject, reactive, watch, provide, toRefs} from 'vue';
+<script setup>
+import {ref, inject, reactive, watch, provide, toRef} from 'vue';
 import AddMarkerAmbito from './TabGISAddMarkerAmbito.vue';
 import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
@@ -67,170 +67,131 @@ import {dataInteger} from '../js/shared';
 import province from '../assets/json/province-italia.json';
 import comuni from '../assets/json/comuni.json';
 
-export default {
-  name: 'TabGIS',
-  components: {
-    AddMarkerAmbito,
-    MainPanel,
-    Explorer,
-    MappaGIS,
-    CheckboxGIS,
-    Details,
-    BtnBIM,
-  },
-  setup(props, {emit}) {
-    const store = inject('store');
-    const mappaRef = ref(null);
-    const primoLoadLivelli = ref(false);
-    const state = reactive({
-      listaComuniFiltrata: [],
-      nuovoMarker: null,
-      coordMarker: null,
-      provinciaMarker: '',
-      comuneMarker: '',
-      nomeMarker: '',
-      confirmMode: false,
-    });
-    // console.log(province);
-    // console.log(comuni);
+const emit = defineEmits(['loadLivelli', 'updateMappa']);
 
-    // prendo i refs solo di ciò che mi serve
-    const { nuovoMarker, coordMarker } = toRefs(state);
+const store = inject('store');
+const mappaRef = ref(null);
+const primoLoadLivelli = ref(false);
+const state = reactive({
+  listaComuniFiltrata: [],
+  nuovoMarker: null,
+  coordMarker: null,
+  provinciaMarker: '',
+  comuneMarker: '',
+  nomeMarker: '',
+  confirmMode: false,
+});
 
-    provide('nuovoMarker', nuovoMarker);
-    provide('coordMarker', coordMarker);
+provide('nuovoMarker', toRef(state, 'nuovoMarker'));
+provide('coordMarker', toRef(state, 'coordMarker'));
 
-    watch(() => state.provinciaMarker, async newVal => {
-      const listaComuniFiltrata = comuni.filter(cm => cm.sigla === newVal);
-      state.listaComuniFiltrata = listaComuniFiltrata;
-      if (listaComuniFiltrata[0]) state.comuneMarker = listaComuniFiltrata[0].nome;
-      else state.comuneMarker = '';
-    });
+watch(() => state.provinciaMarker, async newVal => {
+  const listaComuniFiltrata = comuni.filter(cm => cm.sigla === newVal);
+  state.listaComuniFiltrata = listaComuniFiltrata;
+  if (listaComuniFiltrata[0]) state.comuneMarker = listaComuniFiltrata[0].nome;
+  else state.comuneMarker = '';
+});
 
-    function chiamaResetMappa() {
-      mappaRef.value.resetMap();
-    }
+function chiamaResetMappa() {
+  mappaRef.value.resetMap();
+}
 
-    function setVistaMappa(posizione) {
-      mappaGlb.setView(posizione, 17);
-    }
+function setVistaMappa(posizione) {
+  mappaGlb.setView(posizione, 17);
+}
 
-    function creaLivello(livId) {
-      const liv = creaLivelloGIS(store.stateGIS.entitàGIS[livId]);
-      const cbx = document.getElementById(`cbx-${livId}`);
-      cbx.addEventListener('click', () => toggleLivello(liv, cbx));
-    }
+function creaLivello(livId) {
+  const liv = creaLivelloGIS(store.stateGIS.entitàGIS[livId]);
+  const cbx = document.getElementById(`cbx-${livId}`);
+  cbx.addEventListener('click', () => toggleLivello(liv, cbx));
+}
 
-    function toggleLivello(livello, checkbox) {
-      if (!checkbox.checked) {
-        mappaGlb.removeLayer(livello);
-      }
-      else {
-        mappaGlb.addLayer(livello);
-      }
-    }
-
-    function emettiLoadLivelli() {
-      if (!primoLoadLivelli.value) {
-        emit('loadLivelli');
-        primoLoadLivelli.value = true;
-      }
-    }
-
-    async function addLocPdiff() {
-      const conferma = await store.methods.setConfirm('Vuoi aggiungere un nuovo marker al livello "Patrimonio diffuso"?');
-      if (conferma) {
-        store.methods.setEditModeGIStrue();
-      }
-    }
-
-    function confermaLocPdiff() {
-      if (!state.nuovoMarker) {
-        store.methods.setAlert('Impossibile continuare senza aver impostato un punto.');
-        return;
-      }
-      store.methods.setEditModeGISfalse();
-      state.confirmMode = true;
-    }
-
-    async function salvaLocPdiff() {
-      if (!state.provinciaMarker || !state.comuneMarker || !state.nomeMarker) {
-        store.methods.setAlert('Impossibile continuare senza aver impostato correttamente un nome.');
-        return;
-      }
-      store.methods.setEditModeGISfalse();
-      state.confirmMode = false;
-      const markerJson = {
-        coord: state.coordMarker,
-        nome: `${state.provinciaMarker}_${state.comuneMarker}_${state.nomeMarker}`,
-        id_marker: `LPD_${dataInteger()}`,
-      };
-      const res = await creaNuovoLocPdiff(markerJson);
-      if (res) {
-        store.methods.setAlert('Operazione andata a buon fine.');
-        emit('updateMappa');
-      }
-      else store.methods.setAlert('Operazione non riuscita, riprovare.');
-    }
-
-    function annullaAddLocPdiff() {
-      store.methods.setEditModeGISfalse();
-      rimuoviMarkerTemporaneo();
-      state.confirmMode = false;
-      resetStateMarker();
-    }
-
-    function verificaDisplayAdd() {
-      return store.getters.getUsrVwList().includes('addLocMatGIS') && !store.stateGIS.editMode && !state.confirmMode;
-    }
-
-    function verificaDisplayConf() {
-      return store.getters.getUsrVwList().includes('addLocMatGIS') && store.stateGIS.editMode && !state.confirmMode;
-    }
-
-    function verificaDisplaySalva() {
-      return store.getters.getUsrVwList().includes('addLocMatGIS') && !store.stateGIS.editMode && state.confirmMode;
-    }
-
-    function verificaDisplayAnnulla() {
-      return store.getters.getUsrVwList().includes('addLocMatGIS') && (!(!store.stateGIS.editMode && !state.confirmMode));
-    }
-
-    function updateMarker(markerJson) {
-      state.nuovoMarker = markerJson.marker;
-      state.coordMarker = markerJson.coord;
-    }
-
-    function resetStateMarker() {
-      state.nuovoMarker = null;
-      state.coordMarker = null;
-      state.provinciaMarker = '';
-      state.comuneMarker = '';
-      state.nomeMarker = '';
-    }
-
-    return {
-      props,
-      store,
-      mappaRef,
-      state,
-      province,
-      comuni,
-      chiamaResetMappa,
-      setVistaMappa,
-      creaLivello,
-      emettiLoadLivelli,
-      addLocPdiff,
-      confermaLocPdiff,
-      salvaLocPdiff,
-      annullaAddLocPdiff,
-      verificaDisplayAdd,
-      verificaDisplayConf,
-      verificaDisplaySalva,
-      verificaDisplayAnnulla,
-      updateMarker,
-    }
+function toggleLivello(livello, checkbox) {
+  if (!checkbox.checked) {
+    mappaGlb.removeLayer(livello);
   }
+  else {
+    mappaGlb.addLayer(livello);
+  }
+}
+
+function emettiLoadLivelli() {
+  if (!primoLoadLivelli.value) {
+    emit('loadLivelli');
+    primoLoadLivelli.value = true;
+  }
+}
+
+async function addLocPdiff() {
+  const conferma = await store.methods.setConfirm('Vuoi aggiungere un nuovo marker al livello "Patrimonio diffuso"?');
+  if (conferma) {
+    store.methods.setEditModeGIStrue();
+  }
+}
+
+function confermaLocPdiff() {
+  if (!state.nuovoMarker) {
+    store.methods.setAlert('Impossibile continuare senza aver impostato un punto.');
+    return;
+  }
+  store.methods.setEditModeGISfalse();
+  state.confirmMode = true;
+}
+
+async function salvaLocPdiff() {
+  if (!state.provinciaMarker || !state.comuneMarker || !state.nomeMarker) {
+    store.methods.setAlert('Impossibile continuare senza aver impostato correttamente un nome.');
+    return;
+  }
+  store.methods.setEditModeGISfalse();
+  state.confirmMode = false;
+  const markerJson = {
+    coord: state.coordMarker,
+    nome: `${state.provinciaMarker}_${state.comuneMarker}_${state.nomeMarker}`,
+    id_marker: `LPD_${dataInteger()}`,
+  };
+  const res = await creaNuovoLocPdiff(markerJson);
+  if (res) {
+    store.methods.setAlert('Operazione andata a buon fine.');
+    emit('updateMappa');
+  }
+  else store.methods.setAlert('Operazione non riuscita, riprovare.');
+}
+
+function annullaAddLocPdiff() {
+  store.methods.setEditModeGISfalse();
+  rimuoviMarkerTemporaneo();
+  state.confirmMode = false;
+  resetStateMarker();
+}
+
+function verificaDisplayAdd() {
+  return store.getters.getUsrVwList().includes('addLocMatGIS') && !store.stateGIS.editMode && !state.confirmMode;
+}
+
+function verificaDisplayConf() {
+  return store.getters.getUsrVwList().includes('addLocMatGIS') && store.stateGIS.editMode && !state.confirmMode;
+}
+
+function verificaDisplaySalva() {
+  return store.getters.getUsrVwList().includes('addLocMatGIS') && !store.stateGIS.editMode && state.confirmMode;
+}
+
+function verificaDisplayAnnulla() {
+  return store.getters.getUsrVwList().includes('addLocMatGIS') && (!(!store.stateGIS.editMode && !state.confirmMode));
+}
+
+function updateMarker(markerJson) {
+  state.nuovoMarker = markerJson.marker;
+  state.coordMarker = markerJson.coord;
+}
+
+function resetStateMarker() {
+  state.nuovoMarker = null;
+  state.coordMarker = null;
+  state.provinciaMarker = '';
+  state.comuneMarker = '';
+  state.nomeMarker = '';
 }
 </script>
 

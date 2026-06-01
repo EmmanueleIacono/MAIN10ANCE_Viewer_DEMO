@@ -7,179 +7,159 @@
 <div v-if="verificaDisplaySalva()" id="campo-dati-marker">
   <!-- PER ORA NON FUNZIONANTE, MA SE IMPLEMENTATO QUESTO, IMPLEMENTARE ANCHE SELETTORE LOC PER QUANDO INSERISCO EDIF -->
   <label class="nome" for="select-tabella">Tipologia marker:</label>
-  <select class="valore" id="select-tabella" v-model="tabella">
+  <select class="valore" id="select-tabella" v-model="state.tabella">
     <option value="dati_località">Località</option>
     <option value="dati_edifici">Edificio</option>
   </select>
   <br />
-  <div v-if="tabella === 'dati_località'">
+  <div v-if="state.tabella === 'dati_località'">
     <label class="nome" for="input-loc-nome">Nome:</label>
-    <input class="valore" id="input-loc-nome" v-model="datiLocalita.nome" placeholder="Nome" />
+    <input class="valore" id="input-loc-nome" v-model="state.datiLocalita.nome" placeholder="Nome" />
     <br />
     <label class="nome" for="input-sigla">Sigla:</label>
-    <input class="valore" id="input-sigla" v-model="datiLocalita.sigla" placeholder="Sigla" />
+    <input class="valore" id="input-sigla" v-model="state.datiLocalita.sigla" placeholder="Sigla" />
     <br />
   </div>
-  <div v-if="tabella === 'dati_edifici'">
+  <div v-if="state.tabella === 'dati_edifici'">
     <label class="nome" for="input-nome">Nome:</label>
-    <input class="valore" id="input-nome" v-model="datiEdificio.nome" placeholder="Nome" />
+    <input class="valore" id="input-nome" v-model="state.datiEdificio.nome" placeholder="Nome" />
     <br />
     <label class="nome" for="input-sigla">Sigla:</label>
-    <input class="valore" id="input-sigla" v-model="datiEdificio.sigla" placeholder="Sigla" />
+    <input class="valore" id="input-sigla" v-model="state.datiEdificio.sigla" placeholder="Sigla" />
     <br />
     <label class="nome" for="input-descrizione">Descrizione:</label>
-    <input class="valore" id="input-descrizione" v-model="datiEdificio.descrizione" placeholder="Descrizione" />
+    <input class="valore" id="input-descrizione" v-model="state.datiEdificio.descrizione" placeholder="Descrizione" />
     <br />
     <label class="nome" for="input-numero">Numero:</label>
-    <input class="valore" id="input-numero" type="number" v-model="datiEdificio.numero" min="0" step="1">
+    <input class="valore" id="input-numero" type="number" v-model="state.datiEdificio.numero" min="0" step="1">
     <br />
     <label class="nome" for="input-edificio">Edificio:</label>
-    <input class="valore" id="input-edificio" v-model="datiEdificio.edificio" placeholder="Edificio" />
+    <input class="valore" id="input-edificio" v-model="state.datiEdificio.edificio" placeholder="Edificio" />
     <br />
     <label class="nome" for="input-nome_menu">Nome per menu:</label>
-    <input class="valore" id="input-nome_menu" v-model="datiEdificio.edif_nome_menu" placeholder="Nome menu" />
+    <input class="valore" id="input-nome_menu" v-model="state.datiEdificio.edif_nome_menu" placeholder="Nome menu" />
     <br />
   </div>
 </div>
 </template>
-<script>
-import { inject, reactive, toRefs } from 'vue';
+<script setup>
+import { inject, reactive } from 'vue';
 import {rimuoviMarkerTemporaneo} from '../js/GIS';
 import {creaNuovoMarkerAmbito} from '../js/richieste';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 
-export default {
-  name: 'TabGISAddMarkerAmbito',
-  components: {
-    BtnBIM,
+const emit = defineEmits(['updateMappa']);
+
+const store = inject('store');
+const nuovoMarker = inject('nuovoMarker');
+const coordMarker = inject('coordMarker');
+const state = reactive({
+  datiLocalita: {
+    nome: '',
+    sigla: '',
   },
+  datiEdificio: {
+    localita: '',
+    nome: '', // se un solo edificio, potrebbe essere uguale a "edif_nome_menu"
+    sigla: '',
+    descrizione: '',
+    numero: 0,
+    edificio: '',
+    edif_nome_menu: '',
+  },
+  tabella: 'dati_edifici',
+  confirmModeMkAmbito: false,
+});
 
-  setup(props, {emit}) {
-    const store = inject('store');
-    const nuovoMarker = inject('nuovoMarker');
-    const coordMarker = inject('coordMarker');
-    const state = reactive({
-      datiLocalita: {
-        nome: '',
-        sigla: '',
-      },
-      datiEdificio: {
-        localita: '',
-        nome: '', // se un solo edificio, potrebbe essere uguale a "edif_nome_menu"
-        sigla: '',
-        descrizione: '',
-        numero: 0,
-        edificio: '',
-        edif_nome_menu: '',
-      },
-      tabella: 'dati_edifici',
-      confirmModeMkAmbito: false,
-    });
-
-    async function addMarkerAmbito() {
-      const conferma = await store.methods.setConfirm(`Vuoi aggiungere un nuovo marker all'ambito "${store.getters.getUsrInfoAmbito().ambito_full_name}"?`);
-      if (conferma) {
-        store.methods.setEditModeMkAmbitoGIStrue();
-      }
-    }
-
-    function confermaMarkerAmbito() {
-      if (!nuovoMarker.value) {
-        store.methods.setAlert('Impossibile continuare senza aver impostato un punto.');
-        return;
-      }
-      console.log(coordMarker.value.lat);
-      console.log(coordMarker.value.lng);
-      store.methods.setEditModeMkAmbitoGISfalse();
-      state.confirmModeMkAmbito = true;
-    }
-
-    async function salvaMarkerAmbito() {
-      if (
-        (!isDatiEdificioValidi() && state.tabella === "dati_edifici") ||
-        (!isDatiLocalitàValidi() && state.tabella === "dati_località")
-      ) {
-        store.methods.setAlert('Impossibile continuare senza aver impostato correttamente tutti i dati.');
-        return;
-      }
-      store.methods.setEditModeGISfalse();
-      state.confirmMode = false;
-      const markerJson = {
-        tabella: state.tabella,
-        coord: coordMarker.value,
-        nome: state.datiEdificio.nome,
-        sigla: state.datiEdificio.sigla,
-        descrizione: state.datiEdificio.descrizione,
-        numero: state.datiEdificio.numero,
-        edificio: state.datiEdificio.edificio,
-        edif_nome_menu: state.datiEdificio.edif_nome_menu,
-        ambito: store.getters.getUsrInfoAmbito().ambito
-      };
-      console.log(markerJson);
-      const res = await creaNuovoMarkerAmbito(markerJson);
-      if (res) {
-        store.methods.setAlert('Operazione andata a buon fine.');
-        emit('updateMappa');
-      }
-      else store.methods.setAlert('Operazione non riuscita, riprovare.');
-    }
-
-    function annullaAddMarkerAmbito() {
-      store.methods.setEditModeMkAmbitoGISfalse();
-      rimuoviMarkerTemporaneo();
-      state.confirmModeMkAmbito = false;
-      resetStateMarker();
-    }
-
-    function verificaDisplayAdd() {
-      return store.getters.getUsrVwList().includes('addMarkerAmbitoGIS') && !store.stateGIS.editModeMkAmbito && !state.confirmModeMkAmbito;
-    }
-
-    function verificaDisplayConf() {
-      return store.getters.getUsrVwList().includes('addMarkerAmbitoGIS') && store.stateGIS.editModeMkAmbito && !state.confirmModeMkAmbito;
-    }
-
-    function verificaDisplaySalva() {
-      return store.getters.getUsrVwList().includes('addMarkerAmbitoGIS') && !store.stateGIS.editModeMkAmbito && state.confirmModeMkAmbito;
-    }
-
-    function verificaDisplayAnnulla() {
-      return store.getters.getUsrVwList().includes('addMarkerAmbitoGIS') && (!(!store.stateGIS.editModeMkAmbito && !state.confirmModeMkAmbito));
-    }
-
-    function resetStateMarker() {
-      nuovoMarker.value = null;
-      coordMarker.value = null;
-    }
-
-    function isDatiEdificioValidi() {
-      return (
-        state.datiEdificio.nome &&
-        state.datiEdificio.sigla &&
-        state.datiEdificio.descrizione &&
-        state.datiEdificio.numero >= 0 &&
-        state.datiEdificio.edificio &&
-        state.datiEdificio.edif_nome_menu
-      );
-    }
-
-    function isDatiLocalitàValidi() {
-      return state.datiLocalita.nome && state.datiLocalita.sigla;
-    }
-
-    return {
-      props,
-      ...toRefs(state),
-      addMarkerAmbito,
-      confermaMarkerAmbito,
-      salvaMarkerAmbito,
-      annullaAddMarkerAmbito,
-      verificaDisplayAdd,
-      verificaDisplayConf,
-      verificaDisplaySalva,
-      verificaDisplayAnnulla,
-    }
+async function addMarkerAmbito() {
+  const conferma = await store.methods.setConfirm(`Vuoi aggiungere un nuovo marker all'ambito "${store.getters.getUsrInfoAmbito().ambito_full_name}"?`);
+  if (conferma) {
+    store.methods.setEditModeMkAmbitoGIStrue();
   }
+}
+
+function confermaMarkerAmbito() {
+  if (!nuovoMarker.value) {
+    store.methods.setAlert('Impossibile continuare senza aver impostato un punto.');
+    return;
+  }
+  console.log(coordMarker.value.lat);
+  console.log(coordMarker.value.lng);
+  store.methods.setEditModeMkAmbitoGISfalse();
+  state.confirmModeMkAmbito = true;
+}
+
+async function salvaMarkerAmbito() {
+  if (
+    (!isDatiEdificioValidi() && state.tabella === "dati_edifici") ||
+    (!isDatiLocalitàValidi() && state.tabella === "dati_località")
+  ) {
+    store.methods.setAlert('Impossibile continuare senza aver impostato correttamente tutti i dati.');
+    return;
+  }
+  store.methods.setEditModeGISfalse();
+  state.confirmModeMkAmbito = false;
+  const markerJson = {
+    tabella: state.tabella,
+    coord: coordMarker.value,
+    nome: state.datiEdificio.nome,
+    sigla: state.datiEdificio.sigla,
+    descrizione: state.datiEdificio.descrizione,
+    numero: state.datiEdificio.numero,
+    edificio: state.datiEdificio.edificio,
+    edif_nome_menu: state.datiEdificio.edif_nome_menu,
+    ambito: store.getters.getUsrInfoAmbito().ambito
+  };
+  console.log(markerJson);
+  const res = await creaNuovoMarkerAmbito(markerJson);
+  if (res) {
+    store.methods.setAlert('Operazione andata a buon fine.');
+    emit('updateMappa');
+  }
+  else store.methods.setAlert('Operazione non riuscita, riprovare.');
+}
+
+function annullaAddMarkerAmbito() {
+  store.methods.setEditModeMkAmbitoGISfalse();
+  rimuoviMarkerTemporaneo();
+  state.confirmModeMkAmbito = false;
+  resetStateMarker();
+}
+
+function verificaDisplayAdd() {
+  return store.getters.getUsrVwList().includes('addMarkerAmbitoGIS') && !store.stateGIS.editModeMkAmbito && !state.confirmModeMkAmbito;
+}
+
+function verificaDisplayConf() {
+  return store.getters.getUsrVwList().includes('addMarkerAmbitoGIS') && store.stateGIS.editModeMkAmbito && !state.confirmModeMkAmbito;
+}
+
+function verificaDisplaySalva() {
+  return store.getters.getUsrVwList().includes('addMarkerAmbitoGIS') && !store.stateGIS.editModeMkAmbito && state.confirmModeMkAmbito;
+}
+
+function verificaDisplayAnnulla() {
+  return store.getters.getUsrVwList().includes('addMarkerAmbitoGIS') && (!(!store.stateGIS.editModeMkAmbito && !state.confirmModeMkAmbito));
+}
+
+function resetStateMarker() {
+  nuovoMarker.value = null;
+  coordMarker.value = null;
+}
+
+function isDatiEdificioValidi() {
+  return (
+    state.datiEdificio.nome &&
+    state.datiEdificio.sigla &&
+    state.datiEdificio.descrizione &&
+    state.datiEdificio.numero >= 0 &&
+    state.datiEdificio.edificio &&
+    state.datiEdificio.edif_nome_menu
+  );
+}
+
+function isDatiLocalitàValidi() {
+  return state.datiLocalita.nome && state.datiLocalita.sigla;
 }
 </script>
 

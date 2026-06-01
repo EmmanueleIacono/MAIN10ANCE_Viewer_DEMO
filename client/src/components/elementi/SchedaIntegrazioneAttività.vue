@@ -45,7 +45,7 @@
         </div>
         <div class="colonna">
           <div class="contenitore-colonne centra">
-            <label for="costo" class="colonna">Costo previsto (EUR):</label>
+            <label for="costo" class="colonna">Costo previsto (€):</label>
             <input v-model="state.costoPrevisto" type="number" min="0" step=".01" id="costo" class="colonna">
           </div>
           <div class="contenitore-colonne centra">
@@ -148,7 +148,7 @@ async function salvaIntegrazione() {
       emit('integrazioneCompletata');
     }
     else {
-      store.methods.setAlert("ATTENZIONE: Si e verificato un errore durante la registrazione dei dati");
+      store.methods.setAlert("ATTENZIONE: Si è verificato un errore durante la registrazione dei dati");
     }
   }
   else {

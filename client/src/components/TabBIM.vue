@@ -16,33 +16,17 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import {inject} from 'vue';
 import Explorer from './elementi/Explorer.vue';
 import Details from './elementi/Details.vue';
 import PannelloDB from './TabBIMPannelloDB.vue';
 import Tree from './TabBIMTree.vue';
 
-export default {
-  name: 'TabBIM',
-  components: {
-    Explorer,
-    Details,
-    PannelloDB,
-    Tree,
-  },
-  setup() {
-    const store = inject('store');
+const store = inject('store');
 
-    function verificaDisplay() {
-      return store.getters.getUsrVwList().includes('idPannelloDB');
-    }
-
-    return {
-      store,
-      verificaDisplay,
-    }
-  }
+function verificaDisplay() {
+  return store.getters.getUsrVwList().includes('idPannelloDB');
 }
 </script>
 
