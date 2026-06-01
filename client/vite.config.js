@@ -29,6 +29,8 @@ export default defineConfig({
     },
   },
   server: {
+    port: 8080,
+    strictPort: true,
     proxy: {
       '^/api': {target: backendTarget},
       '^/auth': {target: backendTarget},
