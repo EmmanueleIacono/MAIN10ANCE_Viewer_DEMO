@@ -4,13 +4,10 @@
 </div>
 </template>
 
-<script>
-export default {
-  name: 'MainPanel',
-  props: {
-    colonna: String
-  }
-}
+<script setup>
+defineProps({
+  colonna: String
+});
 </script>
 
 <style scoped>

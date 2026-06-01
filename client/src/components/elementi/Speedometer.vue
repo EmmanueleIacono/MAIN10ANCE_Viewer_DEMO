@@ -9,22 +9,19 @@
 </div>
 </template>
 
-<script>
-export default {
-  name: 'Speedometer',
-  props: {
-    colore: {
-      type: String,
-      default: 'grey',
-    },
-    numDots: {
-      type: Number,
-      default: 100,
-    },
-    percentuale: Number,
-    descrizione: String,
+<script setup>
+defineProps({
+  colore: {
+    type: String,
+    default: 'grey',
   },
-}
+  numDots: {
+    type: Number,
+    default: 100,
+  },
+  percentuale: Number,
+  descrizione: String,
+});
 </script>
 
 <style scoped>

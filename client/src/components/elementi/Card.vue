@@ -4,20 +4,12 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Card',
-}
-</script>
-
 <style scoped>
 .au-card {
   -webkit-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
   box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
-  /* padding: 40px; */
   padding: 25px;
-  /* padding-right: 35px; */
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;

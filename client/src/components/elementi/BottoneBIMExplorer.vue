@@ -2,16 +2,13 @@
   <button :id="nome" :class="[icona, colore]" :title="title" class="glyphicon dbBtn" height="30"></button>
 </template>
 
-<script>
-export default {
-  name: 'BottoneBIMExplorer',
-  props: {
-    icona: String,
-    nome: String,
-    title: String,
-    colore: String,
-  }
-}
+<script setup>
+defineProps({
+  icona: String,
+  nome: String,
+  title: String,
+  colore: String,
+});
 </script>
 
 <style scoped>

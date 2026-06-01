@@ -7,17 +7,14 @@
 </div>
 </template>
 
-<script>
-export default {
-  name: 'Details',
-  props: {
-    summary: String,
-    open: {
-      type: Boolean,
-      default: false,
-    },
-  }
-}
+<script setup>
+defineProps({
+  summary: String,
+  open: {
+    type: Boolean,
+    default: false,
+  },
+});
 </script>
 
 <style scoped>

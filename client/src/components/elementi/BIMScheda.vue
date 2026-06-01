@@ -10,19 +10,13 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import Details from './Details.vue';
 
-export default {
-  name: 'BIMScheda',
-  components: {
-    Details,
-  },
-  props: {
-    scheda: Object,
-    tipo: String,
-  },
-}
+defineProps({
+  scheda: Object,
+  tipo: String,
+});
 </script>
 
 <style scoped>

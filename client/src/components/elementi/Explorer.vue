@@ -11,13 +11,10 @@
 </div>
 </template>
 
-<script>
-export default {
-  name: 'Explorer',
-  props: {
-    colonna: String
-  }
-}
+<script setup>
+defineProps({
+  colonna: String
+});
 </script>
 
 <style scoped>

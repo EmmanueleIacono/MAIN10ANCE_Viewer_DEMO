@@ -4,13 +4,10 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'LoadingScreen',
-  props: {
-    caricamento: Boolean,
-  }
-}
+<script setup>
+defineProps({
+  caricamento: Boolean,
+});
 </script>
 
 <style scoped>
