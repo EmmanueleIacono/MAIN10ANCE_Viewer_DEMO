@@ -19,23 +19,13 @@
   </teleport>
 </template>
 
-<script>
+<script setup>
 import {inject} from 'vue';
 
-export default {
-  name: 'Alert',
-  setup() {
-    const store = inject('store');
+const store = inject('store');
 
-    function conferma(bool) {
-      store.methods.resetConfirm(bool);
-    }
-
-    return {
-      store,
-      conferma,
-    }
-  }
+function conferma(bool) {
+  store.methods.resetConfirm(bool);
 }
 </script>
 

@@ -1,7 +1,7 @@
 <template>
 <div class="fill" id="tabLogin">
   <div id="messaggio-errore-container">
-    <h4 v-if="messaggioDiErrore" id="messaggio-errore">{{messaggioDiErrore}}</h4>
+    <h4 v-if="state.messaggioDiErrore" id="messaggio-errore">{{state.messaggioDiErrore}}</h4>
   </div>
   <div id="contenitoreLoginSignup">
     <component :is="tabLoginAttivo" @cambioTab="cambiaTab" @authErr="cambiaMessaggioErrore" />
@@ -9,40 +9,28 @@
 </div>
 </template>
 
-<script>
-import {reactive, toRefs, inject} from 'vue';
+<script setup>
+import {reactive, shallowRef} from 'vue';
 import PannelloLogin from './TabAuthPannelloLogin.vue';
 import PannelloSignup from './TabAuthPannelloSignup.vue';
 
-export default {
-  name: 'TabAuth',
-  components: {
-    PannelloLogin,
-    PannelloSignup,
-  },
-  setup() {
-    const state = reactive({
-      tabLoginAttivo: 'PannelloLogin',
-      messaggioDiErrore: '',
-    });
+const state = reactive({
+  messaggioDiErrore: '',
+});
 
-    const store = inject('store');
+const authPanels = {
+  PannelloLogin,
+  PannelloSignup,
+};
 
-    function cambiaTab(nomeTab) {
-      state.tabLoginAttivo = nomeTab;
-    }
+const tabLoginAttivo = shallowRef(authPanels.PannelloLogin);
 
-    function cambiaMessaggioErrore(errMsg) {
-      state.messaggioDiErrore = errMsg;
-    }
+function cambiaTab(nomeTab) {
+  tabLoginAttivo.value = authPanels[nomeTab] || authPanels.PannelloLogin;
+}
 
-    return {
-      store,
-      ...toRefs(state),
-      cambiaTab,
-      cambiaMessaggioErrore,
-    }
-  }
+function cambiaMessaggioErrore(errMsg) {
+  state.messaggioDiErrore = errMsg;
 }
 </script>
 

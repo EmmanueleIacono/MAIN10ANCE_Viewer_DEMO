@@ -7,26 +7,17 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import SchedaInt from './elementi/SchedaIntegrazioneAttività.vue';
 
-export default {
-  name: 'TabPlannerIntergazioneAttRiallineamento',
-  components: {
-    SchedaInt,
-  },
-  props: {
-    att: Array,
-  },
-  setup(props, {emit}) {
-    function emettiOkInt() {
-      emit('IntegrazioneOK');
-    }
+defineProps({
+  att: Array,
+});
 
-    return {
-      emettiOkInt,
-    }
-  }
+const emit = defineEmits(['IntegrazioneOK']);
+
+function emettiOkInt() {
+  emit('IntegrazioneOK');
 }
 </script>
 

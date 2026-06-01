@@ -11,28 +11,11 @@
 </Card>
 </template>
 
-<script>
+<script setup>
 import {inject} from 'vue';
 import Card from './elementi/Card.vue';
 import Details from './elementi/Details.vue';
 import SchedaStorico from './elementi/SchedaStorico.vue';
 
-export default {
-  name: 'TabPlannerStorico',
-  components: {
-    Card,
-    Details,
-    SchedaStorico,
-  },
-  setup() {
-    const store = inject('store');
-
-    return {
-      store,
-    }
-  }
-}
+const store = inject('store');
 </script>
-
-<style scoped>
-</style>

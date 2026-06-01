@@ -18,19 +18,10 @@
   </teleport>
 </template>
 
-<script>
+<script setup>
 import {inject} from 'vue';
 
-export default {
-  name: 'Alert',
-  setup() {
-    const store = inject('store');
-
-    return {
-      store,
-    }
-  }
-}
+const store = inject('store');
 </script>
 
 <style scoped>

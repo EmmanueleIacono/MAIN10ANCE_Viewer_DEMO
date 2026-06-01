@@ -6,29 +6,25 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import {watch} from 'vue';
 
-export default {
-  name: 'Checkbox',
-  props: {
-    idUnivoco: String,
-    valore: String,
-    nome: String,
-    colore: String,
-    pronto: Boolean,
-  },
-  setup(props, {emit}) {
-    watch(() => props.pronto, (newCond) => {
-      if (newCond) {
-        emettiCreaLivello(props.idUnivoco);
-      }
-    });
+const props = defineProps({
+  idUnivoco: String,
+  valore: String,
+  nome: String,
+  colore: String,
+  pronto: Boolean,
+});
 
-    function emettiCreaLivello(idLiv) {
-      emit('creazioneLivello', idLiv);
-    }
-  }
+const emit = defineEmits(['creazioneLivello']);
+
+watch(() => props.pronto, (newCond) => {
+  if (newCond) emettiCreaLivello(props.idUnivoco);
+});
+
+function emettiCreaLivello(idLiv) {
+  emit('creazioneLivello', idLiv);
 }
 </script>
 
