@@ -94,6 +94,35 @@ router.get('/logout', (req, res) => {
     });
 });
 
+router.get('/session', async (req, res, next) => {
+    try {
+        const {user_id, role, ambito} = req.signedCookies;
+        if (!user_id || !role || !ambito) {
+            return res.status(401).send({message: 'Sessione non attiva'});
+        }
+
+        const roleSettings = await getSettingsByRuolo(role);
+        const ambitoSettings = await getSettingsByAmbito(ambito);
+        if (!roleSettings || !ambitoSettings) {
+            return res.status(401).send({message: 'Sessione non valida'});
+        }
+
+        res.json({
+            message: 'Sessione attiva',
+            id: user_id,
+            bim_vw_sets: roleSettings.bim_vw_sets,
+            usr_vw: roleSettings.usr_vw,
+            buckets: ambitoSettings.buckets,
+            ambito: ambitoSettings.ambito,
+            ambito_schema: ambitoSettings.schema,
+            ambito_full_name: ambitoSettings.ambito_full_name,
+        });
+    }
+    catch(e) {
+        next(e);
+    }
+});
+
 // validazione TRUE se nome e pw sono corrette
 // validazione FALSE se campo nome è vuoto o mancante
 // validazione FALSE se campo pw è vuoto o incorretto

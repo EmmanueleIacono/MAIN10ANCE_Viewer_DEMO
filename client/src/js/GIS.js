@@ -6,6 +6,11 @@ import 'proj4leaflet';
 
 import {getModel} from './BIM';
 import store from '../store/index';
+import locationIconUrl from '@/assets/img/location_icon.png';
+import markerShadowUrl from '@/assets/img/ombre_icone_v4.png';
+import buildingIconUrl from '@/assets/img/edificio_icon.png';
+import genericBuildingIconUrl from '@/assets/img/icona_edif_generico.png';
+import cubeIconUrl from '@/assets/img/icona_cubo_v1.png';
 
 export let mappaGlb;
 export let newLocMatMarker;
@@ -20,7 +25,7 @@ export function creaMappa(divId, posizioneIniziale) {
     const tiles = L.tileLayer(tileUrl, { attribution, "detectRetina": false, "maxNativeZoom": 20, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false});
     tiles.addTo(mappaGIS);
     // mappaGIS.on('click', addLocMat);
-    if (!mappaGlb) {mappaGlb = mappaGIS};
+    if (!mappaGlb) mappaGlb = mappaGIS;
     return mappaGIS;
 }
 
@@ -72,8 +77,8 @@ export function creaLivelloGIS(livello) {
 }
 
 export const iconaLocalità = L.icon({
-    iconUrl: require('/src/assets/img/location_icon.png'),
-    shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
+    iconUrl: locationIconUrl,
+    shadowUrl: markerShadowUrl,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     shadowSize: [36, 36],
@@ -81,8 +86,8 @@ export const iconaLocalità = L.icon({
 });
 
 export const iconaEdifici = L.icon({
-    iconUrl: require('/src/assets/img/edificio_icon.png'),
-    shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
+    iconUrl: buildingIconUrl,
+    shadowUrl: markerShadowUrl,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     shadowSize: [36, 36],
@@ -90,8 +95,8 @@ export const iconaEdifici = L.icon({
 });
 
 export const iconaEdifGenerico = L.icon({
-    iconUrl: require('/src/assets/img/icona_edif_generico.png'),
-    shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
+    iconUrl: genericBuildingIconUrl,
+    shadowUrl: markerShadowUrl,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     shadowSize: [36, 36],
@@ -99,8 +104,8 @@ export const iconaEdifGenerico = L.icon({
 });
 
 const iconaLocPdiff = L.icon({
-    iconUrl: require('/src/assets/img/icona_cubo_v1.png'),
-    shadowUrl: require('/src/assets/img/ombre_icone_v4.png'),
+    iconUrl: cubeIconUrl,
+    shadowUrl: markerShadowUrl,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     shadowSize: [36, 36],

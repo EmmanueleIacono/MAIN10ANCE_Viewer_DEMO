@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "open": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --open",
-    "serve": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
-    "build": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
-    "lint": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service lint",
+    "open": "vite --open",
+    "serve": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "typecheck": "echo TypeScript is not configured yet; this placeholder keeps the Phase 0 verification command available.",
     "vca": "vca --dir src --port 6060"
   },
   "dependencies": {
@@ -19,37 +22,17 @@
     "leaflet.markercluster": "^1.5.3",
     "proj4": "^2.20.8",
     "proj4leaflet": "^1.0.2",
-    "vue": "^3.5.34",
+    "vue": "^3.5.35",
     "vue-chart-3": "^4.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/eslint-parser": "^7.28.6",
+    "@eslint/js": "^10.0.1",
     "@tkskto/vue-component-analyzer": "0.10.3",
-    "@vue/cli-plugin-babel": "5.0.9",
-    "@vue/cli-plugin-eslint": "5.0.9",
-    "@vue/cli-service": "5.0.9",
-    "@vue/compiler-sfc": "^3.5.34",
-    "eslint": "^8.57.1",
-    "eslint-plugin-vue": "^9.33.0"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/vue3-essential",
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "parser": "@babel/eslint-parser",
-      "requireConfigFile": false
-    },
-    "rules": {
-      "vue/multi-word-component-names": "off",
-      "vue/no-reserved-component-names": "off"
-    }
+    "@vitejs/plugin-vue": "^6.0.7",
+    "@vue/compiler-sfc": "^3.5.35",
+    "eslint": "^10.4.1",
+    "eslint-plugin-vue": "^10.9.1",
+    "vite": "^8.0.15"
   },
   "browserslist": [
     "> 1%",

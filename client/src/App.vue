@@ -100,8 +100,23 @@ export default {
     });
 
     async function primoLoad() {
-      if (localStorage.user_id) {
-        store.methods.setUserSettings();
+      try {
+        const resRaw = await fetch('/auth/session', {method: 'GET', headers: {'content-type': 'application/json'}});
+        if (resRaw.ok) {
+          const sessionInfo = await resRaw.json();
+          store.methods.setLocalStorageUserInfo(sessionInfo);
+        }
+        else if (resRaw.status === 401 && localStorage.user_id) {
+          store.methods.setLogoutUserSettings();
+        }
+        else if (localStorage.user_id) {
+          store.methods.setUserSettings();
+        }
+      }
+      catch {
+        if (localStorage.user_id) {
+          store.methods.setUserSettings();
+        }
       }
       await store_globale.methods.popolaStoreGlobale();
     }

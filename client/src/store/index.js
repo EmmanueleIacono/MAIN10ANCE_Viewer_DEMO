@@ -163,6 +163,9 @@ const methods = {
         localStorage.removeItem('bim_vw_sets');
         localStorage.removeItem('usr_vw');
         localStorage.removeItem('bkts');
+        localStorage.removeItem('ambito');
+        localStorage.removeItem('ambito_schema');
+        localStorage.removeItem('ambito_full_name');
         state.userSettings.user_id = '';
         state.userSettings.bim_vw_sets = '9-3';
         state.userSettings.usr_vw = '';
