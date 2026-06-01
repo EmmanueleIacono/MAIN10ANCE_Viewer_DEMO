@@ -18,67 +18,54 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import { computed } from 'vue';
 import { Chart, DoughnutController, ArcElement, Tooltip, CategoryScale, LinearScale } from 'chart.js';
 import {DoughnutChart} from 'vue-chart-3';
 
 Chart.register(DoughnutController, ArcElement, Tooltip, CategoryScale, LinearScale);
 
-export default {
-  name: 'OverviewItem',
-  components: {
-    DoughnutChart,
+const props = defineProps({
+  infoContenuto: String,
+  gradiente: String,
+  icona: {
+    type: String,
+    default: 'zmdi-info',
   },
-  props: {
-    infoContenuto: String,
-    gradiente: String,
-    icona: {
-      type: String,
-      default: 'zmdi-info',
-    },
-    labels: {
-      type: Array,
-      default: () => ['Data_A', 'Data_B', 'Data_C', 'Data_D', 'Data_E'],
-    },
-    data: {
-      type: Array,
-      default: () => [10, 20, 50, 15, 5],
-    }
+  labels: {
+    type: Array,
+    default: () => ['Data_A', 'Data_B', 'Data_C', 'Data_D', 'Data_E'],
   },
-  setup(props) {
-    const chartData = computed(() => ({
-      labels: props.labels,
-      datasets: [
-        {
-          data: props.data,
-          borderColor: "white",
-          borderWidth: "2",
-          backgroundColor: "rgba(255,255,255,.3)",
-          hoverBackgroundColor: 'white',
-        },
-      ],
-    }));
-
-    const totale = computed(() => chartData.value.datasets[0].data.map(n => parseInt(n)).reduce((sommaParziale, a) => sommaParziale + a, 0));
-
-    const options = {
-      cutout: '70%',
-      plugins: {
-        legend: {display: false}
-      },
-      scales: {
-        x: {display: false, beginAtZero: true},
-        y: {display: false, beginAtZero: true}
-      },
-    }
-
-    return {
-      chartData,
-      totale,
-      options,
-    }
+  data: {
+    type: Array,
+    default: () => [10, 20, 50, 15, 5],
   }
+});
+
+const chartData = computed(() => ({
+  labels: props.labels,
+  datasets: [
+    {
+      data: props.data,
+      borderColor: "white",
+      borderWidth: "2",
+      backgroundColor: "rgba(255,255,255,.3)",
+      hoverBackgroundColor: 'white',
+    },
+  ],
+}));
+
+const totale = computed(() => chartData.value.datasets[0].data.map(n => parseInt(n)).reduce((sommaParziale, a) => sommaParziale + a, 0));
+
+const options = {
+  cutout: '70%',
+  plugins: {
+    legend: {display: false}
+  },
+  scales: {
+    x: {display: false, beginAtZero: true},
+    y: {display: false, beginAtZero: true}
+  },
 }
 </script>
 
@@ -139,7 +126,6 @@ h6 {font-size: 13px;}
 }
 
 .overview-box .icon i {
-  /* font-size: 60px; */
   font-size: 50px;
   color: #fff;
 }
@@ -168,7 +154,6 @@ h6 {font-size: 13px;}
 .overview-box .text h2 {
   font-weight: 300;
   color: #fff;
-  /* font-size: 36px; */
   line-height: 1;
 }
 
@@ -203,7 +188,6 @@ h6 {font-size: 13px;}
 }
 
 .overview-chart {
-  /* height: 115px; */
   position: relative;
   display: flex;
   justify-content: center;
@@ -211,10 +195,6 @@ h6 {font-size: 13px;}
 }
 
 .overview-chart .canvas {
-  /* max-width: 90%;
-  max-height: 90%;
-  min-width: 90%;
-  min-height: 90%; */
   width: 90%;
   height: 90%;
 }

@@ -14,67 +14,58 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import {inject, reactive} from 'vue';
 import {getObjects} from '../../js/richieste';
 import {getModel} from '../../js/BIM';
 
-export default {
-  name: 'TreeNode',
-  props: {
-    node: Object,
-  },
-  setup(props, {emit}) {
-    const idCliccato = inject('idCliccato');
-    const store = inject('store');
-    const state = reactive({
-      nodeOpen: false,
-      childNodes: null,
-      childLoad: false,
-    });
+defineOptions({name: 'TreeNode'});
 
-    const icone = {
-      'default': 'glyphicon glyphicon-question-sign',
-      'bucket': 'glyphicon glyphicon-folder-open',
-      'object': 'glyphicon glyphicon-file'
-    }
-    const stileCliccato = {
-      'background': "#beebff",
-      'border-radius': "2px",
-      'box-shadow': "inset 0 0 1px #999999",
-    }
+const props = defineProps({
+  node: Object,
+});
 
-    async function apriNodo() {
-      emit('cambiaIdCliccato', props.node.id);
-      state.nodeOpen = !state.nodeOpen;
-      if (!state.childNodes && props.node.children) {
-        state.childLoad = true;
-        const childObjects = await getObjects(props.node.id);
-        state.childNodes = childObjects;
-        state.childNodes.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
-      }
-    }
-    function apriModello(id) {
-      emit('cambiaIdCliccato', id);
-      try {
-        getModel(id);
-      }
-      catch {
-        let messaggioDiErrore = 'Si è verificato un errore. Modello non disponibile.';
-        store.stateBIM.urnModelloCorrente = null;
-        store.stateBIM.modelPlaceholder = true;
-        store.methods.setAlert(messaggioDiErrore);
-      }
-    }
+const emit = defineEmits(['cambiaIdCliccato']);
 
-    return {
-      idCliccato,
-      state,
-      icone,
-      stileCliccato,
-      apriNodo,
-      apriModello,
-    }
+const idCliccato = inject('idCliccato');
+const store = inject('store');
+const state = reactive({
+  nodeOpen: false,
+  childNodes: null,
+  childLoad: false,
+});
+
+const icone = {
+  'default': 'glyphicon glyphicon-question-sign',
+  'bucket': 'glyphicon glyphicon-folder-open',
+  'object': 'glyphicon glyphicon-file'
+}
+const stileCliccato = {
+  'background': "#beebff",
+  'border-radius': "2px",
+  'box-shadow': "inset 0 0 1px #999999",
+}
+
+async function apriNodo() {
+  emit('cambiaIdCliccato', props.node.id);
+  state.nodeOpen = !state.nodeOpen;
+  if (!state.childNodes && props.node.children) {
+    state.childLoad = true;
+    const childObjects = await getObjects(props.node.id);
+    state.childNodes = childObjects;
+    state.childNodes.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
+  }
+}
+function apriModello(id) {
+  emit('cambiaIdCliccato', id);
+  try {
+    getModel(id);
+  }
+  catch {
+    let messaggioDiErrore = 'Si è verificato un errore. Modello non disponibile.';
+    store.stateBIM.urnModelloCorrente = null;
+    store.stateBIM.modelPlaceholder = true;
+    store.methods.setAlert(messaggioDiErrore);
   }
 }
 </script>

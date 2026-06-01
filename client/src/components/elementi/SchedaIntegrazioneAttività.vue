@@ -5,62 +5,60 @@
       <div class="colonna">
         <p><b>Attività: </b>{{stringAtt}}</p>
         <p><b>Classe oggetti: </b>{{att.cl_ogg_fr}}</p>
-        <p><b>Località: </b>{{att.località_estesa}}</p>
+        <p><b>Località: </b>{{att['località_estesa']}}</p>
         <p><b>Edificio: </b>{{edificio}}</p>
         <p v-if="att.frequenza"><b :class="att.necessaria_revisione ? 'avviso-revisione' : ''">Frequenza: </b>{{att.frequenza}} {{parseInt(att.frequenza) === 1 ? 'mese' : 'mesi'}}</p>
       </div>
       <div class="colonna">
-        <p>
-          <b>Descrizione: </b>
-          <span v-for="ta in att.tipo_attività" :key="ta">
-            <p>
-              <i>{{ta}}: </i>
-              {{att[ta]}}
-            </p>
-          </span>
-        </p>
+        <div>
+          <p><b>Descrizione: </b></p>
+          <p v-for="ta in att.tipo_attività" :key="ta">
+            <i>{{ta}}: </i>
+            {{att[ta]}}
+          </p>
+        </div>
       </div>
     </div>
     <p class="id">{{att.data_prog}}</p>
     <div class="dx">
-      <button @click="integra" :class="[integrazioneAttiva ? 'glyphicon-minus' : 'glyphicon-plus', pianificate ? 'verde' : 'giallo']" class="glyphicon integra"></button>
+      <button @click="integra" :class="[state.integrazioneAttiva ? 'glyphicon-minus' : 'glyphicon-plus', pianificate ? 'verde' : 'giallo']" class="glyphicon integra"></button>
     </div>
-    <div v-if="integrazioneAttiva">
+    <div v-if="state.integrazioneAttiva">
       <div class="contenitore-colonne">
         <div class="colonna">
           <div v-if="['manutenzione straordinaria', 'restauro'].includes(att.tipo_attività[0])" class="contenitore-colonne centra">
             <label for="progettista" class="colonna">Progettista:</label>
-            <input v-model="progettista" id="progettista" class="colonna">
+            <input v-model="state.progettista" id="progettista" class="colonna">
           </div>
           <div class="contenitore-colonne centra">
             <label for="esecutori" class="colonna">Esecutori:</label>
-            <input v-model="esecutori" id="esecutori" class="colonna">
+            <input v-model="state.esecutori" id="esecutori" class="colonna">
           </div>
           <div class="contenitore-colonne centra">
             <label for="strumentazione" class="colonna">Strumentazione:</label>
-            <input v-model="strumentazione" id="strumentazione" class="colonna">
+            <input v-model="state.strumentazione" id="strumentazione" class="colonna">
           </div>
           <div class="contenitore-colonne centra">
             <label for="note" class="colonna">Note:</label>
-            <input v-model="note" id="note" class="colonna">
+            <input v-model="state.note" id="note" class="colonna">
           </div>
         </div>
         <div class="colonna">
           <div class="contenitore-colonne centra">
-            <label for="costo" class="colonna">Costo previsto (€):</label>
-            <input v-model="costoPrevisto" type="number" min="0" step=".01" id="costo" class="colonna">
+            <label for="costo" class="colonna">Costo previsto (EUR):</label>
+            <input v-model="state.costoPrevisto" type="number" min="0" step=".01" id="costo" class="colonna">
           </div>
           <div class="contenitore-colonne centra">
             <label for="ore" class="colonna">Ore previste:</label>
-            <input v-model="orePreviste" type="number" step=".5" id="ore" class="colonna">
+            <input v-model="state.orePreviste" type="number" step=".5" id="ore" class="colonna">
           </div>
           <div class="contenitore-colonne centra">
             <label for="data" class="colonna">Data programmata:</label>
-            <input v-model="dataProgrammata" type="date" id="data" class="colonna">
+            <input v-model="state.dataProgrammata" type="date" id="data" class="colonna">
           </div>
           <div v-if="att.necessaria_revisione" class="contenitore-colonne centra">
             <label for="nuova-freq" class="colonna">Nuova frequenza:</label>
-            <input v-model="frequenza" type="number" min="1" step="1" id="nuova-freq" class="colonna">
+            <input v-model="state.frequenza" type="number" min="1" step="1" id="nuova-freq" class="colonna">
           </div>
         </div>
       </div>
@@ -69,104 +67,92 @@
   </div>
 </template>
 
-<script>
-import {reactive, toRefs, computed, inject/*, onMounted*/} from 'vue';
+<script setup>
+import {reactive, computed, inject} from 'vue';
 import {dataCorta, dataInteger} from '../../js/shared';
 import { integraAttività } from '../../js/richieste';
 
-export default {
-  name: 'SchedaIntegrazioneAttività',
-  props: {
-    pianificate: Boolean,
-    att: Object,
-  },
-  setup(props, {emit}) {
-    const store = inject('store');
-    const state = reactive({
-      id_record: props.att.id_att_prog,
-      integrazioneAttiva: false,
-      esecutori: props.att.esecutori,
-      strumentazione: props.att.strumentazione,
-      note: props.att.commenti,
-      costoPrevisto: props.att.costo,
-      orePreviste: props.att.ore,
-      dataProgrammata: props.att.data_prog,
-      frequenza: props.att.frequenza,
-      progettista: '',
-    });
+const props = defineProps({
+  pianificate: Boolean,
+  att: Object,
+});
 
-    const stringAtt = computed(() => {
-      return props.att.tipo_attività.join(', ');
-    });
-    const edificio = computed(() => {
-      return props.att.id_main10ance[0].split('|')[1];
-    });
+const emit = defineEmits(['integrazioneCompletata']);
 
-    // onMounted(() => console.log(props.att));
+const store = inject('store');
+const state = reactive({
+  id_record: props.att.id_att_prog,
+  integrazioneAttiva: false,
+  esecutori: props.att.esecutori,
+  strumentazione: props.att.strumentazione,
+  note: props.att.commenti,
+  costoPrevisto: props.att.costo,
+  orePreviste: props.att.ore,
+  dataProgrammata: props.att.data_prog,
+  frequenza: props.att.frequenza,
+  progettista: '',
+});
 
-    function integra() {
-      state.integrazioneAttiva = !state.integrazioneAttiva;
-      if (state.integrazioneAttiva) resetDati();
+const stringAtt = computed(() => {
+  return props.att.tipo_attività.join(', ');
+});
+const edificio = computed(() => {
+  return props.att.id_main10ance[0].split('|')[1];
+});
+
+function integra() {
+  state.integrazioneAttiva = !state.integrazioneAttiva;
+  if (state.integrazioneAttiva) resetDati();
+}
+
+function resetDati() {
+  state.esecutori = props.att.esecutori;
+  state.strumentazione = props.att.strumentazione;
+  state.note = props.att.commenti;
+  state.costoPrevisto = props.att.costo;
+  state.orePreviste = props.att.ore;
+  state.dataProgrammata = props.att.data_prog;
+  if (props.att.frequenza) state.frequenza = props.att.frequenza;
+  state.progettista = '';
+}
+
+async function salvaIntegrazione() {
+  if ([state.esecutori, state.strumentazione, state.costoPrevisto, state.orePreviste, state.dataProgrammata].every(elem => !!elem) && (props.att.necessaria_revisione ? state.frequenza : true)) {
+    const jsonAtt = {};
+    const datiIns = {};
+    jsonAtt['id_att_prog'] = parseInt(state.id_record);
+    jsonAtt['data_ultima_mod'] = dataCorta();
+    jsonAtt['dati_inserimento'] = datiIns;
+    datiIns['tabelle'] = props.att.tipo_attività.map(t => store.statePlanner.attività[t].tabella);
+    datiIns['id_att'] = dataInteger();
+    datiIns['cl_ogg_fr'] = props.att.cl_ogg_fr;
+    datiIns['descrizione'] = props.att.tipo_attività.map(t => props.att[t]);
+    datiIns['id_main10ance'] = props.att.id_main10ance;
+    datiIns['rid_fr_risc'] = props.att.rid_fr_risc;
+    datiIns['data_azione'] = state.dataProgrammata;
+    datiIns['id_group'] = props.att.id_group;
+    datiIns['rid_contr'] = parseInt(props.att.rid_contr);
+    datiIns['rid_dad'] = parseInt(props.att.rid_dad);
+    datiIns['progettista'] = state.progettista;
+    if (state.dataProgrammata !== props.att.data_prog) jsonAtt['data_prog'] = state.dataProgrammata;
+    if (state.esecutori) jsonAtt['esecutori'] = state.esecutori;
+    if (state.strumentazione) jsonAtt['strumentaz'] = state.strumentazione;
+    if (state.costoPrevisto) jsonAtt['costo'] = state.costoPrevisto;
+    if (state.orePreviste) jsonAtt['ore'] = state.orePreviste;
+    if (state.note) jsonAtt['commenti'] = state.note;
+    if (state.frequenza) jsonAtt['frequenza'] = state.frequenza;
+    if (props.att.necessaria_revisione) jsonAtt['necessaria_revisione'] = false;
+    const res = await integraAttività(jsonAtt);
+    if (res.success) {
+      store.methods.setAlert("Salvataggio avvenuto con successo");
+      emit('integrazioneCompletata');
     }
-
-    function resetDati() {
-      state.esecutori = props.att.esecutori;
-      state.strumentazione = props.att.strumentazione;
-      state.note = props.att.commenti;
-      state.costoPrevisto = props.att.costo;
-      state.orePreviste = props.att.ore;
-      state.dataProgrammata = props.att.data_prog;
-      if (props.att.frequenza) state.frequenza = props.att.frequenza;
-      state.progettista = '';
+    else {
+      store.methods.setAlert("ATTENZIONE: Si e verificato un errore durante la registrazione dei dati");
     }
-
-    async function salvaIntegrazione() {
-      if ([state.esecutori, state.strumentazione, state.costoPrevisto, state.orePreviste, state.dataProgrammata].every(elem => !!elem) && (props.att.necessaria_revisione ? state.frequenza : true)) {
-        const jsonAtt = {};
-        const datiIns = {};
-        jsonAtt['id_att_prog'] = parseInt(state.id_record);
-        jsonAtt['data_ultima_mod'] = dataCorta();
-        jsonAtt['dati_inserimento'] = datiIns;
-        datiIns['tabelle'] = props.att.tipo_attività.map(t => store.statePlanner.attività[t].tabella);
-        datiIns['id_att'] = dataInteger();
-        datiIns['cl_ogg_fr'] = props.att.cl_ogg_fr;
-        datiIns['descrizione'] = props.att.tipo_attività.map(t => props.att[t]);
-        datiIns['id_main10ance'] = props.att.id_main10ance;
-        datiIns['rid_fr_risc'] = props.att.rid_fr_risc;
-        datiIns['data_azione'] = state.dataProgrammata;
-        datiIns['id_group'] = props.att.id_group;
-        datiIns['rid_contr'] = parseInt(props.att.rid_contr);
-        datiIns['rid_dad'] = parseInt(props.att.rid_dad);
-        datiIns['progettista'] = state.progettista;
-        if (state.dataProgrammata !== props.att.data_prog) jsonAtt['data_prog'] = state.dataProgrammata;
-        if (state.esecutori) jsonAtt['esecutori'] = state.esecutori;
-        if (state.strumentazione) jsonAtt['strumentaz'] = state.strumentazione;
-        if (state.costoPrevisto) jsonAtt['costo'] = state.costoPrevisto;
-        if (state.orePreviste) jsonAtt['ore'] = state.orePreviste;
-        if (state.note) jsonAtt['commenti'] = state.note;
-        if (state.frequenza) jsonAtt['frequenza'] = state.frequenza;
-        if (props.att.necessaria_revisione) jsonAtt['necessaria_revisione'] = false;
-        const res = await integraAttività(jsonAtt);
-        if (res.success) {
-          store.methods.setAlert("Salvataggio avvenuto con successo");
-          emit('integrazioneCompletata');
-        }
-        else {
-          store.methods.setAlert("ATTENZIONE: Si è verificato un errore durante la registrazione dei dati");
-        }
-      }
-      else {
-        store.methods.setAlert('I campi "Esecutori", "Strumentazione", "Costo previsto", "Ore previste" e "Data programmata" sono obbligatori');
-      }
-    }
-
-    return {
-      ...toRefs(state),
-      stringAtt,
-      edificio,
-      integra,
-      salvaIntegrazione,
-    }
+  }
+  else {
+    store.methods.setAlert('I campi "Esecutori", "Strumentazione", "Costo previsto", "Ore previste" e "Data programmata" sono obbligatori');
   }
 }
 </script>

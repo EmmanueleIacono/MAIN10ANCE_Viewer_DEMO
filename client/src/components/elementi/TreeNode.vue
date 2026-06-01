@@ -14,76 +14,66 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import { reactive, inject } from 'vue';
 
-export default {
-  name: 'TreeNode',
-  props: {
-    node: {
-      type: Object,
-      required: true
-    },
+defineOptions({name: 'TreeNode'});
+
+const props = defineProps({
+  node: {
+    type: Object,
+    required: true
   },
-  emits: ['cambiaIdCliccato'],
-  setup(props, { emit }) {
-    const idNodoSelezionato = inject('cartellaSelezionata');
+});
 
-    const state = reactive({
-      nodeOpen: false,
-      childNodes: null,
-      childLoad: false,
-    });
+const emit = defineEmits(['cambiaIdCliccato']);
 
-    const icone = {
-      'default': 'glyphicon-question-sign',
-      'folder-open': 'glyphicon-folder-open',
-      'folder-close': 'glyphicon-folder-close',
-      'object': 'glyphicon-file'
-    }
+const idNodoSelezionato = inject('cartellaSelezionata');
 
-    function getNodeIcon() {
-      if (props.node.type === 'folder') {
-        return state.nodeOpen ? icone['folder-open'] : icone['folder-close'];
-      }
-      return icone[props.node.type] || icone['default'];
-    }
+const state = reactive({
+  nodeOpen: false,
+  childNodes: null,
+  childLoad: false,
+});
 
-    function apriNodo(id) {
-      console.log('nodo aperto', id);
-      console.log('nodo selezionato: ', idNodoSelezionato);
-      emit('cambiaIdCliccato', id);
-      state.nodeOpen = !state.nodeOpen;
-      if (state.nodeOpen && !state.childNodes && props.node.children && props.node.children.length > 0) {
-        state.childLoad = true;
-        // per simulare load async, poi togliere
-        setTimeout(() => {
-          const childObjects = [...props.node.children]; // creo copia per evitare mutazioni (?)
-          childObjects.sort((a, b) => {
-            if (a.id < b.id) return -1;
-            if (a.id > b.id) return 1;
-            return 0;
-          });
-          state.childNodes = childObjects;
-          state.childLoad = false;
-        }, 100);
-      }
-    }
+const icone = {
+  'default': 'glyphicon-question-sign',
+  'folder-open': 'glyphicon-folder-open',
+  'folder-close': 'glyphicon-folder-close',
+  'object': 'glyphicon-file'
+}
 
-    function apriNodoChild(id) {
-      console.log('apri figlio: ', id);
-      emit('cambiaIdCliccato', id);
-    }
-
-    return {
-      state,
-      idNodoSelezionato,
-      icone,
-      getNodeIcon,
-      apriNodo,
-      apriNodoChild,
-    }
+function getNodeIcon() {
+  if (props.node.type === 'folder') {
+    return state.nodeOpen ? icone['folder-open'] : icone['folder-close'];
   }
+  return icone[props.node.type] || icone['default'];
+}
+
+function apriNodo(id) {
+  console.log('nodo aperto', id);
+  console.log('nodo selezionato: ', idNodoSelezionato);
+  emit('cambiaIdCliccato', id);
+  state.nodeOpen = !state.nodeOpen;
+  if (state.nodeOpen && !state.childNodes && props.node.children && props.node.children.length > 0) {
+    state.childLoad = true;
+    // per simulare load async, poi togliere
+    setTimeout(() => {
+      const childObjects = [...props.node.children]; // creo copia per evitare mutazioni (?)
+      childObjects.sort((a, b) => {
+        if (a.id < b.id) return -1;
+        if (a.id > b.id) return 1;
+        return 0;
+      });
+      state.childNodes = childObjects;
+      state.childLoad = false;
+    }, 100);
+  }
+}
+
+function apriNodoChild(id) {
+  console.log('apri figlio: ', id);
+  emit('cambiaIdCliccato', id);
 }
 </script>
 

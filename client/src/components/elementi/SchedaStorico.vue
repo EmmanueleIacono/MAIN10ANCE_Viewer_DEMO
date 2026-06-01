@@ -2,65 +2,52 @@
   <div>
     <table>
       <caption @click="confirmApriModello" class="caption-schede"><b>{{`Attività di ${tipo} n. ${dati[`Codice scheda ${tipo}`]}`}}</b></caption>
-      <tr v-for="(valore, chiave) in dati" :key="valore" :class="tipoClass" class="tr-schede">
-        <td :class="tipoClass" class="td-schede f40"><b>{{chiave}}</b></td>
-        <td v-if="chiave.startsWith('Elementi')" :class="tipoClass" class="td-schede f60">
-          <Details summary="Vedi elementi" :open="false">{{valore.join(', ')}}</Details>
-        </td>
-        <td v-else-if="valore" :class="tipoClass" class="td-schede f60">{{valore}}</td>
-        <td v-else :class="tipoClass" class="td-schede f60"><i>Nessun valore</i></td>
-      </tr>
+      <tbody>
+        <tr v-for="(valore, chiave) in dati" :key="valore" :class="tipoClass" class="tr-schede">
+          <td :class="tipoClass" class="td-schede f40"><b>{{chiave}}</b></td>
+          <td v-if="chiave.startsWith('Elementi')" :class="tipoClass" class="td-schede f60">
+            <Details summary="Vedi elementi" :open="false">{{valore.join(', ')}}</Details>
+          </td>
+          <td v-else-if="valore" :class="tipoClass" class="td-schede f60">{{valore}}</td>
+          <td v-else :class="tipoClass" class="td-schede f60"><i>Nessun valore</i></td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </template>
 
-<script>
-import {ref, computed, inject} from 'vue';
+<script setup>
+import {computed, inject} from 'vue';
 import {prendiUrn} from '../../js/richieste';
 import {getModel, cercaElementiDaScheda} from '../../js/BIM';
 import Details from './Details.vue';
 
-export default {
-  name: 'SchedaStorico',
-  components: {
-    Details,
-  },
-  props: {
-    dati: Object,
-    tipo: String,
-  },
-  setup(props) {
-    const store = inject('store');
-    const detailsOpen = ref(false);
-    const tipoClass = computed(() => props.tipo.replaceAll(' ', '-'));
+const props = defineProps({
+  dati: Object,
+  tipo: String,
+});
 
-    async function confirmApriModello() {
-      const conferma = await store.methods.setConfirm('Visualizzare gli elementi nel BIM Viewer?');
-      if (conferma) apriModello();
-      return;
-    }
+const store = inject('store');
+const tipoClass = computed(() => props.tipo.replaceAll(' ', '-'));
 
-    async function apriModello() {
-      const listaIdM10a = Object.entries(props.dati).filter(e => e[0].startsWith('Elementi'))[0][1];
-      const idArray = listaIdM10a[0].split('|');
-      const loc = idArray[0];
-      const edif = idArray[1].split('-')[0];
-      const urnJson = await prendiUrn({sm: loc, capp: edif});
-      const urn = await urnJson.urn;
-      store.methods.toggleLoaderGlobale();
-      getModel(urn, async () => {
-        await cercaElementiDaScheda(listaIdM10a);
-        store.stateBIM.elementiSelezionati = listaIdM10a;
-        store.methods.toggleLoaderGlobale();
-      });
-    }
+async function confirmApriModello() {
+  const conferma = await store.methods.setConfirm('Visualizzare gli elementi nel BIM Viewer?');
+  if (conferma) apriModello();
+}
 
-    return {
-      detailsOpen,
-      tipoClass,
-      confirmApriModello,
-    }
-  }
+async function apriModello() {
+  const listaIdM10a = Object.entries(props.dati).filter(e => e[0].startsWith('Elementi'))[0][1];
+  const idArray = listaIdM10a[0].split('|');
+  const loc = idArray[0];
+  const edif = idArray[1].split('-')[0];
+  const urnJson = await prendiUrn({sm: loc, capp: edif});
+  const urn = await urnJson.urn;
+  store.methods.toggleLoaderGlobale();
+  getModel(urn, async () => {
+    await cercaElementiDaScheda(listaIdM10a);
+    store.stateBIM.elementiSelezionati = listaIdM10a;
+    store.methods.toggleLoaderGlobale();
+  });
 }
 </script>
 
