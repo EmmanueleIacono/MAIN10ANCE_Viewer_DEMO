@@ -26,82 +26,68 @@
 </Card>
 </template>
 
-<script>
+<script setup>
 import {Chart, BarController, LineController, PointElement, LineElement, BarElement, Legend} from 'chart.js';
 import {BarChart} from 'vue-chart-3';
 import Card from './elementi/Card.vue';
 
 Chart.register(BarController, LineController, PointElement, LineElement, BarElement, Legend);
 
-export default {
-  name: 'TabDashboardTaskProgress',
-  components: {
-    Card,
-    BarChart,
-  },
-  setup() {
-    const controllo = '#a8c956';
-    const intervento = '#1a4f9c';
+const controllo = '#a8c956';
+const intervento = '#1a4f9c';
 
-    const data1 = [52, 60, 55, 50, 65, 80, 57, 70, 105, 115, 100, 0];
-    const data2 = [102, 70, 80, 100, 56, 53, 80, 75, 65, 90];
-    const data3 = [13, 27, 15, 42, 23, 25, 10, 12, 13, 25, 17, 0];
+const data1 = [52, 60, 55, 50, 65, 80, 57, 70, 105, 115, 100, 0];
+const data2 = [102, 70, 80, 100, 56, 53, 80, 75, 65, 90];
+const data3 = [13, 27, 15, 42, 23, 25, 10, 12, 13, 25, 17, 0];
 
-    const testData = {
+const testData = {
+  type: 'bar',
+  labels: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio ', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
+  datasets: [
+    {
+      label: 'attività',
+      type: 'line',
+      borderColor: 'orange',
+      backgroundColor: 'orange',
+      pointBorderColor: 'orange',
+      borderRadius: 5,
+      borderWidth: 2,
+      data: data3
+    },
+    {
+      label: 'Costo previsto (€)',
       type: 'bar',
-      labels: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio ', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
-      datasets: [
-        {
-          label: 'attività',
-          type: 'line',
-          borderColor: 'orange',
-          backgroundColor: 'orange',
-          pointBorderColor: 'orange',
-          borderRadius: 5,
-          borderWidth: 2,
-          data: data3
-        },
-        {
-          label: 'Costo previsto (€)',
-          type: 'bar',
-          backgroundColor: controllo,
-          borderRadius: 5,
-          data: data1
-        },
-        {
-          label: 'Costo effettivo (€)',
-          type: 'bar',
-          backgroundColor: intervento,
-          borderRadius: 5,
-          data: data2
-        },
-      ]
-    }
+      backgroundColor: controllo,
+      borderRadius: 5,
+      data: data1
+    },
+    {
+      label: 'Costo effettivo (€)',
+      type: 'bar',
+      backgroundColor: intervento,
+      borderRadius: 5,
+      data: data2
+    },
+  ]
+}
 
-    const options = {
-      aspectRatio: 2,
-      maintainAspectRation: true,
-      plugins: {
-        legend: {display: true, position: 'top',
-          font: {size: 12, family: 'Poppins'}},
-        scales: [{
-          x: {display: true, color: 'grey'},
-          y: {display: true, color: 'grey'}
-        }],
-      },
-      elements: {
-        point: {radius: 5, hitRadius: 10, hoverRadius: 15, hoverBorderWidth: 3},
-        line: {backgroundColor: 'grey', borderWidth: 10}
-        },
-      animations: {
-        animation: true,
-      }
-    }
-
-    return {
-      testData,
-      options,
-    }
+const options = {
+  aspectRatio: 2,
+  maintainAspectRation: true,
+  plugins: {
+    legend: {display: true, position: 'top',
+      font: {size: 12, family: 'Poppins'}},
+    scales: [{
+      x: {display: true, color: 'grey'},
+      y: {display: true, color: 'grey'}
+    }],
+  },
+  elements: {
+    point: {radius: 5, hitRadius: 10, hoverRadius: 15, hoverBorderWidth: 3},
+    line: {backgroundColor: 'grey', borderWidth: 10}
+    },
+  animations: {
+    animation: true,
   }
 }
 </script>

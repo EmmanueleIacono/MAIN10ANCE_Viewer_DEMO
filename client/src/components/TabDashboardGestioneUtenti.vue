@@ -1,78 +1,71 @@
 <template>
 <div class="parent">
   <table>
-    <tr>
-      <th>Utenti</th>
-      <th>E-mail</th>
-      <th>Ruolo</th>
-    </tr>
-    <tr v-for="utente in infoUtenti" :key="utente.email">
-      <td>{{utente.user}}</td>
-      <td>{{utente.email}}</td>
-      <td>
-        <select v-model="utente.ruolo" :disabled="store.state.userSettings.user_id === utente.user">
-          <option v-for="ruolo in listaRuoli" :key="ruolo" :value="ruolo">{{ruolo}}</option>
-        </select>
-        <button @click="modificaRuolo(utente)" :disabled="store.state.userSettings.user_id === utente.user">MODIFICA</button>
-      </td>
-    </tr>
+    <thead>
+      <tr>
+        <th>Utenti</th>
+        <th>E-mail</th>
+        <th>Ruolo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="utente in state.infoUtenti" :key="utente.email">
+        <td>{{utente.user}}</td>
+        <td>{{utente.email}}</td>
+        <td>
+          <select v-model="utente.ruolo" :disabled="store.state.userSettings.user_id === utente.user">
+            <option v-for="ruolo in state.listaRuoli" :key="ruolo" :value="ruolo">{{ruolo}}</option>
+          </select>
+          <button @click="modificaRuolo(utente)" :disabled="store.state.userSettings.user_id === utente.user">MODIFICA</button>
+        </td>
+      </tr>
+    </tbody>
   </table>
 </div>
 </template>
 
-<script>
-import {inject, onMounted, reactive, toRefs} from 'vue';
+<script setup>
+import {inject, onMounted, reactive} from 'vue';
 import {getInfoGestioneUtenti, getRuoliEnum, updateRuoloUtente} from '../js/richieste';
 
-export default {
-  name: 'TabDashboardGestioneUtenti',
-  setup() {
-    const store = inject('store');
-    const state = reactive({
-      infoUtenti: [],
-      listaRuoli: [],
-    });
+const store = inject('store');
+const state = reactive({
+  infoUtenti: [],
+  listaRuoli: [],
+});
 
-    let ruoliOriginali = [];
+let ruoliOriginali = [];
 
-    onMounted(async () => {
-      const listaRuoli = await getRuoliEnum();
-      state.listaRuoli = listaRuoli;
-      await impostaTabellaUtenti();
-    });
+onMounted(async () => {
+  const listaRuoli = await getRuoliEnum();
+  state.listaRuoli = listaRuoli;
+  await impostaTabellaUtenti();
+});
 
-    async function impostaTabellaUtenti() {
-      const infoUtenti = await getInfoGestioneUtenti();
-      ruoliOriginali = infoUtenti.map(utente => JSON.parse(JSON.stringify(utente)));
-      state.infoUtenti = infoUtenti;
+async function impostaTabellaUtenti() {
+  const infoUtenti = await getInfoGestioneUtenti();
+  ruoliOriginali = infoUtenti.map(utente => JSON.parse(JSON.stringify(utente)));
+  state.infoUtenti = infoUtenti;
+}
+
+async function modificaRuolo(datiUtente) {
+  if (store.state.userSettings.user_id === datiUtente.user) return;
+  const datiUtenteOriginali = ruoliOriginali.find(utente => utente.user === datiUtente.user);
+  const match = datiUtenteOriginali.ruolo === datiUtente.ruolo;
+  if (match) {
+    store.methods.setAlert('Nessuna modifica da effettuare');
+  }
+  else {
+    const userJson = {
+      user: datiUtente.user,
+      ruolo: datiUtente.ruolo,
     }
-
-    async function modificaRuolo(datiUtente) {
-      if (store.state.userSettings.user_id === datiUtente.user) return;
-      const datiUtenteOriginali = ruoliOriginali.find(utente => utente.user === datiUtente.user);
-      const match = datiUtenteOriginali.ruolo === datiUtente.ruolo;
-      if (match) {
-        store.methods.setAlert('Nessuna modifica da effettuare');
-      }
-      else {
-        const userJson = {
-          user: datiUtente.user,
-          ruolo: datiUtente.ruolo,
-        }
-        store.methods.toggleLoaderGlobale();
-        const res = await updateRuoloUtente(userJson);
-        if (res) store.methods.setAlert('Modifica effettuata');
-        else store.methods.setAlert('Si è verificato un errore, la modifica non è andata a buon fine');
-        await impostaTabellaUtenti();
-        store.methods.toggleLoaderGlobale();
-      }
-    }
-
-    return {
-      store,
-      ...toRefs(state),
-      modificaRuolo,
-    }
+    store.methods.toggleLoaderGlobale();
+    const res = await updateRuoloUtente(userJson);
+    if (res) store.methods.setAlert('Modifica effettuata');
+    else store.methods.setAlert('Si è verificato un errore, la modifica non è andata a buon fine');
+    await impostaTabellaUtenti();
+    store.methods.toggleLoaderGlobale();
   }
 }
 </script>
@@ -99,7 +92,6 @@ button:disabled {
 table {
   border-collapse: collapse;
   width: 100%;
-  /* padding: 10px; */
   overflow: auto;
 }
 td, th {

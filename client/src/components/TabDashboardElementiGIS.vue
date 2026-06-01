@@ -5,7 +5,7 @@
 </Card>
 </template>
 
-<script>
+<script setup>
 import {Chart, PieController, Legend} from 'chart.js';
 import {PieChart} from 'vue-chart-3';
 import {onMounted, reactive, computed} from 'vue';
@@ -15,47 +15,33 @@ import Card from './elementi/Card.vue';
 
 Chart.register(PieController, Legend);
 
-export default {
-  name: 'TabDashboardElementiGIS',
-  components: {
-    Card,
-    PieChart,
-  },
-  setup() {
-    const state = reactive({
-      dataGIS: [],
-      labelsGIS: [],
-      colori: []
-    });
+const state = reactive({
+  dataGIS: [],
+  labelsGIS: [],
+  colori: []
+});
 
-    const data = computed(() => ({
-      datasets: [{
-        data: state.dataGIS,
-        backgroundColor: state.dataGIS.map(() => generaColoreRandom()),
-      }],
-      labels: state.labelsGIS,
-    }));
+const data = computed(() => ({
+  datasets: [{
+    data: state.dataGIS,
+    backgroundColor: state.dataGIS.map(() => generaColoreRandom()),
+  }],
+  labels: state.labelsGIS,
+}));
 
-    const options = {
-      plugins: {
-        legend: {
-          display: true,
-          position: 'left'
-          },
-        },
-      responsive: true
-    }
-
-    onMounted(async () => {
-      [state.dataGIS, state.labelsGIS] = await getDatiElementiGISDashboard();
-    });
-
-    return {
-      data,
-      options,
-    }
-  }
+const options = {
+  plugins: {
+    legend: {
+      display: true,
+      position: 'left'
+      },
+    },
+  responsive: true
 }
+
+onMounted(async () => {
+  [state.dataGIS, state.labelsGIS] = await getDatiElementiGISDashboard();
+});
 </script>
 
 <style scoped>

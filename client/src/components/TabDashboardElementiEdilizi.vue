@@ -14,7 +14,7 @@
 </Card>
 </template>
 
-<script>
+<script setup>
 import {Chart, PieController, Legend} from 'chart.js';
 import {PieChart} from 'vue-chart-3';
 import {onMounted, reactive, computed} from 'vue';
@@ -25,44 +25,29 @@ import Speedometer from './elementi/Speedometer.vue';
 
 Chart.register(PieController, Legend);
 
-export default {
-  name: 'TabDashboardElementiEdilizi',
-  components: {
-    Card,
-    PieChart,
-    Speedometer,
+const state = reactive({
+  dataBIM: [],
+  labelsBIM: [],
+});
+
+const data = computed(() => ({
+  datasets: [{
+    data: state.dataBIM,
+    backgroundColor: state.dataBIM.map(() => generaColoreRandom()),
+  }],
+  labels: state.labelsBIM,
+}));
+
+const options = {
+  plugins: {
+    legend: {display: true, position: 'left'},
   },
-  setup() {
-    const state = reactive({
-      dataBIM: [],
-      labelsBIM: [],
-    });
-
-    const data = computed(() => ({
-      datasets: [{
-        data: state.dataBIM,
-        backgroundColor: state.dataBIM.map(() => generaColoreRandom()),
-      }],
-      labels: state.labelsBIM,
-    }));
-
-    const options = {
-      plugins: {
-        legend: {display: true, position: 'left'},
-      },
-      responsive: true
-    }
-
-    onMounted(async () => {
-      [state.dataBIM, state.labelsBIM] = await getDatiElementiEdiliziDashboard();
-    });
-
-    return {
-      data,
-      options,
-    }
-  }
+  responsive: true
 }
+
+onMounted(async () => {
+  [state.dataBIM, state.labelsBIM] = await getDatiElementiEdiliziDashboard();
+});
 </script>
 
 <style scoped>

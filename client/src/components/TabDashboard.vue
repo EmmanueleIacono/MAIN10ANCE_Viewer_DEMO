@@ -21,7 +21,7 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import {inject} from 'vue';
 import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
@@ -33,27 +33,7 @@ import GraficiDettaglio from './TabDashboardGraficiDettaglio.vue';
 import GestioneUtenti from './TabDashboardGestioneUtenti.vue';
 import Details from './elementi/Details.vue';
 
-export default {
-  name: 'TabDashboard',
-  components: {
-    MainPanel,
-    Explorer,
-    Overview,
-    TaskProgress,
-    ElementiEdilizi,
-    ElementiGIS,
-    GraficiDettaglio,
-    GestioneUtenti,
-    Details,
-  },
-  setup() {
-    const store = inject('store');
-
-    return {
-      store,
-    }
-  }
-}
+const store = inject('store');
 </script>
 
 <style scoped>
