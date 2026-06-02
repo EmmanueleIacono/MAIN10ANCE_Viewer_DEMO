@@ -2,12 +2,12 @@
 <div>
   <MainPanel :class="`col-sm-${store.getters.getBimVwSets()[0]} fill`"><br>
     <DownloadImage @nuovaSelezione="aggiornaSelezione" ref="downloadRef" :percorsoCartella="percorsoCartella" />
-    <Galleria v-if="datiGalleria.galleriaVisibile" />
+    <Galleria v-if="state.datiGalleria.galleriaVisibile" />
   </MainPanel>
   <Explorer :colonna="`col-sm-${store.getters.getBimVwSets()[1]}`">
     <Details summary="SELEZIONE IMMAGINI" :open="true">
       <div class="wrapper-crea-percorso loading-wrapper">
-        <LoadingScreen :caricamento="datiNavigazione.caricamento" />
+        <LoadingScreen :caricamento="state.datiNavigazione.caricamento" />
         <CreaPercorso />
       </div>
     </Details>
@@ -30,27 +30,27 @@
     </div>
     <div class="explorer-body">
       <div class="col-lg-12 loading-wrapper">
-        <LoadingScreen :caricamento="datiNavigazione.caricamento" />
+        <LoadingScreen :caricamento="state.datiNavigazione.caricamento" />
         <UploadImage
           @annullaCaricamentoImmagine="cancellaAnteprima"
           @salvaCaricamentoImmagine="salvaImmagine"
-          v-if="datiCaricamento.anteprimaImg"
-          :source="datiCaricamento.anteprimaImg"
+          v-if="state.datiCaricamento.anteprimaImg"
+          :source="state.datiCaricamento.anteprimaImg"
           :percorso="percorsoCartella"
         />
-        <ModuloAnagrafica ref="anagraficaRef" v-if="datiAnagrafica.moduloAnagraficaVisibile" />
-        <ModuloSegnalazione ref="segnalazioneRef" v-if="datiSegnalazione.moduloSegnalazioneVisibile" />
-        <SchedaAnagrafica ref="scAnagraficaRef" v-if="datiAnagrafica.schedaAnagraficaVisibile" />
+        <ModuloAnagrafica ref="anagraficaRef" v-if="state.datiAnagrafica.moduloAnagraficaVisibile" />
+        <ModuloSegnalazione ref="segnalazioneRef" v-if="state.datiSegnalazione.moduloSegnalazioneVisibile" />
+        <SchedaAnagrafica ref="scAnagraficaRef" v-if="state.datiAnagrafica.schedaAnagraficaVisibile" />
         <br />
-        <SchedaSegnalazione ref="scSegnalazioneRef" v-if="datiSegnalazione.schedaSegnalazioneVisibile" />
+        <SchedaSegnalazione ref="scSegnalazioneRef" v-if="state.datiSegnalazione.schedaSegnalazioneVisibile" />
         </div>
     </div>
   </Explorer>
 </div>
 </template>
 
-<script>
-import {inject, reactive, toRefs, provide, computed, ref} from 'vue';
+<script setup>
+import {inject, reactive, provide, computed, ref} from 'vue';
 import {dataInteger, verificaPercorso, dataCorta, trattaStringArray} from '../js/shared';
 import {getListaImmagini} from '../js/richieste';
 import {creaRecordLOD4, eliminaRecordLOD4, getAnagraficaArtifactViewer, getSegnalazioneArtifactViewer} from '../js/richieste';
@@ -68,596 +68,553 @@ import SchedaAnagrafica from './TabCollectionSchedaAnagrafica.vue';
 import SchedaSegnalazione from './TabCollectionSchedaSegnalazione.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 
-export default {
-  name: 'TabCollection',
-  components: {
-    Explorer,
-    Details,
-    DownloadImage,
-    MainPanel,
-    BtnBIM,
-    UploadImage,
-    CreaPercorso,
-    Galleria,
-    ModuloAnagrafica,
-    ModuloSegnalazione,
-    SchedaAnagrafica,
-    SchedaSegnalazione,
-    LoadingScreen,
+const store = inject('store');
+const downloadRef = ref(null);
+const inputRef = ref(null);
+const labelRef = ref(null);
+const anagraficaRef = ref(null);
+const scAnagraficaRef = ref(null);
+const state = reactive({
+  datiGalleria: {
+    galleriaVisibile: false,
+    listaImmagini: [],
+    idImgSelezionate: [],
   },
-  setup() {
-    const store = inject('store');
-    const downloadRef = ref(null);
-    const inputRef = ref(null);
-    const labelRef = ref(null);
-    const anagraficaRef = ref(null);
-    const scAnagraficaRef = ref(null);
-    const state = reactive({
-      datiGalleria: {
-        galleriaVisibile: false,
-        listaImmagini: [],
-        idImgSelezionate: [],
-      },
-      datiNavigazione: {
-        caricamento: false,
-        selectLocalita: '',
-        selectEdificio: '',
-        selectElemento: '',
-        listaSigleLoc: [],
-        listaEdif: [],
-        listaEdifFiltrata: [],
-        listaElementi: [],
-      },
-      datiCaricamento: {
-        anteprimaImg: null,
-        file: null,
-        idImmagine: '',
-      },
-      datiAnagrafica: {
-        moduloAnagraficaVisibile: false,
-        schedaAnagraficaVisibile: false,
-        schedaAnagrafica: null,
-      },
-      datiSegnalazione: {
-        moduloSegnalazioneVisibile: false,
-        schedaSegnalazioneVisibile: false,
-        schedaSegnalazione: null,
-      },
-      datiModuloAnagrafica: {
-        descrizione_sistema: '',
-        descrizione_subsistema: '',
-        tecnica_costruttiva: '',
-        dimensioni: '',
-        materiale: '',
-        epoca: '',
-        ispezionabilità: '',
-        fonti: '',
-        definizione: '',
-        autore: '',
-        descrizione: '',
-        tecniche: '',
-        documenti: '',
-        iter_autorizzativo: '',
-        data: '',
-        docs: [], // lista nomi documenti
-        id_anagr: null,
-        data_registrazione: null,
-        data_ultima_mod: null,
-        autore_scheda: null,
-        autore_ultima_mod: null,
-      },
-      datiModuloAnagraficaStatua: {
-        nome_statua: '',
-        codice_statua: '',
-        codici_altro: '',
-        descrizione_statua: '',
-        tecnica_esecuzione: '',
-        dimensioni: '',
-        materiale_statua: '',
-        materiale_annotazioni: '',
-        materiali_armatura: [], // enum[]
-        materiale_supporto: '', // enum
-        lamina_metallica: false, // bool
-        pellicola_pittorica_tecnica_e_mat: {
-          su_legno: '',
-          su_gesso: '',
-          su_terracotta: '',
-          altro: '',
-        },
-        strato_di_preparazione: '',
-        elementi_accessori_monili: [], // enum[]
-        materiale_elementi_accessori_monili: [], // enum[]
-        elementi_accessori_monili_annotazioni: '',
-        elementi_di_ancoraggio_a_parete: false,
-        materiale_ancoraggio_parete: '', // enum
-        ancoraggio_parete_annotazioni: '',
-        elementi_di_ancoraggio_a_pavimento: false,
-        materiale_ancoraggio_pavimento: '', // enum
-        ancoraggio_pavimento_annotazioni: '',
-        epoca: '',
-        fonti: '',
-        autore: '',
-        accessibilità: false, // bool
-        note: '',
-        docs: [], // lista nomi documenti
-        id_anagr: null,
-        data_registrazione: null,
-        data_ultima_mod: null,
-        autore_scheda: null,
-        autore_ultima_mod: null,
-      },
-      datiModuloAnagraficaCoperture: {
-        codice: '',
-        descrizione_copertura_rapporti: '', // enum
-        descrizione_copertura_rapporti_annotazioni: '',
-        estensione_compl: null, // double
-        estensione_compl_comment: '', // enum
-        descrizione_copertura_gen: '',
-        cronologia_cop: '',
-        tipo_manto: '', // enum
-        tipo_manto_annotazioni: '',
-        materiale_manto_pietra: '', // enum
-        materiale_manto_later: '', // enum
-        materiale_manto_annotazioni: '',
-        tipo_elementi_manto_pietra: '', // enum
-        tipo_elementi_manto_later: '', // enum
-        tipo_elementi_manto_annotazioni: '',
-        tecnica_esec_posa_manto_pietra: '', // enum
-        tecnica_esec_posa_manto_later: '', // enum
-        tecnica_esec_posa_manto_annotazioni: '',
-        colmo_sist_descrizione: '',
-        colmo_sist_gloss: '',
-        colmo_sist_annotazioni: '',
-        displuvi_sist_descrizione: '',
-        displuvi_sist_gloss: '',
-        displuvi_sist_annotazioni: '',
-        gronda_sist_descrizione: '',
-        gronda_sist_gloss: '',
-        gronda_sist_annotazioni: '',
-        el_strati_funz_acc: [], // enum[]
-        el_strati_funz_acc_gloss: '',
-        el_strati_funz_acc_annotazioni: '',
-        el_strati_funz_acc_aggiunto: false, // bool
-        materiale_cop_str: '', // enum
-        materiale_cop_strutt_annotazioni: '',
-        grossa_orditura_el: [],
-        grossa_orditura_annotazioni: '',
-        media_orditura_el: [],
-        media_orditura_annotazioni: '',
-        piccola_orditura_el: [],
-        piccola_orditura_annotazioni: '',
-        el_giunzioni: [],
-        el_giunzioni_annotazioni: '',
-        epoca: '',
-        fonti: '',
-        autore: '',
-        accessibilità: false, // bool
-        accessibilità_annotazioni: '',
-        ispezionabilità_sottotetto: false, // bool
-        ispezionabilità_sottotetto_annotazioni: '',
-        note: '',
-        docs: [], // lista nomi documenti
-        id_anagr: null,
-        data_registrazione: null,
-        data_ultima_mod: null,
-        autore_scheda: null,
-        autore_ultima_mod: null,
-      },
-      datiModuloSegnalazione: {
-        meteo: '',
-        temperatura: '',
-        condizioni_sett_precedente: '',
-        descrizione: '',
-        intervento_urgenza: '',
-        id_segnalazione: null,
-        data_registrazione: null,
-        data_ultima_mod: null,
-        autore_scheda: null,
-        autore_ultima_mod: null,
-      },
-      datiDocumenti: {
-        docs: [], // lista nomi documenti
-      },
-      datiUtility: {
-        schedaPreesistente: false,
-      },
-    });
-    provide('stateArtifact', state.datiNavigazione);
-    provide('stateGalleria', state.datiGalleria);
-    provide('stateAnagrafica', state.datiAnagrafica);
-    provide('stateSegnalazione', state.datiSegnalazione);
-    provide('stateModuloAnagrafica', state.datiModuloAnagrafica);
-    provide('stateModuloAnagraficaStatua', state.datiModuloAnagraficaStatua);
-    provide('stateModuloAnagraficaCoperture', state.datiModuloAnagraficaCoperture);
-    provide('stateDocumenti', state.datiDocumenti);
-    provide('stateModuloSegnalazione', state.datiModuloSegnalazione);
+  datiNavigazione: {
+    caricamento: false,
+    selectLocalita: '',
+    selectEdificio: '',
+    selectElemento: '',
+    listaSigleLoc: [],
+    listaEdif: [],
+    listaEdifFiltrata: [],
+    listaElementi: [],
+  },
+  datiCaricamento: {
+    anteprimaImg: null,
+    file: null,
+    idImmagine: '',
+  },
+  datiAnagrafica: {
+    moduloAnagraficaVisibile: false,
+    schedaAnagraficaVisibile: false,
+    schedaAnagrafica: null,
+  },
+  datiSegnalazione: {
+    moduloSegnalazioneVisibile: false,
+    schedaSegnalazioneVisibile: false,
+    schedaSegnalazione: null,
+  },
+  datiModuloAnagrafica: {
+    descrizione_sistema: '',
+    descrizione_subsistema: '',
+    tecnica_costruttiva: '',
+    dimensioni: '',
+    materiale: '',
+    epoca: '',
+    ispezionabilità: '',
+    fonti: '',
+    definizione: '',
+    autore: '',
+    descrizione: '',
+    tecniche: '',
+    documenti: '',
+    iter_autorizzativo: '',
+    data: '',
+    docs: [], // lista nomi documenti
+    id_anagr: null,
+    data_registrazione: null,
+    data_ultima_mod: null,
+    autore_scheda: null,
+    autore_ultima_mod: null,
+  },
+  datiModuloAnagraficaStatua: {
+    nome_statua: '',
+    codice_statua: '',
+    codici_altro: '',
+    descrizione_statua: '',
+    tecnica_esecuzione: '',
+    dimensioni: '',
+    materiale_statua: '',
+    materiale_annotazioni: '',
+    materiali_armatura: [], // enum[]
+    materiale_supporto: '', // enum
+    lamina_metallica: false, // bool
+    pellicola_pittorica_tecnica_e_mat: {
+      su_legno: '',
+      su_gesso: '',
+      su_terracotta: '',
+      altro: '',
+    },
+    strato_di_preparazione: '',
+    elementi_accessori_monili: [], // enum[]
+    materiale_elementi_accessori_monili: [], // enum[]
+    elementi_accessori_monili_annotazioni: '',
+    elementi_di_ancoraggio_a_parete: false,
+    materiale_ancoraggio_parete: '', // enum
+    ancoraggio_parete_annotazioni: '',
+    elementi_di_ancoraggio_a_pavimento: false,
+    materiale_ancoraggio_pavimento: '', // enum
+    ancoraggio_pavimento_annotazioni: '',
+    epoca: '',
+    fonti: '',
+    autore: '',
+    accessibilità: false, // bool
+    note: '',
+    docs: [], // lista nomi documenti
+    id_anagr: null,
+    data_registrazione: null,
+    data_ultima_mod: null,
+    autore_scheda: null,
+    autore_ultima_mod: null,
+  },
+  datiModuloAnagraficaCoperture: {
+    codice: '',
+    descrizione_copertura_rapporti: '', // enum
+    descrizione_copertura_rapporti_annotazioni: '',
+    estensione_compl: null, // double
+    estensione_compl_comment: '', // enum
+    descrizione_copertura_gen: '',
+    cronologia_cop: '',
+    tipo_manto: '', // enum
+    tipo_manto_annotazioni: '',
+    materiale_manto_pietra: '', // enum
+    materiale_manto_later: '', // enum
+    materiale_manto_annotazioni: '',
+    tipo_elementi_manto_pietra: '', // enum
+    tipo_elementi_manto_later: '', // enum
+    tipo_elementi_manto_annotazioni: '',
+    tecnica_esec_posa_manto_pietra: '', // enum
+    tecnica_esec_posa_manto_later: '', // enum
+    tecnica_esec_posa_manto_annotazioni: '',
+    colmo_sist_descrizione: '',
+    colmo_sist_gloss: '',
+    colmo_sist_annotazioni: '',
+    displuvi_sist_descrizione: '',
+    displuvi_sist_gloss: '',
+    displuvi_sist_annotazioni: '',
+    gronda_sist_descrizione: '',
+    gronda_sist_gloss: '',
+    gronda_sist_annotazioni: '',
+    el_strati_funz_acc: [], // enum[]
+    el_strati_funz_acc_gloss: '',
+    el_strati_funz_acc_annotazioni: '',
+    el_strati_funz_acc_aggiunto: false, // bool
+    materiale_cop_str: '', // enum
+    materiale_cop_strutt_annotazioni: '',
+    grossa_orditura_el: [],
+    grossa_orditura_annotazioni: '',
+    media_orditura_el: [],
+    media_orditura_annotazioni: '',
+    piccola_orditura_el: [],
+    piccola_orditura_annotazioni: '',
+    el_giunzioni: [],
+    el_giunzioni_annotazioni: '',
+    epoca: '',
+    fonti: '',
+    autore: '',
+    accessibilità: false, // bool
+    accessibilità_annotazioni: '',
+    ispezionabilità_sottotetto: false, // bool
+    ispezionabilità_sottotetto_annotazioni: '',
+    note: '',
+    docs: [], // lista nomi documenti
+    id_anagr: null,
+    data_registrazione: null,
+    data_ultima_mod: null,
+    autore_scheda: null,
+    autore_ultima_mod: null,
+  },
+  datiModuloSegnalazione: {
+    meteo: '',
+    temperatura: '',
+    condizioni_sett_precedente: '',
+    descrizione: '',
+    intervento_urgenza: '',
+    id_segnalazione: null,
+    data_registrazione: null,
+    data_ultima_mod: null,
+    autore_scheda: null,
+    autore_ultima_mod: null,
+  },
+  datiDocumenti: {
+    docs: [], // lista nomi documenti
+  },
+  datiUtility: {
+    schedaPreesistente: false,
+  },
+});
 
-    const percorsoCartella = computed(() => `${state.datiNavigazione.selectLocalita}/${state.datiNavigazione.selectEdificio}/${state.datiNavigazione.selectElemento}`);
-    const id_main10ance = computed(() => `${state.datiNavigazione.selectLocalita}|${state.datiNavigazione.selectEdificio}|${state.datiNavigazione.selectElemento}|${state.datiCaricamento.idImmagine}`);
+provide('stateArtifact', state.datiNavigazione);
+provide('stateGalleria', state.datiGalleria);
+provide('stateAnagrafica', state.datiAnagrafica);
+provide('stateSegnalazione', state.datiSegnalazione);
+provide('stateModuloAnagrafica', state.datiModuloAnagrafica);
+provide('stateModuloAnagraficaStatua', state.datiModuloAnagraficaStatua);
+provide('stateModuloAnagraficaCoperture', state.datiModuloAnagraficaCoperture);
+provide('stateDocumenti', state.datiDocumenti);
+provide('stateModuloSegnalazione', state.datiModuloSegnalazione);
 
-    function mostraGalleria() {
-      state.datiGalleria.galleriaVisibile = !state.datiGalleria.galleriaVisibile;
+const percorsoCartella = computed(() => `${state.datiNavigazione.selectLocalita}/${state.datiNavigazione.selectEdificio}/${state.datiNavigazione.selectElemento}`);
+// const id_main10ance = computed(() => `${state.datiNavigazione.selectLocalita}|${state.datiNavigazione.selectEdificio}|${state.datiNavigazione.selectElemento}|${state.datiCaricamento.idImmagine}`);
+
+function mostraGalleria() {
+  state.datiGalleria.galleriaVisibile = !state.datiGalleria.galleriaVisibile;
+}
+
+function cliccaLabel() {
+  labelRef.value.click();
+}
+
+function mostraAnteprima(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const idImmagine = dataInteger();
+    state.datiCaricamento.idImmagine = idImmagine;
+    state.datiCaricamento.anteprimaImg = URL.createObjectURL(file);
+    const nuovoNomeImmagine = `${state.datiCaricamento.idImmagine}__${file.name}`;
+    const nuovoFile = new File([file], nuovoNomeImmagine, {type: file.type});
+    state.datiCaricamento.file = nuovoFile;
+    console.log(state.datiCaricamento);
+    console.log('percorso cartella: ', percorsoCartella.value);
+    console.log('nuovo nome file: ', nuovoNomeImmagine);
+  }
+  else {
+    cancellaAnteprima();
+  }
+}
+
+function cancellaAnteprima() {
+  URL.revokeObjectURL(state.datiCaricamento.anteprimaImg);
+  const dt = new DataTransfer();
+  inputRef.value.files = dt.files;
+  state.datiCaricamento.anteprimaImg = null;
+  state.datiCaricamento.file = null;
+  state.datiCaricamento.idImmagine = '';
+}
+
+function verificaDisplay(sezione) {
+  return store.getters.getUsrVwList().includes(sezione);
+}
+
+function deseleziona() {
+  downloadRef.value.deselectImage();
+  if (anagraficaRef.value) anagraficaRef.value.chiudiScheda();
+  if (scAnagraficaRef.value) scAnagraficaRef.value.chiudiScheda();
+}
+
+async function eliminaImmagine() {
+  const daEliminare = downloadRef.value.getPercorsiSelezionati();
+  if (!daEliminare.length) {
+    store.methods.setAlert('Nessun elemento selezionato');
+    return;
+  }
+  const confermaProcedere = await store.methods.setConfirm("Sei sicuro di voler eliminare gli elementi selezionati? L'operazione è irreversibile.");
+  if (!confermaProcedere) return;
+  const jsonReq = {};
+  jsonReq.immagini = [...daEliminare];
+  jsonReq.entità = state.datiNavigazione.selectElemento;
+  store.methods.toggleLoaderGlobale();
+  const risultato = await eliminaRecordLOD4(jsonReq);
+  if (risultato.success) {
+    store.methods.setAlert('Operazione andata a buon fine');
+    const filePaths = await getListaImmagini(percorsoCartella.value);
+    downloadRef.value.aggiornaFilePaths(filePaths);
+  }
+  else {
+    store.methods.setAlert('Operazione fallita, riprovare');
+  }
+  store.methods.toggleLoaderGlobale();
+}
+
+async function salvaImmagine(dati) {
+  if (verificaPercorso(percorsoCartella.value)) {
+    // QUI SE MANUFATTO O DETTAGLIO, SERVE MODIFICA DATI COMPLETI
+    const datiCompleti = {
+      ...dati,
+      id_immagine: state.datiCaricamento.idImmagine,
+      percorso: percorsoCartella.value,
+      entità: state.datiNavigazione.selectElemento,
+      data_ins: dataCorta(),
+    };
+    const fd = new FormData();
+    fd.append('file', state.datiCaricamento.file);
+    fd.append('dati', JSON.stringify(datiCompleti));
+
+    store.methods.toggleLoaderGlobale();
+    const risultato = await creaRecordLOD4(fd);
+    if (risultato.success) {
+      store.methods.setAlert('Operazione andata a buon fine');
+      cancellaAnteprima();
+      const filePaths = await getListaImmagini(percorsoCartella.value);
+      downloadRef.value.aggiornaFilePaths(filePaths);
     }
-
-    function cliccaLabel() {
-      labelRef.value.click();
-    }
-
-    function mostraAnteprima(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const idImmagine = dataInteger();
-        state.datiCaricamento.idImmagine = idImmagine;
-        state.datiCaricamento.anteprimaImg = URL.createObjectURL(file);
-        const nuovoNomeImmagine = `${state.datiCaricamento.idImmagine}__${file.name}`;
-        const nuovoFile = new File([file], nuovoNomeImmagine, {type: file.type});
-        state.datiCaricamento.file = nuovoFile;
-        console.log(state.datiCaricamento);
-        console.log('percorso cartella: ', percorsoCartella.value);
-        console.log('nuovo nome file: ', nuovoNomeImmagine);
-      }
-      else {
-        cancellaAnteprima();
-      }
-    }
-
-    function cancellaAnteprima() {
-      URL.revokeObjectURL(state.datiCaricamento.anteprimaImg);
-      const dt = new DataTransfer();
-      inputRef.value.files = dt.files;
-      state.datiCaricamento.anteprimaImg = null;
-      state.datiCaricamento.file = null;
-      state.datiCaricamento.idImmagine = '';
-    }
-
-    function verificaDisplay(sezione) {
-      return store.getters.getUsrVwList().includes(sezione);
-    }
-
-    function deseleziona() {
-      downloadRef.value.deselectImage();
-      if (anagraficaRef.value) anagraficaRef.value.chiudiScheda();
-      if (scAnagraficaRef.value) scAnagraficaRef.value.chiudiScheda();
-    }
-
-    async function eliminaImmagine() {
-      const daEliminare = downloadRef.value.getPercorsiSelezionati();
-      if (!daEliminare.length) {
-        store.methods.setAlert('Nessun elemento selezionato');
-        return;
-      }
-      const confermaProcedere = await store.methods.setConfirm("Sei sicuro di voler eliminare gli elementi selezionati? L'operazione è irreversibile.");
-      if (!confermaProcedere) return;
-      const jsonReq = {};
-      jsonReq.immagini = [...daEliminare];
-      jsonReq.entità = state.datiNavigazione.selectElemento;
-      store.methods.toggleLoaderGlobale();
-      const risultato = await eliminaRecordLOD4(jsonReq);
-      if (risultato.success) {
-        store.methods.setAlert('Operazione andata a buon fine');
-        const filePaths = await getListaImmagini(percorsoCartella.value);
-        downloadRef.value.aggiornaFilePaths(filePaths);
-      }
-      else {
-        store.methods.setAlert('Operazione fallita, riprovare');
-      }
-      store.methods.toggleLoaderGlobale();
-    }
-
-    async function salvaImmagine(dati) {
-      if (verificaPercorso(percorsoCartella.value)) {
-        // QUI SE MANUFATTO O DETTAGLIO, SERVE MODIFICA DATI COMPLETI
-        const datiCompleti = {
-          ...dati,
-          id_immagine: state.datiCaricamento.idImmagine,
-          percorso: percorsoCartella.value,
-          entità: state.datiNavigazione.selectElemento,
-          data_ins: dataCorta(),
-        };
-        const fd = new FormData();
-        fd.append('file', state.datiCaricamento.file);
-        fd.append('dati', JSON.stringify(datiCompleti));
-
-        store.methods.toggleLoaderGlobale();
-        const risultato = await creaRecordLOD4(fd);
-        if (risultato.success) {
-          store.methods.setAlert('Operazione andata a buon fine');
-          cancellaAnteprima();
-          const filePaths = await getListaImmagini(percorsoCartella.value);
-          downloadRef.value.aggiornaFilePaths(filePaths);
-        }
-        else {
-          store.methods.setAlert('Operazione fallita, riprovare');
-        }
-      }
-      else {
-        store.methods.setAlert('Percorso non valido, impossibile continuare');
-      }
-      store.methods.toggleLoaderGlobale();
-    }
-
-    async function interrogaImmagine() {
-      const daInterrogare = downloadRef.value.getPercorsiSelezionati();
-      if (!daInterrogare.length) {
-        store.methods.setAlert('Nessun elemento selezionato');
-        return;
-      }
-      else if (daInterrogare.length !== 1) {
-        store.methods.setAlert('Selezionare un solo elemento per volta');
-        return;
-      }
-      else {
-        state.datiNavigazione.caricamento = true;
-        const idMain10ance = state.datiGalleria.idImgSelezionate[0];
-        const categoria = state.datiNavigazione.selectElemento;
-        const jsonReq = {
-          id: idMain10ance,
-          categoria: categoria
-        };
-        console.log(jsonReq);
-        const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
-        const datiSegnalazione = await getSegnalazioneArtifactViewer(jsonReq);
-        console.log("datiAnagrafica\n", datiAnagrafica);
-        console.log("datiSegnalazione\n", datiSegnalazione);
-        state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
-        state.datiSegnalazione.schedaSegnalazione = datiSegnalazione[0];
-        state.datiAnagrafica.moduloAnagraficaVisibile = false;
-        state.datiSegnalazione.moduloSegnalazioneVisibile = false;
-        state.datiAnagrafica.schedaAnagraficaVisibile = true;
-        state.datiSegnalazione.schedaSegnalazioneVisibile = true;
-        state.datiNavigazione.caricamento = false;
-      }
-    }
-
-    async function anagraficaImmagine() {
-      const immaginiSelezionate = downloadRef.value.getPercorsiSelezionati();
-      if (!immaginiSelezionate.length) {
-        store.methods.setAlert('Nessun elemento selezionato');
-        return;
-      }
-      else if (immaginiSelezionate.length !== 1) {
-        store.methods.setAlert('Selezionare un solo elemento per volta');
-        return;
-      }
-      else {
-        state.datiNavigazione.caricamento = true;
-        state.datiAnagrafica.schedaAnagrafica = null;
-        const idMain10ance = state.datiGalleria.idImgSelezionate[0];
-        const categoria = state.datiNavigazione.selectElemento;
-        const jsonReq = {
-          id: idMain10ance,
-          categoria: categoria
-        };
-        console.log(jsonReq);
-        const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
-        console.log("datiAnagrafica\n", datiAnagrafica);
-        state.datiAnagrafica.schedaAnagraficaVisibile = false;
-        state.datiSegnalazione.schedaSegnalazioneVisibile = false;
-        state.datiSegnalazione.moduloSegnalazioneVisibile = false;
-        state.datiAnagrafica.moduloAnagraficaVisibile = true;
-        if (Object.keys(datiAnagrafica).length) {
-          console.log('ci sono dei dati');
-          // QUI IMPOSTARE DATI ANAGRAFICA
-          switch (categoria) {
-            case 'manufatto':
-              // dati Manufatto
-              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
-              console.log('state anagrafica: ', state.datiAnagrafica.schedaAnagrafica);
-              state.datiModuloAnagrafica.definizione = state.datiAnagrafica.schedaAnagrafica['Definizione'];
-              state.datiModuloAnagrafica.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
-              state.datiModuloAnagrafica.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
-              state.datiModuloAnagrafica.descrizione = state.datiAnagrafica.schedaAnagrafica['Descrizione'];
-              state.datiModuloAnagrafica.materiale = state.datiAnagrafica.schedaAnagrafica['Materiale/i'];
-              state.datiModuloAnagrafica.tecniche = state.datiAnagrafica.schedaAnagrafica['Tecniche'];
-              state.datiModuloAnagrafica.documenti = state.datiAnagrafica.schedaAnagrafica['Documenti'];
-              state.datiModuloAnagrafica.iter_autorizzativo = state.datiAnagrafica.schedaAnagrafica['Iter autorizzativo'];
-              break;
-
-            case 'dettaglio':
-              // dati Dettaglio
-              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
-              console.log('state anagrafica: ', state.datiAnagrafica.schedaAnagrafica);
-              state.datiModuloAnagrafica.definizione = state.datiAnagrafica.schedaAnagrafica['Definizione'];
-              state.datiModuloAnagrafica.descrizione = state.datiAnagrafica.schedaAnagrafica['Descrizione'];
-              state.datiModuloAnagrafica.materiale = state.datiAnagrafica.schedaAnagrafica['Materiale/i'];
-              state.datiModuloAnagrafica.tecniche = state.datiAnagrafica.schedaAnagrafica['Tecniche'];
-              state.datiModuloAnagrafica.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
-              state.datiModuloAnagrafica.documenti = state.datiAnagrafica.schedaAnagrafica['Documenti'];
-              state.datiModuloAnagrafica.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
-              state.datiModuloAnagrafica.data = state.datiAnagrafica.schedaAnagrafica['Data'];
-              break;
-
-            case 'statua':
-              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica;
-              console.log('state anagrafica statua: ', state.datiAnagrafica.schedaAnagrafica);
-              state.datiModuloAnagraficaStatua.nome_statua = state.datiAnagrafica.schedaAnagrafica['Soggetto statua']; // DA TABELLA "statua"
-              state.datiModuloAnagraficaStatua.codice_statua = state.datiAnagrafica.schedaAnagrafica['Codice statua']; // DA TABELLA "statua"
-              state.datiModuloAnagraficaStatua.codici_altro = state.datiAnagrafica.schedaAnagrafica['Altri codici'];
-              state.datiModuloAnagraficaStatua.descrizione_statua = state.datiAnagrafica.schedaAnagrafica['Descrizione statua'];
-              state.datiModuloAnagraficaStatua.tecnica_esecuzione = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione'];
-              state.datiModuloAnagraficaStatua.dimensioni = state.datiAnagrafica.schedaAnagrafica['Dimensioni'];
-              state.datiModuloAnagraficaStatua.materiale_statua = state.datiAnagrafica.schedaAnagrafica['Materiale statua']
-              state.datiModuloAnagraficaStatua.materiale_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale annotazioni'];
-              state.datiModuloAnagraficaStatua.materiali_armatura = state.datiAnagrafica.schedaAnagrafica['Materiali armatura'] ? state.datiAnagrafica.schedaAnagrafica['Materiali armatura'] : []; // array
-              state.datiModuloAnagraficaStatua.materiale_supporto = state.datiAnagrafica.schedaAnagrafica['Materiale supporto'];
-              state.datiModuloAnagraficaStatua.lamina_metallica = state.datiAnagrafica.schedaAnagrafica['Lamina metallica']; // bool
-              state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_legno = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su legno'];
-              state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_gesso = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su gesso'];
-              state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_terracotta = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su terracotta'];
-              state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.altro = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica - Altro'];
-              state.datiModuloAnagraficaStatua.strato_di_preparazione = state.datiAnagrafica.schedaAnagrafica['Strato di preparazione'];
-              state.datiModuloAnagraficaStatua.elementi_accessori_monili = state.datiAnagrafica.schedaAnagrafica['Elementi accessori e monili'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Elementi accessori e monili']) : []; // array
-              state.datiModuloAnagraficaStatua.materiale_elementi_accessori_monili = state.datiAnagrafica.schedaAnagrafica['Materiale elementi accessori e monili'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Materiale elementi accessori e monili']) : []; // array
-              state.datiModuloAnagraficaStatua.elementi_accessori_monili_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni elementi accessori e monili'];
-              state.datiModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete = state.datiAnagrafica.schedaAnagrafica['Elementi di ancoraggio a parete']; // bool
-              state.datiModuloAnagraficaStatua.materiale_ancoraggio_parete = state.datiAnagrafica.schedaAnagrafica['Materiale ancoraggi a parete'];
-              state.datiModuloAnagraficaStatua.ancoraggio_parete_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni ancoraggi a parete'];
-              state.datiModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento = state.datiAnagrafica.schedaAnagrafica['Elementi di ancoraggio a pavimento']; // bool
-              state.datiModuloAnagraficaStatua.materiale_ancoraggio_pavimento = state.datiAnagrafica.schedaAnagrafica['Materiale ancoraggi a pavimento'];
-              state.datiModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni ancoraggi a pavimento'];
-              state.datiModuloAnagraficaStatua.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
-              state.datiModuloAnagraficaStatua.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
-              state.datiModuloAnagraficaStatua.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
-              state.datiModuloAnagraficaStatua.accessibilità = state.datiAnagrafica.schedaAnagrafica['Accessibilità']; // bool
-              state.datiModuloAnagraficaStatua.note = state.datiAnagrafica.schedaAnagrafica['Note'];
-              state.datiDocumenti.docs = state.datiAnagrafica.schedaAnagrafica['Documenti'];
-              break;
-
-            case 'elementi':
-              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica;
-              console.log('state anagrafica coperture: ', state.datiAnagrafica.schedaAnagrafica);
-              state.datiModuloAnagraficaCoperture.codice = state.datiAnagrafica.schedaAnagrafica['Codice copertura']; // DA TABELLA "elementi"
-              state.datiModuloAnagraficaCoperture.descrizione_copertura_rapporti = state.datiAnagrafica.schedaAnagrafica['Descrizione copertura rapporti'];
-              state.datiModuloAnagraficaCoperture.descrizione_copertura_rapporti_annotazioni = state.datiAnagrafica.schedaAnagrafica['Descrizione copertura rapporti annotazioni'];
-              state.datiModuloAnagraficaCoperture.estensione_compl = state.datiAnagrafica.schedaAnagrafica['Estensione complessiva']; // double
-              state.datiModuloAnagraficaCoperture.estensione_compl_comment = state.datiAnagrafica.schedaAnagrafica['Estensione desunta da']; // enum
-              state.datiModuloAnagraficaCoperture.descrizione_copertura_gen = state.datiAnagrafica.schedaAnagrafica['Descrizione generale copertura'];
-              state.datiModuloAnagraficaCoperture.cronologia_cop = state.datiAnagrafica.schedaAnagrafica['Cronologia'];
-              state.datiModuloAnagraficaCoperture.tipo_manto = state.datiAnagrafica.schedaAnagrafica['Tipo manto']; // enum
-              state.datiModuloAnagraficaCoperture.tipo_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Tipo manto annotazioni'];
-              state.datiModuloAnagraficaCoperture.materiale_manto_pietra = state.datiAnagrafica.schedaAnagrafica['Materiale manto pietra']; // enum
-              state.datiModuloAnagraficaCoperture.materiale_manto_later = state.datiAnagrafica.schedaAnagrafica['Materiale manto laterizio']; // enum
-              state.datiModuloAnagraficaCoperture.materiale_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale manto annotazioni'];
-              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_pietra = state.datiAnagrafica.schedaAnagrafica['Tipo elementi manto pietra']; // enum
-              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_later = state.datiAnagrafica.schedaAnagrafica['Tipo elementi manto laterizio']; // enum
-              state.datiModuloAnagraficaCoperture.tipo_elementi_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Tipo elementi manto annotazioni'];
-              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_pietra = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione posa manto pietra']; // enum
-              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_later = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione posa manto laterizio']; // enum
-              state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione posa manto annotazioni'];
-              state.datiModuloAnagraficaCoperture.colmo_sist_descrizione = state.datiAnagrafica.schedaAnagrafica['Sistema colmo descrizione'];
-              state.datiModuloAnagraficaCoperture.colmo_sist_gloss = state.datiAnagrafica.schedaAnagrafica['Sistema colmo glossario'];
-              state.datiModuloAnagraficaCoperture.colmo_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica['Sistema colmo annotazioni'];
-              state.datiModuloAnagraficaCoperture.displuvi_sist_descrizione = state.datiAnagrafica.schedaAnagrafica['Sistema displuvi descrizione'];
-              state.datiModuloAnagraficaCoperture.displuvi_sist_gloss = state.datiAnagrafica.schedaAnagrafica['Sistema displuvi glossario'];
-              state.datiModuloAnagraficaCoperture.displuvi_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica['Sistema displuvi annotazioni'];
-              state.datiModuloAnagraficaCoperture.gronda_sist_descrizione = state.datiAnagrafica.schedaAnagrafica['Sistema gronda descrizione'];
-              state.datiModuloAnagraficaCoperture.gronda_sist_gloss = state.datiAnagrafica.schedaAnagrafica['Sistema gronda glossario'];
-              state.datiModuloAnagraficaCoperture.gronda_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica['Sistema gronda annotazioni'];
-              state.datiModuloAnagraficaCoperture.el_strati_funz_acc = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori']) : []; // enum[]
-              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_gloss = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori glossario'];
-              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_annotazioni = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori annotazioni'];
-              state.datiModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori aggiunto']; // bool
-              state.datiModuloAnagraficaCoperture.materiale_cop_str = state.datiAnagrafica.schedaAnagrafica['Materiale copertura']; // enum
-              state.datiModuloAnagraficaCoperture.materiale_cop_strutt_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale copertura annotazioni'];
-              state.datiModuloAnagraficaCoperture.grossa_orditura_el = state.datiAnagrafica.schedaAnagrafica['Elementi grossa orditura'] ? state.datiAnagrafica.schedaAnagrafica['Elementi grossa orditura'] : []; // liv4[]
-              state.datiModuloAnagraficaCoperture.grossa_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi grossa orditura annotazioni'];
-              state.datiModuloAnagraficaCoperture.media_orditura_el = state.datiAnagrafica.schedaAnagrafica['Elementi media orditura'] ? state.datiAnagrafica.schedaAnagrafica['Elementi media orditura'] : []; // liv4[]
-              state.datiModuloAnagraficaCoperture.media_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi media orditura annotazioni'];
-              state.datiModuloAnagraficaCoperture.piccola_orditura_el = state.datiAnagrafica.schedaAnagrafica['Elementi piccola orditura'] ? state.datiAnagrafica.schedaAnagrafica['Elementi piccola orditura'] : []; // liv4[]
-              state.datiModuloAnagraficaCoperture.piccola_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi piccola orditura annotazioni'];
-              state.datiModuloAnagraficaCoperture.el_giunzioni = state.datiAnagrafica.schedaAnagrafica['Elementi di giunzione'] ? state.datiAnagrafica.schedaAnagrafica['Elementi di giunzione'] : []; // liv4[]
-              state.datiModuloAnagraficaCoperture.el_giunzioni_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi di giunzione annotazioni'];
-              state.datiModuloAnagraficaCoperture.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
-              state.datiModuloAnagraficaCoperture.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
-              state.datiModuloAnagraficaCoperture.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
-              state.datiModuloAnagraficaCoperture.accessibilità = state.datiAnagrafica.schedaAnagrafica['Accessibilità']; // bool
-              state.datiModuloAnagraficaCoperture.accessibilità_annotazioni = state.datiAnagrafica.schedaAnagrafica['Accessibilità annotazioni'];
-              state.datiModuloAnagraficaCoperture.ispezionabilità_sottotetto = state.datiAnagrafica.schedaAnagrafica['Ispezionabilità sottotetto']; // bool
-              state.datiModuloAnagraficaCoperture.ispezionabilità_sottotetto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Ispezionabilità sottotetto annotazioni'];
-              state.datiModuloAnagraficaCoperture.note = state.datiAnagrafica.schedaAnagrafica['Note'];
-              state.datiDocumenti.docs = state.datiAnagrafica.schedaAnagrafica['Documenti'];
-              break;
-
-            default:
-              // dati LOD4
-              state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
-              console.log('state anagrafica: ', state.datiAnagrafica.schedaAnagrafica);
-              state.datiModuloAnagrafica.descrizione_sistema = state.datiAnagrafica.schedaAnagrafica['Descrizione sistema'];
-              state.datiModuloAnagrafica.descrizione_subsistema = state.datiAnagrafica.schedaAnagrafica['Descrizione subsistema'];
-              state.datiModuloAnagrafica.tecnica_costruttiva = state.datiAnagrafica.schedaAnagrafica['Tecnica costruttiva'];
-              state.datiModuloAnagrafica.dimensioni = state.datiAnagrafica.schedaAnagrafica['Dimensioni'];
-              state.datiModuloAnagrafica.materiale = state.datiAnagrafica.schedaAnagrafica['Materiale/i'];
-              state.datiModuloAnagrafica.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
-              state.datiModuloAnagrafica.ispezionabilità = state.datiAnagrafica.schedaAnagrafica['Ispezionabilità'];
-              state.datiModuloAnagrafica.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
-              break;
-          }
-        }
-        else {
-          console.log('non ci sono dati');
-        }
-        state.datiNavigazione.caricamento = false;
-      }
-    }
-
-    async function segnalazioneImmagine() {
-      const immaginiSelezionate = downloadRef.value.getPercorsiSelezionati();
-      if (!immaginiSelezionate.length) {
-        store.methods.setAlert('Nessun elemento selezionato');
-        return;
-      }
-      else if (immaginiSelezionate.length !== 1) {
-        store.methods.setAlert('Selezionare un solo elemento per volta');
-        return;
-      }
-      else {
-        state.datiNavigazione.caricamento = true;
-        state.datiSegnalazione.schedaSegnalazione = null;
-        const idMain10ance = state.datiGalleria.idImgSelezionate[0];
-        const categoria = state.datiNavigazione.selectElemento;
-        const jsonReq = {
-          id: idMain10ance,
-          categoria: categoria
-        };
-        console.log(jsonReq);
-        // const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
-        const datiSegnalazione = await getSegnalazioneArtifactViewer(jsonReq);
-        console.log(datiSegnalazione);
-        state.datiAnagrafica.schedaAnagraficaVisibile = false;
-        state.datiAnagrafica.moduloAnagraficaVisibile = false;
-        state.datiSegnalazione.schedaSegnalazioneVisibile = false;
-        state.datiSegnalazione.moduloSegnalazioneVisibile = true;
-        if (datiSegnalazione.length) {
-          console.log('ci sono dei dati');
-          // QUI IMPOSTARE DATI SEGNALAZIONE
-          state.datiSegnalazione.schedaSegnalazione = datiSegnalazione[0];
-          console.log('state segnalazione: ', state.datiSegnalazione.schedaSegnalazione);
-          state.datiModuloSegnalazione.meteo = state.datiSegnalazione.schedaSegnalazione['Meteo'];
-          state.datiModuloSegnalazione.temperatura = state.datiSegnalazione.schedaSegnalazione['Temperatura'];
-          state.datiModuloSegnalazione.condizioni_sett_precedente = state.datiSegnalazione.schedaSegnalazione['Condizioni sett. precedente'];
-          state.datiModuloSegnalazione.descrizione = state.datiSegnalazione.schedaSegnalazione['Descrizione'];
-          state.datiModuloSegnalazione.intervento_urgenza = state.datiSegnalazione.schedaSegnalazione['Intervento di urgenza'];
-        }
-        else {
-          console.log('non ci sono dati');
-        }
-        state.datiNavigazione.caricamento = false;
-      }
-    }
-
-    function aggiornaSelezione(nuovaSelezione) {
-      // deseleziona(); // QUESTA DA' PROBLEMI MA SERVE RISOLVERE IN QUALCHE MODO
-      const imgSelezionate = state.datiGalleria.listaImmagini.filter(img => nuovaSelezione.includes(img.percorso));
-      const idImgSelezionate = imgSelezionate.map(img => img.info.id_main10ance);
-      state.datiGalleria.idImgSelezionate = idImgSelezionate;
-      // PER SICUREZZA, RESET STATE MODULO ANAGRAFICA
-      if (anagraficaRef.value) anagraficaRef.value.resetState();
-    }
-
-    return {
-      store,
-      downloadRef,
-      inputRef,
-      labelRef,
-      anagraficaRef,
-      scAnagraficaRef,
-      ...toRefs(state),
-      percorsoCartella,
-      id_main10ance,
-      cliccaLabel,
-      mostraGalleria,
-      mostraAnteprima,
-      cancellaAnteprima,
-      verificaDisplay,
-      deseleziona,
-      eliminaImmagine,
-      salvaImmagine,
-      interrogaImmagine,
-      anagraficaImmagine,
-      segnalazioneImmagine,
-      aggiornaSelezione,
+    else {
+      store.methods.setAlert('Operazione fallita, riprovare');
     }
   }
+  else {
+    store.methods.setAlert('Percorso non valido, impossibile continuare');
+  }
+  store.methods.toggleLoaderGlobale();
+}
+
+async function interrogaImmagine() {
+  const daInterrogare = downloadRef.value.getPercorsiSelezionati();
+  if (!daInterrogare.length) {
+    store.methods.setAlert('Nessun elemento selezionato');
+    return;
+  }
+  else if (daInterrogare.length !== 1) {
+    store.methods.setAlert('Selezionare un solo elemento per volta');
+    return;
+  }
+  else {
+    state.datiNavigazione.caricamento = true;
+    const idMain10ance = state.datiGalleria.idImgSelezionate[0];
+    const categoria = state.datiNavigazione.selectElemento;
+    const jsonReq = {
+      id: idMain10ance,
+      categoria: categoria
+    };
+    console.log(jsonReq);
+    const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
+    const datiSegnalazione = await getSegnalazioneArtifactViewer(jsonReq);
+    console.log("datiAnagrafica\n", datiAnagrafica);
+    console.log("datiSegnalazione\n", datiSegnalazione);
+    state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+    state.datiSegnalazione.schedaSegnalazione = datiSegnalazione[0];
+    state.datiAnagrafica.moduloAnagraficaVisibile = false;
+    state.datiSegnalazione.moduloSegnalazioneVisibile = false;
+    state.datiAnagrafica.schedaAnagraficaVisibile = true;
+    state.datiSegnalazione.schedaSegnalazioneVisibile = true;
+    state.datiNavigazione.caricamento = false;
+  }
+}
+
+async function anagraficaImmagine() {
+  const immaginiSelezionate = downloadRef.value.getPercorsiSelezionati();
+  if (!immaginiSelezionate.length) {
+    store.methods.setAlert('Nessun elemento selezionato');
+    return;
+  }
+  else if (immaginiSelezionate.length !== 1) {
+    store.methods.setAlert('Selezionare un solo elemento per volta');
+    return;
+  }
+  else {
+    state.datiNavigazione.caricamento = true;
+    state.datiAnagrafica.schedaAnagrafica = null;
+    const idMain10ance = state.datiGalleria.idImgSelezionate[0];
+    const categoria = state.datiNavigazione.selectElemento;
+    const jsonReq = {
+      id: idMain10ance,
+      categoria: categoria
+    };
+    console.log(jsonReq);
+    const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
+    console.log("datiAnagrafica\n", datiAnagrafica);
+    state.datiAnagrafica.schedaAnagraficaVisibile = false;
+    state.datiSegnalazione.schedaSegnalazioneVisibile = false;
+    state.datiSegnalazione.moduloSegnalazioneVisibile = false;
+    state.datiAnagrafica.moduloAnagraficaVisibile = true;
+    if (Object.keys(datiAnagrafica).length) {
+      console.log('ci sono dei dati');
+      // QUI IMPOSTARE DATI ANAGRAFICA
+      switch (categoria) {
+        case 'manufatto':
+          // dati Manufatto
+          state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+          console.log('state anagrafica: ', state.datiAnagrafica.schedaAnagrafica);
+          state.datiModuloAnagrafica.definizione = state.datiAnagrafica.schedaAnagrafica['Definizione'];
+          state.datiModuloAnagrafica.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
+          state.datiModuloAnagrafica.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
+          state.datiModuloAnagrafica.descrizione = state.datiAnagrafica.schedaAnagrafica['Descrizione'];
+          state.datiModuloAnagrafica.materiale = state.datiAnagrafica.schedaAnagrafica['Materiale/i'];
+          state.datiModuloAnagrafica.tecniche = state.datiAnagrafica.schedaAnagrafica['Tecniche'];
+          state.datiModuloAnagrafica.documenti = state.datiAnagrafica.schedaAnagrafica['Documenti'];
+          state.datiModuloAnagrafica.iter_autorizzativo = state.datiAnagrafica.schedaAnagrafica['Iter autorizzativo'];
+          break;
+
+        case 'dettaglio':
+          // dati Dettaglio
+          state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+          console.log('state anagrafica: ', state.datiAnagrafica.schedaAnagrafica);
+          state.datiModuloAnagrafica.definizione = state.datiAnagrafica.schedaAnagrafica['Definizione'];
+          state.datiModuloAnagrafica.descrizione = state.datiAnagrafica.schedaAnagrafica['Descrizione'];
+          state.datiModuloAnagrafica.materiale = state.datiAnagrafica.schedaAnagrafica['Materiale/i'];
+          state.datiModuloAnagrafica.tecniche = state.datiAnagrafica.schedaAnagrafica['Tecniche'];
+          state.datiModuloAnagrafica.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
+          state.datiModuloAnagrafica.documenti = state.datiAnagrafica.schedaAnagrafica['Documenti'];
+          state.datiModuloAnagrafica.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
+          state.datiModuloAnagrafica.data = state.datiAnagrafica.schedaAnagrafica['Data'];
+          break;
+
+        case 'statua':
+          state.datiAnagrafica.schedaAnagrafica = datiAnagrafica;
+          console.log('state anagrafica statua: ', state.datiAnagrafica.schedaAnagrafica);
+          state.datiModuloAnagraficaStatua.nome_statua = state.datiAnagrafica.schedaAnagrafica['Soggetto statua']; // DA TABELLA "statua"
+          state.datiModuloAnagraficaStatua.codice_statua = state.datiAnagrafica.schedaAnagrafica['Codice statua']; // DA TABELLA "statua"
+          state.datiModuloAnagraficaStatua.codici_altro = state.datiAnagrafica.schedaAnagrafica['Altri codici'];
+          state.datiModuloAnagraficaStatua.descrizione_statua = state.datiAnagrafica.schedaAnagrafica['Descrizione statua'];
+          state.datiModuloAnagraficaStatua.tecnica_esecuzione = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione'];
+          state.datiModuloAnagraficaStatua.dimensioni = state.datiAnagrafica.schedaAnagrafica['Dimensioni'];
+          state.datiModuloAnagraficaStatua.materiale_statua = state.datiAnagrafica.schedaAnagrafica['Materiale statua']
+          state.datiModuloAnagraficaStatua.materiale_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale annotazioni'];
+          state.datiModuloAnagraficaStatua.materiali_armatura = state.datiAnagrafica.schedaAnagrafica['Materiali armatura'] ? state.datiAnagrafica.schedaAnagrafica['Materiali armatura'] : []; // array
+          state.datiModuloAnagraficaStatua.materiale_supporto = state.datiAnagrafica.schedaAnagrafica['Materiale supporto'];
+          state.datiModuloAnagraficaStatua.lamina_metallica = state.datiAnagrafica.schedaAnagrafica['Lamina metallica']; // bool
+          state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_legno = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su legno'];
+          state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_gesso = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su gesso'];
+          state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_terracotta = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su terracotta'];
+          state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.altro = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica - Altro'];
+          state.datiModuloAnagraficaStatua.strato_di_preparazione = state.datiAnagrafica.schedaAnagrafica['Strato di preparazione'];
+          state.datiModuloAnagraficaStatua.elementi_accessori_monili = state.datiAnagrafica.schedaAnagrafica['Elementi accessori e monili'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Elementi accessori e monili']) : []; // array
+          state.datiModuloAnagraficaStatua.materiale_elementi_accessori_monili = state.datiAnagrafica.schedaAnagrafica['Materiale elementi accessori e monili'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Materiale elementi accessori e monili']) : []; // array
+          state.datiModuloAnagraficaStatua.elementi_accessori_monili_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni elementi accessori e monili'];
+          state.datiModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete = state.datiAnagrafica.schedaAnagrafica['Elementi di ancoraggio a parete']; // bool
+          state.datiModuloAnagraficaStatua.materiale_ancoraggio_parete = state.datiAnagrafica.schedaAnagrafica['Materiale ancoraggi a parete'];
+          state.datiModuloAnagraficaStatua.ancoraggio_parete_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni ancoraggi a parete'];
+          state.datiModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento = state.datiAnagrafica.schedaAnagrafica['Elementi di ancoraggio a pavimento']; // bool
+          state.datiModuloAnagraficaStatua.materiale_ancoraggio_pavimento = state.datiAnagrafica.schedaAnagrafica['Materiale ancoraggi a pavimento'];
+          state.datiModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni ancoraggi a pavimento'];
+          state.datiModuloAnagraficaStatua.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
+          state.datiModuloAnagraficaStatua.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
+          state.datiModuloAnagraficaStatua.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
+          state.datiModuloAnagraficaStatua.accessibilità = state.datiAnagrafica.schedaAnagrafica['Accessibilità']; // bool
+          state.datiModuloAnagraficaStatua.note = state.datiAnagrafica.schedaAnagrafica['Note'];
+          state.datiDocumenti.docs = state.datiAnagrafica.schedaAnagrafica['Documenti'];
+          break;
+
+        case 'elementi':
+          state.datiAnagrafica.schedaAnagrafica = datiAnagrafica;
+          console.log('state anagrafica coperture: ', state.datiAnagrafica.schedaAnagrafica);
+          state.datiModuloAnagraficaCoperture.codice = state.datiAnagrafica.schedaAnagrafica['Codice copertura']; // DA TABELLA "elementi"
+          state.datiModuloAnagraficaCoperture.descrizione_copertura_rapporti = state.datiAnagrafica.schedaAnagrafica['Descrizione copertura rapporti'];
+          state.datiModuloAnagraficaCoperture.descrizione_copertura_rapporti_annotazioni = state.datiAnagrafica.schedaAnagrafica['Descrizione copertura rapporti annotazioni'];
+          state.datiModuloAnagraficaCoperture.estensione_compl = state.datiAnagrafica.schedaAnagrafica['Estensione complessiva']; // double
+          state.datiModuloAnagraficaCoperture.estensione_compl_comment = state.datiAnagrafica.schedaAnagrafica['Estensione desunta da']; // enum
+          state.datiModuloAnagraficaCoperture.descrizione_copertura_gen = state.datiAnagrafica.schedaAnagrafica['Descrizione generale copertura'];
+          state.datiModuloAnagraficaCoperture.cronologia_cop = state.datiAnagrafica.schedaAnagrafica['Cronologia'];
+          state.datiModuloAnagraficaCoperture.tipo_manto = state.datiAnagrafica.schedaAnagrafica['Tipo manto']; // enum
+          state.datiModuloAnagraficaCoperture.tipo_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Tipo manto annotazioni'];
+          state.datiModuloAnagraficaCoperture.materiale_manto_pietra = state.datiAnagrafica.schedaAnagrafica['Materiale manto pietra']; // enum
+          state.datiModuloAnagraficaCoperture.materiale_manto_later = state.datiAnagrafica.schedaAnagrafica['Materiale manto laterizio']; // enum
+          state.datiModuloAnagraficaCoperture.materiale_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale manto annotazioni'];
+          state.datiModuloAnagraficaCoperture.tipo_elementi_manto_pietra = state.datiAnagrafica.schedaAnagrafica['Tipo elementi manto pietra']; // enum
+          state.datiModuloAnagraficaCoperture.tipo_elementi_manto_later = state.datiAnagrafica.schedaAnagrafica['Tipo elementi manto laterizio']; // enum
+          state.datiModuloAnagraficaCoperture.tipo_elementi_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Tipo elementi manto annotazioni'];
+          state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_pietra = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione posa manto pietra']; // enum
+          state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_later = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione posa manto laterizio']; // enum
+          state.datiModuloAnagraficaCoperture.tecnica_esec_posa_manto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione posa manto annotazioni'];
+          state.datiModuloAnagraficaCoperture.colmo_sist_descrizione = state.datiAnagrafica.schedaAnagrafica['Sistema colmo descrizione'];
+          state.datiModuloAnagraficaCoperture.colmo_sist_gloss = state.datiAnagrafica.schedaAnagrafica['Sistema colmo glossario'];
+          state.datiModuloAnagraficaCoperture.colmo_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica['Sistema colmo annotazioni'];
+          state.datiModuloAnagraficaCoperture.displuvi_sist_descrizione = state.datiAnagrafica.schedaAnagrafica['Sistema displuvi descrizione'];
+          state.datiModuloAnagraficaCoperture.displuvi_sist_gloss = state.datiAnagrafica.schedaAnagrafica['Sistema displuvi glossario'];
+          state.datiModuloAnagraficaCoperture.displuvi_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica['Sistema displuvi annotazioni'];
+          state.datiModuloAnagraficaCoperture.gronda_sist_descrizione = state.datiAnagrafica.schedaAnagrafica['Sistema gronda descrizione'];
+          state.datiModuloAnagraficaCoperture.gronda_sist_gloss = state.datiAnagrafica.schedaAnagrafica['Sistema gronda glossario'];
+          state.datiModuloAnagraficaCoperture.gronda_sist_annotazioni = state.datiAnagrafica.schedaAnagrafica['Sistema gronda annotazioni'];
+          state.datiModuloAnagraficaCoperture.el_strati_funz_acc = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori']) : []; // enum[]
+          state.datiModuloAnagraficaCoperture.el_strati_funz_acc_gloss = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori glossario'];
+          state.datiModuloAnagraficaCoperture.el_strati_funz_acc_annotazioni = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori annotazioni'];
+          state.datiModuloAnagraficaCoperture.el_strati_funz_acc_aggiunto = state.datiAnagrafica.schedaAnagrafica['Strati funzionali accessori aggiunto']; // bool
+          state.datiModuloAnagraficaCoperture.materiale_cop_str = state.datiAnagrafica.schedaAnagrafica['Materiale copertura']; // enum
+          state.datiModuloAnagraficaCoperture.materiale_cop_strutt_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale copertura annotazioni'];
+          state.datiModuloAnagraficaCoperture.grossa_orditura_el = state.datiAnagrafica.schedaAnagrafica['Elementi grossa orditura'] ? state.datiAnagrafica.schedaAnagrafica['Elementi grossa orditura'] : []; // liv4[]
+          state.datiModuloAnagraficaCoperture.grossa_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi grossa orditura annotazioni'];
+          state.datiModuloAnagraficaCoperture.media_orditura_el = state.datiAnagrafica.schedaAnagrafica['Elementi media orditura'] ? state.datiAnagrafica.schedaAnagrafica['Elementi media orditura'] : []; // liv4[]
+          state.datiModuloAnagraficaCoperture.media_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi media orditura annotazioni'];
+          state.datiModuloAnagraficaCoperture.piccola_orditura_el = state.datiAnagrafica.schedaAnagrafica['Elementi piccola orditura'] ? state.datiAnagrafica.schedaAnagrafica['Elementi piccola orditura'] : []; // liv4[]
+          state.datiModuloAnagraficaCoperture.piccola_orditura_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi piccola orditura annotazioni'];
+          state.datiModuloAnagraficaCoperture.el_giunzioni = state.datiAnagrafica.schedaAnagrafica['Elementi di giunzione'] ? state.datiAnagrafica.schedaAnagrafica['Elementi di giunzione'] : []; // liv4[]
+          state.datiModuloAnagraficaCoperture.el_giunzioni_annotazioni = state.datiAnagrafica.schedaAnagrafica['Elementi di giunzione annotazioni'];
+          state.datiModuloAnagraficaCoperture.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
+          state.datiModuloAnagraficaCoperture.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
+          state.datiModuloAnagraficaCoperture.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
+          state.datiModuloAnagraficaCoperture.accessibilità = state.datiAnagrafica.schedaAnagrafica['Accessibilità']; // bool
+          state.datiModuloAnagraficaCoperture.accessibilità_annotazioni = state.datiAnagrafica.schedaAnagrafica['Accessibilità annotazioni'];
+          state.datiModuloAnagraficaCoperture.ispezionabilità_sottotetto = state.datiAnagrafica.schedaAnagrafica['Ispezionabilità sottotetto']; // bool
+          state.datiModuloAnagraficaCoperture.ispezionabilità_sottotetto_annotazioni = state.datiAnagrafica.schedaAnagrafica['Ispezionabilità sottotetto annotazioni'];
+          state.datiModuloAnagraficaCoperture.note = state.datiAnagrafica.schedaAnagrafica['Note'];
+          state.datiDocumenti.docs = state.datiAnagrafica.schedaAnagrafica['Documenti'];
+          break;
+
+        default:
+          // dati LOD4
+          state.datiAnagrafica.schedaAnagrafica = datiAnagrafica[0];
+          console.log('state anagrafica: ', state.datiAnagrafica.schedaAnagrafica);
+          state.datiModuloAnagrafica.descrizione_sistema = state.datiAnagrafica.schedaAnagrafica['Descrizione sistema'];
+          state.datiModuloAnagrafica.descrizione_subsistema = state.datiAnagrafica.schedaAnagrafica['Descrizione subsistema'];
+          state.datiModuloAnagrafica.tecnica_costruttiva = state.datiAnagrafica.schedaAnagrafica['Tecnica costruttiva'];
+          state.datiModuloAnagrafica.dimensioni = state.datiAnagrafica.schedaAnagrafica['Dimensioni'];
+          state.datiModuloAnagrafica.materiale = state.datiAnagrafica.schedaAnagrafica['Materiale/i'];
+          state.datiModuloAnagrafica.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
+          state.datiModuloAnagrafica.ispezionabilità = state.datiAnagrafica.schedaAnagrafica['Ispezionabilità'];
+          state.datiModuloAnagrafica.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
+          break;
+      }
+    }
+    else {
+      console.log('non ci sono dati');
+    }
+    state.datiNavigazione.caricamento = false;
+  }
+}
+
+async function segnalazioneImmagine() {
+  const immaginiSelezionate = downloadRef.value.getPercorsiSelezionati();
+  if (!immaginiSelezionate.length) {
+    store.methods.setAlert('Nessun elemento selezionato');
+    return;
+  }
+  else if (immaginiSelezionate.length !== 1) {
+    store.methods.setAlert('Selezionare un solo elemento per volta');
+    return;
+  }
+  else {
+    state.datiNavigazione.caricamento = true;
+    state.datiSegnalazione.schedaSegnalazione = null;
+    const idMain10ance = state.datiGalleria.idImgSelezionate[0];
+    const categoria = state.datiNavigazione.selectElemento;
+    const jsonReq = {
+      id: idMain10ance,
+      categoria: categoria
+    };
+    console.log(jsonReq);
+    // const datiAnagrafica = await getAnagraficaArtifactViewer(jsonReq);
+    const datiSegnalazione = await getSegnalazioneArtifactViewer(jsonReq);
+    console.log(datiSegnalazione);
+    state.datiAnagrafica.schedaAnagraficaVisibile = false;
+    state.datiAnagrafica.moduloAnagraficaVisibile = false;
+    state.datiSegnalazione.schedaSegnalazioneVisibile = false;
+    state.datiSegnalazione.moduloSegnalazioneVisibile = true;
+    if (datiSegnalazione.length) {
+      console.log('ci sono dei dati');
+      // QUI IMPOSTARE DATI SEGNALAZIONE
+      state.datiSegnalazione.schedaSegnalazione = datiSegnalazione[0];
+      console.log('state segnalazione: ', state.datiSegnalazione.schedaSegnalazione);
+      state.datiModuloSegnalazione.meteo = state.datiSegnalazione.schedaSegnalazione['Meteo'];
+      state.datiModuloSegnalazione.temperatura = state.datiSegnalazione.schedaSegnalazione['Temperatura'];
+      state.datiModuloSegnalazione.condizioni_sett_precedente = state.datiSegnalazione.schedaSegnalazione['Condizioni sett. precedente'];
+      state.datiModuloSegnalazione.descrizione = state.datiSegnalazione.schedaSegnalazione['Descrizione'];
+      state.datiModuloSegnalazione.intervento_urgenza = state.datiSegnalazione.schedaSegnalazione['Intervento di urgenza'];
+    }
+    else {
+      console.log('non ci sono dati');
+    }
+    state.datiNavigazione.caricamento = false;
+  }
+}
+
+function aggiornaSelezione(nuovaSelezione) {
+  // deseleziona(); // QUESTA DA' PROBLEMI MA SERVE RISOLVERE IN QUALCHE MODO
+  const imgSelezionate = state.datiGalleria.listaImmagini.filter(img => nuovaSelezione.includes(img.percorso));
+  const idImgSelezionate = imgSelezionate.map(img => img.info.id_main10ance);
+  state.datiGalleria.idImgSelezionate = idImgSelezionate;
+  // PER SICUREZZA, RESET STATE MODULO ANAGRAFICA
+  if (anagraficaRef.value) anagraficaRef.value.resetState();
 }
 </script>
 

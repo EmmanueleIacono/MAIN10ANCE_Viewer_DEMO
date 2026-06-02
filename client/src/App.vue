@@ -44,7 +44,7 @@
       <div class="fill loading-wrapper">
         <LoadingScreen :caricamento="store.state.loaderGlobaleVisibile" />
         <keep-alive>
-          <component :is="store.state.tabAttivo" @loadLivelli="loadLayers" @updateMappa="popolaMappa" />
+          <component :is="tabAttivo" @loadLivelli="loadLayers" @updateMappa="popolaMappa" />
         </keep-alive>
       </div>
     </div>
@@ -55,8 +55,8 @@
 </div>
 </template>
 
-<script>
-import {provide, onMounted} from 'vue';
+<script setup>
+import {provide, onMounted, markRaw, shallowRef, watch} from 'vue';
 import {getTabelleGIS, getGIS, leggiDBMarkerLoc, leggiDBMarkerEdif, leggiDBMarkerLocPdiff} from './js/richieste';
 import store from '@/store';
 import store_globale from './store/store_globale';
@@ -73,92 +73,82 @@ import Confirm from './components/Confirm.vue';
 import LoadingScreen from './components/elementi/LoadingScreen.vue';
 import DialogFileUpload from './components/DialogFileUpload.vue';
 
-export default {
-  name: 'App',
-  components: {
-    Tab1,
-    Tab2,
-    Tab3,
-    Tab4,
-    Tab5,
-    Tab6,
-    TabAuth,
-    Alert,
-    Confirm,
-    LoadingScreen,
-    DialogFileUpload,
-  },
-  setup() {
-    provide('store', store);
-    provide('store_globale', store_globale);
-    provide('store_anagrafica', store_anagrafica);
+provide('store', store);
+provide('store_globale', store_globale);
+provide('store_anagrafica', store_anagrafica);
 
-    primoLoad();
+const tabs = {
+  Tab1: markRaw(Tab1),
+  Tab2: markRaw(Tab2),
+  Tab3: markRaw(Tab3),
+  Tab4: markRaw(Tab4),
+  Tab5: markRaw(Tab5),
+  Tab6: markRaw(Tab6),
+  TabAuth: markRaw(TabAuth),
+};
+const tabAttivo = shallowRef(tabs[store.state.tabAttivo] || tabs.Tab2);
 
-    onMounted(async () => {
-      await popolaMappa();
-    });
+watch(() => store.state.tabAttivo, nuovoTab => {
+  tabAttivo.value = tabs[nuovoTab] || tabs.Tab2;
+}, {immediate: true});
 
-    async function primoLoad() {
-      try {
-        const resRaw = await fetch('/auth/session', {method: 'GET', headers: {'content-type': 'application/json'}});
-        if (resRaw.ok) {
-          const sessionInfo = await resRaw.json();
-          store.methods.setLocalStorageUserInfo(sessionInfo);
-        }
-        else if (resRaw.status === 401 && localStorage.user_id) {
-          store.methods.setLogoutUserSettings();
-        }
-        else if (localStorage.user_id) {
-          store.methods.setUserSettings();
-        }
-      }
-      catch {
-        if (localStorage.user_id) {
-          store.methods.setUserSettings();
-        }
-      }
-      await store_globale.methods.popolaStoreGlobale();
+primoLoad();
+
+onMounted(async () => {
+  await popolaMappa();
+});
+
+async function primoLoad() {
+  try {
+    const resRaw = await fetch('/auth/session', {method: 'GET', headers: {'content-type': 'application/json'}});
+    if (resRaw.ok) {
+      const sessionInfo = await resRaw.json();
+      store.methods.setLocalStorageUserInfo(sessionInfo);
     }
-
-    async function logout() {
-      const resRaw = await fetch("/auth/logout", {method: "GET", headers: {"content-type": "application/json"} });
-      const res = await resRaw.json();
+    else if (resRaw.status === 401 && localStorage.user_id) {
       store.methods.setLogoutUserSettings();
-      // store.methods.resetStateBIM();
-      // store.methods.resetStateGIS();
-      store.methods.resetStatePlanner();
-      store.methods.setAlert(res.message);
-      store.methods.setTabAttivo('Tab2');
     }
-
-    async function loadLayers() {
-      const tabelleGIS = await getTabelleGIS();
-      store.methods.setTabelleGIS(tabelleGIS);
-      for await (const tab of tabelleGIS) {
-        if (tab.colonneUtili) {
-          const gis = await getGIS(tab.tabella, tab.geometria, tab.colonneUtili.join(", "));
-          store.methods.setEntitàGIS(tab.tabella, gis);
-        }
-      }
-    }
-
-    async function popolaMappa() {
-      const localitaJson = await leggiDBMarkerLoc();
-      const edificiJson = await leggiDBMarkerEdif();
-      const locPdiffJson = await leggiDBMarkerLocPdiff();
-      store.methods.setMarkerLoc(localitaJson);
-      store.methods.setMarkerEdif(edificiJson);
-      store.methods.setMarkerLocPdiff(locPdiffJson);
-    }
-
-    return {
-      store,
-      logout,
-      loadLayers,
-      popolaMappa,
+    else if (localStorage.user_id) {
+      store.methods.setUserSettings();
     }
   }
+  catch {
+    if (localStorage.user_id) {
+      store.methods.setUserSettings();
+    }
+  }
+  await store_globale.methods.popolaStoreGlobale();
+}
+
+async function logout() {
+  const resRaw = await fetch("/auth/logout", {method: "GET", headers: {"content-type": "application/json"} });
+  const res = await resRaw.json();
+  store.methods.setLogoutUserSettings();
+  // store.methods.resetStateBIM();
+  // store.methods.resetStateGIS();
+  store.methods.resetStatePlanner();
+  store.methods.setAlert(res.message);
+  store.methods.setTabAttivo('Tab2');
+}
+
+async function loadLayers() {
+  const tabelleGIS = await getTabelleGIS();
+  store.methods.setTabelleGIS(tabelleGIS);
+  for await (const tab of tabelleGIS) {
+    if (tab.colonneUtili) {
+      const gis = await getGIS(tab.tabella, tab.geometria, tab.colonneUtili.join(", "));
+      store.methods.setEntitàGIS(tab.tabella, gis);
+    }
+  }
+}
+
+async function popolaMappa() {
+  const localitaJson = await leggiDBMarkerLoc();
+  const edificiJson = await leggiDBMarkerEdif();
+  const locPdiffJson = await leggiDBMarkerLocPdiff();
+  store.methods.setMarkerLoc(localitaJson);
+  store.methods.setMarkerEdif(edificiJson);
+  store.methods.setMarkerLocPdiff(locPdiffJson);
 }
 </script>
 
@@ -291,37 +281,11 @@ body {
 
 /* STILI TABELLE FULLCALENDAR --- PER ORA NON FUNZIONANO BENISSIMO */
 th {
-  /* background-color: #b6b4b4; */
   background-color: var(--verdeMain10anceTrasparenza);
 }
 .fc-theme-standard td, .fc-theme-standard th {
   border: 1px solid var(--verdeMain10anceTrasparenza);
 }
-/* table[class^="fc-"] {
-  border-collapse: collapse;
-  width: 100%;
-  padding: 10px;
-  overflow: auto;
-}
-
-td[class^="fc-"], th[class^="fc-"] {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-  max-width: 200px;
-}
-
-td[class^="fc-"] {
-  word-break: break-all;
-}
-
-th[class^="fc-"] {
-  background-color: #b6b4b4;
-} 
-
-tr:nth-child(even)[class^="fc-"] {
-  background-color: #cacaca;
-} */
 
 .loading-wrapper {
   position: relative;

@@ -2,11 +2,12 @@
   <div>
     <h4><b>Report {{store.stateBIM.schedeAttivitàTipo}}</b></h4>
     <table :class="tipoClass">
+      <tbody>
       <tr>
         <td class="fLeft"><label><b>OPERATORE</b></label></td>
         <td class="fRight"><p>{{store.statePlanner.datiSchedaInCompilazione['Operatore']}}</p></td>
       </tr>
-      <div v-if="store.stateBIM.schedeAttivitàTipo === 'controllo'">
+      <template v-if="store.stateBIM.schedeAttivitàTipo === 'controllo'">
         <tr>
           <td class="fLeft"><label><b>CONTROLLO</b></label></td>
           <td class="fRight"><p>{{store.statePlanner.datiSchedaInCompilazione['Tipo di controllo']}}</p></td>
@@ -21,30 +22,30 @@
         </tr>
         <tr>
           <td class="fLeft"><label><b>STATO DI CONSERVAZIONE</b></label></td>
-          <td class="fRight"><select v-model="selectStCons">
+          <td class="fRight"><select v-model="state.selectStCons">
             <option v-for="(en, ind) in store.statePlanner.enumUNI.enumStCons" :key="ind" :value="ind+2">{{en}}</option>
           </select></td>
         </tr>
         <tr>
           <td class="fLeft"><label><b>ESTENSIONE (%)</b></label></td>
-          <td class="fRight"><select v-model="selectEstensione">
-            <option v-for="(en, ind) in listaEstensioni" :key="ind" :value="en">{{en}}</option>
+          <td class="fRight"><select v-model="state.selectEstensione">
+            <option v-for="(en, ind) in state.listaEstensioni" :key="ind" :value="en">{{en}}</option>
           </select></td>
         </tr>
         <tr>
           <td class="fLeft"><label><b>CLASSE DI RACCOMANDAZIONE</b></label></td>
-          <td class="fRight"><select v-model="selectClRacc">
-            <option v-for="(en, ind) in store.statePlanner.enumUNI.enumClRacc" :key="ind" :value="ind" :disabled="selectClRaccOpzioniBloccate.includes(ind)">{{en}}</option>
+          <td class="fRight"><select v-model="state.selectClRacc">
+            <option v-for="(en, ind) in store.statePlanner.enumUNI.enumClRacc" :key="ind" :value="ind" :disabled="state.selectClRaccOpzioniBloccate.includes(ind)">{{en}}</option>
           </select></td>
         </tr>
-        <tr v-if="!selectLivUrgNascosto">
+        <tr v-if="!state.selectLivUrgNascosto">
           <td class="fLeft"><label><b>LIVELLO DI URGENZA</b></label></td>
-          <td class="fRight"><select v-model="selectLivUrg">
+          <td class="fRight"><select v-model="state.selectLivUrg">
             <option v-for="(en, ind) in store.statePlanner.enumUNI.enumLivUrg" :key="ind" :value="ind+1">{{en}}</option>
           </select></td>
         </tr>
-      </div>
-      <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione regolare' || store.stateBIM.schedeAttivitàTipo === 'manutenzione correttiva'">
+      </template>
+      <template v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione regolare' || store.stateBIM.schedeAttivitàTipo === 'manutenzione correttiva'">
         <tr>
           <td class="fLeft"><label><b>MANUTENZIONE</b></label></td>
           <td class="fRight"><p>{{store.statePlanner.datiSchedaInCompilazione['Tipo di intervento']}}</p></td>
@@ -59,13 +60,19 @@
         </tr>
         <tr>
           <td class="fLeft"><label><b>MATERIALE</b></label></td>
-          <td class="fRight"><input v-model="materialeMan"></td>
+          <td class="fRight"><input v-model="state.materialeMan"></td>
         </tr>
-      </div>
+      </template>
       <!-- <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione correttiva'"></div> -->
-      <div v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione straordinaria'">modulo per manutenzione straordinaria</div>
-      <div v-if="store.stateBIM.schedeAttivitàTipo === 'restauro'">modulo per restauro</div>
-      <div v-if="store.stateBIM.schedeAttivitàTipo === 'diagnosi'">modulo per diagnostica</div>
+      <tr v-if="store.stateBIM.schedeAttivitàTipo === 'manutenzione straordinaria'">
+        <td colspan="2">modulo per manutenzione straordinaria</td>
+      </tr>
+      <tr v-if="store.stateBIM.schedeAttivitàTipo === 'restauro'">
+        <td colspan="2">modulo per restauro</td>
+      </tr>
+      <tr v-if="store.stateBIM.schedeAttivitàTipo === 'diagnosi'">
+        <td colspan="2">modulo per diagnostica</td>
+      </tr>
       <tr v-if="!store.statePlanner.compilazioneParziale">
         <td class="fLeft"><label><b>COSTO EFFETTIVO (€)</b></label></td>
         <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Costo previsto (€)']" type="number" min="0" step=".01"></td>
@@ -83,13 +90,13 @@
         <!-- <td class="fRight"><input v-model="store.statePlanner.datiSchedaInCompilazione['Documenti']"></td> -->
         <!-- <td class="fRight"><input type="file" accept="*/*" @change="gestisciFileUpload"></td> -->
       </tr>
-      <tr v-for="(file_item, index) in files" :key="index">
+      <tr v-for="(file_item, index) in state.files" :key="index">
         <td class="fLeft">
           <label><b>Documento {{ index+1 }}</b></label>
         </td>
         <td class="fRight">
           <input :ref="el => fileInputs[index] = el" type="file" accept="*/*" @change="gestisciFileUpload($event, index)" style="display: none;">
-          <button v-if="files.length > 1" class="x" type="button" @click="rimuoviFile(index)">x</button>
+          <button v-if="state.files.length > 1" class="x" type="button" @click="rimuoviFile(index)">x</button>
           <button @click="scegliFile(index)">Scegli file</button>
           <span v-if="file_item.name">{{ file_item.name }}</span>
         </td>
@@ -99,6 +106,7 @@
           <button type="button" class="x" @click="aggiungiFile">+</button>
         </td>
       </tr>
+      </tbody>
     </table>
     <div class="div-bottoni">
       <BtnBIM @click="chiudiAttReset" class="btn-bim" icona="glyphicon-remove" nome="chiudiSchedaAtt" title="Chiudi" colore="verde" />
@@ -107,299 +115,278 @@
   </div>
 </template>
 
-<script>
-import {inject, onMounted, reactive, computed, toRefs, watch} from 'vue';
+<script setup>
+import {inject, onMounted, reactive, computed, watch} from 'vue';
 import {leggiEnum, prendiFrequenzaAttProg, registraAttivitàEseguita} from '../js/richieste';
 import {aggiornaPlanner, aggiungiMesi, dataCorta, dataInteger, chiudiAttività} from '../js/shared';
 import { cambiaColore, cercaElementiDaScheda, getElementiSelezionati, getIdM10AFromSelezione, resetColori, resetVista } from '../js/BIM';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 
-export default {
-  name: 'TabBIMSchedeAttività',
-  components: {
-    BtnBIM,
-  },
-  setup() {
-    const store = inject('store');
-    const state = reactive({
-      selectStCons: 2,
-      selectLivUrg: 1,
-      selectClRacc: 0,
-      selectEstensione: '',
-      selectMatriceDisabled: false, // con vecchia logica partiva da "true"
-      selectLivUrgNascosto: true,
-      selectClRaccOpzioniBloccate: [2, 3], // per bloccare opzioni non selezionabili
-      materialeMan: '',
-      listaEstensioni: [],
-      files: [
-        {file: null, name: ""}
-      ],
-    });
-    const fileInputs = reactive([null]);
-    const livPriorità = computed(() => state.selectStCons * state.selectLivUrg + state.selectClRacc);
-    const tipoClass = computed(() => store.stateBIM.schedeAttivitàTipo.replaceAll(' ', '-'));
+const store = inject('store');
+const state = reactive({
+  selectStCons: 2,
+  selectLivUrg: 1,
+  selectClRacc: 0,
+  selectEstensione: '',
+  selectMatriceDisabled: false, // con vecchia logica partiva da "true"
+  selectLivUrgNascosto: true,
+  selectClRaccOpzioniBloccate: [2, 3], // per bloccare opzioni non selezionabili
+  materialeMan: '',
+  listaEstensioni: [],
+  files: [
+    {file: null, name: ""}
+  ],
+});
+const fileInputs = reactive([null]);
+const livPriorità = computed(() => state.selectStCons * state.selectLivUrg + state.selectClRacc);
+const tipoClass = computed(() => store.stateBIM.schedeAttivitàTipo.replaceAll(' ', '-'));
 
-    // ---------------------------------- NUOVA LOGICA ----------------------------------
-    watch(() => state.selectClRacc, newVal => {
-      if (newVal > 1) {
-        state.selectMatriceDisabled = false;
-      } else {
-        state.selectMatriceDisabled = true;
-        if (state.selectStCons === 0) {
-          state.selectStCons = 2;
-          state.selectLivUrg = 1;
-        }
-      }
-    });
-
-    watch(() => state.selectStCons, newVal => {
-      switch(newVal) {
-        case 2:
-          state.selectLivUrgNascosto = true;
-          state.selectClRaccOpzioniBloccate = [2, 3];
-          state.selectClRacc = 0;
-          state.selectLivUrg = 1;
-          break;
-        case 3:
-          state.selectLivUrgNascosto = false;
-          state.selectClRaccOpzioniBloccate = [3];
-          state.selectClRacc = 0;
-          break;
-        case 4:
-        case 5:
-          state.selectLivUrgNascosto = false;
-          state.selectClRaccOpzioniBloccate = [0, 1];
-          state.selectClRacc = 2;
-          break;
-      }
-    });
-
-    watch(() => state.selectLivUrg, () => {
-      if (state.selectStCons === 0) {
-        state.selectLivUrg = 1;
-      }
-    });
-
-    onMounted(async () => {
-      await recuperaEnumUNI();
-      const estensione = await leggiEnum('estensione');
-      const estensioneLista = estensione.map(perc => perc.unnest);
-      state.listaEstensioni = estensioneLista;
-    });
-
-    async function recuperaEnumUNI() {
-      const enumStCons = await leggiEnum('st_cons');
-      const enumLivUrg = await leggiEnum('liv_urg');
-      const enumClRacc = await leggiEnum('cl_racc');
-      store.statePlanner.enumUNI.enumStCons = enumStCons.map(en => en.unnest);
-      store.statePlanner.enumUNI.enumLivUrg = enumLivUrg.map(en => en.unnest);
-      store.statePlanner.enumUNI.enumClRacc = enumClRacc.map(en => en.unnest);
+// ---------------------------------- NUOVA LOGICA ----------------------------------
+watch(() => state.selectClRacc, newVal => {
+  if (newVal > 1) {
+    state.selectMatriceDisabled = false;
+  } else {
+    state.selectMatriceDisabled = true;
+    if (state.selectStCons === 0) {
+      state.selectStCons = 2;
+      state.selectLivUrg = 1;
     }
+  }
+});
 
-    function scegliFile(ind) {
-      fileInputs[ind]?.click();
+watch(() => state.selectStCons, newVal => {
+  switch(newVal) {
+    case 2:
+      state.selectLivUrgNascosto = true;
+      state.selectClRaccOpzioniBloccate = [2, 3];
+      state.selectClRacc = 0;
+      state.selectLivUrg = 1;
+      break;
+    case 3:
+      state.selectLivUrgNascosto = false;
+      state.selectClRaccOpzioniBloccate = [3];
+      state.selectClRacc = 0;
+      break;
+    case 4:
+    case 5:
+      state.selectLivUrgNascosto = false;
+      state.selectClRaccOpzioniBloccate = [0, 1];
+      state.selectClRacc = 2;
+      break;
+  }
+});
+
+watch(() => state.selectLivUrg, () => {
+  if (state.selectStCons === 0) {
+    state.selectLivUrg = 1;
+  }
+});
+
+onMounted(async () => {
+  await recuperaEnumUNI();
+  const estensione = await leggiEnum('estensione');
+  const estensioneLista = estensione.map(perc => perc.unnest);
+  state.listaEstensioni = estensioneLista;
+});
+
+async function recuperaEnumUNI() {
+  const enumStCons = await leggiEnum('st_cons');
+  const enumLivUrg = await leggiEnum('liv_urg');
+  const enumClRacc = await leggiEnum('cl_racc');
+  store.statePlanner.enumUNI.enumStCons = enumStCons.map(en => en.unnest);
+  store.statePlanner.enumUNI.enumLivUrg = enumLivUrg.map(en => en.unnest);
+  store.statePlanner.enumUNI.enumClRacc = enumClRacc.map(en => en.unnest);
+}
+
+function scegliFile(ind) {
+  fileInputs[ind]?.click();
+}
+
+function gestisciFileUpload(evt, ind) {
+  const file = evt.target.files[0];
+
+  if (!store.statePlanner.datiSchedaInCompilazione["Documenti"]) {
+    store.statePlanner.datiSchedaInCompilazione["Documenti"] = [];
+  }
+
+  if (file) {
+    store.statePlanner.datiSchedaInCompilazione["Documenti"][ind] = `${file.name}`;
+    state.files[ind].file = file;
+    state.files[ind].name = file.name;
+  } else {
+    store.statePlanner.datiSchedaInCompilazione["Documenti"][ind] = null;
+    store.statePlanner.datiSchedaInCompilazione["Documenti"].splice(ind, 1);
+    state.files[ind].file = null;
+    state.files[ind].name = "";
+  }
+}
+
+function aggiungiFile() {
+  state.files.push({file: null, name: ""});
+}
+
+function rimuoviFile(ind) {
+  state.files.splice(ind, 1);
+}
+
+async function salvaAttività() {
+  console.log(store.statePlanner.datiSchedaInCompilazione);
+  const {selezione, parziale, rimanenti} = await verificaSelezione();
+  if (!selezione.length) return;
+  let datiAttività = {};
+  store.statePlanner.listaCRregistrati.push(state.selectClRacc);
+  const dati = await raccogliDati(selezione);
+  console.log(dati);
+  if (!dati.estensione) {
+    store.methods.setAlert('Il campo "estensione" deve essere compilato.');
+    return;
+  }
+  datiAttività = dati;
+  if (store.statePlanner.compilazioneParziale) { // se "true" -> INSERT INTO, se "false" -> UPDATE
+    const datiAggiuntivi = raccogliDatiAggiuntivi();
+    datiAttività = {...datiAttività, ...datiAggiuntivi};
+  }
+  if (!rimanenti.length) {
+    datiAttività['listaCRregistrati'] = store.statePlanner.listaCRregistrati;
+    datiAttività['idDiEmergenza'] = dataInteger()+100; // necessario per evitare conflitto con "id_att_prog", creato nello stesso processo
+  }
+
+  // FILE (+ DATI)
+  const fd = new FormData();
+  // 1) aggiungo ogni file
+  state.files.forEach((file_item, idx) => {
+    if (file_item.file) {
+      fd.append(`file_${idx}`, file_item.file, file_item.name);
     }
+  });
+  // 2) aggiungo i dati
+  fd.append('dati', JSON.stringify(datiAttività));
 
-    function gestisciFileUpload(evt, ind) {
-      const file = evt.target.files[0];
-
-      if (!store.statePlanner.datiSchedaInCompilazione["Documenti"]) {
-        store.statePlanner.datiSchedaInCompilazione["Documenti"] = [];
-      }
-
-      if (file) {
-        store.statePlanner.datiSchedaInCompilazione["Documenti"][ind] = `${file.name}`;
-        state.files[ind].file = file;
-        state.files[ind].name = file.name;
-      } else {
-        store.statePlanner.datiSchedaInCompilazione["Documenti"][ind] = null;
-        store.statePlanner.datiSchedaInCompilazione["Documenti"].splice(ind, 1);
-        state.files[ind].file = null;
-        state.files[ind].name = "";
-      }
+  const resp = await registraAttivitàEseguita(fd);
+  if (resp.success) {
+    const fraseContinuare = rimanenti.length ? '. Si prega di continuare la registrazione per gli elementi rimanenti.' : '';
+    store.methods.setAlert(`Operazione completata${fraseContinuare}`);
+    store.statePlanner.compilazioneParziale = parziale;
+    store.stateBIM.elementiDaSchedare = rimanenti;
+    resetColori();
+    if (rimanenti.length) {
+      const idElementi = await cercaElementiDaScheda(store.stateBIM.elementiDaSchedare);
+      store.stateBIM.elementiSelezionati = store.stateBIM.elementiDaSchedare;
+      cambiaColore(idElementi);
     }
-
-    function aggiungiFile() {
-      state.files.push({file: null, name: ""});
-    }
-
-    function rimuoviFile(ind) {
-      state.files.splice(ind, 1);
-    }
-
-    async function salvaAttività() {
-      console.log(store.statePlanner.datiSchedaInCompilazione);
-      const {selezione, parziale, rimanenti} = await verificaSelezione();
-      if (!selezione.length) return;
-      let datiAttività = {};
-      store.statePlanner.listaCRregistrati.push(state.selectClRacc);
-      const dati = await raccogliDati(selezione);
-      console.log(dati);
-      if (!dati.estensione) {
-        store.methods.setAlert('Il campo "estensione" deve essere compilato.');
-        return;
-      }
-      datiAttività = dati;
-      if (store.statePlanner.compilazioneParziale) { // se "true" -> INSERT INTO, se "false" -> UPDATE
-        const datiAggiuntivi = raccogliDatiAggiuntivi();
-        datiAttività = {...datiAttività, ...datiAggiuntivi};
-      }
-      if (!rimanenti.length) {
-        datiAttività['listaCRregistrati'] = store.statePlanner.listaCRregistrati;
-        datiAttività['idDiEmergenza'] = dataInteger()+100; // necessario per evitare conflitto con "id_att_prog", creato nello stesso processo
-      }
-
-      // FILE (+ DATI)
-      const fd = new FormData();
-      // 1) aggiungo ogni file
-      state.files.forEach((file_item, idx) => {
-        if (file_item.file) {
-          fd.append(`file_${idx}`, file_item.file, file_item.name);
-        }
-      });
-      // 2) aggiungo i dati
-      fd.append('dati', JSON.stringify(datiAttività));
-
-      const resp = await registraAttivitàEseguita(fd);
-      if (resp.success) {
-        const fraseContinuare = rimanenti.length ? '. Si prega di continuare la registrazione per gli elementi rimanenti.' : '';
-        store.methods.setAlert(`Operazione completata${fraseContinuare}`);
-        store.statePlanner.compilazioneParziale = parziale;
-        store.stateBIM.elementiDaSchedare = rimanenti;
-        resetColori();
-        if (rimanenti.length) {
-          const idElementi = await cercaElementiDaScheda(store.stateBIM.elementiDaSchedare);
-          store.stateBIM.elementiSelezionati = store.stateBIM.elementiDaSchedare;
-          cambiaColore(idElementi);
-        }
-        else {
-          store.stateBIM.schedeAttivitàVisibile = false;
-          store.statePlanner.datiSchedaInCompilazione = {};
-          store.stateBIM.elementiSelezionati = null;
-          store.statePlanner.listaCRregistrati = [];
-          resetVista();
-          aggiornaPlanner();
-        }
-      }
-      else {
-        store.methods.setAlert("ATTENZIONE: L'operazione non è andata a buon fine. Riprovare");
-      }
-    }
-
-    function chiudiAttReset() {
-      chiudiAttività();
-      resetVista();
+    else {
+      store.stateBIM.schedeAttivitàVisibile = false;
+      store.statePlanner.datiSchedaInCompilazione = {};
       store.stateBIM.elementiSelezionati = null;
+      store.statePlanner.listaCRregistrati = [];
+      resetVista();
+      aggiornaPlanner();
     }
+  }
+  else {
+    store.methods.setAlert("ATTENZIONE: L'operazione non è andata a buon fine. Riprovare");
+  }
+}
 
-    async function raccogliDati(selezione) {
-      const datiSpec = await datiSpecifici();
-      if (state.selectClRacc > 1) datiSpec['liv_priorità'] = livPriorità.value;
-      const autore_ultima_mod = store.state.userSettings.user_id;
-      const data_ultima_mod = dataCorta();
-      const id_att_prog = dataInteger();
-      const id_main10ance = selezione;
-      const tabella = store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella;
-      const doc = store.statePlanner.datiSchedaInCompilazione['Documenti'].map(fl => `${id_att_prog}/${fl}`);
-      const costo = store.statePlanner.datiSchedaInCompilazione['Costo previsto (€)'];
-      const ore = store.statePlanner.datiSchedaInCompilazione['Ore previste'];
-      const commenti = store.statePlanner.datiSchedaInCompilazione['Note'];
-      const edificio = store.statePlanner.datiSchedaInCompilazione['Edificio'];
-      const esecutori = store.statePlanner.datiSchedaInCompilazione['Operatore'];
-      return {...datiSpec, tabella, doc, costo, ore, commenti, id_main10ance, autore_ultima_mod, data_ultima_mod, id_att_prog, edificio, esecutori};
+function chiudiAttReset() {
+  chiudiAttività();
+  resetVista();
+  store.stateBIM.elementiSelezionati = null;
+}
+
+async function raccogliDati(selezione) {
+  const datiSpec = await datiSpecifici();
+  if (state.selectClRacc > 1) datiSpec['liv_priorità'] = livPriorità.value;
+  const autore_ultima_mod = store.state.userSettings.user_id;
+  const data_ultima_mod = dataCorta();
+  const id_att_prog = dataInteger();
+  const id_main10ance = selezione;
+  const tabella = store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella;
+  const doc = store.statePlanner.datiSchedaInCompilazione['Documenti'].map(fl => `${id_att_prog}/${fl}`);
+  const costo = store.statePlanner.datiSchedaInCompilazione['Costo previsto (€)'];
+  const ore = store.statePlanner.datiSchedaInCompilazione['Ore previste'];
+  const commenti = store.statePlanner.datiSchedaInCompilazione['Note'];
+  const edificio = store.statePlanner.datiSchedaInCompilazione['Edificio'];
+  const esecutori = store.statePlanner.datiSchedaInCompilazione['Operatore'];
+  return {...datiSpec, tabella, doc, costo, ore, commenti, id_main10ance, autore_ultima_mod, data_ultima_mod, id_att_prog, edificio, esecutori};
+}
+
+async function datiSpecifici() {
+  const tabella = store.stateBIM.schedeAttivitàTipo;
+  switch (tabella) {
+    case 'controllo': {
+      const data_con = store.statePlanner.datiSchedaInCompilazione['Data controllo'];
+      const strumentaz = store.statePlanner.datiSchedaInCompilazione['Strumentazione'];
+      const cl_racc = store.statePlanner.enumUNI.enumClRacc[state.selectClRacc];
+      const st_cons = store.statePlanner.enumUNI.enumStCons[state.selectStCons-2];
+      const liv_urg = store.statePlanner.enumUNI.enumLivUrg[state.selectLivUrg-1];
+      const estensione = state.selectEstensione;
+      const id_contr = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda controllo']);
+      const frequenzaJson = await prendiFrequenzaAttProg({id: id_contr, tabella: store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella});
+      const frequenza = frequenzaJson.frequenza;
+      const data_next = aggiungiMesi(data_con, frequenza);
+      return {data_con, strumentaz, cl_racc, st_cons, liv_urg, estensione, id_contr, data_next};
     }
-
-    async function datiSpecifici() {
-      const tabella = store.stateBIM.schedeAttivitàTipo;
-      switch (tabella) {
-        case 'controllo': {
-          const data_con = store.statePlanner.datiSchedaInCompilazione['Data controllo'];
-          const strumentaz = store.statePlanner.datiSchedaInCompilazione['Strumentazione'];
-          const cl_racc = store.statePlanner.enumUNI.enumClRacc[state.selectClRacc];
-          const st_cons = store.statePlanner.enumUNI.enumStCons[state.selectStCons-2];
-          const liv_urg = store.statePlanner.enumUNI.enumLivUrg[state.selectLivUrg-1];
-          const estensione = state.selectEstensione;
-          const id_contr = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda controllo']);
-          const frequenzaJson = await prendiFrequenzaAttProg({id: id_contr, tabella: store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella});
-          const frequenza = frequenzaJson.frequenza;
-          const data_next = aggiungiMesi(data_con, frequenza);
-          return {data_con, strumentaz, cl_racc, st_cons, liv_urg, estensione, id_contr, data_next};
-        }
-        case 'manutenzione regolare': {
-          const data_ese = store.statePlanner.datiSchedaInCompilazione['Data intervento'];
-          const strumentaz = store.statePlanner.datiSchedaInCompilazione['Strumentazione'];
-          const materiale = state.materialeMan ? state.materialeMan : null;
-          const id_mn_reg = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda manutenzione regolare']);
-          const frequenzaJson = await prendiFrequenzaAttProg({id: id_mn_reg, tabella: store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella});
-          const frequenza = frequenzaJson.frequenza;
-          const data_next = aggiungiMesi(data_ese, frequenza);
-          return {data_ese, strumentaz, materiale, id_mn_reg, data_next};
-        }
-        case 'manutenzione correttiva': {
-          const data_ese = store.statePlanner.datiSchedaInCompilazione['Data intervento'];
-          const strumentaz = store.statePlanner.datiSchedaInCompilazione['Strumentazione'];
-          const materiale = state.materialeMan ? state.materialeMan : null;
-          const id_mn_gu = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda manutenzione correttiva']);
-          return {data_ese, strumentaz, materiale, id_mn_gu};
-        }
-      }
+    case 'manutenzione regolare': {
+      const data_ese = store.statePlanner.datiSchedaInCompilazione['Data intervento'];
+      const strumentaz = store.statePlanner.datiSchedaInCompilazione['Strumentazione'];
+      const materiale = state.materialeMan ? state.materialeMan : null;
+      const id_mn_reg = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda manutenzione regolare']);
+      const frequenzaJson = await prendiFrequenzaAttProg({id: id_mn_reg, tabella: store.statePlanner.attività[store.stateBIM.schedeAttivitàTipo].tabella});
+      const frequenza = frequenzaJson.frequenza;
+      const data_next = aggiungiMesi(data_ese, frequenza);
+      return {data_ese, strumentaz, materiale, id_mn_reg, data_next};
     }
-
-    function raccogliDatiAggiuntivi() {
-      const nuovo_record = true;
-      const nuovo_id = dataInteger();
-      return {nuovo_record, nuovo_id};
+    case 'manutenzione correttiva': {
+      const data_ese = store.statePlanner.datiSchedaInCompilazione['Data intervento'];
+      const strumentaz = store.statePlanner.datiSchedaInCompilazione['Strumentazione'];
+      const materiale = state.materialeMan ? state.materialeMan : null;
+      const id_mn_gu = parseInt(store.statePlanner.datiSchedaInCompilazione['Codice scheda manutenzione correttiva']);
+      return {data_ese, strumentaz, materiale, id_mn_gu};
     }
+  }
+}
 
-    async function verificaSelezione() {
-      // verifica 0: ci DEVONO essere elementi selezionati o isolati, se lista selezionati è vuota, errore
-      const elSelezionati = getElementiSelezionati();
-      if (!elSelezionati) return {selezione: [], parziale: false, rimanenti: []};
-      // verifica 1: non ci devono essere in selezione elementi esterni alla lista di elementi da schedare
-      const id_main10anceSelezionati = await getIdM10AFromSelezione(elSelezionati);
-      const elEstranei = id_main10anceSelezionati.some(idSel => !store.stateBIM.elementiDaSchedare.includes(idSel));
-      if (elEstranei) {
-        store.methods.setAlert("ATTENZIONE: Alcuni degli elementi selezionati non fanno parte dell'operazione corrente.");
-        const idElementi = await cercaElementiDaScheda(store.stateBIM.elementiDaSchedare);
-        store.stateBIM.elementiSelezionati = store.stateBIM.elementiDaSchedare;
-        cambiaColore(idElementi);
-        return {selezione: [], parziale: false, rimanenti: []};
-      }
-      // verifica 2: tenere conto di una eventuale selezione parziale degli elementi da schedare
-      const elRimanenti = store.stateBIM.elementiDaSchedare.filter(el => !id_main10anceSelezionati.includes(el));
-      // se NON CI SONO elementi rimasti dopo verifica 2
-      if (!elRimanenti.length) {
-        return {selezione: id_main10anceSelezionati, parziale: false, rimanenti: []};
-      }
-      // se CI SONO elementi rimasti:
-      else {
-        const frase = elRimanenti.length === 1 ? 'elemento è stato escluso' : 'elementi sono stati esclusi';
-        const fraseIntera = `${elRimanenti.length} ${frase} dalla selezione corrente. Sarà necessario registrare un'ulteriore scheda per completare la procedura. Si desidera continuare?`;
-        const confermaProcedere = await store.methods.setConfirm(fraseIntera);
-        if (confermaProcedere) {
-          // store.stateBIM.elementiDaSchedare = elRimanenti;
-          return {selezione: id_main10anceSelezionati, parziale: true, rimanenti: elRimanenti};
-        }
-        else {
-          const idElementi = await cercaElementiDaScheda(store.stateBIM.elementiDaSchedare);
-          store.stateBIM.elementiSelezionati = store.stateBIM.elementiDaSchedare;
-          cambiaColore(idElementi);
-          return {selezione: [], parziale: false, rimanenti: []};
-        }
-      }
+function raccogliDatiAggiuntivi() {
+  const nuovo_record = true;
+  const nuovo_id = dataInteger();
+  return {nuovo_record, nuovo_id};
+}
+
+async function verificaSelezione() {
+  // verifica 0: ci DEVONO essere elementi selezionati o isolati, se lista selezionati è vuota, errore
+  const elSelezionati = getElementiSelezionati();
+  if (!elSelezionati) return {selezione: [], parziale: false, rimanenti: []};
+  // verifica 1: non ci devono essere in selezione elementi esterni alla lista di elementi da schedare
+  const id_main10anceSelezionati = await getIdM10AFromSelezione(elSelezionati);
+  const elEstranei = id_main10anceSelezionati.some(idSel => !store.stateBIM.elementiDaSchedare.includes(idSel));
+  if (elEstranei) {
+    store.methods.setAlert("ATTENZIONE: Alcuni degli elementi selezionati non fanno parte dell'operazione corrente.");
+    const idElementi = await cercaElementiDaScheda(store.stateBIM.elementiDaSchedare);
+    store.stateBIM.elementiSelezionati = store.stateBIM.elementiDaSchedare;
+    cambiaColore(idElementi);
+    return {selezione: [], parziale: false, rimanenti: []};
+  }
+  // verifica 2: tenere conto di una eventuale selezione parziale degli elementi da schedare
+  const elRimanenti = store.stateBIM.elementiDaSchedare.filter(el => !id_main10anceSelezionati.includes(el));
+  // se NON CI SONO elementi rimasti dopo verifica 2
+  if (!elRimanenti.length) {
+    return {selezione: id_main10anceSelezionati, parziale: false, rimanenti: []};
+  }
+  // se CI SONO elementi rimasti:
+  else {
+    const frase = elRimanenti.length === 1 ? 'elemento è stato escluso' : 'elementi sono stati esclusi';
+    const fraseIntera = `${elRimanenti.length} ${frase} dalla selezione corrente. Sarà necessario registrare un'ulteriore scheda per completare la procedura. Si desidera continuare?`;
+    const confermaProcedere = await store.methods.setConfirm(fraseIntera);
+    if (confermaProcedere) {
+      // store.stateBIM.elementiDaSchedare = elRimanenti;
+      return {selezione: id_main10anceSelezionati, parziale: true, rimanenti: elRimanenti};
     }
-
-    return {
-      store,
-      ...toRefs(state),
-      fileInputs,
-      tipoClass,
-      scegliFile,
-      gestisciFileUpload,
-      aggiungiFile,
-      rimuoviFile,
-      salvaAttività,
-      chiudiAttReset,
+    else {
+      const idElementi = await cercaElementiDaScheda(store.stateBIM.elementiDaSchedare);
+      store.stateBIM.elementiSelezionati = store.stateBIM.elementiDaSchedare;
+      cambiaColore(idElementi);
+      return {selezione: [], parziale: false, rimanenti: []};
     }
   }
 }

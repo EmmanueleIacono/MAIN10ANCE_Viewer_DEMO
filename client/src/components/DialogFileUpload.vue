@@ -9,16 +9,11 @@
 
       <!-- Body: Sidebar + Main -->
       <div class="body">
-        <!--Sidebar: Navigazione cartelle  -->
-        <!-- <aside class="sidebar">
-          <p style="color: red; padding-left: 5px;">SEZIONE IN COSTRUZIONE</p>
-          <TreeNode @cambiaIdCliccato="selectCartella(cart)" v-for="cart in cartelle" :key="cart.id" :node="cart" class="tree-node" />
-        </aside> -->
 
         <!-- Main: Lista file -->
         <main class="main-content">
           <div class="file-list">
-            <div v-for="(doc, idx) in docs" :key="idx" class="file-item">
+            <div v-for="(doc, idx) in state.docs" :key="idx" class="file-item">
               <!-- Barra principale -->
               <div class="file-bar" @click="toggleEspandi(idx)">
                 <div class="file-icon">{{ getEstensione(doc) }}</div>
@@ -162,360 +157,303 @@
       <!-- Footer -->
       <div class="footer">
         <button type="button" @click="resetDocs">Reset</button>
-        <button type="button" @click="submitDocs" :disabled="docs.some(doc => (!doc.file || !doc.id))">Carica</button>
+        <button type="button" @click="submitDocs" :disabled="state.docs.some(doc => (!doc.file || !doc.id))">Carica</button>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { reactive, toRefs, inject, /*provide,*/ computed, onMounted } from 'vue';
+<script setup>
+import { reactive, inject, computed, onMounted } from 'vue';
 import { leggiEnumServizio, leggiListaLocalita, leggiListaEdifici, leggiListaElementi, caricaDocumento, leggiIdDocEsistenti } from "../js/richieste";
-// import TreeNode from './elementi/TreeNode.vue';
 
-export default {
-  name: 'DialogFileUpload',
-  // components: {
-  //   TreeNode,
-  // },
-  setup() {
-    // const cartelle = [
-    //   {id: 'cartella_1', type: 'folder', nome: 'Cartella 1', open: true, children: [
-    //     {id: 'cartella_1.1', type: 'folder', nome: 'Cartella 1.1', open: false, children: []},
-    //     {id: 'cartella_1.2', type: 'folder', nome: 'Cartella 1.2', open: false, children: [
-    //       {id: 'cartella_1.2.1', type: 'folder', nome: 'Cartella 1.2.1', open: false, children: []},
-    //     ]},
-    //   ]},
-    //   {id: 'cartella_2', type: 'folder', nome: 'Cartella 2', open: false, children: []},
-    //   {id: 'cartella_3', type: 'folder', nome: 'Cartella 3', open: false, children: []},
-    // ];
+const store = inject('store');
 
-    const store = inject('store');
+const tipiDocs = reactive({
+  tipi: [],
+  temi: [],
+  sist_comp: [],
+});
 
-    const tipiDocs = reactive({
-      tipi: [],
-      temi: [],
-      sist_comp: [],
-    });
+const relOptions = reactive({
+  localita: [],
+  edificio: [],
+  classe: [],
+  elemento: [],
+});
 
-    const relOptions = reactive({
-      localita: [],
-      edificio: [],
-      classe: [],
-      elemento: [],
-    });
+const idDocs = reactive([]);
 
-    const idDocs = reactive([]);
+const state = reactive({
+  docs: [
+    {
+      file: null,
+      input_key: Date.now(),
+      tipo: tipiDocs.tipi[0], // tipo_doc servizio.docs_ty
+      id: '', // id_doc varchar NOT NULL
+      data: '', // data_doc varchar
+      autore: '', // autore_doc varchar
+      descr: '', // descrizione
+      note: '', // annotazioni
+      temi: [], // temi servizio.temi[]
+      sist_comp: tipiDocs.sist_comp[0], // sist_composto servizio.sistemi_composti
+      relazioni: [], // relazioni servizio.doc_relazione[]
+      espanso: true,
+      id_focused: false,
+    },
+  ],
+});
 
-    const state = reactive({
-      docs: [
-        {
-          file: null,
-          input_key: Date.now(),
-          tipo: tipiDocs.tipi[0], // tipo_doc servizio.docs_ty
-          id: '', // id_doc varchar NOT NULL
-          data: '', // data_doc varchar
-          autore: '', // autore_doc varchar
-          descr: '', // descrizione
-          note: '', // annotazioni
-          temi: [], // temi servizio.temi[]
-          sist_comp: tipiDocs.sist_comp[0], // sist_composto servizio.sistemi_composti
-          relazioni: [], // relazioni servizio.doc_relazione[]
-          espanso: true,
-          id_focused: false,
-        },
-      ],
-      // cartelle: cartelle,
-      // cartellaSelezionata: cartelle[0],
-    });
+const idDocsInCompilazione = computed(() => state.docs.map(doc => doc.id).filter(id => !!id));
 
-    const idDocsInCompilazione = computed(() => state.docs.map(doc => doc.id).filter(id => !!id));
+onMounted(async () => {
+  const tpDocsRaw = await leggiEnumServizio('docs_ty');
+  const temiDocsRaw = await leggiEnumServizio('temi');
+  const sistCompDocsRaw = await leggiEnumServizio('sistemi_composti');
+  const clOggRaw = await leggiEnumServizio('cl_ogg');
+  const listaLoc = await leggiListaLocalita();
+  const listaEdif = await leggiListaEdifici();
+  const listaElems = await leggiListaElementi();
+  const idDocEsistenti = await leggiIdDocEsistenti();
 
-    // const idCartellaSelezionata = computed(() => state.cartellaSelezionata.id);
+  const tpDocs = tpDocsRaw.map(datoRaw => datoRaw.unnest);
+  const temiDocs = temiDocsRaw.map(datoRaw => datoRaw.unnest);
+  const sistCompDocs = sistCompDocsRaw.map(datoRaw => datoRaw.unnest);
+  const clOgg = clOggRaw.map(datoRaw => datoRaw.unnest);
+  idDocEsistenti.forEach(idObj => idDocs.push(idObj.id_doc));
 
-    // provide('cartellaSelezionata', idCartellaSelezionata);
+  tipiDocs.tipi = tpDocs;
+  tipiDocs.temi = temiDocs;
+  tipiDocs.sist_comp = sistCompDocs;
+  relOptions.localita = listaLoc;
+  relOptions.edificio = listaEdif;
+  relOptions.classe = clOgg;
+  relOptions.elemento = listaElems;
 
-    onMounted(async () => {
-      const tpDocsRaw = await leggiEnumServizio('docs_ty');
-      const temiDocsRaw = await leggiEnumServizio('temi');
-      const sistCompDocsRaw = await leggiEnumServizio('sistemi_composti');
-      const clOggRaw = await leggiEnumServizio('cl_ogg');
-      const listaLoc = await leggiListaLocalita();
-      const listaEdif = await leggiListaEdifici();
-      const listaElems = await leggiListaElementi();
-      const idDocEsistenti = await leggiIdDocEsistenti();
+  state.docs.forEach(doc => {
+    if (!doc.tipo) doc.tipo = tipiDocs.tipi[0];
+  });
+});
 
-      const tpDocs = tpDocsRaw.map(datoRaw => datoRaw.unnest);
-      const temiDocs = temiDocsRaw.map(datoRaw => datoRaw.unnest);
-      const sistCompDocs = sistCompDocsRaw.map(datoRaw => datoRaw.unnest);
-      const clOgg = clOggRaw.map(datoRaw => datoRaw.unnest);
-      idDocEsistenti.forEach(idObj => idDocs.push(idObj.id_doc));
+function creaRelazione() {
+  return {
+    localita: '',
+    edificio: '',
+    classe: '',
+    elemento: '',
+    annotazioni: "",
+  };
+}
 
-      tipiDocs.tipi = tpDocs;
-      tipiDocs.temi = temiDocs;
-      tipiDocs.sist_comp = sistCompDocs;
-      relOptions.localita = listaLoc;
-      relOptions.edificio = listaEdif;
-      relOptions.classe = clOgg;
-      relOptions.elemento = listaElems;
+function chiudi() {
+  store.methods.chiudiDocsDialog();
+  resetDocs();
+}
 
-      state.docs.forEach(doc => {
-        if (!doc.tipo) doc.tipo = tipiDocs.tipi[0];
-      });
-    });
+async function submitDocs() {
+  store.methods.toggleLoaderGlobale();
 
-    function creaRelazione() {
-      return {
-        localita: '',
-        edificio: '',
-        classe: '',
-        elemento: '',
-        annotazioni: "",
-      };
-    }
+  const datiDocs = collectDatiDocs();
+  console.log("datiDocs:\n", datiDocs);
 
-    function chiudi() {
-      store.methods.chiudiDocsDialog();
-      resetDocs();
-    }
-
-    async function submitDocs() {
+  // conferma se relazioni vuote
+  if (datiDocs.some(doc => doc.metadata.relazioni.length < 1)) {
+    const confermaProcedere = await store.methods.setConfirm('Alcuni dei documenti in caricamento sono privi di associazioni. Proseguire ugualmente?');
+    if (!confermaProcedere) {
       store.methods.toggleLoaderGlobale();
-
-      const datiDocs = collectDatiDocs();
-      console.log("datiDocs:\n", datiDocs);
-
-      // conferma se relazioni vuote
-      if (datiDocs.some(doc => doc.metadata.relazioni.length < 1)) {
-        const confermaProcedere = await store.methods.setConfirm('Alcuni dei documenti in caricamento sono privi di associazioni. Proseguire ugualmente?');
-        if (!confermaProcedere) {
-          store.methods.toggleLoaderGlobale();
-          return;
-        }
-      }
-
-      // invio in sequenza
-      const uploadPromises = datiDocs.map(({ file, metadata }) => {
-        // form data
-        const form = new FormData();
-        form.append('file', file);
-        form.append('metadata', JSON.stringify(metadata));
-        // return con la fetch-promise
-        return caricaDocumento(form);
-      });
-
-      const results = await Promise.allSettled(uploadPromises);
-      console.log("results:\n", results);
-
-      const report = results.map((res, idx) => ({
-        id_doc: datiDocs[idx].metadata.id_doc,
-        success: res.value.success, // true o false
-      }));
-      console.log("report:\n", report);
-
-      const successi = report.filter(r => r.success === true);
-      const fallimenti = report.filter(r => r.success === false);
-
-      let msg;
-      if (fallimenti.length === 0) {
-        msg = `Operazione andata a buon fine. ${successi.length} documenti caricati.`;
-      } else if (successi.length === 0) {
-        msg = `Operazione fallita. Nessun documento è stato caricato.`;
-      } else {
-        const okList = successi.map(r => r.id_doc).join(', ');
-        const failList = fallimenti.map(r => r.id_doc).join(', ');
-        msg = `I seguenti documenti sono stati caricati con successo: ${okList}.\nI seguenti documenti non sono stati caricati: ${failList}.`;
-      }
-
-      store.methods.toggleLoaderGlobale();
-      store.methods.setAlert(msg);
-
-      if (fallimenti.length === 0) {
-        chiudi();
-      }
-    }
-
-    function resetDocs() {
-      state.docs = [
-        {
-          file: null,
-          input_key: Date.now(),
-          tipo: tipiDocs.tipi[0],
-          id: '',
-          data: '',
-          autore: '',
-          descr: '',
-          note: '',
-          temi: [],
-          sist_comp: '',
-          relazioni: [],
-          espanso: true,
-          id_focused: false,
-        },
-      ];
-    }
-
-    function addDoc(idx) {
-      state.docs.splice(
-        idx + 1,
-        0,
-        {
-          file: null,
-          input_key: Date.now(),
-          tipo: tipiDocs.tipi[0],
-          id: '',
-          data: '',
-          autore: '',
-          descr: '',
-          note: '',
-          temi: [],
-          sist_comp: '',
-          relazioni: [],
-          espanso: true,
-          id_focused: false,
-        },
-      );
-    }
-
-    function removeDoc(idx) {
-      if (state.docs.length > 1) state.docs.splice(idx, 1);
-      else resetDocs();
-    }
-
-    function addRelazione(docIdx) {
-      state.docs[docIdx].relazioni.push(creaRelazione());
-    }
-
-    function removeRelazione(docIdx, relIdx) {
-      state.docs[docIdx].relazioni.splice(relIdx, 1);
-    }
-
-    function onFileChange(evt, index) {
-      const files = (evt.target || evt.srcElement).files;
-      if (files && files.length > 0) {
-        state.docs[index].file = files[0];
-      }
-    }
-
-    function toggleEspandi(idx) {
-      state.docs[idx].espanso = !state.docs[idx].espanso;
-    }
-
-    function getEstensione(doc) {
-      if (doc && doc.file) return doc.file.name.split('.').pop().toUpperCase();
-      return 'N/A';
-    }
-
-    function formattaStringa(str) {
-      return str
-        .toString() // per sicurezza, qualsiasi sia l'oggetto, rende una stringa
-        .trim() // rimuove spazi prima e dopo
-        .toLowerCase() // tutto minuscolo
-        .replace(/[\\/]/g, '') // rimuove tutti backslash e forwardslash
-        .replace(/\s+/g, ' ') // sostituisce spazi multipli con spazio singolo
-        .replace(/\s/g, '_'); // sostituisce spazi rimanenti con underscore
-    }
-
-    function getFilteredEdifici(rel) {
-      if (!rel.localita) return [];
-      return relOptions.edificio.filter(ed => ed.localita === rel.localita);
-    }
-
-    function onLocalitaChanged(rel) {
-      rel.edificio = '';
-    }
-
-    function getFilteredElementi(rel) {
-      if (!rel.classe) return [];
-      return relOptions.elemento.filter(el => el.cl_ogg === rel.classe);
-    }
-
-    function onClasseChanged(rel) {
-      rel.elemento = '';
-    }
-
-    function collectDatiDocs() {
-      return state.docs.map(doc => {
-        return {
-          file: doc.file,
-          metadata: {
-            cartella_tipo: formattaStringa(doc.tipo),
-            tipo_doc: doc.tipo,
-            id_doc: sanitizeStringa(doc.id),
-            data_doc: doc.data,
-            autore_doc: doc.autore,
-            descrizione: doc.descr,
-            annotazioni: doc.note,
-            temi: doc.temi,
-            sist_composto: doc.sist_comp,
-            relazioni: doc.relazioni.map(r => ({
-              localita: r.localita,
-              edificio: r.edificio,
-              classe: r.classe,
-              elemento: r.elemento,
-              annotazioni: r.annotazioni
-            }))
-          }
-        };
-      });
-    }
-
-    function sanitizeStringa(str) {
-      return str.replaceAll(/\s/g, '_').replaceAll(/(\/|\\)/g, '-').replaceAll(/(\?|!)/g, '');
-    }
-
-    function idDisponibile(id, idx) {
-      if (id) {
-        const idSanit = sanitizeStringa(id);
-        const idEsistente = idDocs.includes(idSanit);
-        const idInCompilazione = idDocsInCompilazione.value.filter((id_cmp, ind) => ind !== idx).includes(idSanit);
-        return !(idEsistente || idInCompilazione);
-      } else return true;
-    }
-
-    function getSuggerimenti(doc) {
-      if (!doc.id) return [];
-      const q = doc.id.toLowerCase();
-      return idDocs
-        .filter(id => id.toLowerCase().startsWith(q) && id !== doc.id)
-        .slice(0, 10);
-    }
-
-    function selezionaSuggerimento(suggerimento, idx) {
-      state.docs[idx].id = suggerimento;
-    }
-
-    // function selectCartella(cartella) {
-    //   state.cartellaSelezionata = cartella;
-    //   console.log('cartella selezionata: ', state.cartellaSelezionata);
-    // }
-
-    return {
-      store,
-      relOptions,
-      ...toRefs(state),
-      tipiDocs,
-      chiudi,
-      submitDocs,
-      resetDocs,
-      addDoc,
-      removeDoc,
-      addRelazione,
-      removeRelazione,
-      onFileChange,
-      toggleEspandi,
-      getEstensione,
-      getFilteredEdifici,
-      onLocalitaChanged,
-      getFilteredElementi,
-      onClasseChanged,
-      sanitizeStringa,
-      idDisponibile,
-      getSuggerimenti,
-      selezionaSuggerimento,
-      // selectCartella,
+      return;
     }
   }
+
+  // invio in sequenza
+  const uploadPromises = datiDocs.map(({ file, metadata }) => {
+    // form data
+    const form = new FormData();
+    form.append('file', file);
+    form.append('metadata', JSON.stringify(metadata));
+    // return con la fetch-promise
+    return caricaDocumento(form);
+  });
+
+  const results = await Promise.allSettled(uploadPromises);
+  console.log("results:\n", results);
+
+  const report = results.map((res, idx) => ({
+    id_doc: datiDocs[idx].metadata.id_doc,
+    success: res.value.success, // true o false
+  }));
+  console.log("report:\n", report);
+
+  const successi = report.filter(r => r.success === true);
+  const fallimenti = report.filter(r => r.success === false);
+
+  let msg;
+  if (fallimenti.length === 0) {
+    msg = `Operazione andata a buon fine. ${successi.length} documenti caricati.`;
+  } else if (successi.length === 0) {
+    msg = `Operazione fallita. Nessun documento è stato caricato.`;
+  } else {
+    const okList = successi.map(r => r.id_doc).join(', ');
+    const failList = fallimenti.map(r => r.id_doc).join(', ');
+    msg = `I seguenti documenti sono stati caricati con successo: ${okList}.\nI seguenti documenti non sono stati caricati: ${failList}.`;
+  }
+
+  store.methods.toggleLoaderGlobale();
+  store.methods.setAlert(msg);
+
+  if (fallimenti.length === 0) {
+    chiudi();
+  }
+}
+
+function resetDocs() {
+  state.docs = [
+    {
+      file: null,
+      input_key: Date.now(),
+      tipo: tipiDocs.tipi[0],
+      id: '',
+      data: '',
+      autore: '',
+      descr: '',
+      note: '',
+      temi: [],
+      sist_comp: '',
+      relazioni: [],
+      espanso: true,
+      id_focused: false,
+    },
+  ];
+}
+
+function addDoc(idx) {
+  state.docs.splice(
+    idx + 1,
+    0,
+    {
+      file: null,
+      input_key: Date.now(),
+      tipo: tipiDocs.tipi[0],
+      id: '',
+      data: '',
+      autore: '',
+      descr: '',
+      note: '',
+      temi: [],
+      sist_comp: '',
+      relazioni: [],
+      espanso: true,
+      id_focused: false,
+    },
+  );
+}
+
+function removeDoc(idx) {
+  if (state.docs.length > 1) state.docs.splice(idx, 1);
+  else resetDocs();
+}
+
+function addRelazione(docIdx) {
+  state.docs[docIdx].relazioni.push(creaRelazione());
+}
+
+function removeRelazione(docIdx, relIdx) {
+  state.docs[docIdx].relazioni.splice(relIdx, 1);
+}
+
+function onFileChange(evt, index) {
+  const files = (evt.target || evt.srcElement).files;
+  if (files && files.length > 0) {
+    state.docs[index].file = files[0];
+  }
+}
+
+function toggleEspandi(idx) {
+  state.docs[idx].espanso = !state.docs[idx].espanso;
+}
+
+function getEstensione(doc) {
+  if (doc && doc.file) return doc.file.name.split('.').pop().toUpperCase();
+  return 'N/A';
+}
+
+function formattaStringa(str) {
+  return str
+    .toString() // per sicurezza, qualsiasi sia l'oggetto, rende una stringa
+    .trim() // rimuove spazi prima e dopo
+    .toLowerCase() // tutto minuscolo
+    .replace(/[\\/]/g, '') // rimuove tutti backslash e forwardslash
+    .replace(/\s+/g, ' ') // sostituisce spazi multipli con spazio singolo
+    .replace(/\s/g, '_'); // sostituisce spazi rimanenti con underscore
+}
+
+function getFilteredEdifici(rel) {
+  if (!rel.localita) return [];
+  return relOptions.edificio.filter(ed => ed.localita === rel.localita);
+}
+
+function onLocalitaChanged(rel) {
+  rel.edificio = '';
+}
+
+function getFilteredElementi(rel) {
+  if (!rel.classe) return [];
+  return relOptions.elemento.filter(el => el.cl_ogg === rel.classe);
+}
+
+function onClasseChanged(rel) {
+  rel.elemento = '';
+}
+
+function collectDatiDocs() {
+  return state.docs.map(doc => {
+    return {
+      file: doc.file,
+      metadata: {
+        cartella_tipo: formattaStringa(doc.tipo),
+        tipo_doc: doc.tipo,
+        id_doc: sanitizeStringa(doc.id),
+        data_doc: doc.data,
+        autore_doc: doc.autore,
+        descrizione: doc.descr,
+        annotazioni: doc.note,
+        temi: doc.temi,
+        sist_composto: doc.sist_comp,
+        relazioni: doc.relazioni.map(r => ({
+          localita: r.localita,
+          edificio: r.edificio,
+          classe: r.classe,
+          elemento: r.elemento,
+          annotazioni: r.annotazioni
+        }))
+      }
+    };
+  });
+}
+
+function sanitizeStringa(str) {
+  return str.replaceAll(/\s/g, '_').replaceAll(/(\/|\\)/g, '-').replaceAll(/(\?|!)/g, '');
+}
+
+function idDisponibile(id, idx) {
+  if (id) {
+    const idSanit = sanitizeStringa(id);
+    const idEsistente = idDocs.includes(idSanit);
+    const idInCompilazione = idDocsInCompilazione.value.filter((id_cmp, ind) => ind !== idx).includes(idSanit);
+    return !(idEsistente || idInCompilazione);
+  } else return true;
+}
+
+function getSuggerimenti(doc) {
+  if (!doc.id) return [];
+  const q = doc.id.toLowerCase();
+  return idDocs
+    .filter(id => id.toLowerCase().startsWith(q) && id !== doc.id)
+    .slice(0, 10);
+}
+
+function selezionaSuggerimento(suggerimento, idx) {
+  state.docs[idx].id = suggerimento;
 }
 </script>
 
@@ -580,28 +518,6 @@ export default {
   overflow: hidden;
 }
 
-/* .sidebar {
-  width: 200px;
-  background: #fafafa;
-  border-right: 1px solid #ddd;
-  overflow-y: auto;
-} */
-
-/* .sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.sidebar li {
-  padding: 10px;
-  cursor: pointer;
-}
-
-.sidebar li.active {
-  background: #e0e0e0;
-} */
-
 .main-content {
   flex: 1;
   padding: 20px;
@@ -659,14 +575,6 @@ export default {
   font-size: 1.2rem;
   margin-left: 5px;
 }
-
-/* .file-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 10px;
-  background: #fff;
-} */
 
 .file-details {
   display: flex;
