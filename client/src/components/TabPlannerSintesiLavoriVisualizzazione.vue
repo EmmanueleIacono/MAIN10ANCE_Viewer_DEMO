@@ -1,19 +1,19 @@
 <template>
   <div class="main-container">
-    <LoadingScreen :caricamento="caricamento" />
-    <div v-if="records.length" class="sort-controls">
-      <button :class="{active: oggi}" @click="setOggi">Oggi</button>
-      <button :class="{active: sortKey === 'data_ins'}" @click="setSort('data_ins')">
+    <LoadingScreen :caricamento="state.caricamento" />
+    <div v-if="state.records.length" class="sort-controls">
+      <button :class="{active: state.oggi}" @click="setOggi">Oggi</button>
+      <button :class="{active: state.sortKey === 'data_ins'}" @click="setSort('data_ins')">
         Data
-        <span v-if="sortKey === 'data_ins'">{{ sortAsc ? '↑' : '↓' }}</span>
+        <span v-if="state.sortKey === 'data_ins'">{{ state.sortAsc ? '↑' : '↓' }}</span>
       </button>
-      <button :class="{active: sortKey === 'edif_nome_menu'}" @click="setSort('edif_nome_menu')">
+      <button :class="{active: state.sortKey === 'edif_nome_menu'}" @click="setSort('edif_nome_menu')">
         Edificio
-        <span v-if="sortKey === 'edif_nome_menu'">{{ sortAsc ? '↑' : '↓' }}</span>
+        <span v-if="state.sortKey === 'edif_nome_menu'">{{ state.sortAsc ? '↑' : '↓' }}</span>
       </button>
     </div>
 
-    <table v-if="records.length" class="tabella-lavori">
+    <table v-if="state.records.length" class="tabella-lavori">
       <caption class="caption-sintesi-lavori"><b>Inserimenti precedenti</b></caption>
       <thead>
         <tr>
@@ -41,147 +41,130 @@
   </div>
 </template>
 
-<script>
-import { computed, inject, reactive, toRefs, watch } from "vue";
+<script setup>
+import { computed, reactive, watch } from "vue";
 import { leggiScoreLavori } from "../js/richieste";
 import LoadingScreen from "./elementi/LoadingScreen.vue";
 
-export default {
-  name: 'TabPlannerSintesiLavoriVisualizzazione',
-  components: {
-    LoadingScreen,
-  },
-  props: {
-    stateLocalita: String,
-    scoreLavori: Object,
-  },
-  setup(props) {
-    const store = inject('store');
-    const state = reactive({
-      caricamento: false,
-      records: [],
-      sortKey: 'data_ins',
-      sortAsc: false,
-      oggi: false,
-    });
+const props = defineProps({
+  stateLocalita: String,
+  scoreLavori: Object,
+});
 
-    const sortedRecords = computed(() => {
-      return [...state.records].sort((a, b) => {
-        let va = a[state.sortKey];
-        let vb = b[state.sortKey];
-        if (state.sortKey === 'data_ins') {
-          va = new Date(va);
-          vb = new Date(vb);
-        }
-        if (va == vb) return 0;
-        const comp = va > vb ? 1 : -1;
-        return state.sortAsc ? comp : -comp;
-      });
-    });
+const state = reactive({
+  caricamento: false,
+  records: [],
+  sortKey: 'data_ins',
+  sortAsc: false,
+  oggi: false,
+});
 
-    const filteredSortedRecords = computed(() => {
-      const sorted = sortedRecords.value;
-      if (state.oggi) {
-        return filtraRecordsOggi(sorted);
-      } else {
-        return sorted;
-      }
-    });
-
-    watch(() => props.stateLocalita, async newVal => {
-      if (!newVal) {
-        state.records = [];
-        return;
-      }
-      state.caricamento = true;
-      const att_prec = await leggiScoreLavori(newVal);
-      console.log('nuove att prec:\n', att_prec);
-      state.records = att_prec;
-      state.caricamento = false;
-    });
-
-    function setSort(key) {
-      if (state.sortKey === key) {
-        state.sortAsc = !state.sortAsc;
-      } else {
-        state.sortKey = key;
-        state.sortAsc = true;
-      }
+const sortedRecords = computed(() => {
+  return [...state.records].sort((a, b) => {
+    let va = a[state.sortKey];
+    let vb = b[state.sortKey];
+    if (state.sortKey === 'data_ins') {
+      va = new Date(va);
+      vb = new Date(vb);
     }
+    if (va == vb) return 0;
+    const comp = va > vb ? 1 : -1;
+    return state.sortAsc ? comp : -comp;
+  });
+});
 
-    function setOggi() {
-      state.oggi = !state.oggi;
-    }
+const filteredSortedRecords = computed(() => {
+  const sorted = sortedRecords.value;
+  if (state.oggi) {
+    return filtraRecordsOggi(sorted);
+  } else {
+    return sorted;
+  }
+});
 
-    function cellStyle(valore) {
-      const default_grey = { backgroundColor: `hsl(0, 0%, 75%)`, color: '#888' };
-      try {
-        const val_int = parseInt(valore);
-        if (isNaN(val_int)) return default_grey;
-        // map 1→0°hue (rosso) to 5→120°hue (verde)
-        const hue = ((val_int -1) / 4) * 120;
-        return {
-          backgroundColor: `hsl(${hue}, 70%, 85%)`,
-          color: '#888'
-        };
-      } catch(err) {
-        console.log(err);
-        return default_grey;
-      }
-    }
+watch(() => props.stateLocalita, async newVal => {
+  if (!newVal) {
+    state.records = [];
+    return;
+  }
+  state.caricamento = true;
+  const att_prec = await leggiScoreLavori(newVal);
+  console.log('nuove att prec:\n', att_prec);
+  state.records = att_prec;
+  state.caricamento = false;
+});
 
-    function trovaVoceDaScore(score, voce) {
-      try {
-        const score_int = parseInt(score);
-        if (isNaN(score_int)) return null;
-        const ogg = props.scoreLavori.find(el => el.score_interno === score_int);
-        return ogg ? ogg[voce] : null;
-      } catch(err) {
-        console.log(err);
-        return null;
-      }
-    }
-
-    function filtraRecordsOggi(records) {
-      const oggiMap = new Map();
-
-      for (const rec of records) {
-        const key = rec.edif_nome_menu;
-        const prev = oggiMap.get(key);
-
-        if (!prev) {
-          oggiMap.set(key, rec);
-        } else {
-          const prevData = new Date(prev.data_ins);
-          const newData = new Date(rec.data_ins);
-
-          // se rec nuovo, o stessa data ma > id_interno (timestamp)
-          if (
-            newData > prevData || // data diversa
-            (
-              newData.getTime() === prevData.getTime() && // stessa data
-              rec.id_interno > prev.id_interno // ma timestamp diverso
-            )
-          ) {
-            oggiMap.set(key, rec);
-          }
-        }
-      }
-
-      return Array.from(oggiMap.values());
-    }
-
-    return {
-      store,
-      ...toRefs(state),
-      filteredSortedRecords,
-      setSort,
-      setOggi,
-      cellStyle,
-      trovaVoceDaScore,
-    };
+function setSort(key) {
+  if (state.sortKey === key) {
+    state.sortAsc = !state.sortAsc;
+  } else {
+    state.sortKey = key;
+    state.sortAsc = true;
   }
 }
+
+function setOggi() {
+  state.oggi = !state.oggi;
+}
+
+function cellStyle(valore) {
+  const default_grey = { backgroundColor: `hsl(0, 0%, 75%)`, color: '#888' };
+  try {
+    const val_int = parseInt(valore);
+    if (isNaN(val_int)) return default_grey;
+    // map 1→0°hue (rosso) to 5→120°hue (verde)
+    const hue = ((val_int -1) / 4) * 120;
+    return {
+      backgroundColor: `hsl(${hue}, 70%, 85%)`,
+      color: '#888'
+    };
+  } catch(err) {
+    console.log(err);
+    return default_grey;
+  }
+}
+
+function trovaVoceDaScore(score, voce) {
+  try {
+    const score_int = parseInt(score);
+    if (isNaN(score_int)) return null;
+    const ogg = props.scoreLavori.find(el => el.score_interno === score_int);
+    return ogg ? ogg[voce] : null;
+  } catch(err) {
+    console.log(err);
+    return null;
+  }
+}
+
+function filtraRecordsOggi(records) {
+  const oggiMap = new Map();
+
+  for (const rec of records) {
+    const key = rec.edif_nome_menu;
+    const prev = oggiMap.get(key);
+
+    if (!prev) {
+      oggiMap.set(key, rec);
+    } else {
+      const prevData = new Date(prev.data_ins);
+      const newData = new Date(rec.data_ins);
+
+      // se rec nuovo, o stessa data ma > id_interno (timestamp)
+      if (
+        newData > prevData || // data diversa
+        (
+          newData.getTime() === prevData.getTime() && // stessa data
+          rec.id_interno > prev.id_interno // ma timestamp diverso
+        )
+      ) {
+        oggiMap.set(key, rec);
+      }
+    }
+  }
+
+  return Array.from(oggiMap.values());
+}
+
 </script>
 
 <style scoped>

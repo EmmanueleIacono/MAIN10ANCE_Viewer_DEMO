@@ -1,8 +1,8 @@
 <template>
   <Details class="loading-wrapper" summary="FILTRI ESECUZIONE" :open="false">
-    <input v-model="filtri.cbxTipoScheda" type="checkbox" id="check-tipo-scheda-es">
+    <input v-model="state.filtri.cbxTipoScheda" type="checkbox" id="check-tipo-scheda-es">
     <label for="check-tipo-scheda-es">Scheda</label>
-    <select v-model="filtri.selectTipoScheda">
+    <select v-model="state.filtri.selectTipoScheda">
       <option value="controllo">Scheda di controllo</option>
       <option value="manutenzione regolare">Scheda di manutenzione ordinaria</option>
       <option value="manutenzione correttiva">Scheda di manutenzione correttiva</option>
@@ -11,217 +11,204 @@
       <option value="diagnosi">Scheda di di diagnosi</option>
     </select>
     <br>
-    <input v-model="filtri.cbxLocalita" type="checkbox" id="check-localita-es">
+    <input v-model="state.filtri.cbxLocalita" type="checkbox" id="check-localita-es">
     <label for="check-localita-es">Località</label>
-    <select v-model="filtri.selectLocalita">
+    <select v-model="state.filtri.selectLocalita">
       <option v-for="loc in store.statePlanner.listaSigleLoc" :key="loc.uuid" :value="loc.sigla">{{loc.nome}}</option>
     </select>
     <br>
-    <input :disabled="!filtri.cbxLocalita" v-model="filtri.cbxEdificio" type="checkbox" id="check-edificio-es">
+    <input :disabled="!state.filtri.cbxLocalita" v-model="state.filtri.cbxEdificio" type="checkbox" id="check-edificio-es">
     <label for="check-edificio-es">Edificio</label>
-    <select v-model="filtri.selectEdificio">
-      <option v-for="edif in listaEdifFiltrata" :key="edif.uuid" :value="edif.edificio">{{edif.nome}}</option>
+    <select v-model="state.filtri.selectEdificio">
+      <option v-for="edif in state.listaEdifFiltrata" :key="edif.uuid" :value="edif.edificio">{{edif.nome}}</option>
     </select>
     <br>
-    <input v-model="filtri.cbxElemento" type="checkbox" id="check-elemento-es">
+    <input v-model="state.filtri.cbxElemento" type="checkbox" id="check-elemento-es">
     <label for="check-elemento-es">Elemento</label>
-    <select v-model="filtri.selectElemento">
+    <select v-model="state.filtri.selectElemento">
       <option v-for="el in store.statePlanner.listaElementi" :key="el.tabella" :value="el.tabella">{{el.alias}}</option>
     </select>
     <br>
-    <input v-model="filtri.cbxData" type="checkbox" id="check-data-es">
+    <input v-model="state.filtri.cbxData" type="checkbox" id="check-data-es">
     <label for="check-data-es">Data</label>
     <label for="input-data-da">Da</label>
-    <input v-model="filtri.selectDataDa" type="date">
+    <input v-model="state.filtri.selectDataDa" type="date">
     <label for="input-data-a">A</label>
-    <input v-model="filtri.selectDataA" type="date">
+    <input v-model="state.filtri.selectDataA" type="date">
     <br>
   </Details>
 </template>
 
-<script>
-import {inject, reactive, toRefs, watch} from 'vue';
+<script setup>
+import {inject, reactive, watch} from 'vue';
 import Details from './elementi/Details.vue';
 
-export default {
-  name: 'TabPlannerFiltriEsecuzione',
-  components: {
-    Details,
+const store = inject('store');
+const state = reactive({
+  filtri: {
+    cbxTipoScheda: false,
+    cbxLocalita: false,
+    cbxEdificio: false,
+    cbxElemento: false,
+    cbxData: false,
+    selectTipoScheda: 'controllo',
+    selectLocalita: '',
+    selectEdificio: '',
+    selectElemento: '',
+    selectDataDa: '',
+    selectDataA: '',
   },
-  setup() {
-    const store = inject('store');
-    const state = reactive({
-      filtri: {
-        cbxTipoScheda: false,
-        cbxLocalita: false,
-        cbxEdificio: false,
-        cbxElemento: false,
-        cbxData: false,
-        selectTipoScheda: 'controllo',
-        selectLocalita: '',
-        selectEdificio: '',
-        selectElemento: '',
-        selectDataDa: '',
-        selectDataA: '',
-      },
-      listaEdifFiltrata: [],
-    });
+  listaEdifFiltrata: [],
+});
 
-    watch(() => store.statePlanner.datiPlannerLoaded, newVal => {
-      if (newVal) inizializzaSelect();
-    });
+watch(() => store.statePlanner.datiPlannerLoaded, newVal => {
+  if (newVal) inizializzaSelect();
+});
 
-    watch(() => state.filtri.selectLocalita, async newVal => {
-      const listaEdifFiltrata = store.statePlanner.listaEdif.filter(ed => ed.localita === newVal);
-      state.listaEdifFiltrata = listaEdifFiltrata;
-      if (listaEdifFiltrata[0]) state.filtri.selectEdificio = listaEdifFiltrata[0].edificio;
-    });
+watch(() => state.filtri.selectLocalita, async newVal => {
+  const listaEdifFiltrata = store.statePlanner.listaEdif.filter(ed => ed.localita === newVal);
+  state.listaEdifFiltrata = listaEdifFiltrata;
+  if (listaEdifFiltrata[0]) state.filtri.selectEdificio = listaEdifFiltrata[0].edificio;
+});
 
-    watch(() => state.filtri.cbxLocalita, newLocCbx => {
-      if (newLocCbx === false) state.filtri.cbxEdificio = false;
-    });
+watch(() => state.filtri.cbxLocalita, newLocCbx => {
+  if (newLocCbx === false) state.filtri.cbxEdificio = false;
+});
 
-    watch(() => state.filtri, (newFiltri) => {
-      resetFiltroSchede();
-      if (newFiltri.cbxTipoScheda) filtraTipoScheda(newFiltri.selectTipoScheda);
-      if (newFiltri.cbxLocalita) filtraLocEdifElemScheda(newFiltri.selectLocalita, 0);
-      if (newFiltri.cbxEdificio) filtraLocEdifElemScheda(newFiltri.selectEdificio, 1);
-      if (newFiltri.cbxElemento) filtraLocEdifElemScheda(newFiltri.selectElemento, 2);
-      if (newFiltri.cbxData) filtraDataScheda(newFiltri.selectDataDa, newFiltri.selectDataA);
-    }, {
-      deep: true
-    });
+watch(() => state.filtri, (newFiltri) => {
+  resetFiltroSchede();
+  if (newFiltri.cbxTipoScheda) filtraTipoScheda(newFiltri.selectTipoScheda);
+  if (newFiltri.cbxLocalita) filtraLocEdifElemScheda(newFiltri.selectLocalita, 0);
+  if (newFiltri.cbxEdificio) filtraLocEdifElemScheda(newFiltri.selectEdificio, 1);
+  if (newFiltri.cbxElemento) filtraLocEdifElemScheda(newFiltri.selectElemento, 2);
+  if (newFiltri.cbxData) filtraDataScheda(newFiltri.selectDataDa, newFiltri.selectDataA);
+}, {
+  deep: true
+});
 
-    function inizializzaSelect() {
-      if (store.statePlanner.listaSigleLoc.length) state.filtri.selectLocalita = store.statePlanner.listaSigleLoc[0].sigla;
-      if (store.statePlanner.listaElementi.length) state.filtri.selectElemento = store.statePlanner.listaElementi[0].tabella;
-    }
+function inizializzaSelect() {
+  if (store.statePlanner.listaSigleLoc.length) state.filtri.selectLocalita = store.statePlanner.listaSigleLoc[0].sigla;
+  if (store.statePlanner.listaElementi.length) state.filtri.selectElemento = store.statePlanner.listaElementi[0].tabella;
+}
 
-    function filtraTipoScheda(tipoScheda) {
-      store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = [];
-      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = [];
-      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = [];
-      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = [];
-      store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = [];
-      store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = [];
+function filtraTipoScheda(tipoScheda) {
+  store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = [];
+  store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = [];
+  store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = [];
+  store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = [];
+  store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = [];
+  store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = [];
 
-      store.statePlanner.schedeEsecuzioneFiltrate[tipoScheda] = store.statePlanner.schedeEsecuzione[tipoScheda];
-    }
+  store.statePlanner.schedeEsecuzioneFiltrate[tipoScheda] = store.statePlanner.schedeEsecuzione[tipoScheda];
+}
 
-    function filtraLocEdifElemScheda(proprietà, indice) {
-      store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = store.statePlanner.schedeEsecuzioneFiltrate['controllo'].filter(scheda => {
-        const prop = scheda['Elementi da controllare'][0]?.split('|')[indice];
-        return prop === proprietà;
-      });
-      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'].filter(scheda => {
-        const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
-        return prop === proprietà;
-      });
-      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'].filter(scheda => {
-        const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
-        return prop === proprietà;
-      });
-      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'].filter(scheda => {
-        const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
-        return prop === proprietà;
-      });
-      store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = store.statePlanner.schedeEsecuzioneFiltrate['restauro'].filter(scheda => {
-        const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
-        return prop === proprietà;
-      });
-      store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'].filter(scheda => {
-        const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
-        return prop === proprietà;
-      });
-    }
+function filtraLocEdifElemScheda(proprietà, indice) {
+  store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = store.statePlanner.schedeEsecuzioneFiltrate['controllo'].filter(scheda => {
+    const prop = scheda['Elementi da controllare'][0]?.split('|')[indice];
+    return prop === proprietà;
+  });
+  store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'].filter(scheda => {
+    const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
+    return prop === proprietà;
+  });
+  store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'].filter(scheda => {
+    const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
+    return prop === proprietà;
+  });
+  store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'].filter(scheda => {
+    const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
+    return prop === proprietà;
+  });
+  store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = store.statePlanner.schedeEsecuzioneFiltrate['restauro'].filter(scheda => {
+    const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
+    return prop === proprietà;
+  });
+  store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'].filter(scheda => {
+    const prop = scheda['Elementi interessati'][0]?.split('|')[indice];
+    return prop === proprietà;
+  });
+}
 
-    function filtraDataScheda(dataDa, dataA) {
-      if (dataDa || dataA) {
-        const dataFrom = dataDa ? new Date(dataDa) : null;
-        const dataTo = dataA ? new Date(dataA) : null;
-        store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = store.statePlanner.schedeEsecuzioneFiltrate['controllo'].filter(scheda => {
-          const dataScheda = new Date(scheda['Data controllo']);
-          if (dataFrom && dataTo) {
-            return dataScheda >= dataFrom && dataScheda <= dataTo;
-          } else if (dataFrom) {
-            return dataScheda >= dataFrom;
-          } else if (dataTo) {
-            return dataScheda <= dataTo;
-          }
-          return true;
-        });
-        store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'].filter(scheda => {
-          const dataScheda = new Date(scheda['Data intervento']);
-          if (dataFrom && dataTo) {
-            return dataScheda >= dataFrom && dataScheda <= dataTo;
-          } else if (dataFrom) {
-            return dataScheda >= dataFrom;
-          } else if (dataTo) {
-            return dataScheda <= dataTo;
-          }
-          return true;
-        });
-        store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'].filter(scheda => {
-          const dataScheda = new Date(scheda['Data intervento']);
-          if (dataFrom && dataTo) {
-            return dataScheda >= dataFrom && dataScheda <= dataTo;
-          } else if (dataFrom) {
-            return dataScheda >= dataFrom;
-          } else if (dataTo) {
-            return dataScheda <= dataTo;
-          }
-          return true;
-        });
-        store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'].filter(scheda => {
-          const dataScheda = new Date(scheda['Data intervento']);
-          if (dataFrom && dataTo) {
-            return dataScheda >= dataFrom && dataScheda <= dataTo;
-          } else if (dataFrom) {
-            return dataScheda >= dataFrom;
-          } else if (dataTo) {
-            return dataScheda <= dataTo;
-          }
-          return true;
-        });
-        store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = store.statePlanner.schedeEsecuzioneFiltrate['restauro'].filter(scheda => {
-          const dataScheda = new Date(scheda['Data intervento']);
-          if (dataFrom && dataTo) {
-            return dataScheda >= dataFrom && dataScheda <= dataTo;
-          } else if (dataFrom) {
-            return dataScheda >= dataFrom;
-          } else if (dataTo) {
-            return dataScheda <= dataTo;
-          }
-          return true;
-        });
-        store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'].filter(scheda => {
-          const dataScheda = new Date(scheda['Data intervento']);
-          if (dataFrom && dataTo) {
-            return dataScheda >= dataFrom && dataScheda <= dataTo;
-          } else if (dataFrom) {
-            return dataScheda >= dataFrom;
-          } else if (dataTo) {
-            return dataScheda <= dataTo;
-          }
-          return true;
-        });
+function filtraDataScheda(dataDa, dataA) {
+  if (dataDa || dataA) {
+    const dataFrom = dataDa ? new Date(dataDa) : null;
+    const dataTo = dataA ? new Date(dataA) : null;
+    store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = store.statePlanner.schedeEsecuzioneFiltrate['controllo'].filter(scheda => {
+      const dataScheda = new Date(scheda['Data controllo']);
+      if (dataFrom && dataTo) {
+        return dataScheda >= dataFrom && dataScheda <= dataTo;
+      } else if (dataFrom) {
+        return dataScheda >= dataFrom;
+      } else if (dataTo) {
+        return dataScheda <= dataTo;
       }
-    }
-
-    function resetFiltroSchede() {
-      store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = store.statePlanner.schedeEsecuzione['controllo'];
-      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = store.statePlanner.schedeEsecuzione['manutenzione regolare'];
-      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = store.statePlanner.schedeEsecuzione['manutenzione correttiva'];
-      store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeEsecuzione['manutenzione straordinaria'];
-      store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = store.statePlanner.schedeEsecuzione['restauro'];
-      store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = store.statePlanner.schedeEsecuzione['diagnosi'];
-    }
-
-    return {
-      store,
-      ...toRefs(state),
-    }
+      return true;
+    });
+    store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'].filter(scheda => {
+      const dataScheda = new Date(scheda['Data intervento']);
+      if (dataFrom && dataTo) {
+        return dataScheda >= dataFrom && dataScheda <= dataTo;
+      } else if (dataFrom) {
+        return dataScheda >= dataFrom;
+      } else if (dataTo) {
+        return dataScheda <= dataTo;
+      }
+      return true;
+    });
+    store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'].filter(scheda => {
+      const dataScheda = new Date(scheda['Data intervento']);
+      if (dataFrom && dataTo) {
+        return dataScheda >= dataFrom && dataScheda <= dataTo;
+      } else if (dataFrom) {
+        return dataScheda >= dataFrom;
+      } else if (dataTo) {
+        return dataScheda <= dataTo;
+      }
+      return true;
+    });
+    store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'].filter(scheda => {
+      const dataScheda = new Date(scheda['Data intervento']);
+      if (dataFrom && dataTo) {
+        return dataScheda >= dataFrom && dataScheda <= dataTo;
+      } else if (dataFrom) {
+        return dataScheda >= dataFrom;
+      } else if (dataTo) {
+        return dataScheda <= dataTo;
+      }
+      return true;
+    });
+    store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = store.statePlanner.schedeEsecuzioneFiltrate['restauro'].filter(scheda => {
+      const dataScheda = new Date(scheda['Data intervento']);
+      if (dataFrom && dataTo) {
+        return dataScheda >= dataFrom && dataScheda <= dataTo;
+      } else if (dataFrom) {
+        return dataScheda >= dataFrom;
+      } else if (dataTo) {
+        return dataScheda <= dataTo;
+      }
+      return true;
+    });
+    store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'].filter(scheda => {
+      const dataScheda = new Date(scheda['Data intervento']);
+      if (dataFrom && dataTo) {
+        return dataScheda >= dataFrom && dataScheda <= dataTo;
+      } else if (dataFrom) {
+        return dataScheda >= dataFrom;
+      } else if (dataTo) {
+        return dataScheda <= dataTo;
+      }
+      return true;
+    });
   }
+}
+
+function resetFiltroSchede() {
+  store.statePlanner.schedeEsecuzioneFiltrate['controllo'] = store.statePlanner.schedeEsecuzione['controllo'];
+  store.statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = store.statePlanner.schedeEsecuzione['manutenzione regolare'];
+  store.statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = store.statePlanner.schedeEsecuzione['manutenzione correttiva'];
+  store.statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = store.statePlanner.schedeEsecuzione['manutenzione straordinaria'];
+  store.statePlanner.schedeEsecuzioneFiltrate['restauro'] = store.statePlanner.schedeEsecuzione['restauro'];
+  store.statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = store.statePlanner.schedeEsecuzione['diagnosi'];
 }
 </script>
 

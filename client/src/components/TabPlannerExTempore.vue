@@ -5,81 +5,81 @@
         <!-- <button @click="moduloVisibile = 'contr'">Programma controllo straordinario</button> -->
         <!-- <button @click="moduloVisibile = 'int'">Programma intervento a guasto</button> -->
       </div>
-      <div v-if="moduloVisibile">
+      <div v-if="state.moduloVisibile">
         <!-- <h4>{{moduloVisibile === 'contr' ? 'Controllo straordinario' : 'Pronto intervento'}}</h4> -->
         <h4>Controllo straordinario</h4>
       </div>
-      <div v-if="moduloVisibile" class="contesto">
+      <div v-if="state.moduloVisibile" class="contesto">
         <div class="contenitore-colonne">
           <label for="località" class="colonna">Località:</label>
-          <select v-model="selectLocalita" id="località" class="colonna">
+          <select v-model="state.selectLocalita" id="località" class="colonna">
             <option value=""></option>
             <option v-for="loc in store.statePlanner.listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
           </select>
           <label for="select-cl-ogg" class="colonna">Classe oggetti:</label>
-          <select v-model="selectClOgg" id="select-cl-ogg" class="colonna">
+          <select v-model="state.selectClOgg" id="select-cl-ogg" class="colonna">
             <option value=""></option>
             <option v-for="cl in store.statePlanner.listaClOgg" :key="cl.unnest" :value="cl.unnest">{{cl.unnest}}</option>
           </select>
         </div>
         <div class="label-edificio"><b>Edificio:</b></div>
         <div id="div-edificio-prog">
-          <div v-for="s in listaSigleEdificiFiltrata" :key="s.edificio" class="checkbox-edifici">
-            <input v-model="listaSigleEdificiSelezionati" :id="`check-edif-prog-${s.edificio}`" :value="s.edificio" type="checkbox">
+          <div v-for="s in state.listaSigleEdificiFiltrata" :key="s.edificio" class="checkbox-edifici">
+            <input v-model="state.listaSigleEdificiSelezionati" :id="`check-edif-prog-${s.edificio}`" :value="s.edificio" type="checkbox">
             <label :for="`check-edif-prog-${s.edificio}`">{{s.edificio}}</label>
           </div>
         </div>
         <br />
       </div>
-      <div v-if="moduloVisibile === 'contr'">
+      <div v-if="state.moduloVisibile === 'contr'">
         <div class="label-descrizione"><b>Descrizione attività:</b></div>
         <div id="div-descrizione">
-          <textarea v-model="datiContrStr.descrizioneContr"></textarea>
+          <textarea v-model="state.datiContrStr.descrizioneContr"></textarea>
         </div>
         <div class="contenitore-colonne">
           <label for="esecutori" class="colonna">Esecutori:</label>
-          <input v-model="datiContrStr.esecutori" id="esecutori" class="colonna">
+          <input v-model="state.datiContrStr.esecutori" id="esecutori" class="colonna">
           <label for="costo" class="colonna">Costo previsto (€):</label>
-          <input v-model="datiContrStr.costoPrevisto" type="number" min="0" step=".01" id="costo" class="colonna">
+          <input v-model="state.datiContrStr.costoPrevisto" type="number" min="0" step=".01" id="costo" class="colonna">
         </div>
         <div class="contenitore-colonne">
           <label for="strumentazione" class="colonna">Strumentazione:</label>
-          <input v-model="datiContrStr.strumentazione" id="strumentazione" class="colonna">
+          <input v-model="state.datiContrStr.strumentazione" id="strumentazione" class="colonna">
           <label for="ore" class="colonna">Ore previste:</label>
-          <input v-model="datiContrStr.orePreviste" type="number" step=".5" id="ore" class="colonna">
+          <input v-model="state.datiContrStr.orePreviste" type="number" step=".5" id="ore" class="colonna">
         </div>
         <div class="contenitore-colonne">
           <label for="note" class="colonna">Note:</label>
-          <input v-model="datiContrStr.note" id="note" class="colonna">
+          <input v-model="state.datiContrStr.note" id="note" class="colonna">
           <label for="data" class="colonna">Data programmata:</label>
-          <input v-model="datiContrStr.dataProgrammata" type="date" id="data" class="colonna">
+          <input v-model="state.datiContrStr.dataProgrammata" type="date" id="data" class="colonna">
         </div>
       </div>
-      <div v-if="moduloVisibile === 'int'">
+      <div v-if="state.moduloVisibile === 'int'">
         <div class="label-descrizione"><b>Descrizione attività:</b></div>
         <div id="div-descrizione">
-          <textarea v-model="datiProntoInt.descrizioneProntoInt"></textarea>
+          <textarea v-model="state.datiProntoInt.descrizioneProntoInt"></textarea>
         </div>
         <div class="contenitore-colonne">
           <label for="esecutori" class="colonna">Esecutori:</label>
-          <input v-model="datiProntoInt.esecutori" id="esecutori" class="colonna">
+          <input v-model="state.datiProntoInt.esecutori" id="esecutori" class="colonna">
           <label for="costo" class="colonna">Costo previsto (€):</label>
-          <input v-model="datiProntoInt.costoPrevisto" type="number" min="0" step=".01" id="costo" class="colonna">
+          <input v-model="state.datiProntoInt.costoPrevisto" type="number" min="0" step=".01" id="costo" class="colonna">
         </div>
         <div class="contenitore-colonne">
           <label for="strumentazione" class="colonna">Strumentazione:</label>
-          <input v-model="datiProntoInt.strumentazione" id="strumentazione" class="colonna">
+          <input v-model="state.datiProntoInt.strumentazione" id="strumentazione" class="colonna">
           <label for="ore" class="colonna">Ore previste:</label>
-          <input v-model="datiProntoInt.orePreviste" type="number" step=".5" id="ore" class="colonna">
+          <input v-model="state.datiProntoInt.orePreviste" type="number" step=".5" id="ore" class="colonna">
         </div>
         <div class="contenitore-colonne">
           <label for="note" class="colonna">Note:</label>
-          <input v-model="datiProntoInt.note" id="note" class="colonna">
+          <input v-model="state.datiProntoInt.note" id="note" class="colonna">
           <label for="data" class="colonna">Data programmata:</label>
-          <input v-model="datiProntoInt.dataProgrammata" type="date" id="data" class="colonna">
+          <input v-model="state.datiProntoInt.dataProgrammata" type="date" id="data" class="colonna">
         </div>
       </div>
-      <div v-if="moduloVisibile" class="contenitore-bottoni-salva">
+      <div v-if="state.moduloVisibile" class="contenitore-bottoni-salva">
         <button @click="chiudi" class="bottone-main10ance">Annulla</button>
         <button @click="salva" class="bottone-main10ance">Salva</button>
       </div>
@@ -87,104 +87,88 @@
   </Card>
 </template>
 
-<script>
-import {inject, reactive, toRefs, watch} from 'vue';
+<script setup>
+import {inject, reactive, watch} from 'vue';
 import Card from './elementi/Card.vue';
 import Details from './elementi/Details.vue';
 
-export default {
-  name: 'TabPlannerExTempore',
-  components: {
-    Card,
-    Details,
+const store = inject('store');
+const state = reactive({
+  moduloVisibile: 'contr',
+  selectLocalita: '',
+  selectClOgg: '',
+  listaSigleEdificiFiltrata: [],
+  listaSigleEdificiSelezionati: [],
+  datiContrStr: {
+    descrizioneContr: '',
+    esecutori: '',
+    strumentazione: '',
+    note: '',
+    costoPrevisto: '',
+    orePreviste: '',
+    dataProgrammata: null,
   },
-  setup() {
-    const store = inject('store');
-    const state = reactive({
-      moduloVisibile: 'contr',
-      selectLocalita: '',
-      selectClOgg: '',
-      listaSigleEdificiFiltrata: [],
-      listaSigleEdificiSelezionati: [],
-      datiContrStr: {
-        descrizioneContr: '',
-        esecutori: '',
-        strumentazione: '',
-        note: '',
-        costoPrevisto: '',
-        orePreviste: '',
-        dataProgrammata: null,
-      },
-      datiProntoInt: {
-        descrizioneProntoInt: '',
-        esecutori: '',
-        strumentazione: '',
-        note: '',
-        costoPrevisto: '',
-        orePreviste: '',
-        dataProgrammata: null,
-      },
-    });
+  datiProntoInt: {
+    descrizioneProntoInt: '',
+    esecutori: '',
+    strumentazione: '',
+    note: '',
+    costoPrevisto: '',
+    orePreviste: '',
+    dataProgrammata: null,
+  },
+});
 
-    watch(() => state.selectLocalita, newVal => {
-      const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.località === newVal);
-      state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
-      state.listaSigleEdificiSelezionati = [];
-    });
+watch(() => state.selectLocalita, newVal => {
+  const listaSigleEdificiFiltrata = store.statePlanner.listaSigleEdifici.filter(s => s.località === newVal);
+  state.listaSigleEdificiFiltrata = listaSigleEdificiFiltrata;
+  state.listaSigleEdificiSelezionati = [];
+});
 
-    function chiudi() {
-      state.moduloVisibile = '';
-      resetDati();
+function chiudi() {
+  state.moduloVisibile = '';
+  resetDati();
+}
+
+function salva() { // implementare registrazione attività nel database
+  switch (state.moduloVisibile) {
+    case 'contr': {
+      console.log(state.datiContrStr);
+      console.log(state.selectLocalita);
+      console.log(state.selectClOgg);
+      console.log(state.listaSigleEdificiSelezionati);
+      break;
     }
-
-    function salva() { // implementare registrazione attività nel database
-      switch (state.moduloVisibile) {
-        case 'contr': {
-          console.log(state.datiContrStr);
-          console.log(state.selectLocalita);
-          console.log(state.selectClOgg);
-          console.log(state.listaSigleEdificiSelezionati);
-          break;
-        }
-        case 'int': {
-          console.log(state.datiProntoInt);
-          break;
-        }
-        default: {
-          store.methods.setAlert('Si è verificato un problema. Impossibile procedere');
-          break;
-        }
-      }
+    case 'int': {
+      console.log(state.datiProntoInt);
+      break;
     }
-
-    function resetDati() {
-      state.selectLocalita = '';
-      state.selectClOgg = '';
-      state.listaSigleEdificiFiltrata = [];
-      state.listaSigleEdificiSelezionati = [];
-      state.datiContrStr.descrizioneContr = '';
-      state.datiContrStr.esecutori = '';
-      state.datiContrStr.strumentazione = '';
-      state.datiContrStr.note = '';
-      state.datiContrStr.costoPrevisto = '';
-      state.datiContrStr.orePreviste = '';
-      state.datiContrStr.dataProgrammata = null;
-      state.datiProntoInt.descrizioneProntoInt = '';
-      state.datiProntoInt.esecutori = '';
-      state.datiProntoInt.strumentazione = '';
-      state.datiProntoInt.note = '';
-      state.datiProntoInt.costoPrevisto = '';
-      state.datiProntoInt.orePreviste = '';
-      state.datiProntoInt.dataProgrammata = null;
-    }
-
-    return {
-      store,
-      ...toRefs(state),
-      chiudi,
-      salva,
+    default: {
+      store.methods.setAlert('Si è verificato un problema. Impossibile procedere');
+      break;
     }
   }
+}
+
+function resetDati() {
+  state.selectLocalita = '';
+  state.selectClOgg = '';
+  state.listaSigleEdificiFiltrata = [];
+  state.listaSigleEdificiSelezionati = [];
+  state.datiContrStr.descrizioneContr = '';
+  state.datiContrStr.esecutori = '';
+  state.datiContrStr.strumentazione = '';
+  state.datiContrStr.note = '';
+  state.datiContrStr.costoPrevisto = '';
+  state.datiContrStr.orePreviste = '';
+  state.datiContrStr.dataProgrammata = null;
+  state.datiProntoInt.descrizioneProntoInt = '';
+  state.datiProntoInt.esecutori = '';
+  state.datiProntoInt.strumentazione = '';
+  state.datiProntoInt.note = '';
+  state.datiProntoInt.costoPrevisto = '';
+  state.datiProntoInt.orePreviste = '';
+  state.datiProntoInt.dataProgrammata = null;
 }
 </script>
 

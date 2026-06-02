@@ -1,37 +1,37 @@
 <template>
 <Card>
-  <Details summary="PROGRAMMAZIONE CON INSERIMENTO A CALENDARIO" :open="aperto" class="loading-wrapper">
-    <LoadingScreen :caricamento="caricamento" />
+  <Details summary="PROGRAMMAZIONE CON INSERIMENTO A CALENDARIO" :open="state.aperto" class="loading-wrapper">
+    <LoadingScreen :caricamento="state.caricamento" />
     <div class="contenitore-scelta-attività">
-      <button @click="tabIntegrazioneAttivo = 'AttPianificate'" class="verde">CONTROLLO E MANUTENZIONE ORDINARIA</button>
-      <button @click="tabIntegrazioneAttivo = 'AttSegnalate'" class="giallo">MANUTENZIONE STRAORDINARIA</button>
+      <button @click="state.tabIntegrazioneAttivo = 'AttPianificate'" class="verde">CONTROLLO E MANUTENZIONE ORDINARIA</button>
+      <button @click="state.tabIntegrazioneAttivo = 'AttSegnalate'" class="giallo">MANUTENZIONE STRAORDINARIA</button>
     </div>
     <div class="contenitore-ordinaper">
       <p><b>Ordina per: </b></p>
-      <div v-if="tabIntegrazioneAttivo === 'AttPianificate'">
-        <input v-model="ordinaPer" type="radio" name="ordina" id="data-prog" class="mr" value="data_prog">
+      <div v-if="state.tabIntegrazioneAttivo === 'AttPianificate'">
+        <input v-model="state.ordinaPer" type="radio" name="ordina" id="data-prog" class="mr" value="data_prog">
         <label for="data-prog">Urgenza</label>
       </div>
-      <div v-if="tabIntegrazioneAttivo === 'AttSegnalate'">
-        <input v-model="ordinaPer" type="radio" name="ordina" id="liv-priorit" class="mr" value="liv_priorità">
+      <div v-if="state.tabIntegrazioneAttivo === 'AttSegnalate'">
+        <input v-model="state.ordinaPer" type="radio" name="ordina" id="liv-priorit" class="mr" value="liv_priorità">
         <label for="liv-priorit">Livello di priorità</label>
       </div>
       <div>
-        <input v-model="ordinaPer" type="radio" name="ordina" id="data-ins" class="mr" value="id_att_prog">
+        <input v-model="state.ordinaPer" type="radio" name="ordina" id="data-ins" class="mr" value="id_att_prog">
         <label for="data-ins">Data di inserimento</label>
       </div>
       <div class="contenitore-bottone">
         <button @click="mostraTutteAttProg" v-if="store.statePlanner.datiProgrammazione.attCicliche.some(att => !att.visibile)" class="glyphicon glyphicon-list" title="Mostra tutto"></button>
       </div>
     </div>
-    <AttCicliche @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttPianificate'" :att="store.statePlanner.datiProgrammazione.attCicliche" />
-    <AttRiallineamento @integrazioneOK="emettiRefresh" v-show="tabIntegrazioneAttivo === 'AttSegnalate'" :att="store.statePlanner.datiProgrammazione.attRiallineamento" />
+    <AttCicliche @integrazioneOK="emettiRefresh" v-show="state.tabIntegrazioneAttivo === 'AttPianificate'" :att="store.statePlanner.datiProgrammazione.attCicliche" />
+    <AttRiallineamento @integrazioneOK="emettiRefresh" v-show="state.tabIntegrazioneAttivo === 'AttSegnalate'" :att="store.statePlanner.datiProgrammazione.attRiallineamento" />
   </Details>
 </Card>
 </template>
 
-<script>
-import {onMounted, reactive, toRefs, watch, inject} from 'vue';
+<script setup>
+import {onMounted, reactive, watch, inject} from 'vue';
 import {leggiAttProgPerIntegrazione} from '../js/richieste';
 import Card from './elementi/Card.vue';
 import Details from './elementi/Details.vue';
@@ -39,77 +39,68 @@ import AttCicliche from './TabPlannerIntegrazioneAttCicliche.vue';
 import AttRiallineamento from './TabPlannerIntegrazioneAttRiallineamento.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 
-export default {
-  name: 'TabPlannerIntergazione',
-  components: {
-    Card,
-    Details,
-    AttCicliche,
-    AttRiallineamento,
-    LoadingScreen,
+const emit = defineEmits(['integrazioneAggiornata']);
+defineExpose({
+  popolaAttività,
+  get aperto() {
+    return state.aperto;
   },
-  setup(props, {emit}) {
-    const store = inject('store');
-    const state = reactive({
-      aperto: false,
-      caricamento: false,
-      tabIntegrazioneAttivo: 'AttPianificate',
-      ordinaPer: 'data_prog',
-    });
+  set aperto(valore) {
+    state.aperto = valore;
+  },
+});
 
-    watch(() => state.tabIntegrazioneAttivo, newVal => {
-      if (newVal === 'AttPianificate') state.ordinaPer = 'data_prog';
-      else state.ordinaPer = 'liv_priorità';
-    });
+const store = inject('store');
+const state = reactive({
+  aperto: false,
+  caricamento: false,
+  tabIntegrazioneAttivo: 'AttPianificate',
+  ordinaPer: 'data_prog',
+});
 
-    watch(() => state.ordinaPer, newVal => {
-      if (state.tabIntegrazioneAttivo === 'AttPianificate') ordinaAttivitàCicliche(newVal);
-      else ordinaAttivitàRiallineamento(newVal);
-    });
+watch(() => state.tabIntegrazioneAttivo, newVal => {
+  if (newVal === 'AttPianificate') state.ordinaPer = 'data_prog';
+  else state.ordinaPer = 'liv_priorità';
+});
 
-    onMounted(async () => {
-      await popolaAttività();
-    });
+watch(() => state.ordinaPer, newVal => {
+  if (state.tabIntegrazioneAttivo === 'AttPianificate') ordinaAttivitàCicliche(newVal);
+  else ordinaAttivitàRiallineamento(newVal);
+});
 
-    async function popolaAttività() {
-      state.caricamento = true;
-      const attDaIntegrare = await leggiAttProgPerIntegrazione(true);
-      const attCicliche = attDaIntegrare.filter(att => att.tipo_attività.includes('controllo') || att.tipo_attività.includes('manutenzione regolare')).filter(att => !!att.id_main10ance.length);
-      const attRiallineamento = attDaIntegrare.filter(att => !att.tipo_attività.includes('controllo') && !att.tipo_attività.includes('manutenzione regolare'));
-      store.statePlanner.datiProgrammazione.attCicliche = attCicliche;
-      store.statePlanner.datiProgrammazione.attCicliche.forEach(att => att.visibile = true);
-      store.statePlanner.datiProgrammazione.attRiallineamento = attRiallineamento;
-      if (state.tabIntegrazioneAttivo === 'AttPianificate') ordinaAttivitàCicliche(state.ordinaPer);
-      else ordinaAttivitàRiallineamento(state.ordinaPer);
-      state.caricamento = false;
-    }
+onMounted(async () => {
+  await popolaAttività();
+});
 
-    function ordinaAttivitàCicliche(param) {
-      if (param === 'data_prog') store.statePlanner.datiProgrammazione.attCicliche.sort((a, b) => a[param].localeCompare(b[param]));
-      else store.statePlanner.datiProgrammazione.attCicliche.sort((a, b) => b[param].localeCompare(a[param]));
-    }
+async function popolaAttività() {
+  state.caricamento = true;
+  const attDaIntegrare = await leggiAttProgPerIntegrazione(true);
+  const attCicliche = attDaIntegrare.filter(att => att.tipo_attività.includes('controllo') || att.tipo_attività.includes('manutenzione regolare')).filter(att => !!att.id_main10ance.length);
+  const attRiallineamento = attDaIntegrare.filter(att => !att.tipo_attività.includes('controllo') && !att.tipo_attività.includes('manutenzione regolare'));
+  store.statePlanner.datiProgrammazione.attCicliche = attCicliche;
+  store.statePlanner.datiProgrammazione.attCicliche.forEach(att => att.visibile = true);
+  store.statePlanner.datiProgrammazione.attRiallineamento = attRiallineamento;
+  if (state.tabIntegrazioneAttivo === 'AttPianificate') ordinaAttivitàCicliche(state.ordinaPer);
+  else ordinaAttivitàRiallineamento(state.ordinaPer);
+  state.caricamento = false;
+}
 
-    function ordinaAttivitàRiallineamento(param) {
-      if (param === 'liv_priorità') store.statePlanner.datiProgrammazione.attRiallineamento.sort((a, b) => parseInt(b[param]) - parseInt(a[param]));
-      else store.statePlanner.datiProgrammazione.attRiallineamento.sort((a, b) => b[param].localeCompare(a[param]));
-    }
+function ordinaAttivitàCicliche(param) {
+  if (param === 'data_prog') store.statePlanner.datiProgrammazione.attCicliche.sort((a, b) => a[param].localeCompare(b[param]));
+  else store.statePlanner.datiProgrammazione.attCicliche.sort((a, b) => b[param].localeCompare(a[param]));
+}
 
-    function emettiRefresh() {
-      emit('integrazioneAggiornata');
-    }
+function ordinaAttivitàRiallineamento(param) {
+  if (param === 'liv_priorità') store.statePlanner.datiProgrammazione.attRiallineamento.sort((a, b) => parseInt(b[param]) - parseInt(a[param]));
+  else store.statePlanner.datiProgrammazione.attRiallineamento.sort((a, b) => b[param].localeCompare(a[param]));
+}
 
-    function mostraTutteAttProg() {
-      store.statePlanner.datiProgrammazione.attCicliche.forEach(att => att.visibile = true);
-    }
+function emettiRefresh() {
+  emit('integrazioneAggiornata');
+}
 
-    return {
-      store,
-      ...toRefs(state),
-      popolaAttività,
-      emettiRefresh,
-      mostraTutteAttProg,
-    }
-  }
+function mostraTutteAttProg() {
+  store.statePlanner.datiProgrammazione.attCicliche.forEach(att => att.visibile = true);
 }
 </script>
 
