@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    env_file:
+      - .env.docker
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MAIN10ANCE_DB: postgresql://${POSTGRES_USER:-main10ance}:${POSTGRES_PASSWORD:-main10ance}@postgres:5432/${POSTGRES_DB:-main10ance}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-main10ance}
+      POSTGRES_USER: ${POSTGRES_USER:-main10ance}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-main10ance}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

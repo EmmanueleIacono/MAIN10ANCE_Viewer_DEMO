@@ -2,5 +2,6 @@
 node_modules
 todo.txt
 .env
+.env.docker
 dist
 _wip

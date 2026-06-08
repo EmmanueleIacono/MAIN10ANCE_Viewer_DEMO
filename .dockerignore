@@ -1,0 +1,15 @@
+.git
+.gitignore
+.vscode
+node_modules
+client/node_modules
+client/dist
+npm-debug.log*
+client/npm-debug.log*
+.env
+.env.*
+!.env.example
+!.env.docker.example
+_wip
+todo.txt
+dependency-graph_js.png
