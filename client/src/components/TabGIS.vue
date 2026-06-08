@@ -65,13 +65,14 @@ import {mappaGlb, creaLivelloGIS, rimuoviMarkerTemporaneo} from '../js/GIS';
 import {creaNuovoLocPdiff} from '../js/richieste';
 import {dataInteger} from '../js/shared';
 import province from '../assets/json/province-italia.json';
-import comuni from '../assets/json/comuni.json';
+import comuniUrl from '../assets/json/comuni.json?url';
 
 const emit = defineEmits(['loadLivelli', 'updateMappa']);
 
 const store = inject('store');
 const mappaRef = ref(null);
 const primoLoadLivelli = ref(false);
+const comuni = ref([]);
 const state = reactive({
   listaComuniFiltrata: [],
   nuovoMarker: null,
@@ -86,7 +87,11 @@ provide('nuovoMarker', toRef(state, 'nuovoMarker'));
 provide('coordMarker', toRef(state, 'coordMarker'));
 
 watch(() => state.provinciaMarker, async newVal => {
-  const listaComuniFiltrata = comuni.filter(cm => cm.sigla === newVal);
+  if (comuni.value.length === 0) {
+    const comuniRaw = await fetch(comuniUrl);
+    comuni.value = await comuniRaw.json();
+  }
+  const listaComuniFiltrata = comuni.value.filter(cm => cm.sigla === newVal);
   state.listaComuniFiltrata = listaComuniFiltrata;
   if (listaComuniFiltrata[0]) state.comuneMarker = listaComuniFiltrata[0].nome;
   else state.comuneMarker = '';

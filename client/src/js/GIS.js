@@ -4,7 +4,6 @@ import L from 'leaflet';
 import proj4 from 'proj4';
 import 'proj4leaflet';
 
-import {getModel} from './BIM';
 import store from '../store/index';
 import locationIconUrl from '@/assets/img/location_icon.png';
 import markerShadowUrl from '@/assets/img/ombre_icone_v4.png';
@@ -122,11 +121,12 @@ export function creaMarker(edif, icona) {
     selettore.id = `selettore_${edif.sigla}`;
     selettore.innerText = 'MODELLO';
     contenitorePopup.appendChild(selettore);
-    selettore.addEventListener('click', () => {
+    selettore.addEventListener('click', async () => {
+        const {getModel} = await import('./BIM');
         getModel(edif.urn);
         mappaGlb.closePopup();
     });
-    
+
     marker.on('popupopen', () => {
         marker._popup.setContent(contenitorePopup);
     });

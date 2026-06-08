@@ -1,11 +1,12 @@
 import {createRouter, createWebHistory} from 'vue-router';
-import TabBIM from './components/TabBIM.vue';
-import TabGIS from './components/TabGIS.vue';
-import TabCollection from './components/TabCollection.vue';
-import TabPlanner from './components/TabPlanner.vue';
-import TabDashboard from './components/TabDashboard.vue';
-import TabAnagrafica from './components/TabAnagrafica/Main.vue';
-import TabAuth from './components/TabAuth.vue';
+
+const TabGIS = () => import('./components/TabGIS.vue');
+const TabBIM = () => import('./components/TabBIM.vue');
+const TabCollection = () => import('./components/TabCollection.vue');
+const TabPlanner = () => import('./components/TabPlanner.vue');
+const TabDashboard = () => import('./components/TabDashboard.vue');
+const TabAnagrafica = () => import('./components/TabAnagrafica/Main.vue');
+const TabAuth = () => import('./components/TabAuth.vue');
 
 const routes = [
   {path: '/', redirect: {name: 'gis'}},
