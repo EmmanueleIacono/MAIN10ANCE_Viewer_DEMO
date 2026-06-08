@@ -18,20 +18,20 @@
           <li class="tab viz-dropdown">
             VISUALIZZATORI
             <ul class="dropdown-menu">
-              <li @click="store.methods.setTabAttivo('Tab2')" :class="{active: store.state.tabAttivo==='Tab2'}" class="tab" id="apriTabGIS">GIS</li>
-              <li @click="store.methods.setTabAttivo('Tab1')" :class="{active: store.state.tabAttivo==='Tab1'}" class="tab" id="apriTabBIM">BIM</li>
-              <li @click="store.methods.setTabAttivo('Tab5')" :class="{active: store.state.tabAttivo==='Tab5'}" class="tab" id="apriTabCollection">GALLERIA</li>
+              <li @click="apriTab('Tab2')" :class="{active: store.state.tabAttivo==='Tab2'}" class="tab" id="apriTabGIS">GIS</li>
+              <li @click="apriTab('Tab1')" :class="{active: store.state.tabAttivo==='Tab1'}" class="tab" id="apriTabBIM">BIM</li>
+              <li @click="apriTab('Tab5')" :class="{active: store.state.tabAttivo==='Tab5'}" class="tab" id="apriTabCollection">GALLERIA</li>
             </ul>
           </li>
-          <li @click="store.methods.setTabAttivo('Tab6')" :class="{active: store.state.tabAttivo==='Tab6'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabAnagrafica">ANAGRAFICA</li>
-          <li @click="store.methods.setTabAttivo('Tab3')" :class="{active: store.state.tabAttivo==='Tab3'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabSchede">STRUMENTO OPERATIVO</li>
-          <li @click="store.methods.setTabAttivo('Tab4')" :class="{active: store.state.tabAttivo==='Tab4'}" v-if="store.getters.getUsrVwList().includes('apriTabDashboard')" class="tab" id="apriTabDashboard">DASHBOARD</li>
-          <li @click="store.methods.apriDocsDialog" v-if="store.getters.getUsrVwList().includes('apriTabDocumenti')" class="tab">DOCUMENTI</li>
+          <li @click="apriTab('Tab6')" :class="{active: store.state.tabAttivo==='Tab6'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabAnagrafica">ANAGRAFICA</li>
+          <li @click="apriTab('Tab3')" :class="{active: store.state.tabAttivo==='Tab3'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabSchede">STRUMENTO OPERATIVO</li>
+          <li @click="apriTab('Tab4')" :class="{active: store.state.tabAttivo==='Tab4'}" v-if="store.getters.getUsrVwList().includes('apriTabDashboard')" class="tab" id="apriTabDashboard">DASHBOARD</li>
+          <li @click="apriDocumenti" :class="{active: $route.name==='documenti'}" v-if="store.getters.getUsrVwList().includes('apriTabDocumenti')" class="tab">DOCUMENTI</li>
         </ul>
         <div class="pull-right">
           <ul class="nav navbar-nav">
             <li id="liUsernameNavbar">{{store.state.userSettings.user_id}}</li>
-            <li @click="store.methods.setTabAttivo('TabAuth')" v-if="!store.state.userSettings.user_id" :class="{active: store.state.tabAttivo==='TabLogin'}" class="tab" id="apriTabLogin">ACCEDI</li>
+            <li @click="apriTab('TabAuth')" v-if="!store.state.userSettings.user_id" :class="{active: store.state.tabAttivo==='TabAuth'}" class="tab" id="apriTabLogin">ACCEDI</li>
             <li @click="logout" v-if="store.state.userSettings.user_id" class="tab" id="navbarLogout">ESCI</li>
           </ul>
         </div>
@@ -43,9 +43,11 @@
     <div class="row fill">
       <div class="fill loading-wrapper">
         <LoadingScreen :caricamento="store.state.loaderGlobaleVisibile" />
-        <keep-alive>
-          <component :is="tabAttivo" @loadLivelli="loadLayers" @updateMappa="popolaMappa" />
-        </keep-alive>
+        <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component" @loadLivelli="loadLayers" @updateMappa="popolaMappa" />
+          </keep-alive>
+        </router-view>
       </div>
     </div>
   </div>
@@ -56,41 +58,57 @@
 </template>
 
 <script setup>
-import {provide, onMounted, markRaw, shallowRef, watch} from 'vue';
+import {provide, onMounted, watch} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
 import {getTabelleGIS, getGIS, leggiDBMarkerLoc, leggiDBMarkerEdif, leggiDBMarkerLocPdiff} from './js/richieste';
 import store from '@/store';
 import store_globale from './store/store_globale';
 import store_anagrafica from './store/store_anagrafica';
-import Tab1 from './components/TabBIM.vue';
-import Tab2 from './components/TabGIS.vue';
-import Tab3 from './components/TabPlanner.vue';
-import Tab4 from './components/TabDashboard.vue';
-import Tab5 from './components/TabCollection.vue';
-import Tab6 from './components/TabAnagrafica/Main.vue'
-import TabAuth from './components/TabAuth.vue';
 import Alert from './components/Alert.vue';
 import Confirm from './components/Confirm.vue';
 import LoadingScreen from './components/elementi/LoadingScreen.vue';
 import DialogFileUpload from './components/DialogFileUpload.vue';
 
+const router = useRouter();
+const route = useRoute();
+
 provide('store', store);
 provide('store_globale', store_globale);
 provide('store_anagrafica', store_anagrafica);
 
-const tabs = {
-  Tab1: markRaw(Tab1),
-  Tab2: markRaw(Tab2),
-  Tab3: markRaw(Tab3),
-  Tab4: markRaw(Tab4),
-  Tab5: markRaw(Tab5),
-  Tab6: markRaw(Tab6),
-  TabAuth: markRaw(TabAuth),
+const tabRoutes = {
+  Tab1: {name: 'bim'},
+  Tab2: {name: 'gis'},
+  Tab3: {name: 'planner'},
+  Tab4: {name: 'dashboard'},
+  Tab5: {name: 'collection'},
+  Tab6: {name: 'anagrafica'},
+  TabAuth: {name: 'auth'},
 };
-const tabAttivo = shallowRef(tabs[store.state.tabAttivo] || tabs.Tab2);
+let routeBeforeDocs = null;
 
-watch(() => store.state.tabAttivo, nuovoTab => {
-  tabAttivo.value = tabs[nuovoTab] || tabs.Tab2;
+store.methods.setTabNavigationHandler(nomeTab => {
+  const destinazione = tabRoutes[nomeTab] || tabRoutes.Tab2;
+  if (route.name !== destinazione.name) {
+    router.push(destinazione).catch(() => {});
+  }
+});
+
+watch(() => route.fullPath, () => {
+  if (route.meta.tab && store.state.tabAttivo !== route.meta.tab) {
+    store.methods.setTabAttivo(route.meta.tab, {navigate: false});
+  }
+  if (route.meta.docsDialog && !store.state.docsDialogVisibile) {
+    store.methods.apriDocsDialog();
+  }
 }, {immediate: true});
+
+watch(() => store.state.docsDialogVisibile, visibile => {
+  if (!visibile && route.name === 'documenti') {
+    router.replace(routeBeforeDocs || tabRoutes.Tab2).catch(() => {});
+    routeBeforeDocs = null;
+  }
+});
 
 primoLoad();
 
@@ -118,6 +136,24 @@ async function primoLoad() {
     }
   }
   await store_globale.methods.popolaStoreGlobale();
+}
+
+function apriTab(nomeTab) {
+  store.methods.setTabAttivo(nomeTab);
+}
+
+function apriDocumenti() {
+  if (route.name !== 'documenti') {
+    routeBeforeDocs = {
+      name: route.name,
+      params: {...route.params},
+      query: {...route.query},
+    };
+  }
+  store.methods.apriDocsDialog();
+  if (route.name !== 'documenti') {
+    router.push({name: 'documenti'}).catch(() => {});
+  }
 }
 
 async function logout() {

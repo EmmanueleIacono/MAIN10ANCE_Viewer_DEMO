@@ -40,6 +40,11 @@ function main() {
     app.use('/o', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_2), reqOperatore);
     app.use('/g', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_3), reqGestore);
     app.use('/a', controllaLoggedIn, controllaRuoli(process.env.LIVELLO_4), reqAmministratore);
+    if (process.env.NODE_ENV === 'production') {
+        app.get(/^(?!\/(?:api|auth|t|l|o|g|a)(?:\/|$)).*/, (req, res) => {
+            res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+        });
+    }
     // handler errori
     app.use((err, req, res, next) => {
         console.error(err);

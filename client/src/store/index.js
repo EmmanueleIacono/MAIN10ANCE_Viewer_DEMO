@@ -132,9 +132,18 @@ const statePlanner = reactive({
     }
 });
 
+let tabNavigationHandler = null;
+
 const methods = {
-    setTabAttivo(nomeTab) {
+    setTabNavigationHandler(handler) {
+        tabNavigationHandler = handler;
+    },
+
+    setTabAttivo(nomeTab, opzioni = {}) {
         state.tabAttivo = nomeTab;
+        if (opzioni.navigate !== false && tabNavigationHandler) {
+            tabNavigationHandler(nomeTab);
+        }
     },
 
     setLocalStorageUserInfo(settingsJson) {
