@@ -21,8 +21,9 @@ WORKDIR /app
 
 COPY --from=server-deps /app/node_modules ./node_modules
 COPY package*.json ./
-COPY start.js config.js supabase_config.js ./
+COPY start.js config.ts supabase_config.ts tsconfig.json ./
 COPY routes ./routes
+COPY types ./types
 COPY --from=client-build /app/client/dist ./client/dist
 
 EXPOSE 3000

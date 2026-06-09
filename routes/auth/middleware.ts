@@ -1,4 +1,6 @@
-function controllaLoggedIn(req, res, next) {
+import type {Request, Response, NextFunction} from 'express';
+
+function controllaLoggedIn(req: Request, res: Response, next: NextFunction) {
     if (req.signedCookies.user_id) {
         next();
     }
@@ -7,7 +9,7 @@ function controllaLoggedIn(req, res, next) {
     }
 }
 
-function consentiAccesso(req, res, next) {
+function consentiAccesso(req: Request, res: Response, next: NextFunction) {
     const usr = req.path.split('/')[2];
     if (req.signedCookies.user_id === usr) {
         next();
@@ -17,8 +19,8 @@ function consentiAccesso(req, res, next) {
     }
 }
 
-function controllaRuoli(stringaRuoli) {
-    return (req, res, next) => {
+function controllaRuoli(stringaRuoli = '') {
+    return (req: Request, res: Response, next: NextFunction) => {
         const listaRuoli = stringaRuoli.split(' ');
         if (listaRuoli.includes(req.signedCookies.role)) {
             next();
@@ -26,7 +28,7 @@ function controllaRuoli(stringaRuoli) {
         else {
             res.status(401).send({message: 'Non autorizzato'});
         }
-    }
+    };
 }
 
 module.exports = {controllaLoggedIn, consentiAccesso, controllaRuoli};

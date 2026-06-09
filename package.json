@@ -8,7 +8,7 @@
     "start": "node start.js",
     "server": "nodemon start.js --ignore client/",
     "build": "npm install && cd client && npm install && npm run build",
-    "typecheck": "node --check start.js && npm run typecheck --prefix client"
+    "typecheck": "node --check start.js && tsc --noEmit && npm run typecheck --prefix client"
   },
   "author": "Emmanuele Iacono",
   "license": "MIT",
@@ -20,9 +20,16 @@
     "express": "^5.2.1",
     "express-fileupload": "^1.5.2",
     "forge-apis": "^0.9.12",
-    "pg": "^8.21.0"
+    "pg": "^8.21.0",
+    "tsx": "^4.22.4"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/express-fileupload": "^1.5.1",
+    "@types/node": "^25.9.2",
+    "@types/pg": "^8.20.0",
+    "nodemon": "^3.1.14",
+    "typescript": "^6.0.3"
   }
 }

@@ -1,25 +1,27 @@
-const { AuthClientTwoLeggedV2 } = require('forge-apis');
+import {AuthClientTwoLeggedV2} from 'forge-apis';
+import type {ForgeConfig, ForgeCredentials} from '../../types/forge';
 
-const config = require('../../config');
+const config: ForgeConfig = require('../../config');
 
 /**
  * Initializes a Forge client for 2-legged authentication.
- * @param {string[]} scopes List of resource access scopes.
- * @returns {AuthClientTwoLeggedV2} 2-legged authentication client.
+ * @param scopes List of resource access scopes.
+ * @returns 2-legged authentication client.
  */
-function getClient(scopes) {
+function getClient(scopes?: string[]) {
     const { client_id, client_secret } = config.credentials;
     return new AuthClientTwoLeggedV2(client_id, client_secret, scopes || config.scopes.internal);
 }
 
-let cache = {};
-async function getToken(scopes) {
+const cache: Record<string, ForgeCredentials> = {};
+
+async function getToken(scopes: string[]) {
     const key = scopes.join('+');
     if (cache[key]) {
         return cache[key];
     }
     const client = getClient(scopes);
-    let credentials = await client.authenticate();
+    const credentials = await client.authenticate() as ForgeCredentials;
     cache[key] = credentials;
     setTimeout(() => { delete cache[key]; }, credentials.expires_in * 1000);
     return credentials;
