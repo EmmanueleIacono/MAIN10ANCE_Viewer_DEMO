@@ -84,7 +84,7 @@ async function leggiGIS(tabella, geometria, colonneUtili) {
 
 async function leggiMarkerLoc() {
     try {
-        const results = await poolM10a.query(`SELECT * FROM ${data_schema}."dati_località" ORDER BY "nome";`);
+        const results = await poolM10a.query(`SELECT * FROM ${data_schema}."dati_localita" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {
@@ -217,7 +217,7 @@ async function getDefinizioniClassiElementi() {
 
 async function getAmbitoPerLoc(sigla_loc) {
     try {
-        const results = await poolM10a.query(`SELECT sigla, ambito FROM ${data_schema}."dati_località" WHERE sigla = $1;`, [sigla_loc]);
+        const results = await poolM10a.query(`SELECT sigla, ambito FROM ${data_schema}."dati_localita" WHERE sigla = $1;`, [sigla_loc]);
         return results.rows;
     } catch(e) {
         console.log('Errore nella lettura delle sigle località:\n', e);

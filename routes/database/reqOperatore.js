@@ -513,7 +513,7 @@ async function recuperaUrnLOD3(sm, capp) {
 
 async function recuperaUrnLOD2(loc) {
     try {
-        const results = await poolM10a.query(`SELECT "urn" FROM ${data_schema}."dati_località" WHERE "sigla" = ($1);`, [loc]);
+        const results = await poolM10a.query(`SELECT "urn" FROM ${data_schema}."dati_localita" WHERE "sigla" = ($1);`, [loc]);
         return results.rows;
     }
     catch(e) {
@@ -609,7 +609,7 @@ async function leggiPianificazioniControlliManutenzioni(ambito) {
                     ORDER BY pcm.data_inizio, pcm.tipo_attivita
                 ) AS attivita
             FROM ${data_schema}."pianificazione_controlli_manutenzioni" AS pcm
-            LEFT JOIN ${data_schema}."dati_località" AS loc
+            LEFT JOIN ${data_schema}."dati_localita" AS loc
                 ON loc.sigla = pcm.localita
                 AND loc.ambito LIKE pcm.ambito
             WHERE pcm.ambito LIKE $1
@@ -1035,7 +1035,7 @@ async function interrogaSegnalazione(id) {
 
 async function leggiMarkerLocAmbito(ambito_loc) {
     try {
-        const results = await poolM10a.query(`SELECT * FROM ${data_schema}."dati_località" WHERE "ambito" LIKE ($1) ORDER BY "nome";`, [ambito_loc]);
+        const results = await poolM10a.query(`SELECT * FROM ${data_schema}."dati_localita" WHERE "ambito" LIKE ($1) ORDER BY "nome";`, [ambito_loc]);
         return results.rows;
     }
     catch(e) {

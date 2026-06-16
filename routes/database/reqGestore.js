@@ -171,7 +171,7 @@ async function leggiListaTabelleBIM() {
 
 async function getSigleSacriMonti() {
     try {
-        const results = await poolM10a.query(`SELECT "nome", "sigla" FROM ${data_schema}."dati_località" ORDER BY "nome";`);
+        const results = await poolM10a.query(`SELECT "nome", "sigla" FROM ${data_schema}."dati_localita" ORDER BY "nome";`);
         return results.rows;
     }
     catch(e) {
