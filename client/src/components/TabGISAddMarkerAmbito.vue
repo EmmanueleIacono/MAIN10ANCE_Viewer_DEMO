@@ -8,11 +8,11 @@
   <!-- PER ORA NON FUNZIONANTE, MA SE IMPLEMENTATO QUESTO, IMPLEMENTARE ANCHE SELETTORE LOC PER QUANDO INSERISCO EDIF -->
   <label class="nome" for="select-tabella">Tipologia marker:</label>
   <select class="valore" id="select-tabella" v-model="state.tabella">
-    <option value="dati_località">Località</option>
+    <option value="dati_localita">Località</option>
     <option value="dati_edifici">Edificio</option>
   </select>
   <br />
-  <div v-if="state.tabella === 'dati_località'">
+  <div v-if="state.tabella === 'dati_localita'">
     <label class="nome" for="input-loc-nome">Nome:</label>
     <input class="valore" id="input-loc-nome" v-model="state.datiLocalita.nome" placeholder="Nome" />
     <br />
@@ -92,7 +92,7 @@ function confermaMarkerAmbito() {
 async function salvaMarkerAmbito() {
   if (
     (!isDatiEdificioValidi() && state.tabella === "dati_edifici") ||
-    (!isDatiLocalitàValidi() && state.tabella === "dati_località")
+    (!isDatiLocalitaValidi() && state.tabella === "dati_localita")
   ) {
     store.methods.setAlert('Impossibile continuare senza aver impostato correttamente tutti i dati.');
     return;
@@ -158,7 +158,7 @@ function isDatiEdificioValidi() {
   );
 }
 
-function isDatiLocalitàValidi() {
+function isDatiLocalitaValidi() {
   return state.datiLocalita.nome && state.datiLocalita.sigla;
 }
 </script>

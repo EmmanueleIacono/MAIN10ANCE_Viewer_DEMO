@@ -1,7 +1,7 @@
 <template>
 <div class="loading-wrapper">
   <LoadingScreen :caricamento="statePercorso.caricamento" />
-  <label class="nome" for="check-località">Località</label>
+  <label class="nome" for="check-localita">Località</label>
   <select class="valore" v-model="statePercorso.selectLocalita">
     <option v-for="loc in statePercorso.listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
     <option value="" disabled>----------</option>

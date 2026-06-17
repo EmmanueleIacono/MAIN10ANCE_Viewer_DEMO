@@ -104,7 +104,7 @@ async function leggiMarkerEdif() {
 
 async function leggiMarkerLocPdiff() {
     try {
-        const results = await poolM10a.query(`SELECT "dati_loc_pdiff".*, 'loc-pdiff' AS "località" FROM ${utility_schema}."dati_loc_pdiff" ORDER BY "nome";`);
+        const results = await poolM10a.query(`SELECT dati_loc_pdiff.*, 'loc-pdiff' AS localita FROM ${utility_schema}.dati_loc_pdiff ORDER BY nome;`);
         return results.rows;
     }
     catch(e) {

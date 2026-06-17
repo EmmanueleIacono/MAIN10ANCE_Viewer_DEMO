@@ -243,7 +243,7 @@ export async function prendiUrn(jsonReq) {
     return risTradotto;
 }
 
-export async function prendiUrnLocalità(jsonReq) {
+export async function prendiUrnLocalita(jsonReq) {
     const risultato = await fetch('/o/DB_Servizio/LOD/UrnLoc', {method: "GET", headers: {"content-type": "application/json", "loc": jsonReq.loc}});
     const risTradotto = await risultato.json();
     return risTradotto;
@@ -387,8 +387,8 @@ export async function conteggioRuoli() {
 }
 
 export async function conteggioModelli() {
-    const località = await fetch('/g/DB_Servizio/lista-localita', {method: "GET", headers: {"content-type": "application/json"}});
-    const localitaJson = await località.json();
+    const localita = await fetch('/g/DB_Servizio/lista-localita', {method: "GET", headers: {"content-type": "application/json"}});
+    const localitaJson = await localita.json();
     const listaNomi = localitaJson.map(tab => tab.nome);
     const listaSigle = localitaJson.map(tab => tab.sigla);
     const risultato = await fetch('/g/Main10ance_DB/dashboard/conteggio-modelli', {method: "GET", headers: {"content-type": "application/json", nomi: JSON.stringify(listaNomi), sigle: JSON.stringify(listaSigle)}});

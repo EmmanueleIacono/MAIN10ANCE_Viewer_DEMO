@@ -15,8 +15,8 @@
       </div>
       <div v-if="state.moduloVisibile" class="contesto">
         <div class="contenitore-colonne">
-          <label for="località" class="colonna">Località:</label>
-          <select v-model="state.selectLocalita" id="località" class="colonna">
+          <label for="localita-att-prec" class="colonna">Località:</label>
+          <select v-model="state.selectLocalita" id="localita-att-prec" class="colonna">
             <option value=""></option>
             <option v-for="loc in store.statePlanner.listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
           </select>

@@ -5,8 +5,8 @@
       <button @click="salvaSintesiLavori" class="bottone-main10ance bottone-sint">Salva</button>
         <br />
       <div class="main-container">
-        <label for="select-località-prog">Località</label>
-        <select v-model="state.selectLocalita" id="select-località-prog">
+        <label for="select-localita-sint">Località</label>
+        <select v-model="state.selectLocalita" id="select-localita-sint">
           <option value=""></option>
           <option v-for="loc in store.statePlanner.listaSigleLoc" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
         </select>

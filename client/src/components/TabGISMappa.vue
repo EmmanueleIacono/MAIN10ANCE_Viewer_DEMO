@@ -8,7 +8,7 @@
 
 <script setup>
 import {onMounted, inject, watch, onActivated} from 'vue';
-import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaLocalità, iconaEdifici, addLocPdiff, addMarkerAmbito, creaMarkerLocPdiff} from '../js/GIS';
+import {aggiungiLayer, creaMappa, rimuoviLayer, setVistaMappa, mappaGlb, creaMarker, iconaLocalita, iconaEdifici, addLocPdiff, addMarkerAmbito, creaMarkerLocPdiff} from '../js/GIS';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 
@@ -22,26 +22,26 @@ const posOrigine = [45.61422, 8.410177];
 onMounted(() => {
   creaMappa('mappa', posOrigine);
 
-  const gruppoMarkerLocalità = L.layerGroup();
+  const gruppoMarkerLocalita = L.layerGroup();
   const gruppoMarkerEdifici = L.layerGroup();
   const clusterMarkerLocPdiff = L.markerClusterGroup(); // per opzioni, L.markerClusterGroup({...})
 
   mappaGlb.on('zoomend', () => {
     const zoomComune = 17;
     if (mappaGlb.getZoom() <= 5) {
-      rimuoviLayer(gruppoMarkerLocalità, mappaGlb);
+      rimuoviLayer(gruppoMarkerLocalita, mappaGlb);
       rimuoviLayer(gruppoMarkerEdifici, mappaGlb);
     }
     else if (mappaGlb.getZoom() < zoomComune && mappaGlb.getZoom() > 5) {
-      aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
+      aggiungiLayer(gruppoMarkerLocalita, mappaGlb);
       rimuoviLayer(gruppoMarkerEdifici, mappaGlb);
     }
     else if (mappaGlb.getZoom() > zoomComune) {
       aggiungiLayer(gruppoMarkerEdifici, mappaGlb);
-      rimuoviLayer(gruppoMarkerLocalità, mappaGlb);
+      rimuoviLayer(gruppoMarkerLocalita, mappaGlb);
     }
     else {
-      aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
+      aggiungiLayer(gruppoMarkerLocalita, mappaGlb);
       aggiungiLayer(gruppoMarkerEdifici, mappaGlb);
     }
   });
@@ -57,15 +57,15 @@ onMounted(() => {
     }
   });
 
-  aggiungiLayer(gruppoMarkerLocalità, mappaGlb);
+  aggiungiLayer(gruppoMarkerLocalita, mappaGlb);
   aggiungiLayer(clusterMarkerLocPdiff, mappaGlb);
 
   watch(() => [store.stateGIS.markerLoc, store.stateGIS.markerEdif, store.stateGIS.markerLocPdiff], () => {
     if (store.stateGIS.markerLoc) {
-      gruppoMarkerLocalità.clearLayers();
+      gruppoMarkerLocalita.clearLayers();
       store.stateGIS.markerLoc.forEach(loc => {
-        const markerSM = creaMarker(loc, iconaLocalità);
-        markerSM.addTo(gruppoMarkerLocalità);
+        const markerSM = creaMarker(loc, iconaLocalita);
+        markerSM.addTo(gruppoMarkerLocalita);
       });
     }
     if (store.stateGIS.markerEdif) {

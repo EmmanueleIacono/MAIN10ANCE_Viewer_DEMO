@@ -1085,7 +1085,7 @@ async function leggiVistaDB(nome_vista, utility = false) {
 
 async function leggiListaLocalita(ambito) {
     try {
-        const results = await poolM10a.query(`SELECT sigla, nome FROM ${data_schema}."v_elenco_località" WHERE ambito LIKE $1;`, [ambito]);
+        const results = await poolM10a.query(`SELECT sigla, nome FROM ${data_schema}."v_elenco_localita" WHERE ambito LIKE $1;`, [ambito]);
         return results.rows;
     }
     catch(e) {

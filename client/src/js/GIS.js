@@ -13,7 +13,7 @@ import cubeIconUrl from '@/assets/img/icona_cubo_v1.png';
 
 export let mappaGlb;
 export let newLocMatMarker;
-export let newLocalitàAmbitoMarker;
+export let newLocalitaAmbitoMarker;
 export let newEdificioAmbitoMarker;
 
 // CREAZIONE MAPPA
@@ -75,7 +75,7 @@ export function creaLivelloGIS(livello) {
     return livelloTabella;
 }
 
-export const iconaLocalità = L.icon({
+export const iconaLocalita = L.icon({
     iconUrl: locationIconUrl,
     shadowUrl: markerShadowUrl,
     iconSize: [30, 30],
@@ -188,6 +188,6 @@ export function addMarkerAmbito(ev) {
 
 export function rimuoviMarkerTemporaneo() {
     if (newLocMatMarker) mappaGlb.removeLayer(newLocMatMarker);
-    // if (newLocalitàAmbitoMarker) mappaGlb.removeLayer(newLocalitàAmbitoMarker); // PER ORA NO
+    // if (newLocalitaAmbitoMarker) mappaGlb.removeLayer(newLocalitaAmbitoMarker); // PER ORA NO
     if (newEdificioAmbitoMarker) mappaGlb.removeLayer(newEdificioAmbitoMarker);
 }

@@ -10,42 +10,42 @@
           <option v-for="loc in state_globale.lista_localita" :key="loc.sigla" :value="loc.sigla">{{loc.nome}}</option>
         </select>
         <br>
-        <label class="nome" for="check-localita">Edifici</label>
+        <label class="nome" for="check-edif">Edifici</label>
         <select class="valore" v-model="state_anagrafica.selezione.select_edif">
           <option v-for="ed in state_anagrafica.selezione.lista_edif_filtrata" :key="ed.edificio" :value="ed.edificio">{{ed.edif_nome_menu}}</option>
         </select>
         <!-- <br>
-        <label class="nome" for="check-localita">Classe elementi</label>
+        <label class="nome" for="check-class">Classe elementi</label>
         <select class="valore" v-model="state_anagrafica.selezione.select_classe">
           <option v-for="cl in state_globale.lista_cl_ogg" :key="cl.cl_ogg" :value="cl.cl_ogg">{{cl.cl_ogg}}</option>
         </select> -->
         <!-- <br>
-        <label class="nome" for="check-localita">Elementi</label>
+        <label class="nome" for="check-elem">Elementi</label>
         <select class="valore" v-model="state_anagrafica.selezione.select_elem">
           <option v-for="el in state_anagrafica.selezione.lista_elem_filtrata" :key="el.elemento_sigla" :value="el.elemento_sigla">{{el.elemento_nome}}</option>
         </select> -->
         <br>
-        <label class="nome" for="check-localita">TEMP: LIV 1</label>
+        <label class="nome" for="check-liv-1">TEMP: LIV 1</label>
         <select class="valore" v-model="state_anagrafica.selezione.select_def_liv_1">
           <option v-for="def in state_globale.gerarchia_classi_elementi" :key="def.id" :value="def.sigla">{{def.nome}}</option>
         </select>
         <!-- <div v-if="state_anagrafica.selezione.select_def_liv_1"> -->
           <br>
-          <label class="nome" for="check-localita">TEMP: LIV 2</label>
+          <label class="nome" for="check-liv-2">TEMP: LIV 2</label>
           <select class="valore" v-model="state_anagrafica.selezione.select_def_liv_2">
             <option v-for="def in opzioni_livello_2" :key="def.id" :value="def.sigla">{{def.nome}}</option>
           </select>
         <!-- </div> -->
         <!-- <div v-if="state_anagrafica.selezione.select_def_liv_2"> -->
           <br>
-          <label class="nome" for="check-localita">TEMP: LIV 3</label>
+          <label class="nome" for="check-liv-3">TEMP: LIV 3</label>
           <select class="valore" v-model="state_anagrafica.selezione.select_def_liv_3">
             <option v-for="def in opzioni_livello_3" :key="def.id" :value="def.sigla">{{def.nome}}</option>
           </select>
         <!-- </div> -->
         <!-- <div v-if="state_anagrafica.selezione.select_def_liv_3"> -->
           <br>
-          <label class="nome" for="check-localita">TEMP: LIV 4</label>
+          <label class="nome" for="check-liv-4">TEMP: LIV 4</label>
           <select class="valore" v-model="state_anagrafica.selezione.select_def_liv_4">
             <option v-for="def in opzioni_livello_4" :key="def.id" :value="def.sigla">{{def.nome}}</option>
           </select>
