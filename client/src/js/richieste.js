@@ -199,8 +199,20 @@ export async function leggiPianificazioniControlliManutenzioni() {
     return resJson;
 }
 
+export async function leggiPianificazioniDaProgrammare() {
+    const res = await fetch('/g/programmazione/pianificazioni-controlli-manutenzioni');
+    const resJson = await res.json();
+    return resJson;
+}
+
 export async function leggiAttProgPerIntegrazione(bool) {
     const res = await fetch('/g/integrazione/attivita-per-integrazione', {method: "GET", headers: {"content-type": "application/json", "bool": JSON.stringify(bool)} });
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function programmaPianificazioneControlliManutenzioni(datiProgrammazione) {
+    const res = await fetch('/g/programmazione/pianificazioni-controlli-manutenzioni', {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(datiProgrammazione)});
     const resJson = await res.json();
     return resJson;
 }

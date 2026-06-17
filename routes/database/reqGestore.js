@@ -72,6 +72,13 @@ app.post('/pianificazione/controlli-manutenzioni', successRoute(req => registraP
 
 app.post('/Main10ance_DB/programmazione/nuovi-controlli', successRoute(req => registraNuoviControlli(req.body)));
 
+app.get('/programmazione/pianificazioni-controlli-manutenzioni', jsonRoute(async (req) => {
+    const ambito = req.signedCookies.ambito;
+    return leggiPianificazioniDaProgrammare(ambito);
+}));
+
+app.patch('/programmazione/pianificazioni-controlli-manutenzioni', successRoute(req => programmaPianificazioneControlliManutenzioni(req.body, req.signedCookies.ambito, req.signedCookies.user_id)));
+
 app.get('/integrazione/attivita-per-integrazione', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
     const reqJson = req.headers;
@@ -328,6 +335,108 @@ function attivitaPianificazioneValida(att) {
         && att.data_inizio
         && Number.isInteger(Number(att.durata_prevista_gg))
         && Number(att.durata_prevista_gg) > 0;
+}
+
+async function leggiPianificazioniDaProgrammare(ambito) {
+    try {
+        const results = await poolM10a.query(`
+            SELECT
+                pcm.id_pianificazione,
+                pcm.tipo_attivita,
+                MAX(pcm.descrizione_attivita) AS descrizione_attivita,
+                MIN(pcm.data_inizio) AS data_inizio,
+                MIN(pcm.durata_prevista_gg) AS durata_prevista_gg,
+                MIN(pcm.frequenza_mesi) AS frequenza_mesi,
+                pcm.localita,
+                COALESCE(MAX(loc.nome), pcm.localita) AS localita_estesa,
+                pcm.ambito_operativo,
+                pcm.necessita_supporto,
+                pcm.stato,
+                ARRAY_AGG(DISTINCT pcm.edificio ORDER BY pcm.edificio) AS edifici,
+                MAX(pcm.operatore_programmazione) AS operatore_programmazione,
+                MAX(pcm.strumentazione_programmazione) AS strumentazione_programmazione,
+                MAX(pcm.costo_previsto) AS costo_previsto,
+                MIN(pcm.data_inizio_programmata) AS data_inizio_programmata,
+                MIN(pcm.durata_programmata_gg) AS durata_programmata_gg,
+                MAX(pcm.note_programmazione) AS note_programmazione
+            FROM ${data_schema}.pianificazione_controlli_manutenzioni AS pcm
+            LEFT JOIN ${data_schema}.dati_localita AS loc
+                ON loc.sigla = pcm.localita
+                AND loc.ambito LIKE pcm.ambito
+            WHERE pcm.ambito LIKE $1
+                AND pcm.stato <> 'programmata'
+            GROUP BY
+                pcm.id_pianificazione,
+                pcm.tipo_attivita,
+                pcm.localita,
+                pcm.ambito_operativo,
+                pcm.necessita_supporto,
+                pcm.stato
+            ORDER BY MIN(pcm.data_inizio), pcm.id_pianificazione, pcm.tipo_attivita;
+        `, [ambito]);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function programmaPianificazioneControlliManutenzioni(reqJson, ambito, autore) {
+    if (!programmazionePianificazioneValida(reqJson)) return false;
+
+    const valuesArray = [
+        reqJson.operatore,
+        reqJson.strumentazione,
+        Number(reqJson.costo_previsto),
+        reqJson.data_inizio_attivita,
+        Number(reqJson.durata_prevista_gg),
+        reqJson.note || null,
+        autore || null,
+        new Date(),
+        reqJson.id_pianificazione,
+        reqJson.tipo_attivita,
+        ambito,
+    ];
+
+    try {
+        await withTransaction(async (tx) => {
+            const result = await tx.query(`
+                UPDATE ${data_schema}.pianificazione_controlli_manutenzioni
+                SET
+                    operatore_programmazione = $1,
+                    strumentazione_programmazione = $2,
+                    costo_previsto = $3,
+                    data_inizio_programmata = $4,
+                    durata_programmata_gg = $5,
+                    note_programmazione = $6,
+                    autore_programmazione = $7,
+                    data_programmazione = $8,
+                    stato = 'programmata'
+                WHERE id_pianificazione = $9
+                    AND tipo_attivita = $10
+                    AND ambito LIKE $11;
+            `, valuesArray);
+            if (!result.rowCount) throw new Error('Nessuna pianificazione aggiornata');
+        });
+        return true;
+    }
+    catch(e) {
+        console.log(e);
+        return false;
+    }
+}
+
+function programmazionePianificazioneValida(dati) {
+    return dati
+        && dati.id_pianificazione
+        && dati.tipo_attivita
+        && dati.operatore
+        && dati.strumentazione
+        && Number(dati.costo_previsto) >= 0
+        && dati.data_inizio_attivita
+        && Number.isInteger(Number(dati.durata_prevista_gg))
+        && Number(dati.durata_prevista_gg) > 0;
 }
 
 async function creaNuovoLocPdiff(reqJson) {

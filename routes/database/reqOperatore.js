@@ -517,7 +517,7 @@ async function leggiPianificazioniControlliManutenzioni(ambito) {
         const results = await poolM10a.query(`
             SELECT
                 pcm.id_pianificazione,
-                MIN(pcm.data_inizio) AS data_inizio,
+                MIN(COALESCE(pcm.data_inizio_programmata, pcm.data_inizio)) AS data_inizio,
                 pcm.localita,
                 COALESCE(MAX(loc.nome), pcm.localita) AS localita_estesa,
                 pcm.ambito_operativo,
@@ -530,10 +530,14 @@ async function leggiPianificazioniControlliManutenzioni(ambito) {
                         'tipo_attivita', pcm.tipo_attivita,
                         'descrizione_attivita', pcm.descrizione_attivita,
                         'frequenza_mesi', pcm.frequenza_mesi,
-                        'data_inizio', pcm.data_inizio,
-                        'durata_prevista_gg', pcm.durata_prevista_gg
+                        'data_inizio', COALESCE(pcm.data_inizio_programmata, pcm.data_inizio),
+                        'durata_prevista_gg', COALESCE(pcm.durata_programmata_gg, pcm.durata_prevista_gg),
+                        'operatore_programmazione', pcm.operatore_programmazione,
+                        'strumentazione_programmazione', pcm.strumentazione_programmazione,
+                        'costo_previsto', pcm.costo_previsto,
+                        'note_programmazione', pcm.note_programmazione
                     )
-                    ORDER BY pcm.data_inizio, pcm.tipo_attivita
+                    ORDER BY COALESCE(pcm.data_inizio_programmata, pcm.data_inizio), pcm.tipo_attivita
                 ) AS attivita
             FROM ${data_schema}."pianificazione_controlli_manutenzioni" AS pcm
             LEFT JOIN ${data_schema}."dati_localita" AS loc
@@ -546,7 +550,7 @@ async function leggiPianificazioniControlliManutenzioni(ambito) {
                 pcm.ambito_operativo,
                 pcm.necessita_supporto,
                 pcm.stato
-            ORDER BY MIN(pcm.data_inizio), pcm.id_pianificazione;
+            ORDER BY MIN(COALESCE(pcm.data_inizio_programmata, pcm.data_inizio)), pcm.id_pianificazione;
         `, [ambito]);
         return results.rows;
     }
