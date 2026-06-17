@@ -24,7 +24,7 @@
 
 <script setup>
 import { inject, reactive, computed } from 'vue';
-import {prendiSchedeAnagrafica, prendiSchedeControllo, prendiSchedeManReg, prendiSchedeManCorr, prendiSchedeManStr, prendiSchedeRestauro} from '../js/richieste';
+import { prendiSchedeAnagrafica } from '../js/richieste';
 import Details from './elementi/Details.vue';
 import BIMScheda from './elementi/BIMScheda.vue';
 
@@ -47,11 +47,11 @@ const schedeNonPronte = computed(() => {
 async function popolaSchede() {
   resetSchede();
   const schedeAnagrafica = await prendiSchedeAnagrafica();
-  const schedeControllo = await prendiSchedeControllo();
-  const schedeManOrd = await prendiSchedeManReg();
-  const schedeManCorr = await prendiSchedeManCorr();
-  const schedeManStr = await prendiSchedeManStr();
-  const schedeRestauro = await prendiSchedeRestauro();
+  const schedeControllo = [];
+  const schedeManOrd = [];
+  const schedeManCorr = [];
+  const schedeManStr = [];
+  const schedeRestauro = [];
   const schedeAnFiltrate = schedeAnagrafica.filter(scheda => store.stateBIM.elementiSelezionati.includes(scheda['Elemento schedato']));
   const schedeConFiltrate = schedeControllo.filter(scheda => store.stateBIM.elementiSelezionati.includes(scheda['Elementi controllati']));
   const schedeManOrdFiltrate = schedeManOrd.filter(scheda => store.stateBIM.elementiSelezionati.includes(scheda['Elementi interessati']));
