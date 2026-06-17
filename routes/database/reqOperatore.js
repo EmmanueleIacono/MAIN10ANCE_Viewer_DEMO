@@ -69,13 +69,6 @@ app.post('/schede/nuova', async (req, res) => {
 
 app.get('/Main10ance_DB/tabellaDB/schede-anagrafica', jsonRoute(() => leggiSchedeAnagrafica()));
 
-app.get('/Main10ance_DB/tabellaDB/schede-controllo', jsonRoute(() => leggiSchedeControllo()));
-
-app.get('/schede-controllo-2', jsonRoute(async (req) => {
-    const ambito = req.signedCookies.ambito;
-    return leggiSchedeControllo2(ambito);
-}));
-
 app.get('/schede-manutenzione-regolare', jsonRoute(async (req) => {
     const ambito = req.signedCookies.ambito;
     return leggiSchedeManReg(ambito);
@@ -108,10 +101,10 @@ app.get('/Main10ance_DB/attivita-programmate', jsonRoute(async (req) => {
     const cookies = req.signedCookies;
     let resp;
     if (cookies.role === 'operatore') {
-        resp = await leggiAttivitàProgOperatore();
+        resp = await leggiAttivitaProgOperatore();
     }
     else {
-        resp = await leggiAttivitàProg();
+        resp = await leggiAttivitaProg();
     }
     return resp;
 }));
@@ -144,21 +137,6 @@ app.get('/esecuzione/frequenza', jsonRoute(async (req) => {
     const reqJson = req.headers;
     const resp = await recuperaFrequenzaAttProg(reqJson.id, reqJson.tabella);
     return resp[0];
-}));
-
-app.get('/schede-storico-controllo', jsonRoute(async (req) => {
-    const ambito = req.signedCookies.ambito;
-    return leggiSchedeStoricoControllo(ambito);
-}));
-
-app.get('/schede-storico-manutenzione-regolare', jsonRoute(async (req) => {
-    const ambito = req.signedCookies.ambito;
-    return leggiSchedeStoricoManReg(ambito);
-}));
-
-app.get('/schede-storico-manutenzione-correttiva', jsonRoute(async (req) => {
-    const ambito = req.signedCookies.ambito;
-    return leggiSchedeStoricoManCorr(ambito);
 }));
 
 app.get('/anagrafica/artifact-viewer/interroga/:id', async (req, res) => {
@@ -450,57 +428,6 @@ async function leggiSchedeAnagrafica() {
     }
 }
 
-async function leggiSchedeControllo() {
-    try {
-        const result = await poolM10a.query(`SELECT mc.data_con, mc.controllo, md.id_dad, md.id_main10ance, md.rid_gloss, mf.mn_reg, mf.frequenza, mf.mn_nec, mc.liv_urg FROM ${data_schema}.scheda_controllo AS mc JOIN ${data_schema}.danno_alterazione_degrado AS md ON mc.id_contr = md.id_dad JOIN ${utility_schema}.frase_di_rischio AS mf ON mc.id_contr = mf.id_fr_risc ORDER BY data_con;`);
-        return result.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
-
-async function leggiSchedeControllo2(ambito) {
-    try {
-        const result = await poolM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_con AS "Data controllo", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_contr AS "Codice scheda controllo", mc.id_main10ance AS "Elementi da controllare" FROM ${data_schema}.scheda_controllo AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE AND mc."ambito" LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
-        return result.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
-
-async function leggiSchedeManReg(ambito) {
-    try { // QUESTA QUERY DA CAMBIARE PER STORICO: NON VA BENE FARE JOIN (OPPURE FARE QUERY PARALLELA PER "ATT PRECEDENTI")
-        const result = await poolM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mr.azione AS "Tipo di intervento", mr.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mr.data_ese AS "Data intervento", mr.data_ins AS "Data programmazione attività", mr.esecutori AS "Operatore", mr.doc AS "Documenti", ap.commenti AS "Note", mr.id_mn_reg AS "Codice scheda manutenzione regolare", mr.id_main10ance AS "Elementi interessati" FROM ${data_schema}.scheda_manutenzione_regolare AS mr JOIN ${data_schema}.attività_prog AS ap ON mr.rid_att_prog = ap.id_att_prog WHERE mr.eseguito = FALSE AND mr."ambito" LIKE ($1) ORDER BY mr.data_ins;`, [ambito]);
-        return result.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
-
-async function leggiSchedeManCorr(ambito) {
-    try {
-        const result = await poolM10a.query(`SELECT ap."località_estesa" AS "Località", (string_to_array(ap.id_main10ance[1], '|'))[2] AS "Edificio", ap.cl_ogg_fr AS "Classe oggetti", mc.azione AS "Tipo di intervento", mc.strumentaz AS "Strumentazione", ap.costo AS "Costo previsto (€)", ap.ore AS "Durata prevista (ore)", mc.data_ese AS "Data intervento", mc.data_ins AS "Data programmazione attività", mc.esecutori AS "Operatore", mc.doc AS "Documenti", ap.commenti AS "Note", mc.id_mn_gu AS "Codice scheda manutenzione correttiva", mc.id_main10ance AS "Elementi interessati" FROM ${data_schema}.scheda_manutenzione_correttiva AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = FALSE AND mc."ambito" LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
-        return result.rows;
-    }
-    catch(e) {
-        console.log(e);
-        return [];
-    }
-}
-
-async function leggiSchedeRestauro() {
-    try {
-        const result = await poolM10a.query(`SELECT operatore AS "Operatore", anno_iniz AS "Anno inizio", anno_fine AS "Anno fine", progettist AS "Progettista/i", rid_gloss AS "Fenomeno interessato", descriz AS "Descrizione intervento", costo AS "Costo (€)", commenti AS "Commenti", doc AS "Documenti", id_restaur AS "Codice scheda restauro", id_main10ance AS "Elementi interessati", data_ins AS "Data registrazione scheda" FROM ${data_schema}.scheda_restauro ORDER BY anno_iniz;`);
-        return result.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
-
 async function recuperaUrnLOD3(sm, capp) {
     try {
         const results = await poolM10a.query(`SELECT urn FROM ${data_schema}.dati_edifici WHERE localita = ($1) AND numero = ($2);`, [sm, capp]);
@@ -546,7 +473,7 @@ async function leggiDatiControlloProg() { // TEMP HACK-FIX B4 DEL, da rivedere
     return [];
 }
 
-async function leggiAttivitàProg() {
+async function leggiAttivitaProg() {
     try {
         const withString = `WITH totale AS (
             (SELECT rid_att_prog FROM ${data_schema}."scheda_controllo" WHERE eseguito = FALSE)
@@ -556,8 +483,8 @@ async function leggiAttivitàProg() {
             UNION ALL (SELECT rid_att_prog FROM ${data_schema}."scheda_restauro" WHERE eseguito = FALSE)
             UNION ALL (SELECT rid_att_prog FROM ${data_schema}."danno_alterazione_degrado" WHERE eseguito = FALSE)
             )`;
-        const subQueryString = `SELECT ("rid_att_prog") AS "lista_id" FROM totale`;
-        const results = await poolM10a.query(`${withString} SELECT "id_att_prog", "rid_fr_risc", "data_prog", "costo", "ore", "esecutori", "strumentaz", "commenti", to_json("id_main10ance") AS "id_main10ance", "id_group", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM ${data_schema}."attività_prog" WHERE "id_att_prog" = ANY(${subQueryString}) OR "da_integrare" = TRUE ORDER BY "id_att_prog";`);
+        const subQueryString = `SELECT (rid_att_prog) AS lista_id FROM totale`;
+        const results = await poolM10a.query(`${withString} SELECT id_att_prog, rid_fr_risc, data_prog, costo, ore, esecutori, strumentaz, commenti, to_json(id_main10ance) AS id_main10ance, id_group, cl_ogg_fr, to_json(tipo_attivita) AS tipo_attivita, data_ins, frequenza, da_integrare FROM ${data_schema}.attivita_prog WHERE id_att_prog = ANY(${subQueryString}) OR da_integrare = TRUE ORDER BY id_att_prog;`);
         return results.rows;
     }
     catch(e) {
@@ -565,7 +492,7 @@ async function leggiAttivitàProg() {
     }
 }
 
-async function leggiAttivitàProgOperatore() {
+async function leggiAttivitaProgOperatore() {
     try {
         const withString = `WITH totale AS (
             (SELECT rid_att_prog FROM ${data_schema}."scheda_controllo" WHERE eseguito = FALSE)
@@ -576,7 +503,7 @@ async function leggiAttivitàProgOperatore() {
             UNION ALL (SELECT rid_att_prog FROM ${data_schema}."danno_alterazione_degrado" WHERE eseguito = FALSE)
             )`;
         const subQueryString = `SELECT ("rid_att_prog") AS "lista_id" FROM totale`;
-        const results = await poolM10a.query(`${withString} SELECT "id_att_prog", "rid_fr_risc", "data_prog", "costo", "ore", "esecutori", "strumentaz", "commenti", to_json("id_main10ance") AS "id_main10ance", "id_group", "cl_ogg_fr", to_json("tipo_attività") AS "tipo_attività", "data_ins", "frequenza", "da_integrare" FROM ${data_schema}."attività_prog" WHERE "id_att_prog" = ANY(${subQueryString}) AND "da_integrare" = FALSE ORDER BY "id_att_prog";`);
+        const results = await poolM10a.query(`${withString} SELECT id_att_prog, rid_fr_risc, data_prog, costo, ore, esecutori, strumentaz, commenti, to_json(id_main10ance) AS id_main10ance, id_group, cl_ogg_fr, to_json(tipo_attivita) AS tipo_attivita, data_ins, frequenza, da_integrare FROM ${data_schema}.attivita_prog WHERE id_att_prog = ANY(${subQueryString}) AND da_integrare = FALSE ORDER BY id_att_prog;`);
         return results.rows;
     }
     catch(e) {
@@ -633,9 +560,6 @@ async function registraAttivitàEsecuzione(dati, all_files, ambito) {
     const stringaContr = ACTIVITY_TABLES.CONTR;
     const stringaManReg = ACTIVITY_TABLES.MAN_REG;
     const stringaManCorr = ACTIVITY_TABLES.MAN_COR;
-    const stringaManStr = ACTIVITY_TABLES.MAN_STR;
-    const stringaRestauro = ACTIVITY_TABLES.REST;
-    const stringaDiagnosi = ACTIVITY_TABLES.DIAGN;
     const docsArray = dati.doc;
     try {
         await withTransaction(async (tx) => {
@@ -657,40 +581,35 @@ async function registraAttivitàEsecuzione(dati, all_files, ambito) {
                 }
 
                 const rid_contr = dati.nuovo_record ? dati.nuovo_id : dati.id_contr;
-                const stringaSelectIdGroup = `SELECT "id_group" FROM ${data_schema}.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
-                const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM ${data_schema}.${stringaContr} WHERE "id_contr" = ${dati.id_contr}`;
-                const stringaSelectAttProgClOgg = `SELECT "cl_ogg_fr" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
-                const stringaSelectAttProgRidFrRisc = `SELECT "rid_fr_risc" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
-                const stringaSelectAttProgFreq = `SELECT "frequenza" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
-                const stringaSelectAttProgIdGroup = `SELECT "id_group" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
-                const stringaSelectAttProgLoc = `SELECT "località_estesa" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                const stringaSelectIdGroup = `SELECT id_group FROM ${data_schema}.${stringaContr} WHERE id_contr = ${dati.id_contr}`;
+                const stringaSelectRidFrRisc = `SELECT rid_fr_risc FROM ${data_schema}.${stringaContr} WHERE id_contr = ${dati.id_contr}`;
+                const stringaSelectAttProgClOgg = `SELECT cl_ogg_fr FROM ${data_schema}.attivita_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY(tipo_attivita) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                const stringaSelectAttProgRidFrRisc = `SELECT rid_fr_risc FROM ${data_schema}.attivita_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY(tipo_attivita) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                const stringaSelectAttProgFreq = `SELECT frequenza FROM ${data_schema}.attivita_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY(tipo_attivita) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                const stringaSelectAttProgIdGroup = `SELECT id_group FROM ${data_schema}.attivita_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY(tipo_attivita) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                const stringaSelectAttProgLoc = `SELECT localita_estesa FROM ${data_schema}.attivita_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY(tipo_attivita) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
                 switch (dati.cl_racc) {
                     case 'cr 0 - nessuna misura': {
                         const valuesArray = [parseInt(dati.id_att_prog), dati.data_next, dati.id_main10ance, dati.data_ultima_mod, dati.data_ultima_mod, dati.costo, dati.ore, dati.strumentaz, dati.esecutori, dati.id_contr, true, ambito];
-                        await tx.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "id_group", "località_estesa", "data_prog", "id_main10ance", "data_ins", "data_ultima_mod", "costo", "ore", "strumentaz", "esecutori", "rid_att_ciclica_prec", "da_integrare", "ambito") VALUES (($1), '{controllo}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
+                        await tx.query(`INSERT INTO ${data_schema}.attivita_prog (id_att_prog, tipo_attivita, cl_ogg_fr, rid_fr_risc, frequenza, id_group, localita_estesa, data_prog, id_main10ance, data_ins, data_ultima_mod, costo, ore, strumentaz, esecutori, rid_att_ciclica_prec, da_integrare, ambito) VALUES (($1), '{controllo}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
                         break;
                     }
                     case 'cr 1 - modifica attività ciclica': {
                         const valuesArray = [parseInt(dati.id_att_prog), dati.data_next, dati.id_main10ance, dati.data_ultima_mod, dati.data_ultima_mod, dati.costo, dati.ore, dati.strumentaz, dati.esecutori, dati.id_contr, true, true, ambito];
-                        await tx.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "id_group", "località_estesa", "data_prog", "id_main10ance", "data_ins", "data_ultima_mod", "costo", "ore", "strumentaz", "esecutori", "rid_att_ciclica_prec", "da_integrare", "ambito", "necessaria_revisione") VALUES (($1), '{controllo}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, valuesArray);
+                        await tx.query(`INSERT INTO ${data_schema}.attivita_prog (id_att_prog, tipo_attivita, cl_ogg_fr, rid_fr_risc, frequenza, id_group, localita_estesa, data_prog, id_main10ance, data_ins, data_ultima_mod, costo, ore, strumentaz, esecutori, rid_att_ciclica_prec, da_integrare, ambito, necessaria_revisione) VALUES (($1), '{controllo}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, valuesArray);
                         break;
                     }
                     case 'cr 2 - intervento correttivo': {
                         const valuesArray = [parseInt(dati.id_att_prog), dati.id_main10ance, dati.data_ultima_mod, dati.data_ultima_mod, dati.liv_priorità, rid_contr, true, ambito];
-                        await tx.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "id_group", "località_estesa", "id_main10ance", "data_ins", "data_ultima_mod", "liv_priorità", "rid_contr", "da_integrare", "ambito") VALUES (($1), '{manutenzione correttiva}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, valuesArray);
+                        await tx.query(`INSERT INTO ${data_schema}.attivita_prog (id_att_prog, tipo_attivita, cl_ogg_fr, rid_fr_risc, id_group, localita_estesa, id_main10ance, data_ins, data_ultima_mod, "liv_priorità", rid_contr, da_integrare, ambito) VALUES (($1), '{manutenzione correttiva}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, valuesArray);
                         break;
                     }
-                    // case 'cr 3 - intervento rilevante dipendente da progetto': {
-                    //     const valuesArray = [parseInt(dati.id_att_prog), dati.id_main10ance, dati.data_ultima_mod, dati.data_ultima_mod, dati.liv_priorità, rid_contr, true, ambito];
-                    //     await tx.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "id_group", "località_estesa", "id_main10ance", "data_ins", "data_ultima_mod", "liv_priorità", "rid_contr", "da_integrare", "ambito") VALUES (($1), '{diagnosi}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8));`, valuesArray);
-                    //     break;
-                    // }
                     default: throw new Error('ERRORE: La richiesta non è andata a buon fine.');
                 }
 
                 if (dati.listaCRregistrati && dati.listaCRregistrati.every(cr => cr > 1)) {
                     const valuesArray = [parseInt(dati.idDiEmergenza), dati.data_next, [], dati.data_ultima_mod, dati.data_ultima_mod, dati.costo, dati.ore, dati.strumentaz, dati.esecutori, rid_contr, true, ambito];
-                    await tx.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "id_group", "località_estesa", "data_prog", "id_main10ance", "data_ins", "data_ultima_mod", "costo", "ore", "strumentaz", "esecutori", "rid_att_ciclica_prec", "da_integrare", "ambito") VALUES (($1), '{controllo}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
+                    await tx.query(`INSERT INTO ${data_schema}.attivita_prog (id_att_prog, tipo_attivita, cl_ogg_fr, rid_fr_risc, frequenza, id_group, localita_estesa, data_prog, id_main10ance, data_ins, data_ultima_mod, costo, ore, strumentaz, esecutori, rid_att_ciclica_prec, da_integrare, ambito) VALUES (($1), '{controllo}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
                 }
 
                 // FILE UPLOAD
@@ -724,23 +643,23 @@ async function registraAttivitàEsecuzione(dati, all_files, ambito) {
                 }
 
                 const rid_mn_reg = dati.nuovo_record ? dati.nuovo_id : dati.id_mn_reg;
-                const stringaSelectIdGroup = `SELECT "id_group" FROM ${data_schema}.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
-                const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM ${data_schema}.${stringaManReg} WHERE "id_mn_reg" = ${dati.id_mn_reg}`;
-                const stringaSelectAttProgClOgg = `SELECT "cl_ogg_fr" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
-                const stringaSelectAttProgRidFrRisc = `SELECT "rid_fr_risc" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
-                const stringaSelectAttProgFreq = `SELECT "frequenza" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
-                const stringaSelectAttProgIdGroup = `SELECT "id_group" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
-                const stringaSelectAttProgLoc = `SELECT "località_estesa" FROM ${data_schema}.attività_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY("tipo_attività") AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                const stringaSelectIdGroup = `SELECT id_group FROM ${data_schema}.${stringaManReg} WHERE id_mn_reg = ${dati.id_mn_reg}`;
+                const stringaSelectRidFrRisc = `SELECT rid_fr_risc FROM ${data_schema}.${stringaManReg} WHERE id_mn_reg = ${dati.id_mn_reg}`;
+                const stringaSelectAttProgClOgg = `SELECT cl_ogg_fr FROM ${data_schema}.attivita_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY(tipo_attivita) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                const stringaSelectAttProgRidFrRisc = `SELECT rid_fr_risc FROM ${data_schema}.attivita_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY(tipo_attivita) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                const stringaSelectAttProgFreq = `SELECT frequenza FROM ${data_schema}.attivita_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY(tipo_attivita) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                const stringaSelectAttProgIdGroup = `SELECT id_group FROM ${data_schema}.attivita_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY(tipo_attivita) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
+                const stringaSelectAttProgLoc = `SELECT localita_estesa FROM ${data_schema}.attivita_prog WHERE id_group = (${stringaSelectIdGroup}) AND rid_fr_risc = (${stringaSelectRidFrRisc}) AND 'controllo' = ANY(tipo_attivita) AND id_main10ance[1] LIKE '%|${dati.edificio}|%' ORDER BY data_prog DESC LIMIT 1`;
                 const valuesArray = [parseInt(dati.id_att_prog), dati.data_next, dati.id_main10ance, dati.data_ultima_mod, dati.data_ultima_mod, dati.costo, dati.ore, dati.strumentaz, dati.esecutori, rid_mn_reg, true, ambito];
-                await tx.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "id_group", "località_estesa", "data_prog", "id_main10ance", "data_ins", "data_ultima_mod", "costo", "ore", "strumentaz", "esecutori", "rid_att_ciclica_prec", "da_integrare", "ambito") VALUES (($1), '{manutenzione regolare}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
-                
+                await tx.query(`INSERT INTO ${data_schema}.attivita_prog (id_att_prog, tipo_attivita, cl_ogg_fr, rid_fr_risc, frequenza, id_group, localita_estesa, data_prog, id_main10ance, data_ins, data_ultima_mod, costo, ore, strumentaz, esecutori, rid_att_ciclica_prec, da_integrare, ambito) VALUES (($1), '{manutenzione regolare}', (${stringaSelectAttProgClOgg}), (${stringaSelectAttProgRidFrRisc}), (${stringaSelectAttProgFreq}), (${stringaSelectAttProgIdGroup}), (${stringaSelectAttProgLoc}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, valuesArray);
+
                 // FILE UPLOAD
                 for (let i = 0; i < docsArray.length; i++) {
                     const docPath = docsArray[i];
                     const fieldName = `file_${i}`;
                     const singleFile = all_files[fieldName];
                     if (!singleFile) continue;
-                    
+
                     const fileOptions = {contentType: singleFile.mimetype};
                     const {error} = await supabase.storage.from("documenti-schede").upload(`${ambito}/${docPath}`, singleFile.data, fileOptions);
                     if (error) throw error;
@@ -751,12 +670,12 @@ async function registraAttivitàEsecuzione(dati, all_files, ambito) {
             case stringaManCorr: {
                 if (dati.nuovo_record) {
                     const arrayInsertManCorr = [dati.nuovo_id, dati.data_ese, dati.data_ultima_mod, dati.data_ultima_mod, dati.materiale, dati.strumentaz, dati.id_main10ance, dati.commenti, dati.doc, dati.autore_ultima_mod, true, ambito];
-                    const stringaSelectClOgg = `SELECT "cl_ogg_fr" FROM ${data_schema}.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
-                    const stringaSelectAzione = `SELECT "azione" FROM ${data_schema}.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
-                    const stringaSelectEsec = `SELECT "esecutori" FROM ${data_schema}.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
-                    const stringaSelectRidFrRisc = `SELECT "rid_fr_risc" FROM ${data_schema}.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
-                    const stringaSelectRidAttProg = `SELECT "rid_att_prog" FROM ${data_schema}.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
-                    const stringaSelectIdGroup = `SELECT "id_group" FROM ${data_schema}.${stringaManCorr} WHERE "id_mn_gu" = ${dati.id_mn_gu}`;
+                    const stringaSelectClOgg = `SELECT cl_ogg_fr FROM ${data_schema}.${stringaManCorr} WHERE id_mn_gu = ${dati.id_mn_gu}`;
+                    const stringaSelectAzione = `SELECT azione FROM ${data_schema}.${stringaManCorr} WHERE id_mn_gu = ${dati.id_mn_gu}`;
+                    const stringaSelectEsec = `SELECT esecutori FROM ${data_schema}.${stringaManCorr} WHERE id_mn_gu = ${dati.id_mn_gu}`;
+                    const stringaSelectRidFrRisc = `SELECT rid_fr_risc FROM ${data_schema}.${stringaManCorr} WHERE id_mn_gu = ${dati.id_mn_gu}`;
+                    const stringaSelectRidAttProg = `SELECT rid_att_prog FROM ${data_schema}.${stringaManCorr} WHERE id_mn_gu = ${dati.id_mn_gu}`;
+                    const stringaSelectIdGroup = `SELECT id_group FROM ${data_schema}.${stringaManCorr} WHERE id_mn_gu = ${dati.id_mn_gu}`;
                     await tx.query(`INSERT INTO ${data_schema}."${stringaManCorr}" ("id_mn_gu", "cl_ogg_fr", "azione", "esecutori", "rid_fr_risc", "rid_att_prog", "id_group", "data_ese", "data_ins", "data_ultima_mod", "materiale", "strumentaz", "id_main10ance", "commenti", "docs", "autore_ultima_mod", "eseguito", "ambito") VALUES (($1), (${stringaSelectClOgg}), (${stringaSelectAzione}), (${stringaSelectEsec}), (${stringaSelectRidFrRisc}), (${stringaSelectRidAttProg}), (${stringaSelectIdGroup}), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12));`, arrayInsertManCorr);
                 }
                 else {
@@ -766,7 +685,7 @@ async function registraAttivitàEsecuzione(dati, all_files, ambito) {
 
                 const attRiall = await cercaAttProgPerRiallineamento(dati.id_mn_gu, 'id_mn_gu', stringaManCorr);
                 const id_att_prog_riall = parseInt(attRiall.id_att_prog);
-                await tx.query(`UPDATE ${data_schema}.attività_prog SET "id_main10ance" = array_cat("id_main10ance", ($1)) WHERE "id_att_prog" = ($2);`, [dati.id_main10ance, id_att_prog_riall]);
+                await tx.query(`UPDATE ${data_schema}.attivita_prog SET "id_main10ance" = array_cat("id_main10ance", ($1)) WHERE "id_att_prog" = ($2);`, [dati.id_main10ance, id_att_prog_riall]);
                 if (!attRiall.da_integrare) {
                     const attEsec = await cercaAttEsecPerRiallineamento(attRiall.id_att_prog, 'id_contr', stringaContr);
                     await tx.query(`UPDATE ${data_schema}.${stringaContr} SET "id_main10ance" = array_cat("id_main10ance", ($1)) WHERE "id_contr" = ($2);`, [dati.id_main10ance, parseInt(attEsec.id_contr)]);
@@ -786,24 +705,6 @@ async function registraAttivitàEsecuzione(dati, all_files, ambito) {
 
                 break;
             }
-            case stringaManStr: {
-                // NOTE:
-                // registrare campo "eseguito" come TRUE
-                console.log('MANUTENZIONE STRAORDINARIA');
-                throw new Error('Manutenzione straordinaria non ancora implementata');
-            }
-            case stringaRestauro: {
-                // NOTE:
-                // registrare campo "eseguito" come TRUE
-                console.log('RESTAURO');
-                throw new Error('Restauro non ancora implementato');
-            }
-            case stringaDiagnosi: {
-                // NOTE:
-                // registrare campo "eseguito" come TRUE
-                console.log('DIAGNOSI');
-                throw new Error('Diagnosi non ancora implementata');
-            }
             default: throw new Error('ERRORE: La richiesta non è andata a buon fine.');
         }
         });
@@ -822,7 +723,7 @@ async function recuperaFrequenzaAttProg(id, tabella) {
         const tableName = qualifiedName(data_schema, tabellaValida);
         const results = await poolM10a.query(
             `SELECT "frequenza"
-             FROM ${data_schema}."attività_prog"
+             FROM ${data_schema}."attivita_prog"
              WHERE id_att_prog = (SELECT "rid_att_prog" FROM ${tableName} WHERE ${quoteIdentifier(id_tab)} = $1)
                AND id_group = (SELECT "id_group" FROM ${tableName} WHERE ${quoteIdentifier(id_tab)} = $1);`,
             [id]
@@ -840,9 +741,9 @@ async function cercaAttProgPerRiallineamento(id, nomeId, nomeTabella) {
         const idCol = assertOneOf(nomeId, ['id_mn_gu'], 'colonna riallineamento');
         const tableName = qualifiedName(data_schema, tabellaValida);
         const idAttCiclicaSql = `(SELECT id_att_ciclica FROM ${data_schema}."scheda_controllo" WHERE id_contr = (SELECT "rid_contr" FROM ${tableName} WHERE ${quoteIdentifier(idCol)} = $1))`;
-        const res = await poolM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "id_main10ance", "id_group", "tipo_attività", "da_integrare", "necessaria_revisione", "rid_att_ciclica_prec" FROM ${data_schema}."attività_prog" WHERE "rid_att_ciclica_prec" = ${idAttCiclicaSql} AND 'controllo' = ANY("tipo_attività") AND ("necessaria_revisione" IS NULL OR "necessaria_revisione" = FALSE) ORDER BY "id_att_prog" ASC LIMIT 1;`, [id]);
+        const res = await poolM10a.query(`SELECT id_att_prog, rid_fr_risc, id_main10ance, id_group, tipo_attivita, da_integrare, necessaria_revisione, rid_att_ciclica_prec FROM ${data_schema}.attivita_prog WHERE rid_att_ciclica_prec = ${idAttCiclicaSql} AND 'controllo' = ANY(tipo_attivita) AND (necessaria_revisione IS NULL OR necessaria_revisione = FALSE) ORDER BY id_att_prog ASC LIMIT 1;`, [id]);
         if (res.rowCount) return res.rows[0];
-        const resTrue = await poolM10a.query(`SELECT "id_att_prog", "rid_fr_risc", "id_main10ance", "id_group", "tipo_attività", "da_integrare", "necessaria_revisione", "rid_att_ciclica_prec" FROM ${data_schema}."attività_prog" WHERE "rid_att_ciclica_prec" = ${idAttCiclicaSql} AND 'controllo' = ANY("tipo_attività") AND "necessaria_revisione" = TRUE ORDER BY "id_att_prog" ASC LIMIT 1;`, [id]);
+        const resTrue = await poolM10a.query(`SELECT id_att_prog, rid_fr_risc, id_main10ance, id_group, tipo_attivita, da_integrare, necessaria_revisione, rid_att_ciclica_prec FROM ${data_schema}.attivita_prog WHERE rid_att_ciclica_prec = ${idAttCiclicaSql} AND 'controllo' = ANY(tipo_attivita) AND necessaria_revisione = TRUE ORDER BY id_att_prog ASC LIMIT 1;`, [id]);
         return resTrue.rows[0];
     }
     catch(e) {
@@ -857,37 +758,6 @@ async function cercaAttEsecPerRiallineamento(id, nomeId, nomeTabella) {
         const idCol = assertOneOf(nomeId, ['id_contr'], 'colonna attivita eseguita');
         const res = await poolM10a.query(`SELECT ${quoteIdentifier(idCol)} FROM ${qualifiedName(data_schema, tabellaValida)} WHERE "rid_att_prog" = $1 LIMIT 1;`, [id]);
         return res.rows[0];
-    }
-    catch(e) {
-        console.log(e);
-        return [];
-    }
-}
-
-async function leggiSchedeStoricoControllo(ambito) {
-    try {
-        const result = await poolM10a.query(`SELECT mc.data_con AS "Data controllo", ap."località_estesa" AS "Località", (string_to_array(mc.id_main10ance[1], '|'))[2] AS "Edificio", mc.cl_ogg_fr AS "Classe oggetti",  mc.controllo AS "Tipo di controllo", mc.strumentaz AS "Strumentazione", mc.st_cons AS "Stato di conservazione", mc.cl_racc AS "Classe di raccomandazione", mc.liv_urg AS "Livello di urgenza", mc.costo AS "Costo effettivo (€)", mc.ore AS "Ore effettive", mc.esecutori AS "Operatore", mc.doc AS "Documenti", mc.commenti AS "Note", mc.id_contr AS "Codice scheda controllo", mc.id_main10ance AS "Elementi da controllare", mc.data_ins AS "Data programmazione attività" FROM ${data_schema}.scheda_controllo AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = TRUE AND mc.ambito LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
-        return result.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
-
-async function leggiSchedeStoricoManReg(ambito) {
-    try {
-        const result = await poolM10a.query(`SELECT mr.data_ese AS "Data intervento", ap."località_estesa" AS "Località", (string_to_array(mr.id_main10ance[1], '|'))[2] AS "Edificio", mr.cl_ogg_fr AS "Classe oggetti", mr.azione AS "Tipo di intervento", mr.strumentaz AS "Strumentazione", mr.materiale AS "Materiale", mr.costo AS "Costo effettivo (€)", mr.ore AS "Ore effettive", mr.esecutori AS "Operatore", mr.doc AS "Documenti", mr.commenti AS "Note", mr.id_mn_reg AS "Codice scheda manutenzione regolare", mr.id_main10ance AS "Elementi interessati", mr.data_ins AS "Data programmazione attività" FROM ${data_schema}.scheda_manutenzione_regolare AS mr JOIN ${data_schema}.attività_prog AS ap ON mr.rid_att_prog = ap.id_att_prog WHERE mr.eseguito = TRUE AND mr.ambito LIKE ($1) ORDER BY mr.data_ins;`, [ambito]);
-        return result.rows;
-    }
-    catch(e) {
-        return [];
-    }
-}
-
-async function leggiSchedeStoricoManCorr(ambito) {
-    try {
-        const result = await poolM10a.query(`SELECT mc.data_ese AS "Data intervento", ap."località_estesa" AS "Località", (string_to_array(mc.id_main10ance[1], '|'))[2] AS "Edificio", mc.cl_ogg_fr AS "Classe oggetti", mc.azione AS "Tipo di intervento", mc.strumentaz AS "Strumentazione", mc.materiale AS "Materiale", mc.costo AS "Costo effettivo (€)", mc.ore AS "Ore effettive", mc.esecutori AS "Operatore", mc.doc AS "Documenti", mc.commenti AS "Note", mc.id_mn_gu AS "Codice scheda manutenzione correttiva", mc.id_main10ance AS "Elementi interessati", mc.data_ins AS "Data programmazione attività" FROM ${data_schema}.scheda_manutenzione_correttiva AS mc JOIN ${data_schema}.attività_prog AS ap ON mc.rid_att_prog = ap.id_att_prog WHERE mc.eseguito = TRUE AND mc.ambito LIKE ($1) ORDER BY mc.data_ins;`, [ambito]);
-        return result.rows;
     }
     catch(e) {
         console.log(e);

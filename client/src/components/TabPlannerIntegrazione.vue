@@ -75,8 +75,8 @@ onMounted(async () => {
 async function popolaAttività() {
   state.caricamento = true;
   const attDaIntegrare = await leggiAttProgPerIntegrazione(true);
-  const attCicliche = attDaIntegrare.filter(att => att.tipo_attività.includes('controllo') || att.tipo_attività.includes('manutenzione regolare')).filter(att => !!att.id_main10ance.length);
-  const attRiallineamento = attDaIntegrare.filter(att => !att.tipo_attività.includes('controllo') && !att.tipo_attività.includes('manutenzione regolare'));
+  const attCicliche = attDaIntegrare.filter(att => att.tipo_attivita.includes('controllo') || att.tipo_attivita.includes('manutenzione regolare')).filter(att => !!att.id_main10ance.length);
+  const attRiallineamento = attDaIntegrare.filter(att => !att.tipo_attivita.includes('controllo') && !att.tipo_attivita.includes('manutenzione regolare'));
   store.statePlanner.datiProgrammazione.attCicliche = attCicliche;
   store.statePlanner.datiProgrammazione.attCicliche.forEach(att => att.visibile = true);
   store.statePlanner.datiProgrammazione.attRiallineamento = attRiallineamento;

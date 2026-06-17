@@ -5,14 +5,14 @@
       <div class="colonna">
         <p><b>Attività: </b>{{stringAtt}}</p>
         <p><b>Classe oggetti: </b>{{att.cl_ogg_fr}}</p>
-        <p><b>Località: </b>{{att['località_estesa']}}</p>
+        <p><b>Località: </b>{{att.localita_estesa}}</p>
         <p><b>Edificio: </b>{{edificio}}</p>
         <p v-if="att.frequenza"><b :class="att.necessaria_revisione ? 'avviso-revisione' : ''">Frequenza: </b>{{att.frequenza}} {{parseInt(att.frequenza) === 1 ? 'mese' : 'mesi'}}</p>
       </div>
       <div class="colonna">
         <div>
           <p><b>Descrizione: </b></p>
-          <p v-for="ta in att.tipo_attività" :key="ta">
+          <p v-for="ta in att.tipo_attivita" :key="ta">
             <i>{{ta}}: </i>
             {{att[ta]}}
           </p>
@@ -26,7 +26,7 @@
     <div v-if="state.integrazioneAttiva">
       <div class="contenitore-colonne">
         <div class="colonna">
-          <div v-if="['manutenzione straordinaria', 'restauro'].includes(att.tipo_attività[0])" class="contenitore-colonne centra">
+          <div v-if="['manutenzione straordinaria', 'restauro'].includes(att.tipo_attivita[0])" class="contenitore-colonne centra">
             <label for="progettista" class="colonna">Progettista:</label>
             <input v-model="state.progettista" id="progettista" class="colonna">
           </div>
@@ -94,7 +94,7 @@ const state = reactive({
 });
 
 const stringAtt = computed(() => {
-  return props.att.tipo_attività.join(', ');
+  return props.att.tipo_attivita.join(', ');
 });
 const edificio = computed(() => {
   return props.att.id_main10ance[0].split('|')[1];
@@ -123,10 +123,10 @@ async function salvaIntegrazione() {
     jsonAtt['id_att_prog'] = parseInt(state.id_record);
     jsonAtt['data_ultima_mod'] = dataCorta();
     jsonAtt['dati_inserimento'] = datiIns;
-    datiIns['tabelle'] = props.att.tipo_attività.map(t => store.statePlanner.attività[t].tabella);
+    datiIns['tabelle'] = props.att.tipo_attivita.map(t => store.statePlanner.attività[t].tabella);
     datiIns['id_att'] = dataInteger();
     datiIns['cl_ogg_fr'] = props.att.cl_ogg_fr;
-    datiIns['descrizione'] = props.att.tipo_attività.map(t => props.att[t]);
+    datiIns['descrizione'] = props.att.tipo_attivita.map(t => props.att[t]);
     datiIns['id_main10ance'] = props.att.id_main10ance;
     datiIns['rid_fr_risc'] = props.att.rid_fr_risc;
     datiIns['data_azione'] = state.dataProgrammata;

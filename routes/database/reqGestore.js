@@ -248,7 +248,7 @@ async function creaAttProgControllo(listaAtt, ambito) {
                 const data_prog = att.data_prog_mr ? att.data_prog_mr : att.data_prog_c;
                 const freq = att.freq_mr ? att.freq_mr : att.freq_c;
                 const valuesArray = [att.id_att_prog, tipo_att, att.cl_ogg, att.rid_fr_risc, freq, data_prog, att.id_group, att.elementi, att.data_ins, att.data_ins, att.loc_estesa, true, ambito];
-                await tx.query(`INSERT INTO ${data_schema}."attività_prog" ("id_att_prog", "tipo_attività", "cl_ogg_fr", "rid_fr_risc", "frequenza", "data_prog", "id_group", "id_main10ance", "data_ins", "data_ultima_mod", "località_estesa", "da_integrare", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, valuesArray);
+                await tx.query(`INSERT INTO ${data_schema}."attivita_prog" (id_att_prog, tipo_attivita, cl_ogg_fr, rid_fr_risc, frequenza, data_prog, id_group, id_main10ance, data_ins, data_ultima_mod, localita_estesa, da_integrare, ambito) VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13));`, valuesArray);
             }
         });
         return true;
@@ -291,21 +291,21 @@ async function registraPianificazioneControlliManutenzioni(reqJson, ambito, nome
                         ambito
                     ];
                     await tx.query(`
-                        INSERT INTO ${data_schema}."pianificazione_controlli_manutenzioni" (
-                            "uuid",
-                            "id_pianificazione",
-                            "autore_pianificazione",
-                            "data_pianificazione",
-                            "localita",
-                            "edificio",
-                            "ambito_operativo",
-                            "necessita_supporto",
-                            "tipo_attivita",
-                            "descrizione_attivita",
-                            "frequenza_mesi",
-                            "data_inizio",
-                            "durata_prevista_gg",
-                            "ambito"
+                        INSERT INTO ${data_schema}.pianificazione_controlli_manutenzioni (
+                            uuid,
+                            id_pianificazione,
+                            autore_pianificazione,
+                            data_pianificazione,
+                            localita,
+                            edificio,
+                            ambito_operativo,
+                            necessita_supporto,
+                            tipo_attivita,
+                            descrizione_attivita,
+                            frequenza_mesi,
+                            data_inizio,
+                            durata_prevista_gg,
+                            ambito
                         )
                         VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11), ($12), ($13), ($14));
                     `, valuesArray);
@@ -369,7 +369,7 @@ async function creaNuovoMarkerAmbito(reqJson) {
 
 async function leggiAttProgPerIntegrazione(bool, ambito) {
     try {
-        const resp = await poolM10a.query(`SELECT a."id_att_prog", a."rid_fr_risc", a."data_prog", to_json(a."id_main10ance") AS "id_main10ance", a."id_group", a."località_estesa", a."cl_ogg_fr", to_json(a."tipo_attività") AS "tipo_attività", a."data_ins", a."data_ultima_mod", a."frequenza", a."da_integrare", a."necessaria_revisione", a."costo", a."ore", a."esecutori", a."strumentaz" AS "strumentazione", a."commenti", a."liv_priorità", a."rid_contr", a."rid_dad", a."rid_att_ciclica_prec", f."fr_risc", f."controllo", f."mn_reg" AS "manutenzione regolare", f."mn_nec" AS "manutenzione correttiva" FROM ${data_schema}."attività_prog" AS "a" JOIN ${utility_schema}."frase_di_rischio" AS "f" ON a."rid_fr_risc" = f."id_fr_risc" WHERE a."da_integrare" = ($1) AND a."ambito" LIKE ($2) ORDER BY "id_att_prog";`, [bool, ambito]);
+        const resp = await poolM10a.query(`SELECT a.id_att_prog, a.rid_fr_risc, a.data_prog, to_json(a.id_main10ance) AS id_main10ance, a.id_group, a.localita_estesa, a.cl_ogg_fr, to_json(a.tipo_attivita) AS tipo_attivita, a.data_ins, a.data_ultima_mod, a.frequenza, a.da_integrare, a.necessaria_revisione, a.costo, a.ore, a.esecutori, a.strumentaz AS strumentazione, a.commenti, a."liv_priorità", a.rid_contr, a.rid_dad, a.rid_att_ciclica_prec, f.fr_risc, f.controllo, f.mn_reg AS manutenzione regolare, f.mn_nec AS manutenzione correttiva FROM ${data_schema}.attivita_prog AS a JOIN ${utility_schema}.frase_di_rischio AS f ON a.rid_fr_risc = f.id_fr_risc WHERE a.da_integrare = ($1) AND a.ambito LIKE ($2) ORDER BY id_att_prog;`, [bool, ambito]);
         return resp.rows;
     }
     catch(e) {
@@ -386,7 +386,7 @@ async function integraAtt(jsonAtt, ambito) {
     const strSet = entriesFiltr.map((e, i) => `"${e[0]}" = ($${i+1})`).join(', ');
     try {
         await withTransaction(async (tx) => {
-            await tx.query(`UPDATE ${data_schema}."attività_prog" SET ${strSet}, "da_integrare" = FALSE WHERE "id_att_prog" = ${ultimoNum};`, values);
+            await tx.query(`UPDATE ${data_schema}."attivita_prog" SET ${strSet}, "da_integrare" = FALSE WHERE "id_att_prog" = ${ultimoNum};`, values);
             const datiInsert = jsonAtt.dati_inserimento;
             const stringaContr = ACTIVITY_TABLES.CONTR;
             const stringaManReg = ACTIVITY_TABLES.MAN_REG;

@@ -80,32 +80,6 @@ export async function prendiSchedeAnagrafica() {
     return apiRequest('/o/Main10ance_DB/tabellaDB/schede-anagrafica');
 }
 
-export async function prendiSchedeControllo() {
-    return apiRequest('/o/schede-controllo-2');
-}
-
-export async function prendiSchedeManReg() {
-    return apiRequest('/o/schede-manutenzione-regolare');
-}
-
-export async function prendiSchedeManCorr() {
-    return apiRequest('/o/schede-manutenzione-correttiva');
-}
-
-export async function prendiSchedeManStr() {
-    // const risultato = await fetch('', {method: "GET", headers: {"content-type": "application/json"}});
-    // const risTradotto = await risultato.json();
-    // return risTradotto;
-    return [];
-}
-
-export async function prendiSchedeRestauro() {
-    // const risultato = await fetch('/o/Main10ance_DB/tabellaDB/schede-restauro', {method: "GET", headers: {"content-type": "application/json"}});
-    // const risTradotto = await risultato.json();
-    // return risTradotto;
-    return [];
-}
-
 /////           ATTENZIONE: QUESTA UGUALE A FUNZIONE "leggiDBMarkerLocAmbito" ------> DA RISOLVERE
 export async function prendiSigleLocalitaAmbito() {
     const risultato = await fetch('/o/MarkerLoc', {method: "GET", headers: {"content-type": "application/json"}});
@@ -259,24 +233,6 @@ export async function prendiFrequenzaAttProg(jsonAtt) {
     const res = await fetch('/o/esecuzione/frequenza', {method: "GET", headers: {"content-type": "application/json", "id": jsonAtt.id, "tabella": jsonAtt.tabella}});
     const resJson = await res.json();
     return resJson;
-}
-
-export async function prendiSchedeStoricoControllo() {
-    const risultato = await fetch('/o/schede-storico-controllo');
-    const risJson = await risultato.json();
-    return risJson;
-}
-
-export async function prendiSchedeStoricoManReg() {
-    const risultato = await fetch('/o/schede-storico-manutenzione-regolare');
-    const risJson = await risultato.json();
-    return risJson;
-}
-
-export async function prendiSchedeStoricoManCorr() {
-    const risultato = await fetch('/o/schede-storico-manutenzione-correttiva');
-    const risJson = await risultato.json();
-    return risJson;
 }
 
 export async function getListaImmagini(percorso) {

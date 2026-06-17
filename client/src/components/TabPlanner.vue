@@ -130,21 +130,21 @@ async function aggiungiEventiProg() {
   const eventi = await leggiAttivitàProg();
   const nuoviEventiProg = eventi.map(evento => ({
     id: `PROG-${evento.id_att_prog}`,
-    title: `${evento.id_main10ance[0]?.split('|')[0]} - ${evento.tipo_attività[0][0].toUpperCase()}${evento.tipo_attività[0].slice(1)}`,
+    title: `${evento.id_main10ance[0]?.split('|')[0]} - ${evento.tipo_attivita[0][0].toUpperCase()}${evento.tipo_attivita[0].slice(1)}`,
     start: evento.data_prog,
     extendedProps: {
       classe: evento.cl_ogg_fr,
       gruppo: evento.id_group,
       frase_di_rischio: evento.rid_fr_risc,
       frequenza_prevista: evento.frequenza,
-      attività_previste: evento.tipo_attività,
-      ciclica: ['controllo', 'manutenzione regolare'].includes(evento.tipo_attività[0]),
+      attività_previste: evento.tipo_attivita,
+      ciclica: ['controllo', 'manutenzione regolare'].includes(evento.tipo_attivita[0]),
       elementi_interessati: evento.id_main10ance,
       data_inserimento: evento.data_ins,
       da_integrare: evento.da_integrare,
     },
-    backgroundColor: evento.da_integrare ? '#bbb' : (['controllo', 'manutenzione regolare'].includes(evento.tipo_attività[0]) ? '#a8c956' : '#ceba4c'),
-    borderColor: evento.da_integrare ? '#bbb' : (['controllo', 'manutenzione regolare'].includes(evento.tipo_attività[0]) ? '#a8c956' : '#ceba4c'),
+    backgroundColor: evento.da_integrare ? '#bbb' : (['controllo', 'manutenzione regolare'].includes(evento.tipo_attivita[0]) ? '#a8c956' : '#ceba4c'),
+    borderColor: evento.da_integrare ? '#bbb' : (['controllo', 'manutenzione regolare'].includes(evento.tipo_attivita[0]) ? '#a8c956' : '#ceba4c'),
     textColor: '#fff'
   }));
   return nuoviEventiProg;

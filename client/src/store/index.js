@@ -7,12 +7,6 @@ import {
     prendiFrasiDiRischio,
     leggiDBMarkerEdif,
     prendiLOD3e4,
-    prendiSchedeStoricoControllo,
-    prendiSchedeStoricoManReg,
-    prendiSchedeStoricoManCorr,
-    prendiSchedeControllo,
-    prendiSchedeManReg,
-    prendiSchedeManCorr
 } from '../js/richieste';
 
 const state = reactive({
@@ -281,18 +275,12 @@ const methods = {
         const listaFrasiDiRischio = await prendiFrasiDiRischio();
         const listaEdif = await leggiDBMarkerEdif();
         const listaElementi = await prendiLOD3e4();
-        const attEsecuzioneContr = await prendiSchedeControllo();
-        const attEsecuzioneManReg = await prendiSchedeManReg();
-        const attEsecuzioneManCorr = await prendiSchedeManCorr();
-        const attEsecuzioneManStr = []; // DA IMPLEMENTARE (11-10-2024)
-        const attEsecuzioneRest = []; // DA IMPLEMENTARE (11-10-2024)
-        const attEsecuzioneDiagn = []; // DA IMPLEMENTARE (11-10-2024)
-        const attStoricoContr = await prendiSchedeStoricoControllo();
-        const attStoricoManReg = await prendiSchedeStoricoManReg();
-        const attStoricoManCorr = await prendiSchedeStoricoManCorr();
-        const attStoricoManStr = []; // DA IMPLEMENTARE (24-09-2024)
-        const attStoricoRest = []; // DA IMPLEMENTARE (24-09-2024)
-        const attStoricoDiagn = []; // DA IMPLEMENTARE (24-09-2024)
+        const attEsecuzioneContr = [];
+        const attEsecuzioneManReg = [];
+        const attEsecuzioneManCorr = [];
+        const attStoricoContr = [];
+        const attStoricoManReg = [];
+        const attStoricoManCorr = [];
         statePlanner.listaSigleLoc = listaSigleLoc;
         statePlanner.listaSigleEdifici = listaSigleEdifici;
         statePlanner.listaClOgg = listaClOgg;
@@ -302,27 +290,15 @@ const methods = {
         statePlanner.schedeEsecuzione['controllo'] = attEsecuzioneContr;
         statePlanner.schedeEsecuzione['manutenzione regolare'] = attEsecuzioneManReg;
         statePlanner.schedeEsecuzione['manutenzione correttiva'] = attEsecuzioneManCorr;
-        statePlanner.schedeEsecuzione['manutenzione straordinaria'] = attEsecuzioneManStr;
-        statePlanner.schedeEsecuzione['restauro'] = attEsecuzioneRest;
-        statePlanner.schedeEsecuzione['diagnosi'] = attEsecuzioneDiagn;
         statePlanner.schedeEsecuzioneFiltrate['controllo'] = attEsecuzioneContr;
         statePlanner.schedeEsecuzioneFiltrate['manutenzione regolare'] = attEsecuzioneManReg;
         statePlanner.schedeEsecuzioneFiltrate['manutenzione correttiva'] = attEsecuzioneManCorr;
-        statePlanner.schedeEsecuzioneFiltrate['manutenzione straordinaria'] = attEsecuzioneManStr;
-        statePlanner.schedeEsecuzioneFiltrate['restauro'] = attEsecuzioneRest;
-        statePlanner.schedeEsecuzioneFiltrate['diagnosi'] = attEsecuzioneDiagn;
         statePlanner.schedeStorico['controllo'] = attStoricoContr;
         statePlanner.schedeStorico['manutenzione regolare'] = attStoricoManReg;
         statePlanner.schedeStorico['manutenzione correttiva'] = attStoricoManCorr;
-        statePlanner.schedeStorico['manutenzione straordinaria'] = attStoricoManStr;
-        statePlanner.schedeStorico['restauro'] = attStoricoRest;
-        statePlanner.schedeStorico['diagnosi'] = attStoricoDiagn;
         statePlanner.schedeStoricoFiltrate['controllo'] = attStoricoContr;
         statePlanner.schedeStoricoFiltrate['manutenzione regolare'] = attStoricoManReg;
         statePlanner.schedeStoricoFiltrate['manutenzione correttiva'] = attStoricoManCorr;
-        statePlanner.schedeStoricoFiltrate['manutenzione straordinaria'] = attStoricoManStr;
-        statePlanner.schedeStoricoFiltrate['restauro'] = attStoricoRest;
-        statePlanner.schedeStoricoFiltrate['diagnosi'] = attStoricoDiagn;
         statePlanner.datiPlannerLoaded = true;
         this.toggleLoaderGlobale();
     },
