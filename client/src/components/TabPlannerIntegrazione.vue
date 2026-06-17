@@ -135,16 +135,6 @@
       </article>
     </div>
     <div v-else>Nessuna attività pianificata per l'ambito selezionato</div>
-
-    <!-- VECCHIA LOGICA COMMENTATA: dipendeva da attivita_prog / da_integrare e sarà rimossa solo dopo il refactoring completo delle fasi successive.
-    <div class="contenitore-scelta-attività">
-      <button @click="state.tabIntegrazioneAttivo = 'AttPianificate'" class="verde">CONTROLLO E MANUTENZIONE ORDINARIA</button>
-      <button @click="state.tabIntegrazioneAttivo = 'AttSegnalate'" class="giallo">MANUTENZIONE STRAORDINARIA</button>
-    </div>
-    <div class="contenitore-ordinaper">...</div>
-    <AttCicliche @integrazioneOK="emettiRefresh" v-show="state.tabIntegrazioneAttivo === 'AttPianificate'" :att="store.statePlanner.datiProgrammazione.attCicliche" />
-    <AttRiallineamento @integrazioneOK="emettiRefresh" v-show="state.tabIntegrazioneAttivo === 'AttSegnalate'" :att="store.statePlanner.datiProgrammazione.attRiallineamento" />
-    -->
   </Details>
 </Card>
 </template>
@@ -154,10 +144,6 @@ import {computed, onMounted, reactive, inject} from 'vue';
 import {leggiPianificazioniDaProgrammare, programmaPianificazioneControlliManutenzioni} from '../js/richieste';
 import Card from './elementi/Card.vue';
 import Details from './elementi/Details.vue';
-// VECCHIA LOGICA COMMENTATA:
-// import {leggiAttProgPerIntegrazione} from '../js/richieste';
-// import AttCicliche from './TabPlannerIntegrazioneAttCicliche.vue';
-// import AttRiallineamento from './TabPlannerIntegrazioneAttRiallineamento.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
 
 const emit = defineEmits(['integrazioneAggiornata']);
@@ -189,9 +175,6 @@ const state = reactive({
     mo: true,
     ms: true,
   },
-  // VECCHIA LOGICA COMMENTATA:
-  // tabIntegrazioneAttivo: 'AttPianificate',
-  // ordinaPer: 'data_prog',
 });
 
 const attivitaFiltrate = computed(() => state.attivita
@@ -322,32 +305,6 @@ function dataISO(data) {
 function formattaData(data) {
   return data ? new Date(`${dataISO(data)}T00:00:00`).toLocaleDateString('it-IT') : '';
 }
-
-// VECCHIA LOGICA COMMENTATA:
-// watch(() => state.tabIntegrazioneAttivo, newVal => {
-//   if (newVal === 'AttPianificate') state.ordinaPer = 'data_prog';
-//   else state.ordinaPer = 'liv_priorità';
-// });
-// watch(() => state.ordinaPer, newVal => {
-//   if (state.tabIntegrazioneAttivo === 'AttPianificate') ordinaAttivitàCicliche(newVal);
-//   else ordinaAttivitàRiallineamento(newVal);
-// });
-// async function popolaAttivitàLegacy() {
-//   state.caricamento = true;
-//   const attDaIntegrare = await leggiAttProgPerIntegrazione(true);
-//   const attCicliche = attDaIntegrare.filter(att => att.tipo_attivita.includes('controllo') || att.tipo_attivita.includes('manutenzione regolare')).filter(att => !!att.id_main10ance.length);
-//   const attRiallineamento = attDaIntegrare.filter(att => !att.tipo_attivita.includes('controllo') && !att.tipo_attivita.includes('manutenzione regolare'));
-//   store.statePlanner.datiProgrammazione.attCicliche = attCicliche;
-//   store.statePlanner.datiProgrammazione.attCicliche.forEach(att => att.visibile = true);
-//   store.statePlanner.datiProgrammazione.attRiallineamento = attRiallineamento;
-//   state.caricamento = false;
-// }
-// function emettiRefresh() {
-//   emit('integrazioneAggiornata');
-// }
-// function mostraTutteAttProg() {
-//   store.statePlanner.datiProgrammazione.attCicliche.forEach(att => att.visibile = true);
-// }
 </script>
 
 <style scoped>
@@ -499,10 +456,4 @@ input {
     flex-direction: column;
   }
 }
-/* VECCHIA LOGICA COMMENTATA: classi mantenute come riferimento cromatico del vecchio componente.
-.contenitore-scelta-attività {}
-.contenitore-ordinaper {}
-.verde {}
-.giallo {}
-*/
 </style>

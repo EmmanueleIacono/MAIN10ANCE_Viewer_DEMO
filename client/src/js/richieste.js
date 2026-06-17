@@ -107,13 +107,6 @@ export async function leggiEnumServizio(nomeEnum) {
     }
 }
 
-///// LATO SERVER LA FUNZIONE RELATIVA E' COMMENTATA ///////
-// export async function recuperaDatiControlliProg() {
-//     const risultato = await fetch('/o/Main10ance_DB/controlli-programmati', {method: "GET", headers: {"content-type": "application/json"}});
-//     const risTradotto = await risultato.json();
-//     return risTradotto;
-// }
-
 export async function compilaScheda(dati) {
     try {
         if (dati instanceof FormData) {

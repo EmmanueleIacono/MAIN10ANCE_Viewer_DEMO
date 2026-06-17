@@ -95,8 +95,6 @@ app.get('/DB_Servizio/LOD/UrnLoc', jsonRoute(async (req) => {
 
 app.get('/DB_Servizio/LOD/3e4', jsonRoute(() => leggiTabelleLOD3e4()));
 
-app.get('/Main10ance_DB/controlli-programmati', jsonRoute(() => leggiDatiControlloProg()));
-
 app.get('/Main10ance_DB/attivita-programmate', jsonRoute(async (req) => {
     const cookies = req.signedCookies;
     let resp;
@@ -457,20 +455,6 @@ async function leggiTabelleLOD3e4() {
     catch(e) {
         return [];
     }
-}
-
-/////// DA ELIMINARE O DA RIVEDERE PER FASE 2 //////////////
-// async function leggiDatiControlloProg() {
-//     try {
-//         const results = await poolM10a.query(`SELECT "c".id_contr AS "id", "fr".cl_ogg_fr AS "classe", "fr".fr_risc AS "frase", "fr".controllo, "fr".mn_reg AS "scheda_manutenzione_regolare", "fr".mn_nec AS "manutenzione_correttiva", "c".data_con AS "data_operazione", "c".freq AS "frequenza", "c".data_ins AS "data_registrazione", "c".id_main10ance FROM ${data_schema}.scheda_controllo AS "c" JOIN ${utility_schema}.frase_di_rischio AS "fr" ON "c".rid_fr_risc = "fr".id_fr_risc ORDER BY data_con;`);
-//         return results.rows;
-//     }
-//     catch(e) {
-//         return [];
-//     }
-// }
-async function leggiDatiControlloProg() { // TEMP HACK-FIX B4 DEL, da rivedere
-    return [];
 }
 
 async function leggiAttivitaProg() {
@@ -1176,18 +1160,6 @@ function normalizzaValoriVuoti(val) {
 }
 
 function gestisciRelazioniDocs(rel) {
-    // const items = rel.map(r => {
-    //     const campi = [
-    //         normalizzaValoriVuoti(r.località),
-    //         normalizzaValoriVuoti(r.edificio),
-    //         normalizzaValoriVuoti(r.classe),
-    //         normalizzaValoriVuoti(r.elemento),
-    //         normalizzaValoriVuoti(r.annotazioni),
-    //     ].map(f => f === null ? 'NULL' : `'${f.replace(/'/g, "\\'")}'`);
-    //     // ].map(f => f === null ? 'NULL' : `'${f}'`);
-    //     return `(${campi.join(',')})`;
-    // });
-    // return `{${items.join(',')}}`;
     const relazioniNorm = (rel || []).map(r => ({
         "località": normalizzaValoriVuoti(r.località),
         "edificio": normalizzaValoriVuoti(r.edificio),
