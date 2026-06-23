@@ -5,3 +5,4 @@ todo.txt
 .env.docker
 dist
 _wip
+/generated/prisma

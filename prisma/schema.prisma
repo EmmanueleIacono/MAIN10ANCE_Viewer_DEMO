@@ -1,0 +1,3049 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["main10ance", "servizio"]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model accesso_civico_toponimo_stradale {
+  oid                            Int
+  uuid_civic                     String                           @id @db.VarChar
+  ente_for                       String?                          @db.VarChar
+  ente_prod                      String?                          @db.VarChar
+  civico_num                     String?                          @db.VarChar
+  civico_sub                     String?                          @db.VarChar
+  tp_str_nom                     String?                          @db.VarChar
+  tp_str_cap                     String?                          @db.VarChar
+  geom_pun                       Unsupported("geometry")?
+  data_ins                       String?                          @db.VarChar
+  acc_pc_ty                      acc_pc_ty?
+  ambito                         String?                          @db.VarChar
+  ambiti                         ambiti?                          @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  area_di_circolazione_veicolare area_di_circolazione_veicolare[]
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model aiuola {
+  oid         Int
+  uuid_aiuola String                   @id @db.VarChar
+  ente_prod   String?                  @db.VarChar
+  geom_pol    Unsupported("geometry")?
+  data_ins    String?                  @db.VarChar
+  cl_ogg_fr   main10ance_cl_ogg_fr?
+  aiuola_ty   aiuola_ty?
+  ambito      String?                  @db.VarChar
+  ambiti      ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model albero_isolato {
+  oid        Int
+  uuid_al    String                   @id @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  cfr_fusto  Float?
+  diam_chiom Float?
+  altezza    Float?
+  piantato   String?                  @db.VarChar
+  tagliato   String?                  @db.VarChar
+  geom_pun   Unsupported("geometry")?
+  data_ins   String?                  @db.VarChar
+  cl_ogg_fr  main10ance_cl_ogg_fr?
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model apparato_decorativo {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  sp_ch         Float?
+  sp_ut         Float?
+  frenelli      Boolean?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  id_appdec     Int
+  idtipo        String                @db.VarChar
+  id_main10ance String                @id @db.VarChar
+  lunghezza     Float?
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model arco {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_arco       Int
+  id_main10ance String                @id @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model area_di_circolazione_veicolare {
+  oid                              Int
+  uuid_acvei                       String                            @id @db.VarChar
+  ruuid_civ                        String?                           @db.VarChar
+  ente_for                         String?                           @db.VarChar
+  ente_prod                        String?                           @db.VarChar
+  geom_pol                         Unsupported("geometry")?
+  data_ins                         String?                           @db.VarChar
+  ac_vei_zon                       ac_vei_zon?
+  ambito                           String?                           @db.VarChar
+  ambiti                           ambiti?                           @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  accesso_civico_toponimo_stradale accesso_civico_toponimo_stradale? @relation(fields: [ruuid_civ], references: [uuid_civic], onDelete: NoAction, onUpdate: NoAction, map: "risiede")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model area_verde {
+  oid       Int
+  uuid_av   String                   @id @db.VarChar
+  ente_for  String?                  @db.VarChar
+  ente_prod String?                  @db.VarChar
+  data_ins  String?                  @db.VarChar
+  ar_vrd_pa ar_vrd_pa?
+  ar_vrd_ty ar_vrd_ty?
+  geom_pol  Unsupported("geometry")?
+  ambito    String?                  @db.VarChar
+  ambiti    ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@index([geom_pol], map: "sidx_area_verde_geom_pol", type: Gist)
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model arredo {
+  id_arr        BigInt                   @id
+  rid_bup       String?                  @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  artista       String?                  @db.VarChar
+  datazione     String?                  @db.VarChar
+  lunghezza     Float?
+  larghezza     Float?
+  profondit_    Float?                   @map("profondità")
+  peso          Float?
+  commenti      String?                  @db.VarChar
+  immagine      String                   @db.VarChar
+  geom_pun      Unsupported("geometry")?
+  data_ins      String?                  @db.VarChar
+  id_main10ance String                   @db.VarChar
+  nome          String?                  @db.VarChar
+  dimensioni    String?                  @db.VarChar
+  ambito        String?                  @db.VarChar
+  codice        String?                  @db.VarChar
+  ambiti        ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model arredo_urbano {
+  oid       Int
+  uuid_au   String                   @id @db.VarChar
+  ente_prod String?                  @db.VarChar
+  geom_pun  Unsupported("geometry")?
+  data_ins  String?                  @db.VarChar
+  mn_arr_ty mn_arr_ty?
+  ambito    String?                  @db.VarChar
+  ambiti    ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+model attivita_prog {
+  id_att_prog                                                                     BigInt                              @id(map: "attività_cicliche_prog_pkey")
+  rid_fr_risc                                                                     BigInt?
+  data_prog                                                                       String?                             @db.VarChar
+  costo                                                                           String?                             @db.VarChar
+  ore                                                                             String?                             @db.VarChar
+  esecutori                                                                       String?                             @db.VarChar
+  strumentaz                                                                      String?                             @db.VarChar
+  commenti                                                                        String?                             @db.VarChar
+  id_main10ance                                                                   String[]                            @db.VarChar
+  id_group                                                                        String                              @db.VarChar
+  cl_ogg_fr                                                                       main10ance_cl_ogg_fr
+  tipo_attivita                                                                   att_prog_ty[]
+  data_ins                                                                        String?                             @db.VarChar
+  frequenza                                                                       String?                             @db.VarChar
+  da_integrare                                                                    Boolean
+  localita_estesa                                                                 String?                             @db.VarChar
+  data_ultima_mod                                                                 String?                             @db.VarChar
+  liv_priorita                                                                    String?                             @db.VarChar
+  necessaria_revisione                                                            Boolean?
+  rid_contr                                                                       BigInt?
+  rid_dad                                                                         BigInt?
+  rid_att_ciclica_prec                                                            BigInt?
+  ambito                                                                          String?                             @db.VarChar
+  ambiti                                                                          ambiti?                             @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  scheda_controllo_attivita_prog_rid_contrToscheda_controllo                      scheda_controllo?                   @relation("attivita_prog_rid_contrToscheda_controllo", fields: [rid_contr], references: [id_contr], onDelete: NoAction, onUpdate: NoAction, map: "rid_contr_fkey")
+  danno_alterazione_degrado_attivita_prog_rid_dadTodanno_alterazione_degrado      danno_alterazione_degrado?          @relation("attivita_prog_rid_dadTodanno_alterazione_degrado", fields: [rid_dad], references: [id_dad], onDelete: NoAction, onUpdate: NoAction, map: "rid_dad_fkey")
+  danno_alterazione_degrado_danno_alterazione_degrado_rid_att_progToattivita_prog danno_alterazione_degrado[]         @relation("danno_alterazione_degrado_rid_att_progToattivita_prog")
+  scheda_controllo_scheda_controllo_rid_att_progToattivita_prog                   scheda_controllo[]                  @relation("scheda_controllo_rid_att_progToattivita_prog")
+  scheda_controllo_tipo_1                                                         scheda_controllo_tipo_1[]
+  scheda_manutenzione_correttiva                                                  scheda_manutenzione_correttiva[]
+  scheda_manutenzione_regolare                                                    scheda_manutenzione_regolare[]
+  scheda_manutenzione_straordinaria                                               scheda_manutenzione_straordinaria[]
+  scheda_restauro                                                                 scheda_restauro[]
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model base_colonna {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_bcol       Int
+  id_main10ance String                @id(map: "bcol_pkey") @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model bosco {
+  oid        Int
+  uuid_bs    String                   @id @db.VarChar
+  ente_for   String?                  @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  geom_pol   Unsupported("geometry")?
+  data_ins   String?                  @db.VarChar
+  bosco_ty   bosco_ty?
+  bosco_gov  bosco_gov?
+  cl_ogg_fr  main10ance_cl_ogg_fr?
+  bosco_essz bosco_essz?
+  bosco_lim  bosco_lim?
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model capitello_colonna {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_ccol       Int
+  id_main10ance String                @id(map: "ccol_pkey") @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model capriata {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  lunghezza     Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_capr       Int
+  id_main10ance String                @id(map: "capr_pkey") @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model catena {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  id_cat        Int
+  idtipo        String                @db.VarChar
+  id_main10ance String                @id @db.VarChar
+  lunghezza     Float?
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model co_attivita_controllo {
+  cod                     String                    @id(map: "pk_co_attivita_controllo") @db.VarChar
+  data_pianificata        DateTime                  @db.Date
+  data_programmata        DateTime                  @db.Date
+  data_esecuzione         DateTime                  @db.Date
+  soggetto                String                    @db.VarChar
+  ambito_operativo        String                    @db.VarChar
+  is_completa             Boolean?
+  localita                String?                   @db.VarChar
+  include_unita           String?                   @db.Uuid
+  dati_unita              dati_unita?               @relation(fields: [include_unita], references: [uuid], onDelete: NoAction, map: "fk_co_attivita_controllo_dati_unita")
+  scheda_controllo_tipo_1 scheda_controllo_tipo_1[]
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model coltura_agricola {
+  oid       Int
+  uuid_ca   String                   @id @db.VarChar
+  ente_for  String?                  @db.VarChar
+  ente_prod String?                  @db.VarChar
+  geom_pol  Unsupported("geometry")?
+  data_ins  String?                  @db.VarChar
+  cl_agr_ty cl_agr_ty?
+  ambito    String?                  @db.VarChar
+  ambiti    ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model corso_d_acqua {
+  oid       Int
+  uuid_cda  String                   @id @db.VarChar
+  ente_for  String?                  @db.VarChar
+  ente_prod String?                  @db.VarChar
+  cda_nom   String?                  @db.VarChar
+  geom_pol  Unsupported("geometry")?
+  data_ins  String?                  @db.VarChar
+  cda_ty    cda_ty?
+  ambito    String?                  @db.VarChar
+  ambiti    ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model curve_di_livello {
+  cv_liv_q  Int?
+  ente_for  String?                  @db.VarChar
+  ente_prod String?                  @db.VarChar
+  geom_lin  Unsupported("geometry")?
+  oid       Int
+  sc_acq    String?                  @db.VarChar
+  uuid_cv   String                   @id @db.VarChar
+  data_ins  String?                  @db.VarChar
+  cv_liv_ty cv_liv_ty?
+  cv_liv_dt cv_liv_dt?
+  ambito    String?                  @db.VarChar
+  ambiti    ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model danno_alterazione_degrado {
+  id_dad                                                              BigInt                              @id
+  rid_gloss                                                           String?                             @db.VarChar
+  fenomeno                                                            String?                             @db.VarChar
+  causa_e                                                             String?                             @db.VarChar
+  commenti                                                            String?                             @db.VarChar
+  immagine                                                            String?                             @db.VarChar
+  data_ins                                                            String?                             @db.VarChar
+  dad_ty                                                              dad_ty?
+  est_sup                                                             est_sup?
+  id_main10ance                                                       String[]                            @db.VarChar
+  materiale                                                           main10ance_mat_ty?
+  eseguito                                                            Boolean?
+  data_ultima_mod                                                     String?                             @db.VarChar
+  autore_ultima_mod                                                   String?                             @db.VarChar
+  doc                                                                 String?                             @db.VarChar
+  costo                                                               String?                             @db.VarChar
+  ore                                                                 String?                             @db.VarChar
+  id_group                                                            String?                             @db.VarChar
+  rid_att_prog                                                        BigInt
+  rid_contr                                                           BigInt?
+  ambito                                                              String?                             @db.VarChar
+  attivita_prog_attivita_prog_rid_dadTodanno_alterazione_degrado      attivita_prog[]                     @relation("attivita_prog_rid_dadTodanno_alterazione_degrado")
+  ambiti                                                              ambiti?                             @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  attivita_prog_danno_alterazione_degrado_rid_att_progToattivita_prog attivita_prog                       @relation("danno_alterazione_degrado_rid_att_progToattivita_prog", fields: [rid_att_prog], references: [id_att_prog], onDelete: NoAction, onUpdate: NoAction, map: "rid_att_prog_fkey")
+  scheda_controllo                                                    scheda_controllo?                   @relation(fields: [rid_contr], references: [id_contr], onDelete: NoAction, onUpdate: NoAction, map: "rid_contr_fkey")
+  scheda_manutenzione_straordinaria                                   scheda_manutenzione_straordinaria[]
+  scheda_restauro                                                     scheda_restauro[]
+
+  @@schema("main10ance")
+}
+
+model dati_edifici {
+  uuid           String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  coord          Float[]
+  nome           String?       @db.VarChar
+  sigla          String        @db.VarChar
+  descrizione    String?       @db.VarChar
+  urn            String?       @db.VarChar
+  localita       String        @db.VarChar
+  numero         String?       @db.VarChar
+  edificio       String?       @db.VarChar
+  edif_nome_menu String?       @db.VarChar
+  ambito         String        @db.VarChar
+  coincide       Boolean?
+  ambiti         ambiti        @relation(fields: [ambito], references: [ambito], onDelete: NoAction, map: "ambito_fkey")
+  dati_localita  dati_localita @relation(fields: [localita], references: [sigla], onDelete: NoAction, map: "localita_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model dati_localita {
+  uuid            String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  coord           Float[]
+  nome            String?
+  sigla           String         @unique(map: "dati_loc_sigla_unique")
+  urn             String?
+  n_edifici       Int?
+  lista_edifici   String[]       @db.VarChar
+  ambito          String         @db.VarChar
+  nome_calendario String?        @db.VarChar
+  dati_edifici    dati_edifici[]
+  ambiti          ambiti         @relation(fields: [ambito], references: [ambito], onDelete: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model dati_unita {
+  uuid                  String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  coord                 Float[]
+  nome                  String?                 @db.VarChar
+  sigla                 String                  @db.VarChar
+  descrizione           String?                 @db.VarChar
+  urn                   String?                 @db.VarChar
+  edificio_sigla        String                  @db.VarChar
+  numero_unita          String?                 @db.VarChar
+  ambito                String                  @db.VarChar
+  localita              String                  @db.VarChar
+  co_attivita_controllo co_attivita_controllo[]
+  ambiti                ambiti                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+model degradi_danni {
+  cod         Int      @id
+  descrizione String   @db.VarChar(100)
+  mat         String[] @db.VarChar(300)
+  l_1         String[] @db.VarChar(300)
+  l_2         String[] @db.VarChar(300)
+  l_3         String[] @db.VarChar(300)
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model dipinto_murale {
+  id_dipmur     BigInt                   @id(map: "dipinto murale_pkey")
+  rid_muro      Int?
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  nome          String?                  @db.VarChar
+  artista       String?                  @db.VarChar
+  datazione     String?                  @db.VarChar
+  lunghezza     Float?
+  larghezza     Float?
+  commenti      String?                  @db.VarChar
+  immagine      String                   @db.VarChar
+  geom_pol      Unsupported("geometry")?
+  data_ins      String?                  @db.VarChar
+  rid_modgen    Int?
+  id_main10ance String                   @db.VarChar
+  dimensioni    String?                  @db.VarChar
+  ambito        String?                  @db.VarChar
+  codice        String?                  @db.VarChar
+  ambiti        ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model documenti {
+  uuid          String                          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  autore_ins    String?                         @db.VarChar
+  data_ins      String?                         @default(dbgenerated("to_char((CURRENT_DATE)::timestamp with time zone, 'YYYY-MM-DD'::text)")) @db.VarChar
+  id_doc        String                          @db.VarChar
+  data_doc      String?                         @db.VarChar
+  autore_doc    String?                         @db.VarChar
+  tipo_doc      docs_ty?
+  annotazioni   String?                         @db.VarChar
+  temi          temi[]
+  descrizione   String?                         @db.VarChar
+  relazioni     Unsupported("_doc_relazione")[]
+  sist_composto sistemi_composti?
+  percorso_doc  String                          @db.VarChar
+  ambito        String                          @db.VarChar
+  ambiti        ambiti                          @relation(fields: [ambito], references: [ambito], onDelete: NoAction, map: "ambito_fkey")
+
+  @@unique([id_doc, ambito], map: "id_doc_ambito_unique")
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model edificio {
+  oid                    Int
+  uuid_edi               String                   @id @db.VarChar
+  ruuid_loc              String?                  @db.VarChar
+  ente_for               String?                  @db.VarChar
+  ente_prod              String?                  @db.VarChar
+  edifc_nom              String?                  @db.VarChar
+  edifc_idag             String?                  @db.VarChar
+  edifc_ided             String?                  @db.VarChar
+  geom_pol               Unsupported("geometry")?
+  data_ins               String?                  @db.VarChar
+  edifc_mon              edifc_mon?
+  edifc_stat             edifc_stat?
+  edifc_ty               edifc_ty?
+  edifc_uso              edifc_uso?
+  link                   String?                  @db.VarChar(200)
+  ambito                 String?                  @db.VarChar
+  ambiti                 ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  localit__significativa localit__significativa?  @relation(fields: [ruuid_loc], references: [uuid_locsg], onDelete: NoAction, onUpdate: NoAction, map: "contenuto in")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model edificio_minore {
+  oid                    Int
+  uuid_edmin             String                   @id @db.VarChar
+  ruuid_loc              String?                  @db.VarChar
+  ente_for               String?                  @db.VarChar
+  ente_prod              String?                  @db.VarChar
+  edi_min_nm             String?                  @db.VarChar
+  geom_pol               Unsupported("geometry")?
+  data_ins               String?                  @db.VarChar
+  edi_min_st             edi_min_st?
+  edi_min_ty             edi_min_ty?
+  ambito                 String?                  @db.VarChar
+  ambiti                 ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  localit__significativa localit__significativa?  @relation(fields: [ruuid_loc], references: [uuid_locsg], onDelete: NoAction, onUpdate: NoAction, map: "contenuto in")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model elementi {
+  uuid                  String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                    String                 @db.VarChar
+  localit_              String?                @map("località") @db.VarChar
+  edificio              String?                @db.VarChar
+  sist_composto         sistemi_composti?
+  temi                  temi[]
+  autore_ins            String?                @db.VarChar
+  data_ins              String?                @db.VarChar
+  autore_ultima_mod     String?                @db.VarChar
+  data_ultima_mod       String?                @db.VarChar
+  annotazioni           String?                @db.VarChar
+  ambito                String                 @db.VarChar
+  livello_1             String?                @db.VarChar
+  livello_2             String?                @db.VarChar
+  livello_3             String?                @db.VarChar
+  livello_4             String?                @db.VarChar
+  unit_                 String?                @map("unità") @db.VarChar
+  nome                  String?                @db.VarChar
+  codice                String?                @db.VarChar
+  artista               String?                @db.VarChar
+  datazione             String?                @db.VarChar
+  dimensioni            String?                @db.VarChar
+  commenti              String?                @db.VarChar
+  id_main10ance         String?                @db.VarChar
+  immagine              String?                @db.VarChar
+  ambiti                ambiti                 @relation(fields: [ambito], references: [ambito], onDelete: NoAction, map: "ambito_fkey")
+  definizioni_livello_1 definizioni_livello_1? @relation(fields: [livello_1], references: [id_liv_1], onDelete: NoAction, map: "livello_1_fkey")
+  definizioni_livello_2 definizioni_livello_2? @relation(fields: [livello_2], references: [id_liv_2], onDelete: NoAction, map: "livello_2_fkey")
+  definizioni_livello_3 definizioni_livello_3? @relation(fields: [livello_3], references: [id_liv_3], onDelete: NoAction, map: "livello_3_fkey")
+  definizioni_livello_4 definizioni_livello_4? @relation(fields: [livello_4], references: [id_liv_4], onDelete: NoAction, map: "livello_4_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model elemento_di_copertura {
+  oid           Int
+  uuid_elecp    String     @db.VarChar
+  ruuid_unvol   String?    @db.VarChar
+  ente_prod     String?    @db.VarChar
+  ele_cp_qe     String?    @db.VarChar
+  data_ins      String?    @db.VarChar
+  ele_cp_ty     ele_cp_ty?
+  id_main10ance String     @id @db.VarChar
+  ambito        String?    @db.VarChar
+  ambiti        ambiti?    @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model fenomeni_degrado_controlli {
+  codice_fenomeno                 String                 @id(map: "pk_fenomeni_degrado_controlli") @db.VarChar
+  fenomeno                        String                 @db.VarChar
+  is_for_app_deco                 Boolean?               @default(false)
+  is_for_coperture                Boolean?               @default(false)
+  is_for_sentieri_pav_est_muretti Boolean?               @default(false)
+  has_sub_caso_fenomeno           Boolean?               @default(false)
+  sub_caso_fenomeno               String?                @db.VarChar
+  has_sub_caso_fenomeno_list      String[]               @db.VarChar
+  tipo_scheda_controllo           tipo_scheda_controllo?
+  voce_estesa_controllo           String?                @db.VarChar
+  codici_livello                  String[]               @db.VarChar
+  is_generale                     Boolean?               @default(false)
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model finestra {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  datazione     String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_fin        Int
+  id_main10ance String                @id @db.VarChar
+  area          Float?
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model fusto_colonna {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_fcol       Int
+  id_main10ance String                @id(map: "fcol_pkey") @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model grata {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  id_grata      Int
+  idtipo        String                @db.VarChar
+  id_main10ance String                @id @db.VarChar
+  area          Float?
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model linee_vita {
+  oid        Int
+  uuid_lv    String                   @id @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  geom_lin   Unsupported("geometry")?
+  data_ins   String?                  @db.VarChar
+  cl_ogg_fr  main10ance_cl_ogg_fr?
+  li_vi_ty   li_vi_ty?
+  documentaz String?                  @db.VarChar
+  immagine   String?                  @db.VarChar
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model localit__significativa {
+  oid             Int
+  uuid_locsg      String                   @id @db.VarChar
+  ente_for        String?                  @db.VarChar
+  ente_prod       String?                  @db.VarChar
+  geom_pun        Unsupported("geometry")?
+  data_ins        String?                  @db.VarChar
+  loc_sg_top      String?                  @db.VarChar
+  loc_sg_ty       loc_sg_ty?
+  loc_sg_sgn      loc_sg_sgn?
+  ambito          String?                  @db.VarChar
+  edificio        edificio[]
+  edificio_minore edificio_minore[]
+  ambiti          ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@map("località_significativa")
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model muro {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  lunghezza     Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_muro       Int
+  id_main10ance String                @id @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model nodo_rete_di_approvvigionamento_idrico {
+  oid       Int
+  uuid_nai  String                   @id(map: "nodo_rete_di _approvvigionamento_idrico_pkey") @db.VarChar
+  ente_prod String?                  @db.VarChar
+  geom_pun  Unsupported("geometry")?
+  data_ins  String?                  @db.VarChar
+  cl_ogg_fr main10ance_cl_ogg_fr?
+  nd_aac_ty nd_aac_ty?
+  ambito    String?                  @db.VarChar
+  ambiti    ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model nodo_rete_di_smaltimento_acque {
+  oid       Int
+  uuid_nsa  String                   @id @db.VarChar
+  ente_prod String?                  @db.VarChar
+  geom_pun  Unsupported("geometry")?
+  data_ins  String?                  @db.VarChar
+  cl_ogg_fr main10ance_cl_ogg_fr?
+  nd_sac_ty nd_sac_ty?
+  ambito    String?                  @db.VarChar
+  ambiti    ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model nodo_rete_elettrica {
+  oid       Int
+  uuid_nre  String                   @id @db.VarChar
+  ente_prod String?                  @db.VarChar
+  geom_pun  Unsupported("geometry")?
+  data_ins  String?                  @db.VarChar
+  cl_ogg_fr main10ance_cl_ogg_fr?
+  nd_ele_ty nd_ele_ty?
+  ambito    String?                  @db.VarChar
+  ambiti    ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model pavimento {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_pav        Int
+  id_main10ance String                @id @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model pavimento_decorativo {
+  id_pd         BigInt                   @id
+  rid_pav       Int?
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  artista       String?                  @db.VarChar
+  datazione     String?                  @db.VarChar
+  lunghezza     Float?
+  larghezza     Float?
+  sp_tes        Float?
+  al_ml_fon     Float?
+  commenti      String?                  @db.VarChar
+  immagine      String                   @db.VarChar
+  geom_pol      Unsupported("geometry")?
+  data_ins      String?                  @db.VarChar
+  id_main10ance String                   @db.VarChar
+  nome          String?                  @db.VarChar
+  dimensioni    String?                  @db.VarChar
+  ambito        String?                  @db.VarChar
+  codice        String?                  @db.VarChar
+  ambiti        ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model pianificazione_controlli_manutenzioni {
+  uuid                          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_pianificazione             String
+  autore_pianificazione         String?
+  data_pianificazione           DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
+  localita                      String
+  edificio                      String
+  ambito_operativo              String
+  necessita_supporto            String?
+  tipo_attivita                 String
+  descrizione_attivita          String
+  frequenza_mesi                Int
+  data_inizio                   DateTime  @db.Date
+  durata_prevista_gg            Int
+  stato                         String    @default("pianificata")
+  note                          String?
+  ambito                        String?
+  operatore_programmazione      String?
+  strumentazione_programmazione String?
+  costo_previsto                Decimal?  @db.Decimal
+  data_inizio_programmata       DateTime? @db.Date
+  durata_programmata_gg         Int?
+  note_programmazione           String?
+  autore_programmazione         String?
+  data_programmazione           DateTime? @db.Timestamp(6)
+
+  @@index([ambito_operativo], map: "idx_pcm_ambito_operativo")
+  @@index([id_pianificazione], map: "idx_pcm_id_pianificazione")
+  @@index([localita, edificio], map: "idx_pcm_localita_edificio")
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model pilastro {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_pil        Int
+  id_main10ance String                @id @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model porta {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  datazione     String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_porta      Int
+  id_main10ance String                @id @db.VarChar
+  area          Float?
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model quadro {
+  id_quadro     BigInt                   @id
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  nome          String?                  @db.VarChar
+  artista       String?                  @db.VarChar
+  datazione     String?                  @db.VarChar
+  lunghezza     Float?
+  larghezza     Float?
+  profondit_    Float?                   @map("profondità")
+  peso          Float?
+  commenti      String?                  @db.VarChar
+  immagine      String                   @db.VarChar
+  geom_pol      Unsupported("geometry")?
+  data_ins      String?                  @db.VarChar
+  rid_muro      Int?
+  id_main10ance String                   @db.VarChar
+  dimensioni    String?                  @db.VarChar
+  ambito        String?                  @db.VarChar
+  codice        String?                  @db.VarChar
+  ambiti        ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model reti_di_sottoservizi {
+  oid        Int
+  uuid_rs    String                   @id @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  infr_rt_pr String?                  @db.VarChar
+  geom_lin   Unsupported("geometry")?
+  data_ins   String?                  @db.VarChar
+  cl_ogg_fr  main10ance_cl_ogg_fr?
+  infr_rt_tr infr_rt_tr?
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model scala {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  larghezza     Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_scala      Int
+  id_main10ance String                @id @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+model scheda_anagrafica {
+  id_anagr               BigInt   @id
+  descrizione_sistema    String?  @db.VarChar
+  descrizione_subsistema String?  @db.VarChar
+  tecnica_costruttiva    String?  @db.VarChar
+  dimensioni             String?  @db.VarChar
+  materiale              String?  @db.VarChar
+  epoca                  String?  @db.VarChar
+  ispezionabilit_        String?  @map("ispezionabilità") @db.VarChar
+  fonti                  String?  @db.VarChar
+  data_registrazione     String?  @db.VarChar
+  autore_scheda          String?  @db.VarChar
+  data_ultima_mod        String?  @db.VarChar
+  autore_ultima_mod      String?  @db.VarChar
+  id_main10ance          String   @db.VarChar
+  autore                 String?  @db.VarChar
+  ambito                 String?  @db.VarChar
+  docs                   String[] @db.VarChar
+  ambiti                 ambiti?  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+model scheda_anagrafica_copertura {
+  id_anagr                                   BigInt                        @id
+  data_registrazione                         String?                       @db.VarChar
+  autore_scheda                              String?                       @db.VarChar
+  data_ultima_mod                            String?                       @db.VarChar
+  autore_ultima_mod                          String?                       @db.VarChar
+  id_main10ance                              String                        @db.VarChar
+  codice                                     String                        @db.VarChar
+  ambito                                     String?                       @db.VarChar
+  descrizione_copertura_rapporti             cop_rapporti?
+  descrizione_copertura_rapporti_annotazioni String?                       @db.VarChar
+  estensione_compl                           Float?
+  estensione_compl_comment                   cop_estens_comment?
+  descrizione_copertura_gen                  String?                       @db.VarChar
+  cronologia_cop                             String?                       @db.VarChar
+  tipo_manto                                 cop_manto_tipo?
+  tipo_manto_annotazioni                     String?                       @db.VarChar
+  materiale_manto_pietra                     cop_manto_mat_pietra?
+  materiale_manto_later                      cop_manto_mat_later?
+  materiale_manto_annotazioni                String?                       @db.VarChar
+  tipo_elementi_manto_pietra                 cop_manto_pietra_el?
+  tipo_elementi_manto_later                  cop_manto_later_el?
+  tipo_elementi_manto_annotazioni            String?                       @db.VarChar
+  tecnica_esec_posa_manto_pietra             cop_manto_pietra_tecnica?
+  tecnica_esec_posa_manto_later              cop_manto_later_tecnica?
+  tecnica_esec_posa_manto_annotazioni        String?                       @db.VarChar
+  colmo_sist_descrizione                     String?                       @db.VarChar
+  colmo_sist_gloss                           String?                       @db.VarChar
+  colmo_sist_annotazioni                     String?                       @db.VarChar
+  colmo_sist_foto                            String?                       @db.VarChar
+  displuvi_sist_descrizione                  String?                       @db.VarChar
+  displuvi_sist_gloss                        String?                       @db.VarChar
+  displuvi_sist_annotazioni                  String?                       @db.VarChar
+  displuvi_sist_foto                         String?                       @db.VarChar
+  gronda_sist_descrizione                    String?                       @db.VarChar
+  gronda_sist_gloss                          String?                       @db.VarChar
+  gronda_sist_annotazioni                    String?                       @db.VarChar
+  gronda_sist_foto                           String?                       @db.VarChar
+  el_strati_funz_acc_gloss                   String?                       @db.VarChar
+  el_strati_funz_acc_annotazioni             String?                       @db.VarChar
+  el_strati_funz_acc_aggiunto                Boolean?                      @default(false)
+  materiale_cop_str                          cop_str_legno_mat?
+  materiale_cop_strutt_annotazioni           String?                       @db.VarChar
+  grossa_orditura_annotazioni                String?                       @db.VarChar
+  media_orditura_annotazioni                 String?                       @db.VarChar
+  piccola_orditura_annotazioni               String?                       @db.VarChar
+  el_giunzioni_annotazioni                   String?                       @db.VarChar
+  epoca                                      String?                       @db.VarChar
+  fonti                                      String?                       @db.VarChar
+  autore                                     String?                       @db.VarChar
+  accessibilit_                              Boolean?                      @map("accessibilità")
+  accessibilit__annotazioni                  String?                       @map("accessibilità_annotazioni") @db.VarChar
+  ispezionabilit__sottotetto                 Boolean?                      @map("ispezionabilità_sottotetto")
+  ispezionabilit__sottotetto_annotazioni     String?                       @map("ispezionabilità_sottotetto_annotazioni") @db.VarChar
+  docs                                       String[]                      @db.VarChar
+  validata                                   Boolean?                      @default(false)
+  note                                       String?                       @db.VarChar
+  docs_NEW                                   Unsupported("_docs_schede")[]
+  el_strati_funz_acc                         cop_strati_funz_acc[]
+  grossa_orditura_el                         String[]                      @db.VarChar
+  media_orditura_el                          String[]                      @db.VarChar
+  piccola_orditura_el                        String[]                      @db.VarChar
+  el_giunzioni                               String[]                      @db.VarChar
+  ambiti                                     ambiti?                       @relation(fields: [ambito], references: [ambito], onDelete: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+model scheda_anagrafica_statua {
+  id_anagr                              BigInt                                 @id
+  descrizione_statua                    String?                                @db.VarChar
+  tecnica_esecuzione                    String?                                @db.VarChar
+  dimensioni                            String?                                @db.VarChar
+  materiale_annotazioni                 String?                                @db.VarChar
+  epoca                                 String?                                @db.VarChar
+  fonti                                 String?                                @db.VarChar
+  data_registrazione                    String?                                @db.VarChar
+  autore_scheda                         String?                                @db.VarChar
+  data_ultima_mod                       String?                                @db.VarChar
+  autore_ultima_mod                     String?                                @db.VarChar
+  id_main10ance                         String                                 @db.VarChar
+  autore                                String?                                @db.VarChar
+  ambito                                String?                                @db.VarChar
+  materiale_armatura                    stat_arm_mat?
+  materiale_supporto                    stat_supp_mat?
+  lamina_metallica                      Boolean?
+  pellicola_pittorica                   String?                                @db.VarChar
+  strato_di_preparazione                String?                                @db.VarChar
+  elementi_accessori                    stat_el_acc_mat?
+  monili                                stat_monil_mat?
+  accessibilit_                         Boolean?                               @map("accessibilità")
+  nome_statua                           String                                 @db.VarChar
+  elementi_di_ancoraggio_a_parete       Boolean?
+  elementi_di_ancoraggio_a_pavimento    Boolean?
+  elementi_di_ancoraggio_annotazioni    String?                                @db.VarChar
+  docs                                  String[]                               @db.VarChar
+  materiale_statua                      stat_mat?
+  validata                              Boolean?                               @default(false)
+  note                                  String?                                @db.VarChar
+  codice_statua                         String                                 @db.VarChar
+  materiale_elementi_accessori_monili   stat_el_acc_monil_mat[]
+  materiale_ancoraggio_parete           stat_anc_par_mat?
+  materiale_ancoraggio_pavimento        stat_anc_pav_mat?
+  ancoraggio_parete_annotazioni         String?                                @db.VarChar
+  ancoraggio_pavimento_annotazioni      String?                                @db.VarChar
+  pellicola_pittorica_tecnica_e_mat     Unsupported("stat_pell_pitt")?
+  elementi_accessori_monili             stat_el_acc_monil[]
+  elementi_accessori_monili_annotazioni String?                                @db.VarChar
+  codici_altro                          String?                                @db.VarChar
+  materiali_armatura                    String[]                               @db.VarChar
+  docs_NEW                              Unsupported("_docs_schede")[]
+  elementi_accessori_monili_NEW         Unsupported("_stat_el_acc_monil_ty")[]
+  elementi_di_ancoraggio_a_soffitto     Boolean?
+  materiale_ancoraggio_soffitto         stat_anc_sof_mat?
+  ancoraggio_soffitto_annotazioni       String?                                @db.VarChar
+  ambiti                                ambiti?                                @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+model scheda_conoscenza {
+  id_conosc        BigInt                @id
+  id_main10ance    String[]              @db.VarChar
+  commento         String?               @db.VarChar
+  riferimenti      String[]              @db.VarChar
+  tipi_riferimenti String?               @db.VarChar
+  questione        tipi_questioni_aperte
+  ambito           String?               @db.VarChar
+  ambiti           ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model scheda_controllo {
+  id_contr                                                   BigInt                              @id(map: "controllo_stato_di_conservazione_livello_di_urgenza_pkey")
+  cl_ogg_fr                                                  main10ance_cl_ogg_fr?
+  controllo                                                  String?                             @db.VarChar
+  data_con                                                   String?                             @db.VarChar
+  esecutori                                                  String?                             @db.VarChar
+  doc                                                        String?                             @db.VarChar
+  strumentaz                                                 String?                             @db.VarChar
+  commenti                                                   String?                             @db.VarChar
+  data_ins                                                   String?                             @db.VarChar
+  st_cons                                                    st_cons?
+  liv_urg                                                    liv_urg?
+  id_main10ance                                              String[]                            @db.VarChar
+  costo                                                      String?                             @db.VarChar
+  rid_fr_risc                                                BigInt?
+  freq                                                       String?                             @db.VarChar
+  cl_racc                                                    cl_racc?
+  rid_att_prog                                               BigInt?
+  ore                                                        String?                             @db.VarChar
+  eseguito                                                   Boolean?
+  data_ultima_mod                                            String?                             @db.VarChar
+  autore_ultima_mod                                          String?                             @db.VarChar
+  id_group                                                   String?                             @db.VarChar
+  id_att_ciclica                                             BigInt?
+  data_inizio                                                String?                             @db.VarChar
+  data_fine                                                  String?                             @db.VarChar
+  ambito                                                     String?                             @db.VarChar
+  estensione                                                 estensione?
+  docs                                                       String[]                            @db.VarChar
+  attivita_prog_attivita_prog_rid_contrToscheda_controllo    attivita_prog[]                     @relation("attivita_prog_rid_contrToscheda_controllo")
+  danno_alterazione_degrado                                  danno_alterazione_degrado[]
+  ambiti                                                     ambiti?                             @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  attivita_prog_scheda_controllo_rid_att_progToattivita_prog attivita_prog?                      @relation("scheda_controllo_rid_att_progToattivita_prog", fields: [rid_att_prog], references: [id_att_prog], onDelete: NoAction, onUpdate: NoAction, map: "rid_att_prog")
+  scheda_manutenzione_correttiva                             scheda_manutenzione_correttiva[]
+  scheda_manutenzione_straordinaria                          scheda_manutenzione_straordinaria[]
+  scheda_restauro                                            scheda_restauro[]
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model scheda_controllo_tipo_1 {
+  id_contr                      BigInt                 @id(map: "id_contr_pkey")
+  cod_controllo                 String?                @db.VarChar
+  data_con                      String?                @db.VarChar
+  operatore                     String?                @db.VarChar
+  doc                           String?                @db.VarChar
+  strumentaz                    String?                @db.VarChar
+  commenti                      String?                @db.VarChar
+  data_ins                      String?                @db.VarChar
+  id_main10ance                 String[]               @db.VarChar
+  costo                         String?                @db.VarChar
+  freq                          String?                @db.VarChar
+  rid_att_prog                  BigInt?
+  durata                        String?                @db.VarChar
+  eseguito                      Boolean?
+  data_ultima_mod               String?                @db.VarChar
+  autore_ultima_mod             String?                @db.VarChar
+  id_group                      String?                @db.VarChar
+  id_att_controllo              BigInt?
+  data_inizio                   String?                @db.VarChar
+  data_fine                     String?                @db.VarChar
+  ambito_azione                 String?                @db.VarChar
+  sc_1_descrizione              String?                @db.VarChar
+  sc_1_fotografia               String?                @db.VarChar
+  sc_1_materiali                String?                @db.VarChar
+  sc_1_annotazioni_osservazioni String?                @db.VarChar
+  docs                          String[]               @db.VarChar
+  ambiti                        ambiti?                @relation(fields: [ambito_azione], references: [ambito], onDelete: NoAction, map: "ambito_azione_fkey")
+  co_attivita_controllo         co_attivita_controllo? @relation(fields: [cod_controllo], references: [cod], onDelete: NoAction, map: "cod_controllo_fkey")
+  attivita_prog                 attivita_prog?         @relation(fields: [rid_att_prog], references: [id_att_prog], onDelete: NoAction, map: "rid_att_prog_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model scheda_manutenzione_correttiva {
+  id_mn_gu          BigInt                @id(map: "manutenzione_correttiva_o_a_guasto_pkey")
+  rid_gloss         String?               @db.VarChar
+  rid_contr         BigInt?
+  cl_ogg_fr         main10ance_cl_ogg_fr?
+  azione            String?               @db.VarChar
+  data_ese          String?               @db.VarChar
+  progettist        String?               @db.VarChar
+  esecutori         String?               @db.VarChar
+  strumentaz        String?               @db.VarChar
+  materiale         String?               @db.VarChar
+  doc               String?               @db.VarChar
+  causa             String?               @db.VarChar
+  costo             String?               @db.VarChar
+  commenti          String?               @db.VarChar
+  data_ins          String?               @db.VarChar
+  id_main10ance     String[]              @db.VarChar
+  rid_att_prog      BigInt?
+  ore               String?               @db.VarChar
+  eseguito          Boolean?
+  data_ultima_mod   String?               @db.VarChar
+  autore_ultima_mod String?               @db.VarChar
+  id_group          String?               @db.VarChar
+  rid_fr_risc       BigInt?
+  data_inizio       String?               @db.VarChar
+  data_fine         String?               @db.VarChar
+  ambito            String?               @db.VarChar
+  docs              String[]              @db.VarChar
+  ambiti            ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  attivita_prog     attivita_prog?        @relation(fields: [rid_att_prog], references: [id_att_prog], onDelete: NoAction, onUpdate: NoAction, map: "rid_att_prog")
+  scheda_controllo  scheda_controllo?     @relation(fields: [rid_contr], references: [id_contr], onDelete: NoAction, onUpdate: NoAction, map: "rid_contr")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model scheda_manutenzione_regolare {
+  id_mn_reg         BigInt                @id(map: "manutenzione_regolare_pkey")
+  rid_gloss         String?               @db.VarChar
+  cl_ogg_fr         main10ance_cl_ogg_fr?
+  azione            String?               @db.VarChar
+  fq_eff            String?               @db.VarChar
+  data_ese          String?               @db.VarChar
+  esecutori         String?               @db.VarChar
+  strumentaz        String?               @db.VarChar
+  materiale         String?               @db.VarChar
+  doc               String?               @db.VarChar
+  costo             String?               @db.VarChar
+  commenti          String?               @db.VarChar
+  data_ins          String?               @db.VarChar
+  id_main10ance     String[]              @db.VarChar
+  rid_att_prog      BigInt?
+  ore               String?               @db.VarChar
+  eseguito          Boolean?
+  data_ultima_mod   String?               @db.VarChar
+  autore_ultima_mod String?               @db.VarChar
+  id_group          String?               @db.VarChar
+  rid_fr_risc       BigInt?
+  id_att_ciclica    BigInt?
+  data_inizio       String?               @db.VarChar
+  data_fine         String?               @db.VarChar
+  ambito            String?               @db.VarChar
+  docs              String[]              @db.VarChar
+  ambiti            ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  attivita_prog     attivita_prog?        @relation(fields: [rid_att_prog], references: [id_att_prog], onDelete: NoAction, onUpdate: NoAction, map: "rid_att_prog")
+
+  @@schema("main10ance")
+}
+
+model scheda_manutenzione_straordinaria {
+  id_mn_str                 BigInt                     @id(map: "manutenzione_straordinaria_pkey")
+  rid_gloss                 String?                    @db.VarChar
+  rid_att_prog              BigInt?
+  rid_dad                   BigInt?
+  azione                    String?                    @db.VarChar
+  data_ese                  String?                    @db.VarChar
+  progettista               String?                    @db.VarChar
+  esecutori                 String?                    @db.VarChar
+  strumentaz                String?                    @db.VarChar
+  materiale                 String?                    @db.VarChar
+  doc                       String?                    @db.VarChar
+  costo                     String?                    @db.VarChar
+  commenti                  String?                    @db.VarChar
+  data_ins                  String?                    @db.VarChar
+  id_main10ance             String[]                   @db.VarChar
+  ore                       String?                    @db.VarChar
+  eseguito                  Boolean?
+  data_ultima_mod           String?                    @db.VarChar
+  autore_ultima_mod         String?                    @db.VarChar
+  id_group                  String?                    @db.VarChar
+  rid_contr                 BigInt?
+  data_inizio               String?                    @db.VarChar
+  data_fine                 String?                    @db.VarChar
+  ambito                    String?                    @db.VarChar
+  docs                      String[]                   @db.VarChar
+  ambiti                    ambiti?                    @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  attivita_prog             attivita_prog?             @relation(fields: [rid_att_prog], references: [id_att_prog], onDelete: NoAction, onUpdate: NoAction, map: "rid_att_prog_fkey")
+  scheda_controllo          scheda_controllo?          @relation(fields: [rid_contr], references: [id_contr], onDelete: NoAction, onUpdate: NoAction, map: "rid_contr_fkey")
+  danno_alterazione_degrado danno_alterazione_degrado? @relation(fields: [rid_dad], references: [id_dad], onDelete: NoAction, onUpdate: NoAction, map: "rid_dad_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model scheda_restauro {
+  id_restaur                BigInt                     @id(map: "restauri_pkey")
+  rid_gloss                 String?                    @db.VarChar
+  cl_ogg_fr                 main10ance_cl_ogg_fr?
+  descriz                   String?                    @db.VarChar
+  anno_iniz                 String?                    @db.VarChar
+  anno_fine                 String?                    @db.VarChar
+  progettist                String?                    @db.VarChar
+  operatore                 String?                    @db.VarChar
+  commenti                  String?                    @db.VarChar
+  doc                       String?                    @db.VarChar
+  immagine                  String?                    @db.VarChar
+  data_ins                  String?                    @db.VarChar
+  id_main10ance             String[]                   @db.VarChar
+  costo                     String?                    @db.VarChar
+  rid_att_prog              BigInt?
+  rid_dad                   BigInt?
+  eseguito                  Boolean?
+  data_ultima_mod           String?                    @db.VarChar
+  autore_ultima_mod         String?                    @db.VarChar
+  ore                       String?                    @db.VarChar
+  id_group                  String?                    @db.VarChar
+  rid_contr                 BigInt?
+  data_inizio               String?                    @db.VarChar
+  data_fine                 String?                    @db.VarChar
+  ambito                    String?                    @db.VarChar
+  docs                      String[]                   @db.VarChar
+  ambiti                    ambiti?                    @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  attivita_prog             attivita_prog?             @relation(fields: [rid_att_prog], references: [id_att_prog], onDelete: NoAction, onUpdate: NoAction, map: "rid_att_prog")
+  scheda_controllo          scheda_controllo?          @relation(fields: [rid_contr], references: [id_contr], onDelete: NoAction, onUpdate: NoAction, map: "rid_contr_fkey")
+  danno_alterazione_degrado danno_alterazione_degrado? @relation(fields: [rid_dad], references: [id_dad], onDelete: NoAction, onUpdate: NoAction, map: "rid_dad")
+
+  @@schema("main10ance")
+}
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model scheda_segnalazione {
+// @@schema("main10ance")
+// }
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model sintesi_lavori {
+  uuid         String  @id(map: "0_temp_pkey") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  localita     String? @db.VarChar
+  edificio     String? @db.VarChar
+  tetti        String? @db.VarChar
+  umidita      String? @db.VarChar
+  statica      String? @db.VarChar
+  interni      String? @db.VarChar
+  esterni      String? @db.VarChar
+  anno_tetti   String? @db.VarChar
+  anno_umidita String? @db.VarChar
+  anno_statica String? @db.VarChar
+  anno_interni String? @db.VarChar
+  anno_esterni String? @db.VarChar
+  data_ins     String? @db.VarChar
+  id_interno   BigInt?
+  ambito       String? @db.VarChar
+  autore_ins   String? @db.VarChar
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sistema_di_raccolta_acque {
+  oid        Int
+  uuid_sra   String                   @id @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  geom_lin   Unsupported("geometry")?
+  data_ins   String?                  @db.VarChar
+  cl_ogg_fr  main10ance_cl_ogg_fr?
+  sist_ac_ty sist_ac_ty?
+  sist_ac_po sist_ac_po?
+  sist_ac_sz sist_ac_sz?
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sistemi_di_sicurezza {
+  oid        Int
+  uuid_sos   String                   @id @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  sist_s_mat String?                  @db.VarChar
+  geom_pun   Unsupported("geometry")?
+  data_ins   String?                  @db.VarChar
+  sist_s_ty  sist_s_ty?
+  sist_s_ele sist_s_ele?
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model specchio_d_acqua {
+  oid        Int
+  uuid_sa    String                   @id @db.VarChar
+  ente_for   String?                  @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  sp_acq_nom String?                  @db.VarChar
+  geom_pol   Unsupported("geometry")?
+  sp_acq_ty  sp_acq_ty?
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model statua {
+  id_statua     BigInt                   @id
+  rid_bup       String?                  @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  nome          String?                  @db.VarChar
+  artista       String?                  @db.VarChar
+  datazione     String?                  @db.VarChar
+  lunghezza     Float?
+  larghezza     Float?
+  altezza       Float?
+  peso          Float?
+  commenti      String?                  @db.VarChar
+  immagine      String                   @db.VarChar
+  geom_pun      Unsupported("geometry")?
+  data_ins      String?                  @db.VarChar
+  id_main10ance String                   @unique(map: "id_m10e_unique") @db.VarChar
+  dimensioni    String?                  @db.VarChar
+  ambito        String?                  @db.VarChar
+  codice        String?                  @db.VarChar
+  ambiti        ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model strade_sentieri_e_altri_percorsi_interni {
+  oid        Int
+  uuid_vms   String                   @id @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  ar_vms_pd  String?                  @db.VarChar
+  geom_pol   Unsupported("geometry")?
+  data_ins   String?                  @db.VarChar
+  cl_ogg_fr  main10ance_cl_ogg_fr?
+  ar_vms_ty  ar_vms_ty?
+  ar_vms_fon ar_vms_fon?
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tetto {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_tetto      Int
+  id_main10ance String                @id @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tratto_rete_di_approvvigionamento_idrico {
+  oid        Int
+  uuid_tai   String                   @id @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  tr_aac_pen String?                  @db.VarChar
+  tr_aac_dia Float?
+  tr_aac_pro String?                  @db.VarChar
+  geom_lin   Unsupported("geometry")?
+  data_ins   String?                  @db.VarChar
+  cl_ogg_fr  main10ance_cl_ogg_fr?
+  tr_aac_ty  tr_aac_ty?
+  tr_aac_typ tr_aac_typ?
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tratto_rete_di_smaltimento_acque {
+  oid        Int
+  uuid_tsa   String                   @id @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  tr_sac_pen String?                  @db.VarChar
+  tr_sac_dia Float?
+  tr_sac_pro String?                  @db.VarChar
+  geom_lin   Unsupported("geometry")?
+  data_ins   String?                  @db.VarChar
+  cl_ogg_fr  main10ance_cl_ogg_fr?
+  tr_sac_ty  tr_sac_ty?
+  tr_sac_fog tr_sac_fog?
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tratto_rete_elettrica {
+  oid        Int
+  uuid_tre   String                   @id @db.VarChar
+  ente_prod  String?                  @db.VarChar
+  tr_ele_dia Float?
+  tr_ele_pro String?                  @db.VarChar
+  geom_lin   Unsupported("geometry")?
+  data_ins   String?                  @db.VarChar
+  cl_ogg_fr  main10ance_cl_ogg_fr?
+  tr_ele_ty  tr_ele_ty?
+  ambito     String?                  @db.VarChar
+  ambiti     ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model trave {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  id_trave      Int
+  idtipo        String                @db.VarChar
+  id_main10ance String                @id @db.VarChar
+  lunghezza     Float?
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model unit__volumetrica {
+  oid           Int
+  uuid_unvol    String    @db.VarChar
+  ruuid_edi     String?   @db.VarChar
+  ente_for      String?   @db.VarChar
+  ente_prod     String?   @db.VarChar
+  un_vol_av     Float?
+  data_ins      String?   @db.VarChar
+  modo_acq      modo_acq?
+  id_main10ance String    @id @db.VarChar
+  ambito        String?   @db.VarChar
+  ambiti        ambiti?   @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@map("unità_volumetrica")
+  @@schema("main10ance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model volta {
+  rid_unvol     String?               @db.VarChar
+  cl_ogg_fr     main10ance_cl_ogg_fr?
+  datazione     String?               @db.VarChar
+  area          Float?
+  commenti      String?               @db.VarChar
+  immagine      String?               @db.VarChar
+  data_ins      String?               @db.VarChar
+  idtipo        String                @db.VarChar
+  id_volta      Int
+  id_main10ance String                @id @db.VarChar
+  ambito        String?               @db.VarChar
+  ambiti        ambiti?               @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+
+  @@schema("main10ance")
+}
+
+model ambiti {
+  ambito                                   String                                     @id @db.VarChar
+  buckets                                  String[]                                   @db.VarChar
+  schema                                   String?                                    @db.VarChar
+  storage                                  String?                                    @db.VarChar
+  ambito_full_name                         String?                                    @db.VarChar
+  accesso_civico_toponimo_stradale         accesso_civico_toponimo_stradale[]
+  aiuola                                   aiuola[]
+  albero_isolato                           albero_isolato[]
+  apparato_decorativo                      apparato_decorativo[]
+  arco                                     arco[]
+  area_di_circolazione_veicolare           area_di_circolazione_veicolare[]
+  area_verde                               area_verde[]
+  arredo                                   arredo[]
+  arredo_urbano                            arredo_urbano[]
+  attivita_prog                            attivita_prog[]
+  base_colonna                             base_colonna[]
+  bosco                                    bosco[]
+  capitello_colonna                        capitello_colonna[]
+  capriata                                 capriata[]
+  catena                                   catena[]
+  coltura_agricola                         coltura_agricola[]
+  corso_d_acqua                            corso_d_acqua[]
+  curve_di_livello                         curve_di_livello[]
+  danno_alterazione_degrado                danno_alterazione_degrado[]
+  dati_edifici                             dati_edifici[]
+  dati_localita                            dati_localita[]
+  dati_unita                               dati_unita[]
+  dipinto_murale                           dipinto_murale[]
+  documenti                                documenti[]
+  edificio                                 edificio[]
+  edificio_minore                          edificio_minore[]
+  elementi                                 elementi[]
+  elemento_di_copertura                    elemento_di_copertura[]
+  finestra                                 finestra[]
+  fusto_colonna                            fusto_colonna[]
+  grata                                    grata[]
+  linee_vita                               linee_vita[]
+  localit__significativa                   localit__significativa[]
+  muro                                     muro[]
+  nodo_rete_di_approvvigionamento_idrico   nodo_rete_di_approvvigionamento_idrico[]
+  nodo_rete_di_smaltimento_acque           nodo_rete_di_smaltimento_acque[]
+  nodo_rete_elettrica                      nodo_rete_elettrica[]
+  pavimento                                pavimento[]
+  pavimento_decorativo                     pavimento_decorativo[]
+  pilastro                                 pilastro[]
+  porta                                    porta[]
+  quadro                                   quadro[]
+  reti_di_sottoservizi                     reti_di_sottoservizi[]
+  scala                                    scala[]
+  scheda_anagrafica                        scheda_anagrafica[]
+  scheda_anagrafica_copertura              scheda_anagrafica_copertura[]
+  scheda_anagrafica_statua                 scheda_anagrafica_statua[]
+  scheda_conoscenza                        scheda_conoscenza[]
+  scheda_controllo                         scheda_controllo[]
+  scheda_controllo_tipo_1                  scheda_controllo_tipo_1[]
+  scheda_manutenzione_correttiva           scheda_manutenzione_correttiva[]
+  scheda_manutenzione_regolare             scheda_manutenzione_regolare[]
+  scheda_manutenzione_straordinaria        scheda_manutenzione_straordinaria[]
+  scheda_restauro                          scheda_restauro[]
+  sistema_di_raccolta_acque                sistema_di_raccolta_acque[]
+  sistemi_di_sicurezza                     sistemi_di_sicurezza[]
+  specchio_d_acqua                         specchio_d_acqua[]
+  statua                                   statua[]
+  strade_sentieri_e_altri_percorsi_interni strade_sentieri_e_altri_percorsi_interni[]
+  tetto                                    tetto[]
+  tratto_rete_di_approvvigionamento_idrico tratto_rete_di_approvvigionamento_idrico[]
+  tratto_rete_di_smaltimento_acque         tratto_rete_di_smaltimento_acque[]
+  tratto_rete_elettrica                    tratto_rete_elettrica[]
+  trave                                    trave[]
+  unit__volumetrica                        unit__volumetrica[]
+  volta                                    volta[]
+  utenti                                   utenti[]
+
+  @@schema("servizio")
+}
+
+model anagrafica_dettaglio {
+  id_anagr           BigInt  @id @default(autoincrement())
+  definizione        String? @db.VarChar
+  descrizione        String? @db.VarChar
+  materiale          String? @db.VarChar
+  tecniche           String? @db.VarChar
+  epoca              String? @db.VarChar
+  documenti          String? @db.VarChar
+  autore             String? @db.VarChar
+  data               String? @db.VarChar
+  data_registrazione String? @db.VarChar
+  autore_scheda      String? @db.VarChar
+  data_ultima_mod    String? @db.VarChar
+  autore_ultima_mod  String? @db.VarChar
+  id_main10ance      String  @db.VarChar
+
+  @@schema("servizio")
+}
+
+model anagrafica_manufatto {
+  id_anagr           BigInt  @id @default(autoincrement())
+  definizione        String? @db.VarChar
+  epoca              String? @db.VarChar
+  autore             String? @db.VarChar
+  descrizione        String? @db.VarChar
+  materiale          String? @db.VarChar
+  tecniche           String? @db.VarChar
+  documenti          String? @db.VarChar
+  iter_autorizzativo String? @db.VarChar
+  data_registrazione String? @db.VarChar
+  autore_scheda      String? @db.VarChar
+  data_ultima_mod    String? @db.VarChar
+  autore_ultima_mod  String? @db.VarChar
+  id_main10ance      String  @db.VarChar
+
+  @@schema("servizio")
+}
+
+model classificazione_elementi {
+  elemento_sigla   String   @id @db.VarChar
+  elemento_nome    String   @db.VarChar
+  cl_ogg           cl_ogg
+  cl_ogg_relazioni cl_ogg[]
+  ordine           Int
+
+  @@schema("servizio")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model classificazione_elementi_OLD {
+  elemento_sigla   String       @id(map: "classificazione_elementi_pkey_OLD") @db.VarChar
+  elemento_nome    String       @db.VarChar
+  cl_ogg           cl_ogg_OLD
+  cl_ogg_relazioni cl_ogg_OLD[]
+
+  @@schema("servizio")
+}
+
+model dati_loc_pdiff {
+  uuid      String      @id(map: "dati_loc_pdf_pkey") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  coord     Float[]
+  nome      String
+  sigla     String      @unique(map: "dati_loc__pdf_sigla_unique")
+  dettaglio dettaglio[]
+  manufatto manufatto[]
+
+  @@schema("servizio")
+}
+
+model definizioni_livello_1 {
+  id_liv_1              String                  @id @db.VarChar
+  def_liv_1_sigla       String                  @db.VarChar
+  def_liv_1_nome        String                  @db.VarChar
+  ordine                Int
+  elementi              elementi[]
+  definizioni_livello_2 definizioni_livello_2[]
+
+  @@schema("servizio")
+}
+
+model definizioni_livello_2 {
+  id_liv_2              String                  @id @db.VarChar
+  def_liv_2_sigla       String                  @db.VarChar
+  def_liv_2_nome        String                  @db.VarChar
+  id_liv_1              String                  @db.VarChar
+  ordine                Int
+  elementi              elementi[]
+  definizioni_livello_1 definizioni_livello_1   @relation(fields: [id_liv_1], references: [id_liv_1], onDelete: NoAction, map: "definizioni_livello_2_fkey")
+  definizioni_livello_3 definizioni_livello_3[]
+
+  @@schema("servizio")
+}
+
+model definizioni_livello_3 {
+  id_liv_3              String                  @id @db.VarChar
+  def_liv_3_sigla       String                  @db.VarChar
+  def_liv_3_nome        String                  @db.VarChar
+  id_liv_2              String                  @db.VarChar
+  ordine                Int
+  elementi              elementi[]
+  definizioni_livello_2 definizioni_livello_2   @relation(fields: [id_liv_2], references: [id_liv_2], onDelete: NoAction, map: "definizioni_livello_3_fkey")
+  definizioni_livello_4 definizioni_livello_4[]
+
+  @@schema("servizio")
+}
+
+model definizioni_livello_4 {
+  id_liv_4              String                @id @db.VarChar
+  def_liv_4_sigla       String                @db.VarChar
+  def_liv_4_nome        String                @db.VarChar
+  id_liv_3              String                @db.VarChar
+  ordine                Int
+  elementi              elementi[]
+  definizioni_livello_3 definizioni_livello_3 @relation(fields: [id_liv_3], references: [id_liv_3], onDelete: NoAction, map: "definizioni_livello_4_fkey")
+
+  @@schema("servizio")
+}
+
+model dettaglio {
+  id_dett        BigInt         @id @default(autoincrement())
+  rid_loc_pdiff  String         @db.VarChar
+  nome           String?        @db.VarChar
+  artista        String?        @db.VarChar
+  datazione      String?        @db.VarChar
+  dimensioni     String?        @db.VarChar
+  commenti       String?        @db.VarChar
+  data_ins       String         @db.VarChar
+  id_main10ance  String         @db.VarChar
+  immagine       String         @db.VarChar
+  dati_loc_pdiff dati_loc_pdiff @relation(fields: [rid_loc_pdiff], references: [sigla], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("servizio")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model frase_di_rischio {
+  id_fr_risc  BigInt              @id
+  cl_ogg_fr   servizio_cl_ogg_fr?
+  fr_risc     String?             @db.VarChar
+  controllo   String?             @db.VarChar
+  mn_reg      String?             @db.VarChar
+  mn_nec      String?             @db.VarChar
+  data_ins    String?             @db.VarChar
+  ambiti      String[]            @db.VarChar
+  entit_      String[]            @map("entità") @db.VarChar
+  aggregatori String[]            @db.VarChar
+  materiali   servizio_mat_ty[]
+  temi        String[]            @db.VarChar
+
+  @@schema("servizio")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model glossario {
+  id_gloss  String             @id @db.VarChar
+  definiz   String?            @db.VarChar
+  fenomeno  String?            @db.VarChar
+  causa_e   String?            @db.VarChar
+  versione  String?            @db.VarChar
+  gloss_ty  servizio_gloss_ty?
+  materiale servizio_mat_ty?
+
+  @@schema("servizio")
+}
+
+model lod {
+  entit__db_m10a String               @id(map: "LOD_pkey") @map("entità_db_m10a") @db.VarChar
+  nome_esteso    String?              @db.VarChar
+  LOD            Int?
+  geometria      String?              @db.VarChar
+  colonne_utili  String[]             @db.VarChar
+  BIM_GIS        String?              @map("BIM-GIS") @db.VarChar
+  cl_ogg_fr      servizio_cl_ogg_fr[]
+
+  @@schema("servizio")
+}
+
+model manufatto {
+  id_man         BigInt         @id @default(autoincrement())
+  rid_loc_pdiff  String         @db.VarChar
+  nome           String?        @db.VarChar
+  artista        String?        @db.VarChar
+  datazione      String?        @db.VarChar
+  dimensioni     String?        @db.VarChar
+  commenti       String?        @db.VarChar
+  data_ins       String         @db.VarChar
+  id_main10ance  String         @db.VarChar
+  immagine       String         @db.VarChar
+  dati_loc_pdiff dati_loc_pdiff @relation(fields: [rid_loc_pdiff], references: [sigla], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("servizio")
+}
+
+model ruoli {
+  ruolo             String   @id @db.VarChar
+  bim_vw_sets       String?  @db.VarChar
+  elementi_visibili String[] @db.VarChar
+  utenti            utenti[]
+
+  @@schema("servizio")
+}
+
+model segnalazione {
+  id_segnalazione            BigInt  @id @default(autoincrement())
+  meteo                      String? @db.VarChar
+  temperatura                String? @db.VarChar
+  condizioni_sett_precedente String? @db.VarChar
+  descrizione                String? @db.VarChar
+  intervento_urgenza         String? @db.VarChar
+  data_registrazione         String? @db.VarChar
+  autore_scheda              String? @db.VarChar
+  data_ultima_mod            String? @db.VarChar
+  autore_ultima_mod          String? @db.VarChar
+  id_main10ance              String  @db.VarChar
+
+  @@schema("servizio")
+}
+
+model utenti {
+  user   String  @id @db.VarChar
+  pw     String  @db.VarChar
+  ruolo  String? @db.VarChar
+  email  String  @db.VarChar
+  ambito String? @db.VarChar
+  ambiti ambiti? @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
+  ruoli  ruoli?  @relation(fields: [ruolo], references: [ruolo], onDelete: NoAction, onUpdate: NoAction, map: "ruolo_utenti_fkey")
+
+  @@schema("servizio")
+}
+
+enum ac_vei_zon {
+  vicolo
+  controviale
+  rampa_svincolo                  @map("rampa/svincolo")
+  tronco_ordinario                @map("tronco ordinario")
+  rotatoria
+  incrocio
+  piazza
+  area_a_traffico_non_strutturato @map("area a traffico non strutturato")
+  parcheggio
+  altro
+
+  @@schema("main10ance")
+}
+
+enum acc_pc_ty {
+  accesso_esterno_diretto   @map("accesso esterno diretto")
+  accesso_esterno_indiretto @map("accesso esterno indiretto")
+  passo_carrabile           @map("passo carrabile")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum aiuola_ty {
+  floreale
+  prato
+  con_siepe @map("con siepe")
+  miste
+  altro
+
+  @@schema("main10ance")
+}
+
+enum ar_vms_fon {
+  pavimentato
+  non_pavimentato @map("non pavimentato")
+
+  @@schema("main10ance")
+}
+
+enum ar_vms_ty {
+  carrareccia__carreggiabile__carrozzabile @map("carrareccia, carreggiabile, carrozzabile")
+  mulattiera
+  campestre
+  sentiero
+  tratturo
+  su_marciapiede                           @map("su marciapiede")
+  area_a_porticato                         @map("area a porticato")
+  galleria_pedonale                        @map("galleria pedonale")
+  percorsi_a_gradinate                     @map("percorsi a gradinate")
+  vialetto
+  vicolo
+  aree_solo_pedonali__sagrato__piazza_     @map("aree solo pedonali (sagrato, piazza)")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum ar_vrd_pa {
+  pubblico
+  privato
+  altro
+  non_conosciuto @map("non conosciuto")
+
+  @@schema("main10ance")
+}
+
+enum ar_vrd_ty {
+  giardino
+  verde_cimiteri        @map("verde cimiteri")
+  verde_scuole          @map("verde scuole")
+  verde_uffici_pubblici @map("verde uffici pubblici")
+  verde_parco_giochi    @map("verde parco giochi")
+  verde_attrezzato      @map("verde attrezzato")
+  verde_arredo_urbano   @map("verde arredo urbano")
+  verde_non_qualificato @map("verde non qualificato")
+  prato
+  siepe
+  altro
+
+  @@schema("main10ance")
+}
+
+enum att_prog_ty {
+  controllo
+  manutenzione_regolare      @map("manutenzione regolare")
+  manutenzione_correttiva    @map("manutenzione correttiva")
+  diagnosi
+  manutenzione_straordinaria @map("manutenzione straordinaria")
+  restauro
+
+  @@schema("main10ance")
+}
+
+enum bosco_essz {
+  abeti
+  aceri__tigli_e_frassini @map("aceri, tigli e frassini")
+  altre_conifere          @map("altre conifere")
+  altre_latifoglie        @map("altre latifoglie")
+  altre_querce            @map("altre querce")
+  altro
+  castagno
+  cerro
+  cipressi
+  essenze_conifere        @map("essenze conifere")
+  essenze_latifoglie      @map("essenze latifoglie")
+  eucalipti
+  faggio
+  larici
+  leccio_e_sughera        @map("leccio e sughera")
+  olmi
+  ontano
+  pini
+  pioppi
+  robinia
+  rovere
+  betulla
+  non_conosciuto          @map("non conosciuto")
+  salice
+
+  @@schema("main10ance")
+}
+
+enum bosco_gov {
+  fustaia
+  ceduo
+  misto
+  non_conosciuto @map("non conosciuto")
+
+  @@schema("main10ance")
+}
+
+enum bosco_lim {
+  limite_certo @map("limite certo")
+  incerto
+  fittizio
+
+  @@schema("main10ance")
+}
+
+enum bosco_ty {
+  boschi_a_prevalenza_di_conifere               @map("boschi a prevalenza di conifere")
+  boschi_a_prevalenza_di_latifoglie             @map("boschi a prevalenza di latifoglie")
+  boschi_a_prevalenza_di_latifoglie_sempreverdi @map("boschi a prevalenza di latifoglie sempreverdi")
+  boschi_a_prevalenza_di_latifoglie_spoglianti  @map("boschi a prevalenza di latifoglie spoglianti")
+  piantagioni
+  arbusteti_e_macchia                           @map("arbusteti e macchia")
+  macchia_mediterranea                          @map("macchia mediterranea")
+  mirteto
+  imboschimenti_e_rimboschimenti                @map("imboschimenti e rimboschimenti")
+  altro
+  non_conosciuto                                @map("non conosciuto")
+
+  @@schema("main10ance")
+}
+
+enum cda_ty {
+  torrente
+  rio
+  altro
+
+  @@schema("main10ance")
+}
+
+enum cl_agr_ty {
+  vigneti
+  frutteti
+  agrumeti
+  uliveti
+  prati__erbai_in_genere_e_le_marcite @map("prati, erbai in genere e le marcite")
+  risaie
+  seminativi
+  orti
+  vivai
+  altro
+
+  @@schema("main10ance")
+}
+
+enum main10ance_cl_ogg_fr {
+  terreno                                  @map("1.1 terreno")
+  vegetazione                              @map("1.2 vegetazione")
+  sentieri__pavimentazioni_esterne_e_scale @map("1.3 sentieri, pavimentazioni esterne e scale")
+  coperture                                @map("2.1 coperture")
+  murature                                 @map("2.2 murature")
+  serramenti                               @map("2.3 serramenti")
+  impianti                                 @map("2.4 impianti")
+  superfici_interne                        @map("3.1 superfici interne")
+  pavimentazioni                           @map("3.2 pavimentazioni")
+  statue                                   @map("3.3 statue")
+  quadri_e_arredi                          @map("3.4 quadri e arredi")
+  Infrastrutture_storiche                  @map("0.Infrastrutture storiche")
+
+  @@map("cl_ogg_fr")
+  @@schema("main10ance")
+}
+
+enum cl_racc {
+  cr_0___nessuna_misura                              @map("cr 0 - nessuna misura")
+  cr_1___modifica_attivit__ciclica                   @map("cr 1 - modifica attività ciclica")
+  cr_2___intervento_correttivo                       @map("cr 2 - intervento correttivo")
+  cr_3___intervento_rilevante_dipendente_da_progetto @map("cr 3 - intervento rilevante dipendente da progetto")
+
+  @@schema("main10ance")
+}
+
+enum cv_liv_dt {
+  restituzione_fotogrammetrica_diretta @map("restituzione fotogrammetrica diretta")
+  interpolazione_dal_tin               @map("interpolazione dal tin")
+  interpolazione_dal_dem               @map("interpolazione dal dem")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum cv_liv_ty {
+  direttrice
+  ordinaria__intermedia @map("ordinaria, intermedia")
+  ausiliaria
+
+  @@schema("main10ance")
+}
+
+enum dad_ty {
+  alterazione
+  danno
+  degrado
+
+  @@schema("main10ance")
+}
+
+enum edi_min_st {
+  in_costruzione @map("in costruzione")
+  diruto__rudere @map("diruto, rudere")
+  costruito
+  non_conosciuto @map("non conosciuto")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum edi_min_ty {
+  edificio_cimiteriale_di_servizio       @map("edificio cimiteriale di servizio")
+  garage__box_auto                       @map("garage, box auto")
+  non_conosciuto                         @map("non conosciuto")
+  tomba_cimiteriale                      @map("tomba cimiteriale")
+  baracca
+  chiosco
+  manufatto_di_insediamento_archeologico @map("manufatto di insediamento archeologico")
+  ingresso__portineria                   @map("ingresso, portineria")
+  attrezzature_turistiche                @map("attrezzature turistiche")
+  loggiato
+  altro
+
+  @@schema("main10ance")
+}
+
+enum edifc_mon {
+  artistica
+  storica
+  archeologica
+  altro
+
+  @@schema("main10ance")
+}
+
+enum edifc_stat {
+  in_costruzione @map("in costruzione")
+  diruto__rudere @map("diruto, rudere")
+  costruito
+  altro
+  non_conosciuto @map("non conosciuto")
+
+  @@schema("main10ance")
+}
+
+enum edifc_ty {
+  capannone
+  chiesa
+  edificio_rurale              @map("edificio rurale")
+  edificio_tipico              @map("edificio tipico")
+  generica
+  hangar
+  non_conosciuto               @map("non conosciuto")
+  villa
+  villetta_a_schiera           @map("villetta a schiera")
+  palazzo_a_torre__grattacielo @map("palazzo a torre, grattacielo")
+  battistero
+  campanile
+  castello
+  mulino
+  cattedrale
+  altro
+
+  @@schema("main10ance")
+}
+
+enum edifc_uso {
+  abitativa
+  aereo
+  agricolturale
+  altro
+  commerciale
+  industriale
+  istruzione
+  luogo_di_culto                  @map("luogo di culto")
+  municipio
+  non_conosciuto                  @map("non conosciuto")
+  residenziale
+  residenziale_e_commerciale      @map("residenziale e commerciale")
+  residenziale_e_produttivo       @map("residenziale e produttivo")
+  residenziale_e_ufficio_pubblico @map("residenziale e ufficio pubblico")
+  sanit_                          @map("sanità")
+  sede_di_attivit__culturali      @map("sede di attività culturali")
+  sede_di_attivit__sportive       @map("sede di attività sportive")
+  sede_di_forze_dell_ordine       @map("sede di forze dell'ordine")
+  sede_di_scuola                  @map("sede di scuola")
+  sede_di_vigili_del_fuoco        @map("sede di vigili del fuoco")
+  servizi_di_trasporto            @map("servizi di trasporto")
+  servizio_pubblico               @map("servizio pubblico")
+  stabilimento_industriale        @map("stabilimento industriale")
+  strutture_ricettive             @map("strutture ricettive")
+  amministrativo
+  militare
+  ricreativo
+
+  @@schema("main10ance")
+}
+
+enum ele_cp_ty {
+  falda
+  terrazzo
+  arrotondata
+  piatta
+  dentellata
+  semisferica__cupola                            @map("semisferica, cupola")
+  pensilina__tettoia                             @map("pensilina, tettoia")
+  copertura_trasparente_di_galleria_o_lucernario @map("copertura trasparente di galleria o lucernario")
+  muro__parapetto_di_coronamento                 @map("muro, parapetto di coronamento")
+  copertura_di_loggiato                          @map("copertura di loggiato")
+  pompeiana
+  altro
+
+  @@schema("main10ance")
+}
+
+enum est_sup {
+  puntuale
+  esteso
+  molto_esteso @map("molto esteso")
+
+  @@schema("main10ance")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum estensione {
+  non_rilevato @map("non rilevato")
+
+  // 0 @map("0")
+  // 5 @map("5")
+  // 10 @map("10")
+  // 15 @map("15")
+  // 20 @map("20")
+  // 25 @map("25")
+  // 30 @map("30")
+  // 35 @map("35")
+  // 40 @map("40")
+  // 45 @map("45")
+  // 50 @map("50")
+  // 55 @map("55")
+  // 60 @map("60")
+  // 65 @map("65")
+  // 70 @map("70")
+  // 75 @map("75")
+  // 80 @map("80")
+  // 85 @map("85")
+  // 90 @map("90")
+  // 95 @map("95")
+  // 100 @map("100")
+  @@schema("main10ance")
+}
+
+enum main10ance_gloss_ty {
+  alterazione
+  danno
+  degrado
+  nessuno
+  materiale_costitutivo @map("materiale costitutivo")
+  termini_generali      @map("termini generali")
+  intervento_precedente @map("intervento precedente")
+
+  @@map("gloss_ty")
+  @@schema("main10ance")
+}
+
+enum infr_rt_tr {
+  rete_di_distribuzione_del_gas        @map("rete di distribuzione del gas")
+  rete_di_teleriscaldamento            @map("rete di teleriscaldamento")
+  oleodotti
+  reti_di_telecomunicazioni_e_cablaggi @map("reti di telecomunicazioni e cablaggi")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum li_vi_ty {
+  assorbitori_di_energia                   @map("assorbitori di energia")
+  dispositivo_di_ancoraggio__classe_A1_    @map("dispositivo di ancoraggio (classe A1)")
+  dispositivo_di_ancoraggio__classe_A2_    @map("dispositivo di ancoraggio (classe A2)")
+  cordini
+  dispositivi_retrattili                   @map("dispositivi retrattili")
+  guide_o_linee_vita_flessibili__classe_C_ @map("guide o linee vita flessibili (classe C)")
+  guide_o_linee_vita_rigide__classe_D_     @map("guide o linee vita rigide (classe D)")
+  imbracature
+  altro
+  connettori
+
+  @@schema("main10ance")
+}
+
+enum liv_urg {
+  uc_0___a_lungo_termine     @map("uc 0 - a lungo termine")
+  uc_1___termine_intermedio  @map("uc 1 - termine intermedio")
+  uc_2___breve_termine       @map("uc 2 - breve termine")
+  uc_3___urgente_e_immediato @map("uc 3 - urgente e immediato")
+
+  @@schema("main10ance")
+}
+
+enum loc_sg_sgn {
+  comunale
+  provinciale
+  regionale
+  nazionale
+  internazionale
+  principale_o_di_primo_ordine   @map("principale o di primo ordine")
+  secondario_o_di_secondo_ordine @map("secondario o di secondo ordine")
+  di_terzo_ordine                @map("di terzo ordine")
+  di_quarto_ordine               @map("di quarto ordine")
+  di_quinto_ordine               @map("di quinto ordine")
+  di_ordine_superiore_al_quinto  @map("di ordine superiore al quinto")
+  non_conosciuto                 @map("non conosciuto")
+
+  @@schema("main10ance")
+}
+
+enum loc_sg_ty {
+  localit_                                       @map("località")
+  area_geografica                                @map("area geografica")
+  antichit_                                      @map("antichità")
+  case_sparse                                    @map("case sparse")
+  centro_abitato                                 @map("centro abitato")
+  passi__selle__valichi                          @map("passi, selle, valichi")
+  monti__massicci__murge_e_vulcani__contrafforti @map("monti, massicci, murge e vulcani, contrafforti")
+  nucleo_abitato                                 @map("nucleo abitato")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum main10ance_mat_ty {
+  ceramica
+  legno
+  materiale_lapideo @map("materiale lapideo")
+  metallo
+  tessuto
+  vetro
+
+  @@map("mat_ty")
+  @@schema("main10ance")
+}
+
+enum mn_arr_ty {
+  fontanella
+  monumento_colonna_indicatrice @map("monumento/colonna indicatrice")
+  lampione
+  panchina
+  rotatoria
+  manufatti_di_igiene_urbana    @map("manufatti di igiene urbana")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum modo_acq {
+  rilievo_tradizionale         @map("rilievo tradizionale")
+  rilievo_speditivo            @map("rilievo speditivo")
+  rilievo_topografico_classico @map("rilievo topografico classico")
+  rilievo_metrico_integrato    @map("rilievo metrico integrato")
+
+  @@schema("main10ance")
+}
+
+enum modo_prod {
+  da_curve_di_livello        @map("da curve di livello")
+  da_rilievo_fotogrammetrico @map("da rilievo fotogrammetrico")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum n_cappella {
+  adamo_ed_eva                        @map("1. adamo ed eva")
+  l_annunciazione                     @map("2. l'annunciazione")
+  la_visitazione                      @map("3. la visitazione")
+  primo_sogno_di_giuseppe             @map("4. primo sogno di giuseppe")
+  l_arrivo_dei_re_magi                @map("5. l'arrivo dei re magi")
+  la_nativit_                         @map("6. la natività")
+  l_adorazione_dei_pastori            @map("7. l'adorazione dei pastori")
+  la_circoncisione                    @map("8. la circoncisione")
+  il_secondo_sogno_di_giuseppe        @map("9. il secondo sogno di giuseppe")
+  la_fuga_in_egitto                   @map("10. la fuga in egitto")
+  la_strage_degli_innocenti           @map("11. la strage degli innocenti")
+  il_battesimo_di_ges_                @map("12. il battesimo di gesù")
+  le_tentazioni_nel_deserto           @map("13. le tentazioni nel deserto")
+  la_samaritana_al_pozzo              @map("14. la samaritana al pozzo")
+  il_paralitico_risanato              @map("15. il paralitico risanato")
+  il_miracolo_della_vedova_di_naim    @map("16. il miracolo della vedova di naim")
+  la_trasfigurazione                  @map("17. la trasfigurazione")
+  la_resurrezione_di_lazzaro          @map("18. la resurrezione di lazzaro")
+  l_entrata_in_gerusalemme            @map("19. l'entrata in gerusalemme")
+  l_ultima_cena                       @map("20. l'ultima cena")
+  l_orazione_nell_orto                @map("21. l'orazione nell'orto")
+  ges__sveglia_gli_apostoli           @map("22. gesù sveglia gli apostoli")
+  la_cattura                          @map("23. la cattura")
+  tribunale_di_anna                   @map("24. tribunale di anna")
+  tribunale_di_caifas                 @map("25. tribunale di caifas")
+  il_pentimento_di_pietro             @map("26. il pentimento di pietro")
+  ges__per_la_prima_volta_da_pilato   @map("27. gesù per la prima volta da pilato")
+  tribunale_di_erode                  @map("28. tribunale di erode")
+  ges__per_la_seconda_volta_da_pilato @map("29. gesù per la seconda volta da pilato")
+  la_flagellazione                    @map("30. la flagellazione")
+  incoronazione_di_spine              @map("31. incoronazione di spine")
+  salita_al_pretorio                  @map("32. salita al pretorio")
+  hecce_homo                          @map("33. hecce homo")
+  pilato_si_lava_le_mani              @map("34. pilato si lava le mani")
+  ges__condannato_a_morte             @map("35. gesù condannato a morte")
+  la_salita_al_calvario               @map("36. la salita al calvario")
+  l_inchiodazione                     @map("37. l'inchiodazione")
+  la_crocifissione                    @map("38. la crocifissione")
+  la_deposizione                      @map("39. la deposizione")
+  la_piet_                            @map("40. la pietà")
+  ges__nella_sindone                  @map("41. gesù nella sindone")
+  altare_di_s__francesco              @map("42. altare di s. francesco")
+  il_sepolcro                         @map("43. il sepolcro")
+  la_fontana_della_resurrezione       @map("44. la fontana della resurrezione")
+
+  @@schema("main10ance")
+}
+
+enum nd_aac_ty {
+  sorgente
+  pozzo
+  serbatoio
+  presa_superficiale              @map("presa superficiale")
+  stacco_per_allacciamento        @map("stacco per allacciamento")
+  impianto_di_trattamento         @map("impianto di trattamento")
+  impianto_di_pompaggio           @map("impianto di pompaggio")
+  riduttore_di_diametro           @map("riduttore di diametro")
+  giunto_dielettrico              @map("giunto dielettrico")
+  connessione
+  idrante
+  fontana
+  sfiato
+  saracinesca
+  valvola
+  contatore_utenza                @map("contatore utenza")
+  tappo
+  misuratore_di_pressione_portata @map("misuratore di pressione/portata")
+  scarico
+  altro
+
+  @@schema("main10ance")
+}
+
+enum nd_ele_ty {
+  quadro_elettrico                        @map("quadro elettrico")
+  punto_luce                              @map("punto luce")
+  interruttore_sezionatore                @map("interruttore/sezionatore")
+  altro
+  allacciamento_utenza                    @map("allacciamento utenza")
+  non_conosciuto                          @map("non conosciuto")
+  cabina_di_trasformazione_media_tensione @map("cabina di trasformazione media tensione")
+
+  @@schema("main10ance")
+}
+
+enum nd_sac_ty {
+  fossa_biologica                         @map("fossa biologica")
+  depuratore
+  griglia
+  pozzetto
+  impianto_di_trattamento                 @map("impianto di trattamento")
+  caditoia
+  valvola_di_non_ritorno                  @map("valvola di non ritorno")
+  connettore
+  contatto_con_reticolo_idrografico_suolo @map("contatto con reticolo idrografico/suolo")
+  impianto_stazione_di_sollevamento       @map("impianto/stazione di sollevamento")
+  sifone
+  sfioratore_scaricatore_di_piena         @map("sfioratore/scaricatore di piena")
+  misuratore_di_portata                   @map("misuratore di portata")
+  stacco_per_allacciamento                @map("stacco per allacciamento")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum sist_ac_po {
+  sotterranee
+  superficiali
+  altro
+
+  @@schema("main10ance")
+}
+
+enum sist_ac_sz {
+  circolare
+  quadrata
+  aperta
+  libera
+  altro
+
+  @@schema("main10ance")
+}
+
+enum sist_ac_ty {
+  canaline
+  gronde
+  pluviali
+  lattonerie
+  altro
+
+  @@schema("main10ance")
+}
+
+enum sist_s_ele {
+  estintore
+  idrante
+  sensore
+  videocamera
+  altro
+
+  @@schema("main10ance")
+}
+
+enum sist_s_ty {
+  antincendio
+  antifurto
+  altro
+
+  @@schema("main10ance")
+}
+
+enum sp_acq_ty {
+  lago
+  stagno
+  palude
+  laguna
+  valle
+  sacca
+  altro
+
+  @@schema("main10ance")
+}
+
+enum st_cons {
+  cc_0___nessun_sintomo              @map("cc 0 - nessun sintomo")
+  cc_1___sintomi_lievi               @map("cc 1 - sintomi lievi")
+  cc_2___sintomi_moderatamente_gravi @map("cc 2 - sintomi moderatamente gravi")
+  cc_3___sintomi_gravi               @map("cc 3 - sintomi gravi")
+
+  @@schema("main10ance")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum stat_component {
+  armatura__elemento_di_sostegno_giunzione_ @map("armatura (elemento di sostegno/giunzione)")
+  supporto__masselli_giunzioni_             @map("supporto (masselli/giunzioni)")
+  strato_di_preparazione                    @map("strato di preparazione")
+  pellicola_pittorica                       @map("pellicola pittorica")
+  lamine_metalliche                         @map("lamine metalliche")
+  elementi_accessori                        @map("elementi accessori")
+  monili
+
+  @@schema("main10ance")
+}
+
+enum tipi_questioni_aperte {
+  Degrado
+  Materiale
+  Vicenda_costruttiva @map("Vicenda costruttiva")
+  Altro
+
+  @@schema("main10ance")
+}
+
+enum tr_aac_ty {
+  tratta_di_adduzione_principale__o_regionale_   @map("tratta di adduzione principale (o regionale)")
+  tratta_collettrice__o_di_adduzione_secondaria_ @map("tratta collettrice (o di adduzione secondaria)")
+  tratta_di_allacciamento                        @map("tratta di allacciamento")
+  tratta_di_distribuzione                        @map("tratta di distribuzione")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum tr_aac_typ {
+  non_trattata @map("non trattata")
+  potabile
+  salata
+  trattata
+
+  @@schema("main10ance")
+}
+
+enum tr_ele_ty {
+  tratta_principale_alta_tensione  @map("tratta principale alta tensione")
+  tratta_principale_media_tensione @map("tratta principale media tensione")
+  tratta_principale_bassa_tensione @map("tratta principale bassa tensione")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum tr_sac_fog {
+  bianca
+  nera
+  mista
+  altro
+
+  @@schema("main10ance")
+}
+
+enum tr_sac_ty {
+  tratta_di_collettazione_primaria_o_collettore @map("tratta di collettazione primaria o collettore")
+  tratta_di_allacciamento                       @map("tratta di allacciamento")
+  tratta_di_rete_o_fogna                        @map("tratta di rete o fogna")
+  tratta_emissaria                              @map("tratta emissaria")
+  altro
+
+  @@schema("main10ance")
+}
+
+enum aggregatori {
+  prova
+
+  @@schema("servizio")
+}
+
+enum cl_ogg {
+  coperture
+  strutture
+  scale
+  aperture
+  partizioni
+  superfici
+  dip_murali
+  pavimentazioni
+  acque
+  app_scultorei
+  el_decorativi
+  statuaria
+  arredi_scenografie
+  el_arredo
+  iscrizioni_lapidi
+  impianti
+
+  @@schema("servizio")
+}
+
+enum cl_ogg_OLD {
+  Coperture
+  Sistemi_di_regimazione_delle_acque                         @map("Sistemi di regimazione delle acque")
+  Superfici_dell_architettura                                @map("Superfici dell'architettura")
+  Dipinti_murali                                             @map("Dipinti murali")
+  Statuaria
+  Arredi_e_scenografie                                       @map("Arredi e scenografie")
+  Aperture_degli_edifici                                     @map("Aperture degli edifici")
+  Pavimentazioni
+  Scale
+  Partizioni___Elementi_di_arredo___decorativi___strutturali @map("Partizioni / Elementi di arredo / decorativi / strutturali")
+  Sistemi_Murari                                             @map("Sistemi Murari")
+  Iscrizioni_Lapidi_Stemmi                                   @map("Iscrizioni/Lapidi/Stemmi")
+  Apparati_scultorei                                         @map("Apparati scultorei")
+  impianto_strutturale                                       @map("impianto strutturale")
+
+  @@schema("servizio")
+}
+
+enum servizio_cl_ogg_fr {
+  terreno                                  @map("1.1 terreno")
+  vegetazione                              @map("1.2 vegetazione")
+  sentieri__pavimentazioni_esterne_e_scale @map("1.3 sentieri, pavimentazioni esterne e scale")
+  coperture                                @map("2.1 coperture")
+  murature                                 @map("2.2 murature")
+  serramenti                               @map("2.3 serramenti")
+  impianti                                 @map("2.4 impianti")
+  superfici_interne                        @map("3.1 superfici interne")
+  pavimentazioni                           @map("3.2 pavimentazioni")
+  statue                                   @map("3.3 statue")
+  quadri_e_arredi                          @map("3.4 quadri e arredi")
+  Infrastrutture_storiche                  @map("0.Infrastrutture storiche")
+  statuaria
+
+  @@map("cl_ogg_fr")
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_estens_comment {
+  Desunta_dalla_proiezione_in_pianta             @map("Desunta dalla proiezione in pianta")
+  Calcolata_sullo_sviluppo_effettivo_della_falda @map("Calcolata sullo sviluppo effettivo della falda")
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_manto_later_el {
+  Coppi
+  Tegole_marsigliesi @map("Tegole marsigliesi")
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_manto_later_tecnica {
+  Tradizionale
+  Con_dispositivi_di_fissaggio @map("Con dispositivi di fissaggio")
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_manto_mat_later {
+  Cotto
+  Laterizio
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_manto_mat_pietra {
+  Gneiss
+  Ardesia
+  Calcescisti
+  Micascisti
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_manto_pietra_el {
+  Forte_spessore__oltre_6_cm_    @map("Forte spessore -oltre 6 cm-")
+  Medio_spessore__tra_4_e_6_cm_  @map("Medio spessore -tra 4 e 6 cm-")
+  Piccolo_spessore__fino_a_4_cm_ @map("Piccolo spessore -fino a 4 cm-")
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_manto_pietra_tecnica {
+  A_corsi_diagonali   @map("A corsi diagonali")
+  A_corsi_orizzontali @map("A corsi orizzontali")
+  Mista
+  Irregolare
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_manto_tipo {
+  Lastre_di_pietra            @map("Lastre di pietra")
+  Elementi_di_cotto_laterizio @map("Elementi di cotto/laterizio")
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_rapporti {
+  Copertura_di_un_edificio_isolato         @map("Copertura di un edificio isolato")
+  Copertura_di_parte_di_organismo_edilizio @map("Copertura di parte di organismo edilizio")
+  Parte_di_copertura_di_un_complesso       @map("Parte di copertura di un complesso")
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_str_legno_mat {
+  Abete
+  Castagno
+  Larice
+  Maggiociondolo
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum cop_strati_funz_acc {
+  Strato_di_tenuta_all_acqua                                 @map("Strato di tenuta all’acqua")
+  Dispositivi_per_il_vincolo_del_manto_alla_piccola_orditura @map("Dispositivi per il vincolo del manto alla piccola orditura")
+  Elementi_fermacoppo                                        @map("Elementi fermacoppo")
+  Elementi_parapasseri                                       @map("Elementi parapasseri")
+  Altro__specificare_                                        @map("Altro (specificare)")
+
+  @@schema("servizio")
+}
+
+enum docs_ty {
+  Indagini_diagnostiche           @map("Indagini diagnostiche")
+  Fonti_storiche                  @map("Fonti storiche")
+  Immagini___fotografie_storiche  @map("Immagini / fotografie storiche")
+  Archivio
+  Documentazione_fotografica      @map("Documentazione fotografica")
+  Studi_e_indagini                @map("Studi e indagini")
+  FONTI_ARCHIVISTICHE_STORICHE    @map("FONTI ARCHIVISTICHE/STORICHE")
+  FONTI_BIBLIOGRAFICHE            @map("FONTI BIBLIOGRAFICHE")
+  DOCUMENTAZIONE_ICONOGRAFICA     @map("DOCUMENTAZIONE ICONOGRAFICA")
+  STUDI_E_INDAGINI                @map("STUDI E INDAGINI")
+  INDAGINI_DIAGNOSTICHE           @map("INDAGINI DIAGNOSTICHE")
+  DOCUMENTAZIONE_FOTOGRAFICA_____ @map("DOCUMENTAZIONE FOTOGRAFICA (..)")
+
+  @@schema("servizio")
+}
+
+enum servizio_gloss_ty {
+  alterazione
+  danno
+  degrado
+  nessuno
+  materiale_costitutivo @map("materiale costitutivo")
+  termini_generali      @map("termini generali")
+  intervento_precedente @map("intervento precedente")
+
+  @@map("gloss_ty")
+  @@schema("servizio")
+}
+
+enum servizio_mat_ty {
+  ceramica
+  legno
+  materiale_lapideo  @map("materiale lapideo")
+  metallo
+  tessuto
+  vetro
+  materiale_di_prova @map("materiale di prova")
+
+  @@map("mat_ty")
+  @@schema("servizio")
+}
+
+enum materiali {
+  prova
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum pell_pitt_mat_dip_mur {
+  a_fresco__pigmenti_legati_con_acqua_e_stesi_su_intonaco_fresco_ @map("a fresco (pigmenti legati con acqua e stesi su intonaco fresco)")
+  a_secco__pigmenti_legati_con_latte_di_calce__tempera__olio_____ @map("a secco (pigmenti legati con latte di calce, tempera, olio,...)")
+  altro
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum pell_pitt_mat_su_gesso {
+  gesso_colorato_in_pasta                                         @map("gesso colorato in pasta")
+  pellicola_pittorica_stesa_a_secco__p__legati_con_tempera__olio_ @map("pellicola pittorica stesa a secco (p. legati con tempera, olio)")
+  altro
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum pell_pitt_mat_su_legno {
+  tempera
+  tempera_magra__leg__uovo__latte_fico__colla_o_gomma_ @map("tempera magra (leg. uovo, latte fico, colla o gomma)")
+  tempera_grassa__con_aggiunta_legante_olio_o_vernice_ @map("tempera grassa (con aggiunta legante olio o vernice)")
+  altro
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum pell_pitt_mat_su_terracotta {
+  a_freddo__pigmenti_legati_con_tempera__olio______              @map("a freddo (pigmenti legati con tempera, olio, ...)")
+  applicata_prima_di_cottura__ingobbio__smalto__vetrina__lustro_ @map("applicata prima di cottura (ingobbio, smalto, vetrina, lustro)")
+  altro
+
+  @@schema("servizio")
+}
+
+enum sistemi_composti {
+  Pronao
+  Nartece
+  Portico
+  Monofora
+  Bifora
+  Trifora
+  Lanternino
+  Cuspide
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum stat_anc_par_mat {
+  legno
+  metallo
+  altro
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum stat_anc_pav_mat {
+  legno
+  metallo
+  altro
+
+  @@schema("servizio")
+}
+
+enum stat_anc_sof_mat {
+  legno
+  metallo
+  altro
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum stat_arm_mat {
+  legno
+  metallo
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum stat_el_acc_mat {
+  adesivo
+  capigliature_barbe__UMANE     @map("capigliature/barbe  UMANE")
+  capigliature_barbe_VEGETALI   @map("capigliature/barbe VEGETALI")
+  code_crini_ANIMALI            @map("code/crini ANIMALI")
+  capigliature_barbe_SINTETICHE @map("capigliature/barbe SINTETICHE")
+  capigliature_barbe            @map("capigliature/barbe")
+  code_crini                    @map("code/crini")
+  strumenti_musicali            @map("strumenti musicali")
+  armi
+  croce
+  stoviglie
+  attrezzi
+  corde
+  altro
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum stat_el_acc_monil {
+  capigliature_barbe @map("capigliature/barbe")
+  code_crini         @map("code/crini")
+  strumenti_musicali @map("strumenti musicali")
+  armi
+  croce
+  stoviglie
+  attrezzi
+  corde
+  altro
+  attributi
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum stat_el_acc_monil_mat {
+  adesivo
+  carta
+  cartapesta
+  ceramica
+  cuoio
+  fibra_artificiale  @map("fibra artificiale")
+  fibra_naturale     @map("fibra naturale")
+  legno
+  metallo
+  pergamena
+  pietra
+  piume
+  terracotta
+  tessuto
+  tessuto_irrigidito @map("tessuto irrigidito")
+  tessuto_sintetico  @map("tessuto sintetico")
+  vetro
+  altro
+
+  @@schema("servizio")
+}
+
+enum stat_mat {
+  legno
+  marmo
+  gesso
+  pietra
+  stucco_malta @map("stucco/malta")
+  cemento
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum stat_monil_mat {
+  legno
+  metallo
+  tessuto
+  tessuto_sintetico  @map("tessuto sintetico")
+  tessuto_irrigidito @map("tessuto irrigidito")
+  carta
+  cartapesta
+  cuoio
+  pietra
+  terracotta
+  ceramica
+  vetro
+  cera
+  piume
+  pergamena
+  fibra_naturale     @map("fibra naturale")
+  fibra_artificiale  @map("fibra artificiale")
+  altro_materiale    @map("altro materiale")
+  adesivo
+  altro
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum stat_supp_mat {
+  tessuto
+  terracotta
+  stucco_malta @map("stucco/malta")
+  gesso
+  legno
+  cemento
+
+  @@schema("servizio")
+}
+
+enum temi {
+  Umidit_ @map("Umidità")
+  Statica
+  Interni
+  Esterni
+
+  @@schema("servizio")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum tipo_scheda_controllo {
+  scheda_controllo_tipo_1 @map("scheda controllo tipo 1")
+  Scheda_controllo_Tipo_2 @map("Scheda controllo Tipo 2")
+  Scheda_controllo_Tipo_3 @map("Scheda controllo Tipo 3")
+  Scheda_controllo_Tipo_4 @map("Scheda controllo Tipo 4")
+  Scheda_controllo_tipo_5 @map("Scheda controllo tipo 5")
+
+  @@schema("servizio")
+}
