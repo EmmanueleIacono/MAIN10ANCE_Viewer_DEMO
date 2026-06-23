@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import {inject, onActivated, reactive, ref, watch} from 'vue';
+import {inject, nextTick, onActivated, reactive, ref, watch} from 'vue';
 import {leggiAttivitàProg, leggiPianificazioniControlliManutenzioni} from '../js/richieste';
 import FullCalendar from '@fullcalendar/vue3';
 import DayGridPlugin from '@fullcalendar/daygrid';
@@ -100,9 +100,7 @@ watch(() => store.statePlanner.refreshPlanner, () => {
 watch(() => store.state.tabAttivo, tab => {
   if (tab === 'Tab3') {
     popolaCalendario();
-    setTimeout(() => {
-      resizeCal();
-    }, 100);
+    programmaResizeCal();
   }
 }, {immediate: true});
 
@@ -183,8 +181,19 @@ async function aggiungiEventiPianificazioniControlliManutenzioni() {
 }
 
 function resizeCal() {
+  if (!fullCalendarPlanner.value) return false;
   const calAPI = fullCalendarPlanner.value.getApi();
   calAPI.updateSize();
+  return true;
+}
+
+async function programmaResizeCal(tentativi = 5) {
+  await nextTick();
+  if (resizeCal()) return;
+  if (tentativi <= 0) return;
+  setTimeout(() => {
+    programmaResizeCal(tentativi - 1);
+  }, 100);
 }
 
 function apriEventoPianificazione(evento) {
