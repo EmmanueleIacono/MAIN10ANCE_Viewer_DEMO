@@ -128,7 +128,7 @@ async function aggiungiEventiProg() {
   const eventi = await leggiAttivitàProg();
   const nuoviEventiProg = eventi.map(evento => ({
     id: `PROG-${evento.id_att_prog}`,
-    title: `${evento.id_main10ance[0]?.split('|')[0]} - ${evento.tipo_attivita[0][0].toUpperCase()}${evento.tipo_attivita[0].slice(1)}`,
+    title: `${evento.localita_calendario || evento.id_main10ance[0]?.split('|')[0]} - ${evento.tipo_attivita[0][0].toUpperCase()}${evento.tipo_attivita[0].slice(1)}`,
     start: evento.data_prog,
     extendedProps: {
       classe: evento.cl_ogg_fr,
@@ -155,7 +155,7 @@ async function aggiungiEventiPianificazioniControlliManutenzioni() {
     const start = dataISO(pianificazione.data_inizio);
     return {
       id: `PIAN-CM-${pianificazione.id_pianificazione}`,
-      title: `${pianificazione.localita} - ${pianificazione.tipi_attivita.map(tipo => tipo.toUpperCase()).join(' ')}`,
+      title: `${pianificazione.localita_calendario || pianificazione.localita} - ${pianificazione.tipi_attivita.map(tipo => tipo.toUpperCase()).join(' ')}`,
       start,
       end: calcolaFinePianificazione(pianificazione.attivita),
       allDay: true,
@@ -164,6 +164,7 @@ async function aggiungiEventiPianificazioniControlliManutenzioni() {
         id_pianificazione: pianificazione.id_pianificazione,
         localita: pianificazione.localita,
         localita_estesa: pianificazione.localita_estesa,
+        localita_calendario: pianificazione.localita_calendario,
         edifici: pianificazione.edifici,
         ambito_operativo: pianificazione.ambito_operativo,
         ambito_operativo_esteso: nomeAmbitoOperativo(pianificazione.ambito_operativo),

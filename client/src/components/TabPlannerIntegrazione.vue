@@ -58,7 +58,7 @@
           <div class="scheda-header">
             <span class="badge-attivita">{{attivita.tipo_attivita.toUpperCase()}}</span>
             <div>
-              <h4>{{attivita.localita}} - {{attivita.descrizione_attivita}}</h4>
+              <h4>{{localitaCalendario(attivita)}} - {{attivita.descrizione_attivita}}</h4>
               <p>{{ambitoEsteso(attivita.ambito_operativo)}}</p>
             </div>
           </div>
@@ -282,6 +282,10 @@ function ordinaAttivita(a, b) {
 
 function ambitoEsteso(idAmbito) {
   return ambitiOperativi.find(ambito => ambito.id === idAmbito)?.nome || idAmbito;
+}
+
+function localitaCalendario(attivita) {
+  return attivita.localita_calendario || attivita.localita;
 }
 
 function coloreConAlpha(hex, alpha) {

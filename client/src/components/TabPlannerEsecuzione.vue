@@ -56,7 +56,7 @@
                 <span class="badge-attivita">{{attivita.tipo_attivita.toUpperCase()}}</span>
                 <span>{{ambitoEsteso(attivita.ambito_operativo)}}</span>
               </div>
-              <h4>{{attivita.localita}} - {{attivita.edificio}}</h4>
+              <h4>{{localitaCalendario(attivita)}} - {{attivita.edificio}}</h4>
             </div>
             <button type="button" class="btn-apri" @click="toggleScheda(attivita)">
               {{attivita.aperta ? 'Chiudi scheda' : 'Compila scheda'}}
@@ -295,6 +295,10 @@ function listaEdifici(attivita) {
 
 function ambitoEsteso(idAmbito) {
   return ambitiOperativi.find(ambito => ambito.id === idAmbito)?.nome || idAmbito;
+}
+
+function localitaCalendario(attivita) {
+  return attivita.localita_calendario || attivita.localita;
 }
 
 function dataISO(data) {

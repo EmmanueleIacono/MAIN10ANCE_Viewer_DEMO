@@ -479,7 +479,32 @@ async function leggiAttivitaProg() {
             UNION ALL (SELECT rid_att_prog FROM ${data_schema}."danno_alterazione_degrado" WHERE eseguito = FALSE)
             )`;
         const subQueryString = `SELECT (rid_att_prog) AS lista_id FROM totale`;
-        const results = await poolM10a.query(`${withString} SELECT id_att_prog, rid_fr_risc, data_prog, costo, ore, esecutori, strumentaz, commenti, to_json(id_main10ance) AS id_main10ance, id_group, cl_ogg_fr, to_json(tipo_attivita) AS tipo_attivita, data_ins, frequenza, da_integrare FROM ${data_schema}.attivita_prog WHERE id_att_prog = ANY(${subQueryString}) OR da_integrare = TRUE ORDER BY id_att_prog;`);
+        const results = await poolM10a.query(`${withString}
+            SELECT
+                a.id_att_prog,
+                a.rid_fr_risc,
+                a.data_prog,
+                a.costo,
+                a.ore,
+                a.esecutori,
+                a.strumentaz,
+                a.commenti,
+                to_json(a.id_main10ance) AS id_main10ance,
+                a.id_group,
+                a.cl_ogg_fr,
+                to_json(a.tipo_attivita) AS tipo_attivita,
+                a.data_ins,
+                a.frequenza,
+                a.da_integrare,
+                COALESCE(loc.nome_calendario, loc.nome, split_part(a.id_main10ance[1], '|', 1)) AS localita_calendario
+            FROM ${data_schema}.attivita_prog AS a
+            LEFT JOIN ${data_schema}.dati_localita AS loc
+                ON loc.sigla = split_part(a.id_main10ance[1], '|', 1)
+                AND loc.ambito LIKE a.ambito
+            WHERE a.id_att_prog = ANY(${subQueryString})
+                OR a.da_integrare = TRUE
+            ORDER BY a.id_att_prog;
+        `);
         return results.rows;
     }
     catch(e) {
@@ -498,7 +523,32 @@ async function leggiAttivitaProgOperatore() {
             UNION ALL (SELECT rid_att_prog FROM ${data_schema}."danno_alterazione_degrado" WHERE eseguito = FALSE)
             )`;
         const subQueryString = `SELECT ("rid_att_prog") AS "lista_id" FROM totale`;
-        const results = await poolM10a.query(`${withString} SELECT id_att_prog, rid_fr_risc, data_prog, costo, ore, esecutori, strumentaz, commenti, to_json(id_main10ance) AS id_main10ance, id_group, cl_ogg_fr, to_json(tipo_attivita) AS tipo_attivita, data_ins, frequenza, da_integrare FROM ${data_schema}.attivita_prog WHERE id_att_prog = ANY(${subQueryString}) AND da_integrare = FALSE ORDER BY id_att_prog;`);
+        const results = await poolM10a.query(`${withString}
+            SELECT
+                a.id_att_prog,
+                a.rid_fr_risc,
+                a.data_prog,
+                a.costo,
+                a.ore,
+                a.esecutori,
+                a.strumentaz,
+                a.commenti,
+                to_json(a.id_main10ance) AS id_main10ance,
+                a.id_group,
+                a.cl_ogg_fr,
+                to_json(a.tipo_attivita) AS tipo_attivita,
+                a.data_ins,
+                a.frequenza,
+                a.da_integrare,
+                COALESCE(loc.nome_calendario, loc.nome, split_part(a.id_main10ance[1], '|', 1)) AS localita_calendario
+            FROM ${data_schema}.attivita_prog AS a
+            LEFT JOIN ${data_schema}.dati_localita AS loc
+                ON loc.sigla = split_part(a.id_main10ance[1], '|', 1)
+                AND loc.ambito LIKE a.ambito
+            WHERE a.id_att_prog = ANY(${subQueryString})
+                AND a.da_integrare = FALSE
+            ORDER BY a.id_att_prog;
+        `);
         return results.rows;
     }
     catch(e) {
@@ -515,6 +565,7 @@ async function leggiPianificazioniControlliManutenzioni(ambito) {
                 MIN(COALESCE(pcm.data_inizio_programmata, pcm.data_inizio)) AS data_inizio,
                 pcm.localita,
                 COALESCE(MAX(loc.nome), pcm.localita) AS localita_estesa,
+                COALESCE(MAX(loc.nome_calendario), MAX(loc.nome), pcm.localita) AS localita_calendario,
                 pcm.ambito_operativo,
                 pcm.necessita_supporto,
                 pcm.stato,
@@ -573,6 +624,7 @@ async function leggiAttivitaProgrammatePerEsecuzione(ambito) {
                 pcm.id_pianificazione,
                 pcm.localita,
                 COALESCE(loc.nome, pcm.localita) AS localita_estesa,
+                COALESCE(loc.nome_calendario, loc.nome, pcm.localita) AS localita_calendario,
                 pcm.edificio,
                 pcm.ambito_operativo,
                 pcm.necessita_supporto,

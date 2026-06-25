@@ -349,6 +349,7 @@ async function leggiPianificazioniDaProgrammare(ambito) {
                 MIN(pcm.frequenza_mesi) AS frequenza_mesi,
                 pcm.localita,
                 COALESCE(MAX(loc.nome), pcm.localita) AS localita_estesa,
+                COALESCE(MAX(loc.nome_calendario), MAX(loc.nome), pcm.localita) AS localita_calendario,
                 pcm.ambito_operativo,
                 pcm.necessita_supporto,
                 pcm.stato,
