@@ -112,6 +112,17 @@ app.get('/pianificazione/controlli-manutenzioni', jsonRoute(async (req) => {
     return leggiPianificazioniControlliManutenzioni(ambito);
 }));
 
+app.get('/esecuzione/pianificazioni-controlli-manutenzioni', jsonRoute(async (req) => {
+    const ambito = req.signedCookies.ambito;
+    return leggiAttivitaProgrammatePerEsecuzione(ambito);
+}));
+
+app.post('/esecuzione/scheda-controllo-tipo-1', jsonRoute(async (req) => {
+    const ambito = req.signedCookies.ambito;
+    const autore = req.signedCookies.user_id;
+    return registraSchedaControlloTipo1(req.body, ambito, autore);
+}));
+
 app.patch('/esecuzione/nuova-attivita', async (req, res) => {
     const ambito = req.signedCookies.ambito;
     const result = {};
@@ -542,6 +553,240 @@ async function leggiPianificazioniControlliManutenzioni(ambito) {
         console.log(e);
         return [];
     }
+}
+
+async function leggiAttivitaProgrammatePerEsecuzione(ambito) {
+    try {
+        const results = await poolM10a.query(`
+            WITH gruppi AS (
+                SELECT
+                    id_pianificazione,
+                    tipo_attivita,
+                    ARRAY_AGG(DISTINCT edificio ORDER BY edificio) AS edifici_pianificazione
+                FROM ${data_schema}."pianificazione_controlli_manutenzioni"
+                WHERE ambito LIKE $1
+                    AND stato = 'programmata'
+                GROUP BY id_pianificazione, tipo_attivita
+            )
+            SELECT
+                pcm.uuid,
+                pcm.id_pianificazione,
+                pcm.localita,
+                COALESCE(loc.nome, pcm.localita) AS localita_estesa,
+                pcm.edificio,
+                pcm.ambito_operativo,
+                pcm.necessita_supporto,
+                pcm.tipo_attivita,
+                pcm.descrizione_attivita,
+                pcm.frequenza_mesi,
+                COALESCE(pcm.data_inizio_programmata, pcm.data_inizio) AS data_programmata,
+                COALESCE(pcm.durata_programmata_gg, pcm.durata_prevista_gg) AS durata_programmata_gg,
+                pcm.operatore_programmazione,
+                pcm.strumentazione_programmazione,
+                pcm.costo_previsto,
+                pcm.note_programmazione,
+                pcm.stato,
+                g.edifici_pianificazione
+            FROM ${data_schema}."pianificazione_controlli_manutenzioni" AS pcm
+            LEFT JOIN ${data_schema}."dati_localita" AS loc
+                ON loc.sigla = pcm.localita
+                AND loc.ambito LIKE pcm.ambito
+            JOIN gruppi AS g
+                ON g.id_pianificazione = pcm.id_pianificazione
+                AND g.tipo_attivita = pcm.tipo_attivita
+            WHERE pcm.ambito LIKE $1
+                AND pcm.stato = 'programmata'
+            ORDER BY
+                COALESCE(pcm.data_inizio_programmata, pcm.data_inizio),
+                pcm.localita,
+                pcm.id_pianificazione,
+                pcm.edificio,
+                pcm.tipo_attivita;
+        `, [ambito]);
+        return results.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function registraSchedaControlloTipo1(dati, ambito, autore) {
+    if (!dati?.rid_pianificazione_uuid || dati.tipo_attivita !== 'co') {
+        return {success: false, error: 'Scheda controllo non valida'};
+    }
+
+    try {
+        return await withTransaction(async (tx) => {
+            const pianificazione = await tx.query(`
+                SELECT
+                    uuid,
+                    id_pianificazione,
+                    edificio,
+                    tipo_attivita,
+                    ambito_operativo,
+                    frequenza_mesi,
+                    COALESCE(data_inizio_programmata, data_inizio) AS data_programmata,
+                    COALESCE(durata_programmata_gg, durata_prevista_gg) AS durata_programmata_gg
+                FROM ${data_schema}."pianificazione_controlli_manutenzioni"
+                WHERE uuid = $1
+                    AND ambito LIKE $2
+                    AND tipo_attivita = 'co'
+                    AND stato = 'programmata'
+                LIMIT 1;
+            `, [dati.rid_pianificazione_uuid, ambito]);
+
+            if (!pianificazione.rowCount) {
+                return {success: false, error: 'Pianificazione non trovata o non programmata'};
+            }
+
+            const attivita = pianificazione.rows[0];
+            const oggi = new Date().toISOString().slice(0, 10);
+            const dataEsecuzione = dati.data_con || dati.data_inizio || dataISOBackend(attivita.data_programmata) || oggi;
+            const durata = dati.durata ? String(dati.durata) : String(attivita.durata_programmata_gg || '');
+            const costo = dati.costo ? String(dati.costo) : null;
+            const docs = Array.isArray(dati.docs) ? dati.docs : [];
+            const annotazioni = dati.sc_1_annotazioni || null;
+            const idMain10ance = Array.isArray(dati.id_main10ance) && dati.id_main10ance.length
+                ? dati.id_main10ance
+                : [attivita.edificio];
+
+            const schedaEsistente = await tx.query(`
+                SELECT id_contr
+                FROM ${data_schema}."scheda_controllo_tipo_1"
+                WHERE rid_pianificazione_uuid = $1
+                LIMIT 1;
+            `, [dati.rid_pianificazione_uuid]);
+
+            if (schedaEsistente.rowCount) {
+                const idContr = schedaEsistente.rows[0].id_contr;
+                await tx.query(`
+                    UPDATE ${data_schema}."scheda_controllo_tipo_1"
+                    SET
+                        data_con = $2,
+                        operatore = $3,
+                        doc = $4,
+                        strumentaz = $5,
+                        id_main10ance = $6,
+                        costo = $7,
+                        freq = $8,
+                        durata = $9,
+                        eseguito = TRUE,
+                        data_ultima_mod = $10,
+                        autore_ultima_mod = $11,
+                        data_inizio = $12,
+                        data_fine = $13,
+                        ambito_azione = $14,
+                        sc_1_descrizione = $15,
+                        sc_1_fotografia = $16,
+                        sc_1_materiali = $17,
+                        sc_1_annotazioni = $18,
+                        docs = $19
+                    WHERE id_contr = $1;
+                `, [
+                    idContr,
+                    dataEsecuzione,
+                    dati.operatore || null,
+                    dati.doc || null,
+                    dati.strumentaz || null,
+                    idMain10ance,
+                    costo,
+                    String(attivita.frequenza_mesi || ''),
+                    durata,
+                    oggi,
+                    autore || null,
+                    dati.data_inizio || dataEsecuzione,
+                    dati.data_fine || null,
+                    attivita.ambito_operativo,
+                    dati.sc_1_descrizione || null,
+                    dati.sc_1_fotografia || null,
+                    dati.sc_1_materiali || null,
+                    annotazioni,
+                    docs,
+                ]);
+
+                await marcaPianificazioneEseguita(tx, dati.rid_pianificazione_uuid, ambito);
+                return {success: true, id_contr: idContr, updated: true};
+            }
+
+            await tx.query(`LOCK TABLE ${data_schema}."scheda_controllo_tipo_1" IN EXCLUSIVE MODE;`);
+            const nuovoId = await tx.query(`SELECT COALESCE(MAX(id_contr), 0) + 1 AS id_contr FROM ${data_schema}."scheda_controllo_tipo_1";`);
+            const idContr = nuovoId.rows[0].id_contr;
+
+            await tx.query(`
+                INSERT INTO ${data_schema}."scheda_controllo_tipo_1" (
+                    id_contr,
+                    data_con,
+                    operatore,
+                    doc,
+                    strumentaz,
+                    data_ins,
+                    id_main10ance,
+                    costo,
+                    freq,
+                    durata,
+                    eseguito,
+                    data_ultima_mod,
+                    autore_ultima_mod,
+                    data_inizio,
+                    data_fine,
+                    ambito_azione,
+                    sc_1_descrizione,
+                    sc_1_fotografia,
+                    sc_1_materiali,
+                    sc_1_annotazioni,
+                    docs,
+                    rid_pianificazione_uuid
+                )
+                VALUES (
+                    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TRUE, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
+                );
+            `, [
+                idContr,
+                dataEsecuzione,
+                dati.operatore || null,
+                dati.doc || null,
+                dati.strumentaz || null,
+                oggi,
+                idMain10ance,
+                costo,
+                String(attivita.frequenza_mesi || ''),
+                durata,
+                oggi,
+                autore || null,
+                dati.data_inizio || dataEsecuzione,
+                dati.data_fine || null,
+                attivita.ambito_operativo,
+                dati.sc_1_descrizione || null,
+                dati.sc_1_fotografia || null,
+                dati.sc_1_materiali || null,
+                annotazioni,
+                docs,
+                dati.rid_pianificazione_uuid,
+            ]);
+
+            await marcaPianificazioneEseguita(tx, dati.rid_pianificazione_uuid, ambito);
+            return {success: true, id_contr: idContr, created: true};
+        });
+    }
+    catch(e) {
+        console.log(e);
+        return {success: false, error: 'Errore durante il salvataggio della scheda controllo'};
+    }
+}
+
+async function marcaPianificazioneEseguita(tx, uuidPianificazione, ambito) {
+    await tx.query(`
+        UPDATE ${data_schema}."pianificazione_controlli_manutenzioni"
+        SET stato = 'eseguita'
+        WHERE uuid = $1
+            AND ambito LIKE $2;
+    `, [uuidPianificazione, ambito]);
+}
+
+function dataISOBackend(data) {
+    if (!data) return '';
+    return String(data).slice(0, 10);
 }
 
 async function registraAttivitàEsecuzione(dati, all_files, ambito) {

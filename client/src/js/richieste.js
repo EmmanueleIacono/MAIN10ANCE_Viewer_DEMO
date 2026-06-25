@@ -210,6 +210,18 @@ export async function programmaPianificazioneControlliManutenzioni(datiProgramma
     return resJson;
 }
 
+export async function leggiAttivitaProgrammatePerEsecuzione() {
+    const res = await fetch('/o/esecuzione/pianificazioni-controlli-manutenzioni');
+    const resJson = await res.json();
+    return resJson;
+}
+
+export async function registraSchedaControlloTipo1(datiScheda) {
+    const res = await fetch('/o/esecuzione/scheda-controllo-tipo-1', {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(datiScheda)});
+    const resJson = await res.json();
+    return resJson;
+}
+
 export async function integraAttività(jsonAtt) {
     const res = await fetch('/g/integrazione/integrazione-attivita', {method: "PATCH", headers: {"content-type": "application/json"}, body: JSON.stringify(jsonAtt)});
     const resJson = await res.json();

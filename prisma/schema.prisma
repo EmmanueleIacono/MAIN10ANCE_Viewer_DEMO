@@ -204,7 +204,6 @@ model attivita_prog {
   danno_alterazione_degrado_attivita_prog_rid_dadTodanno_alterazione_degrado      danno_alterazione_degrado?          @relation("attivita_prog_rid_dadTodanno_alterazione_degrado", fields: [rid_dad], references: [id_dad], onDelete: NoAction, onUpdate: NoAction, map: "rid_dad_fkey")
   danno_alterazione_degrado_danno_alterazione_degrado_rid_att_progToattivita_prog danno_alterazione_degrado[]         @relation("danno_alterazione_degrado_rid_att_progToattivita_prog")
   scheda_controllo_scheda_controllo_rid_att_progToattivita_prog                   scheda_controllo[]                  @relation("scheda_controllo_rid_att_progToattivita_prog")
-  scheda_controllo_tipo_1                                                         scheda_controllo_tipo_1[]
   scheda_manutenzione_correttiva                                                  scheda_manutenzione_correttiva[]
   scheda_manutenzione_regolare                                                    scheda_manutenzione_regolare[]
   scheda_manutenzione_straordinaria                                               scheda_manutenzione_straordinaria[]
@@ -307,17 +306,16 @@ model catena {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model co_attivita_controllo {
-  cod                     String                    @id(map: "pk_co_attivita_controllo") @db.VarChar
-  data_pianificata        DateTime                  @db.Date
-  data_programmata        DateTime                  @db.Date
-  data_esecuzione         DateTime                  @db.Date
-  soggetto                String                    @db.VarChar
-  ambito_operativo        String                    @db.VarChar
-  is_completa             Boolean?
-  localita                String?                   @db.VarChar
-  include_unita           String?                   @db.Uuid
-  dati_unita              dati_unita?               @relation(fields: [include_unita], references: [uuid], onDelete: NoAction, map: "fk_co_attivita_controllo_dati_unita")
-  scheda_controllo_tipo_1 scheda_controllo_tipo_1[]
+  cod              String      @id(map: "pk_co_attivita_controllo") @db.VarChar
+  data_pianificata DateTime    @db.Date
+  data_programmata DateTime    @db.Date
+  data_esecuzione  DateTime    @db.Date
+  soggetto         String      @db.VarChar
+  ambito_operativo String      @db.VarChar
+  is_completa      Boolean?
+  localita         String?     @db.VarChar
+  include_unita    String?     @db.Uuid
+  dati_unita       dati_unita? @relation(fields: [include_unita], references: [uuid], onDelete: NoAction, map: "fk_co_attivita_controllo_dati_unita")
 
   @@schema("main10ance")
 }
@@ -828,10 +826,10 @@ model pavimento_decorativo {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model pianificazione_controlli_manutenzioni {
-  uuid                          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  uuid                          String                    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   id_pianificazione             String
   autore_pianificazione         String?
-  data_pianificazione           DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
+  data_pianificazione           DateTime                  @default(dbgenerated("CURRENT_DATE")) @db.Date
   localita                      String
   edificio                      String
   ambito_operativo              String
@@ -839,19 +837,20 @@ model pianificazione_controlli_manutenzioni {
   tipo_attivita                 String
   descrizione_attivita          String
   frequenza_mesi                Int
-  data_inizio                   DateTime  @db.Date
+  data_inizio                   DateTime                  @db.Date
   durata_prevista_gg            Int
-  stato                         String    @default("pianificata")
+  stato                         String                    @default("pianificata")
   note                          String?
   ambito                        String?
   operatore_programmazione      String?
   strumentazione_programmazione String?
-  costo_previsto                Decimal?  @db.Decimal
-  data_inizio_programmata       DateTime? @db.Date
+  costo_previsto                Decimal?                  @db.Decimal
+  data_inizio_programmata       DateTime?                 @db.Date
   durata_programmata_gg         Int?
   note_programmazione           String?
   autore_programmazione         String?
-  data_programmazione           DateTime? @db.Timestamp(6)
+  data_programmazione           DateTime?                 @db.Timestamp(6)
+  scheda_controllo_tipo_1       scheda_controllo_tipo_1[]
 
   @@index([ambito_operativo], map: "idx_pcm_ambito_operativo")
   @@index([id_pianificazione], map: "idx_pcm_id_pianificazione")
@@ -1153,36 +1152,34 @@ model scheda_controllo {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model scheda_controllo_tipo_1 {
-  id_contr                      BigInt                 @id(map: "id_contr_pkey")
-  cod_controllo                 String?                @db.VarChar
-  data_con                      String?                @db.VarChar
-  operatore                     String?                @db.VarChar
-  doc                           String?                @db.VarChar
-  strumentaz                    String?                @db.VarChar
-  commenti                      String?                @db.VarChar
-  data_ins                      String?                @db.VarChar
-  id_main10ance                 String[]               @db.VarChar
-  costo                         String?                @db.VarChar
-  freq                          String?                @db.VarChar
-  rid_att_prog                  BigInt?
-  durata                        String?                @db.VarChar
-  eseguito                      Boolean?
-  data_ultima_mod               String?                @db.VarChar
-  autore_ultima_mod             String?                @db.VarChar
-  id_group                      String?                @db.VarChar
-  id_att_controllo              BigInt?
-  data_inizio                   String?                @db.VarChar
-  data_fine                     String?                @db.VarChar
-  ambito_azione                 String?                @db.VarChar
-  sc_1_descrizione              String?                @db.VarChar
-  sc_1_fotografia               String?                @db.VarChar
-  sc_1_materiali                String?                @db.VarChar
-  sc_1_annotazioni_osservazioni String?                @db.VarChar
-  docs                          String[]               @db.VarChar
-  ambiti                        ambiti?                @relation(fields: [ambito_azione], references: [ambito], onDelete: NoAction, map: "ambito_azione_fkey")
-  co_attivita_controllo         co_attivita_controllo? @relation(fields: [cod_controllo], references: [cod], onDelete: NoAction, map: "cod_controllo_fkey")
-  attivita_prog                 attivita_prog?         @relation(fields: [rid_att_prog], references: [id_att_prog], onDelete: NoAction, map: "rid_att_prog_fkey")
+  id_contr                              BigInt                                 @id(map: "id_contr_pkey")
+  data_con                              String?                                @db.VarChar
+  operatore                             String?                                @db.VarChar
+  doc                                   String?                                @db.VarChar
+  strumentaz                            String?                                @db.VarChar
+  data_ins                              String?                                @db.VarChar
+  id_main10ance                         String[]                               @db.VarChar
+  costo                                 String?                                @db.VarChar
+  freq                                  String?                                @db.VarChar
+  durata                                String?                                @db.VarChar
+  eseguito                              Boolean?
+  data_ultima_mod                       String?                                @db.VarChar
+  autore_ultima_mod                     String?                                @db.VarChar
+  id_group                              String?                                @db.VarChar
+  id_att_controllo                      BigInt?
+  data_inizio                           String?                                @db.VarChar
+  data_fine                             String?                                @db.VarChar
+  ambito_azione                         String?                                @db.VarChar
+  sc_1_descrizione                      String?                                @db.VarChar
+  sc_1_fotografia                       String?                                @db.VarChar
+  sc_1_materiali                        String?                                @db.VarChar
+  sc_1_annotazioni                      String?                                @db.VarChar
+  docs                                  String[]                               @db.VarChar
+  rid_pianificazione_uuid               String?                                @db.Uuid
+  ambiti                                ambiti?                                @relation(fields: [ambito_azione], references: [ambito], onDelete: NoAction, map: "ambito_azione_fkey")
+  pianificazione_controlli_manutenzioni pianificazione_controlli_manutenzioni? @relation(fields: [rid_pianificazione_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction)
 
+  @@index([rid_pianificazione_uuid])
   @@schema("main10ance")
 }
 
@@ -1325,11 +1322,6 @@ model scheda_restauro {
 
   @@schema("main10ance")
 }
-
-/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
-// model scheda_segnalazione {
-// @@schema("main10ance")
-// }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model sintesi_lavori {
@@ -1877,6 +1869,11 @@ model utenti {
 
   @@schema("servizio")
 }
+
+/// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+// model scheda_segnalazione {
+// @@schema("main10ance")
+// }
 
 enum ac_vei_zon {
   vicolo
