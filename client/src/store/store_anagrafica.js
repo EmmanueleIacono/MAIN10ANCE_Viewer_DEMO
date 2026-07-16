@@ -13,24 +13,27 @@ const state_anagrafica = reactive({
     lista_edif_filtrata: [],
     lista_elem_filtrata: []
   },
+  galleria: {
+    caricamento: false,
+    elementi: [],
+    immagini: [],
+  },
   caricamento: {
     file: null,
     anteprima_img: null,
     id_img: '',
   },
   dati_elemento: {
-    codice: '',
-    nome: '',
-    artista: '',
+    id: '',
+    autore: '',
     datazione: '',
     dimensioni: '',
-    commenti: '',
+    annotazioni: '',
   }
 });
 
 const methods_anagrafica = {
   reset_state_anagrafica() {
-    this.reset_state_selezione();
     this.reset_state_caricamento();
     this.reset_state_dati_elemento();
   },
@@ -57,12 +60,19 @@ const methods_anagrafica = {
   },
   reset_state_dati_elemento() {
     state_anagrafica.dati_elemento = {
-      codice: '',
-      nome: '',
-      artista: '',
+      id: '',
+      autore: '',
       datazione: '',
       dimensioni: '',
-      commenti: '',
+      annotazioni: '',
+    };
+  },
+  reset_state_galleria() {
+    state_anagrafica.galleria.immagini.forEach(img => URL.revokeObjectURL(img.object));
+    state_anagrafica.galleria = {
+      caricamento: false,
+      elementi: [],
+      immagini: [],
     };
   },
 }

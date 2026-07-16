@@ -23,8 +23,8 @@
       <input v-model="state.codice" id="codice" class="colonna2">
     </div>
     <div class="contenitore">
-      <label for="artista" class="colonna1">Artista/Autore</label>
-      <input v-model="state.artista" id="artista" class="colonna2">
+      <label for="autore" class="colonna1">Autore</label>
+      <input v-model="state.autore" id="autore" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="datazione" class="colonna1">Datazione</label>
@@ -61,7 +61,7 @@ const emit = defineEmits(['annullaCaricamentoImmagine', 'salvaCaricamentoImmagin
 const state = reactive({
   codice: '',
   nome: '',
-  artista: '',
+  autore: '',
   datazione: '',
   dimensioni: '',
   commenti: '',

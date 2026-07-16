@@ -10,7 +10,7 @@ const {supabase} = require('../../supabase_config');
 const {assertIdentifier, assertOneOf, quoteIdentifier, qualifiedName} = require('../security/sql');
 const {uploadMiddlewareOptions, asSingleFile, validateFile, safeStoragePath} = require('../security/upload');
 const {ACTIVITY_TABLES, FORM_TABLE_LIST, SERVICE_FORM_TABLE_LIST} = require('./metadata');
-const {jsonRoute, sendJson} = require('../security/http');
+const {jsonRoute, sendJson, successRoute} = require('../security/http');
 
 app.use(fileupload(uploadMiddlewareOptions));
 
@@ -147,6 +147,13 @@ app.get('/esecuzione/frequenza', jsonRoute(async (req) => {
     const resp = await recuperaFrequenzaAttProg(reqJson.id, reqJson.tabella);
     return resp[0];
 }));
+
+app.get('/anagrafica/elementi', jsonRoute(async (req) => {
+    const ambito = req.signedCookies.ambito;
+    return cercaElementiAnagrafica(req.headers, ambito);
+}));
+
+app.post('/anagrafica/elementi', successRoute(req => creaElementoAnagrafica(req.files, req.body, req.signedCookies.ambito, req.signedCookies.user_id)));
 
 app.get('/anagrafica/artifact-viewer/interroga/:id', async (req, res) => {
     const id = req.params.id;
@@ -390,6 +397,171 @@ async function leggiEnumServizio(nomeEnum) {
     }
     catch(e) {
         return [];
+    }
+}
+
+function parseOptionalHeaderJson(value) {
+    if (value === undefined || value === null || value === '') return null;
+    try {
+        return JSON.parse(value);
+    }
+    catch(e) {
+        return value;
+    }
+}
+
+function normalizzaCodiceElemento(value) {
+    return String(value || '').trim().replace(/(\s|\|)+/g, '_');
+}
+
+function filtroLivelliDaInput(input) {
+    return [
+        input.livello_1,
+        input.livello_2,
+        input.livello_3,
+        input.livello_4,
+    ].map(parseOptionalHeaderJson);
+}
+
+async function cercaElementiAnagrafica(headers, ambito) {
+    const localita = parseOptionalHeaderJson(headers.localita);
+    const edificio = parseOptionalHeaderJson(headers.edificio);
+    const livelli = filtroLivelliDaInput(headers);
+
+    if (!localita || !edificio || !livelli[0]) return [];
+
+    const clauses = [
+        'ambito = $1',
+        'localita = $2',
+        'edificio = $3',
+        'livello_1 = $4',
+        'immagine IS NOT NULL',
+    ];
+    const values = [ambito, localita, edificio, livelli[0]];
+    livelli.slice(1).forEach((livello, index) => {
+        if (!livello) return;
+        values.push(livello);
+        clauses.push(`livello_${index + 2} = $${values.length}`);
+    });
+
+    const query = `
+        SELECT
+            uuid,
+            id,
+            nome,
+            codice,
+            annotazioni,
+            autore,
+            datazione,
+            dimensioni,
+            localita,
+            edificio,
+            livello_1,
+            livello_2,
+            livello_3,
+            livello_4,
+            autore_ins,
+            data_ins,
+            autore_ultima_mod,
+            data_ultima_mod,
+            id_main10ance,
+            immagine
+        FROM ${data_schema}.elementi
+        WHERE ${clauses.join(' AND ')}
+        ORDER BY COALESCE(data_ultima_mod, data_ins) DESC, id DESC;
+    `;
+
+    try {
+        const result = await poolM10a.query(query, values);
+        return result.rows;
+    }
+    catch(e) {
+        console.log(e);
+        return [];
+    }
+}
+
+async function creaElementoAnagrafica(files, body, ambito, utente) {
+    const {file, safeName, options: fileOptions} = validateFile(asSingleFile(files), ['image/']);
+    const dati = JSON.parse(body.dati);
+    const localita = dati.localita;
+    const edificio = dati.edificio;
+    const livello_1 = dati.livello_1;
+    const livello_2 = dati.livello_2 || null;
+    const livello_3 = dati.livello_3 || null;
+    const livello_4 = dati.livello_4 || null;
+    const id = normalizzaCodiceElemento(dati.id);
+    const annotazioni = dati.annotazioni || null;
+    const autore = dati.autore || null;
+    const datazione = dati.datazione || null;
+    const dimensioni = dati.dimensioni || null;
+    const data = dati.data || new Date().toISOString().split('T')[0];
+
+    if (!localita || !edificio || !livello_1 || !id) return false;
+
+    const percorsoFile = safeStoragePath(localita, edificio, 'elementi', safeName);
+    const storagePath = safeStoragePath(ambito, percorsoFile);
+    const idMain10ance = `${localita}|${edificio}|elementi|${id}`;
+
+    try {
+        await withTransaction(async (tx) => {
+            await tx.query(`
+                INSERT INTO ${data_schema}.elementi (
+                    id,
+                    localita,
+                    edificio,
+                    autore_ins,
+                    data_ins,
+                    autore_ultima_mod,
+                    data_ultima_mod,
+                    annotazioni,
+                    autore,
+                    datazione,
+                    dimensioni,
+                    ambito,
+                    livello_1,
+                    livello_2,
+                    livello_3,
+                    livello_4,
+                    codice,
+                    id_main10ance,
+                    immagine
+                ) VALUES (
+                    $1, $2, $3, $4, $5, $6, $7, $8,
+                    $9, $10, $11, $12, $13, $14, $15, $16,
+                    $17, $18, $19
+                );
+            `, [
+                id,
+                localita,
+                edificio,
+                utente,
+                data,
+                utente,
+                data,
+                annotazioni,
+                autore,
+                datazione,
+                dimensioni,
+                ambito,
+                livello_1,
+                livello_2,
+                livello_3,
+                livello_4,
+                id,
+                idMain10ance,
+                percorsoFile
+            ]);
+
+            const {error} = await supabase.storage.from('elementi').upload(storagePath, file.data, fileOptions);
+            if (error) throw error;
+        });
+        return true;
+    }
+    catch(e) {
+        console.log(e);
+        await supabase.storage.from('elementi').remove([storagePath]).catch(() => {});
+        return false;
     }
 }
 

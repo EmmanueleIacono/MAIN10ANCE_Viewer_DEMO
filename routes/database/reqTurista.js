@@ -193,7 +193,8 @@ async function getInfoImmagine(percorsoFile, tabella) {
     const schema = percorsoFile.startsWith('loc-pdiff') ? utility_schema : data_schema;
     try {
         const tableName = qualifiedName(schema, tabella);
-        const result = await poolM10a.query(`SELECT "nome" AS "Nome", "artista" AS "Artista", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "codice" AS "Codice", "id_main10ance" FROM ${tableName} WHERE "immagine" = ($1);`, [percorsoFile]);
+        const autoreColumn = tabella === 'elementi' ? 'autore' : 'artista';
+        const result = await poolM10a.query(`SELECT "nome" AS "Nome", "${autoreColumn}" AS "Autore", "datazione" AS "Datazione", "dimensioni" AS "Dimensioni", "commenti" AS "Note", "codice" AS "Codice", "id_main10ance" FROM ${tableName} WHERE "immagine" = ($1);`, [percorsoFile]);
         return result.rows;
     }
     catch(e) {

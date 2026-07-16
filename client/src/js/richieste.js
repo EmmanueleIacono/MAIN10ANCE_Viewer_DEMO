@@ -517,3 +517,18 @@ export async function leggiDefinizioniClassiElementi() {
     const resJson = await res.json();
     return resJson;
 }
+
+export async function cercaElementiAnagrafica(filtri) {
+    return apiRequest('/o/anagrafica/elementi', {headers: jsonHeaders({
+        localita: JSON.stringify(filtri.localita || null),
+        edificio: JSON.stringify(filtri.edificio || null),
+        livello_1: JSON.stringify(filtri.livello_1 || null),
+        livello_2: JSON.stringify(filtri.livello_2 || null),
+        livello_3: JSON.stringify(filtri.livello_3 || null),
+        livello_4: JSON.stringify(filtri.livello_4 || null),
+    })});
+}
+
+export async function creaElementoAnagrafica(formData) {
+    return apiRequest('/o/anagrafica/elementi', {method: 'POST', body: formData});
+}

@@ -15,16 +15,12 @@
       <p id="id_main10ance" class="colonna2"><b>{{id_main10ance}}</b></p>
     </div>
     <div class="contenitore">
-      <label for="nome" class="colonna1">Nome/Soggetto</label>
-      <input v-model="state_elemento.nome" id="nome" class="colonna2">
+      <label for="id-elemento" class="colonna1">ID</label>
+      <input v-model="state_elemento.id" id="id-elemento" class="colonna2">
     </div>
     <div class="contenitore">
-      <label for="codice" class="colonna1">Codice</label>
-      <input v-model="state_elemento.codice" id="codice" class="colonna2">
-    </div>
-    <div class="contenitore">
-      <label for="artista" class="colonna1">Artista/Autore</label>
-      <input v-model="state_elemento.artista" id="artista" class="colonna2">
+      <label for="autore" class="colonna1">Autore</label>
+      <input v-model="state_elemento.autore" id="autore" class="colonna2">
     </div>
     <div class="contenitore">
       <label for="datazione" class="colonna1">Datazione</label>
@@ -35,8 +31,8 @@
       <input v-model="state_elemento.dimensioni" id="dimensioni" class="colonna2">
     </div>
     <div class="contenitore">
-      <label for="commenti" class="colonna1">Note</label>
-      <textarea v-model="state_elemento.commenti" id="commenti" class="colonna2"></textarea>
+      <label for="annotazioni" class="colonna1">Annotazioni</label>
+      <textarea v-model="state_elemento.annotazioni" id="annotazioni" class="colonna2"></textarea>
     </div>
   </div>
   <div class="wrapper-bottoni flt-dx">
@@ -62,8 +58,8 @@ const store_anagrafica = inject('store_anagrafica');
 const state_anagrafica = store_anagrafica.state_anagrafica;
 const state_elemento = state_anagrafica.dati_elemento;
 
-const codice_pulito = computed(() => state_elemento.codice.trim().replaceAll(/(\s|\|)/g, '_'));
-const id_main10ance = computed(() => `${state_anagrafica.selezione.select_loc}|${state_anagrafica.selezione.select_edif}|${state_anagrafica.selezione.select_elem}|${codice_pulito.value}`);
+const id_pulito = computed(() => state_elemento.id.trim().replaceAll(/(\s|\|)/g, '_'));
+const id_main10ance = computed(() => `${state_anagrafica.selezione.select_loc}|${state_anagrafica.selezione.select_edif}|elementi|${id_pulito.value}`);
 
 function annulla() {
   emit('annullaCaricamento');

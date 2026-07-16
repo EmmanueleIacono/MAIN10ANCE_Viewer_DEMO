@@ -558,36 +558,37 @@ model edificio_minore {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model elementi {
-  uuid                  String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  id                    String                 @db.VarChar
-  localit_              String?                @map("località") @db.VarChar
-  edificio              String?                @db.VarChar
-  sist_composto         sistemi_composti?
-  temi                  temi[]
-  autore_ins            String?                @db.VarChar
-  data_ins              String?                @db.VarChar
-  autore_ultima_mod     String?                @db.VarChar
-  data_ultima_mod       String?                @db.VarChar
-  annotazioni           String?                @db.VarChar
-  ambito                String                 @db.VarChar
-  livello_1             String?                @db.VarChar
-  livello_2             String?                @db.VarChar
-  livello_3             String?                @db.VarChar
-  livello_4             String?                @db.VarChar
-  unit_                 String?                @map("unità") @db.VarChar
-  nome                  String?                @db.VarChar
-  codice                String?                @db.VarChar
-  artista               String?                @db.VarChar
-  datazione             String?                @db.VarChar
-  dimensioni            String?                @db.VarChar
-  commenti              String?                @db.VarChar
-  id_main10ance         String?                @db.VarChar
-  immagine              String?                @db.VarChar
-  ambiti                ambiti                 @relation(fields: [ambito], references: [ambito], onDelete: NoAction, map: "ambito_fkey")
-  definizioni_livello_1 definizioni_livello_1? @relation(fields: [livello_1], references: [id_liv_1], onDelete: NoAction, map: "livello_1_fkey")
-  definizioni_livello_2 definizioni_livello_2? @relation(fields: [livello_2], references: [id_liv_2], onDelete: NoAction, map: "livello_2_fkey")
-  definizioni_livello_3 definizioni_livello_3? @relation(fields: [livello_3], references: [id_liv_3], onDelete: NoAction, map: "livello_3_fkey")
-  definizioni_livello_4 definizioni_livello_4? @relation(fields: [livello_4], references: [id_liv_4], onDelete: NoAction, map: "livello_4_fkey")
+  uuid                             String                             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                               String                             @db.VarChar
+  localita                         String?                            @db.VarChar
+  edificio                         String?                            @db.VarChar
+  sist_composto                    sistemi_composti?
+  temi                             temi[]
+  autore_ins                       String?                            @db.VarChar
+  data_ins                         String?                            @db.VarChar
+  autore_ultima_mod                String?                            @db.VarChar
+  data_ultima_mod                  String?                            @db.VarChar
+  annotazioni                      String?                            @db.VarChar
+  ambito                           String                             @db.VarChar
+  livello_1                        String?                            @db.VarChar
+  livello_2                        String?                            @db.VarChar
+  livello_3                        String?                            @db.VarChar
+  livello_4                        String?                            @db.VarChar
+  unita                            String?                            @db.VarChar
+  nome                             String?                            @db.VarChar
+  codice                           String?                            @db.VarChar
+  autore                           String?                            @db.VarChar
+  datazione                        String?                            @db.VarChar
+  dimensioni                       String?                            @db.VarChar
+  commenti                         String?                            @db.VarChar
+  id_main10ance                    String?                            @db.VarChar
+  immagine                         String?                            @db.VarChar
+  ambiti                           ambiti                             @relation(fields: [ambito], references: [ambito], onDelete: NoAction, map: "ambito_fkey")
+  definizioni_livello_1            definizioni_livello_1?             @relation(fields: [livello_1], references: [id_liv_1], onDelete: NoAction, map: "livello_1_fkey")
+  definizioni_livello_2            definizioni_livello_2?             @relation(fields: [livello_2], references: [id_liv_2], onDelete: NoAction, map: "livello_2_fkey")
+  definizioni_livello_3            definizioni_livello_3?             @relation(fields: [livello_3], references: [id_liv_3], onDelete: NoAction, map: "livello_3_fkey")
+  definizioni_livello_4            definizioni_livello_4?             @relation(fields: [livello_4], references: [id_liv_4], onDelete: NoAction, map: "livello_4_fkey")
+  scheda_anagrafica_dipinti_murali scheda_anagrafica_dipinti_murali[]
 
   @@schema("main10ance")
 }
@@ -1615,6 +1616,7 @@ model ambiti {
   scala                                    scala[]
   scheda_anagrafica                        scheda_anagrafica[]
   scheda_anagrafica_copertura              scheda_anagrafica_copertura[]
+  scheda_anagrafica_dipinti_murali         scheda_anagrafica_dipinti_murali[]
   scheda_anagrafica_statua                 scheda_anagrafica_statua[]
   scheda_conoscenza                        scheda_conoscenza[]
   scheda_controllo                         scheda_controllo[]
@@ -1710,50 +1712,57 @@ model dati_loc_pdiff {
 }
 
 model definizioni_livello_1 {
-  id_liv_1              String                  @id @db.VarChar
-  def_liv_1_sigla       String                  @db.VarChar
-  def_liv_1_nome        String                  @db.VarChar
-  ordine                Int
-  elementi              elementi[]
-  definizioni_livello_2 definizioni_livello_2[]
+  id_liv_1                         String                             @id @db.VarChar
+  def_liv_1_sigla                  String                             @db.VarChar
+  def_liv_1_nome                   String                             @db.VarChar
+  def_liv_1_note                   String?                            @db.VarChar
+  is_for_app_deco                  Boolean?                           @default(false)
+  is_for_coperture                 Boolean?                           @default(false)
+  is_for_sentieri_pav_est_muretti  Boolean?                           @default(false)
+  elementi                         elementi[]
+  scheda_anagrafica_dipinti_murali scheda_anagrafica_dipinti_murali[]
+  definizioni_livello_2            definizioni_livello_2[]
 
   @@schema("servizio")
 }
 
 model definizioni_livello_2 {
-  id_liv_2              String                  @id @db.VarChar
-  def_liv_2_sigla       String                  @db.VarChar
-  def_liv_2_nome        String                  @db.VarChar
-  id_liv_1              String                  @db.VarChar
-  ordine                Int
-  elementi              elementi[]
-  definizioni_livello_1 definizioni_livello_1   @relation(fields: [id_liv_1], references: [id_liv_1], onDelete: NoAction, map: "definizioni_livello_2_fkey")
-  definizioni_livello_3 definizioni_livello_3[]
+  id_liv_2                         String                             @id @db.VarChar
+  def_liv_2_sigla                  String                             @db.VarChar
+  def_liv_2_nome                   String                             @db.VarChar
+  id_liv_1                         String                             @db.VarChar
+  def_liv_2_note                   String?                            @db.VarChar
+  elementi                         elementi[]
+  scheda_anagrafica_dipinti_murali scheda_anagrafica_dipinti_murali[]
+  definizioni_livello_1            definizioni_livello_1              @relation(fields: [id_liv_1], references: [id_liv_1], onDelete: NoAction, map: "definizioni_livello_2_fkey")
+  definizioni_livello_3            definizioni_livello_3[]
 
   @@schema("servizio")
 }
 
 model definizioni_livello_3 {
-  id_liv_3              String                  @id @db.VarChar
-  def_liv_3_sigla       String                  @db.VarChar
-  def_liv_3_nome        String                  @db.VarChar
-  id_liv_2              String                  @db.VarChar
-  ordine                Int
-  elementi              elementi[]
-  definizioni_livello_2 definizioni_livello_2   @relation(fields: [id_liv_2], references: [id_liv_2], onDelete: NoAction, map: "definizioni_livello_3_fkey")
-  definizioni_livello_4 definizioni_livello_4[]
+  id_liv_3                         String                             @id @db.VarChar
+  def_liv_3_sigla                  String                             @db.VarChar
+  def_liv_3_nome                   String                             @db.VarChar
+  id_liv_2                         String                             @db.VarChar
+  def_liv_3_note                   String?                            @db.VarChar
+  elementi                         elementi[]
+  scheda_anagrafica_dipinti_murali scheda_anagrafica_dipinti_murali[]
+  definizioni_livello_2            definizioni_livello_2              @relation(fields: [id_liv_2], references: [id_liv_2], onDelete: NoAction, map: "definizioni_livello_3_fkey")
+  definizioni_livello_4            definizioni_livello_4[]
 
   @@schema("servizio")
 }
 
 model definizioni_livello_4 {
-  id_liv_4              String                @id @db.VarChar
-  def_liv_4_sigla       String                @db.VarChar
-  def_liv_4_nome        String                @db.VarChar
-  id_liv_3              String                @db.VarChar
-  ordine                Int
-  elementi              elementi[]
-  definizioni_livello_3 definizioni_livello_3 @relation(fields: [id_liv_3], references: [id_liv_3], onDelete: NoAction, map: "definizioni_livello_4_fkey")
+  id_liv_4                         String                             @id @db.VarChar
+  def_liv_4_sigla                  String                             @db.VarChar
+  def_liv_4_nome                   String                             @db.VarChar
+  id_liv_3                         String                             @db.VarChar
+  def_liv_4_note                   String?                            @db.VarChar
+  elementi                         elementi[]
+  scheda_anagrafica_dipinti_murali scheda_anagrafica_dipinti_murali[]
+  definizioni_livello_3            definizioni_livello_3              @relation(fields: [id_liv_3], references: [id_liv_3], onDelete: NoAction, map: "definizioni_livello_4_fkey")
 
   @@schema("servizio")
 }
@@ -1868,6 +1877,126 @@ model utenti {
   ruoli  ruoli?  @relation(fields: [ruolo], references: [ruolo], onDelete: NoAction, onUpdate: NoAction, map: "ruolo_utenti_fkey")
 
   @@schema("servizio")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model scheda_anagrafica_dipinti_murali {
+  id_anagr                                                   BigInt                                     @id @default(autoincrement())
+  uuid_elemento                                              String                                     @db.Uuid
+  id_main10ance                                              String                                     @db.VarChar
+  ambito                                                     String                                     @db.VarChar
+  livello_1                                                  String?                                    @db.VarChar
+  livello_2                                                  String?                                    @db.VarChar
+  livello_3                                                  String?                                    @db.VarChar
+  livello_4                                                  String?                                    @db.VarChar
+  data_registrazione                                         DateTime                                   @default(dbgenerated("CURRENT_DATE")) @db.Date
+  autore_scheda                                              String?                                    @db.VarChar
+  data_ultima_mod                                            DateTime                                   @default(dbgenerated("CURRENT_DATE")) @db.Date
+  autore_ultima_mod                                          String?                                    @db.VarChar
+  validata                                                   Boolean                                    @default(false)
+  descrizione_dipinto                                        String?
+  autore                                                     String?                                    @db.VarChar
+  datazione                                                  String?                                    @db.VarChar
+  dimensioni                                                 String?                                    @db.VarChar
+  note                                                       String?
+  unita                                                      String?                                    @db.VarChar
+  sist_composto                                              sistemi_composti?
+  collocazione_is_interno                                    Boolean?                                   @default(true)
+  appartiene_a_parete_int                                    String?
+  collocazione_is_esterno                                    Boolean?                                   @default(false)
+  appartiene_a_parete_ext                                    String?
+  appartiene_a_volta                                         String?
+  has_elementi_di_protezione                                 Boolean?                                   @default(false)
+  collocazione_note                                          String?
+  is_isolato                                                 Boolean                                    @default(true)
+  is_parte_di_un_ciclo                                       Boolean                                    @default(false)
+  isolato_o_ciclo_note                                       String?
+  descrizione_iconografia_ciclo                              String?
+  estensione_ciclo                                           Decimal?                                   @db.Decimal
+  estensione_note                                            String?
+  scena_cod                                                  String?                                    @db.VarChar
+  descrizione_iconografia_scena                              String?
+  soggetto_cod                                               String?                                    @db.VarChar
+  descrizione_porzione_soggetto                              String?
+  tecnica                                                    dip_mur_tecnica?
+  tecnica_descrizione_annot                                  String?
+  cronologia                                                 String?
+  has_intercapedine                                          Boolean?                                   @default(false)
+  intercapedine_descrizione                                  String?
+  supporto                                                   dip_mur_supporto_tipo?
+  supporto_descrizione                                       String?
+  armatura                                                   dip_mur_armatura_tipo[]                    @default([])
+  armatura_str_prep_dip_descrizione                          String?
+  rinzaffo_str_prep_dip                                      String?
+  rinzaffo_str_prep_dip_descrizione                          String?
+  arriccio_str_prep_dip                                      String?
+  arriccio_str_prep_dip_descrizione                          String?
+  intonaco_str_prep_dip                                      String?
+  intonaco_str_prep_dip_descrizione                          String?
+  intonachino_str_prep_dip                                   String?
+  intonachino_str_prep_dip_descrizione                       String?
+  strato_di_preparazione_dip                                 dip_mur_strato_prep_mat?
+  strato_di_preparazione_dip_descrizione                     String?
+  imprimitura_str_prep_dip                                   String?
+  imprimitura_str_prep_dip_descrizione                       String?
+  segni_lavorazione_str_prep_dip                             String?
+  segni_lavorazione_str_prep_dip_descrizione                 String?
+  segni_trasp_dis_str_prep_dip                               dip_mur_str_prep_segni_trasp_dis_tipo?
+  segni_trasp_dis_str_prep_dip_descrizione                   String?
+  elementi_rilievo_str_prep_dip                              dip_mur_str_prep_elementi_rilievo_mat?
+  elementi_rilievo_str_prep_dip_descrizione                  String?
+  elementi_inseriti_str_prep_dip                             dip_mur_str_prep_elementi_inseriti_mat?
+  elementi_inseriti_str_prep_dip_descrizione                 String?
+  segni_trasp_dis_pell_pitt_dip                              dip_mur_pell_pitt_segni_trasp_dis?
+  segni_trasp_dis_pell_pitt_dip_descrizione                  String?
+  disegno_preparatorio_pell_pitt_dip                         String?
+  preparazione_pell_pitt_dip                                 String?
+  pell_pitt_originale_dip                                    dip_mur_pell_pitt_originale_tecnica?
+  pell_pitt_originale_dip_secco                              dip_mur_pell_pitt_originale_secco_mat?
+  pell_pitt_originale_dip_descrizione                        String?
+  lamine_metalliche_pell_pitt_dip                            dip_mur_pell_pitt_lamine_metall_mat?
+  lamine_metalliche_pell_pitt_dip_doratura                   dip_mur_pell_pitt_lamine_metall_doratura?
+  lamine_metalliche_pell_pitt_dip_descrizione                String?
+  pell_pitt_dip_altro                                        Boolean?                                   @default(false)
+  pell_pitt_dip_altro_specificare                            String?
+  pell_pitt_dip_note                                         String?
+  el_accessori_applicati_dip                                 dip_mur_el_acc_applicati_mat?
+  el_accessori_applicati_dip_altro                           Boolean?                                   @default(false)
+  el_accessori_applicati_dip_altro_specificare               String?
+  el_accessori_applicati_dip_descrizione                     String?
+  segni_particolari_dip                                      dip_mur_segni_particolari_tipo?
+  segni_particolari_dip_iscrizioni_descrizione               String?
+  segni_particolari_dip_graffiti_descrizione                 String?
+  segni_particolari_dip_altro_descrizione                    String?
+  has_interventi_successivi_dip                              Boolean?                                   @default(false)
+  interventi_successivi_dip_descrizione                      String?
+  interventi_successivi_dip_tecniche                         String?
+  interventi_successivi_dip_mat                              String?
+  interventi_successivi_dip_supp_strati_prep                 dip_mur_int_succ_supp_str_prep_tipo?
+  interventi_successivi_dip_supp_strati_prep_stuccature      dip_mur_int_succ_supp_str_prep_stucc_mat?
+  interventi_successivi_dip_supp_strati_prep_stuccature_note String?
+  interventi_successivi_dip_supp_strati_prep_messa_sicu      dip_mur_int_succ_supp_str_prep_messa_sicu?
+  interventi_successivi_dip_supp_strati_prep_messa_sicu_note String?
+  interventi_successivi_dip_pell_pitt                        dip_mur_int_succ_pell_pitt_tipo?
+  interventi_successivi_dip_pell_pitt_fissativi              dip_mur_int_succ_pell_pitt_fissativi_tipo?
+  interventi_successivi_dip_pell_pitt_fissativi_note         String?
+  interventi_successivi_dip_pell_pitt_dorature               dip_mur_int_succ_pell_pitt_dorature_tipo?
+  interventi_successivi_dip_pell_pitt_dorature_note          String?
+  epoca                                                      String?                                    @db.VarChar
+  fonti                                                      String?
+  accessibilita                                              Boolean?                                   @default(false)
+  docs                                                       String[]                                   @default([])
+  ambiti                                                     ambiti                                     @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction)
+  elementi                                                   elementi                                   @relation(fields: [uuid_elemento], references: [uuid], onDelete: Cascade, onUpdate: NoAction, map: "scheda_anagrafica_dipinti_murali_elemento_fkey")
+  definizioni_livello_1                                      definizioni_livello_1?                     @relation(fields: [livello_1], references: [id_liv_1], onDelete: NoAction, onUpdate: NoAction)
+  definizioni_livello_2                                      definizioni_livello_2?                     @relation(fields: [livello_2], references: [id_liv_2], onDelete: NoAction, onUpdate: NoAction)
+  definizioni_livello_3                                      definizioni_livello_3?                     @relation(fields: [livello_3], references: [id_liv_3], onDelete: NoAction, onUpdate: NoAction)
+  definizioni_livello_4                                      definizioni_livello_4?                     @relation(fields: [livello_4], references: [id_liv_4], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([ambito])
+  @@index([id_main10ance])
+  @@index([uuid_elemento])
+  @@schema("main10ance")
 }
 
 /// We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
@@ -3041,6 +3170,172 @@ enum tipo_scheda_controllo {
   Scheda_controllo_Tipo_3 @map("Scheda controllo Tipo 3")
   Scheda_controllo_Tipo_4 @map("Scheda controllo Tipo 4")
   Scheda_controllo_tipo_5 @map("Scheda controllo tipo 5")
+
+  @@schema("servizio")
+}
+
+enum dip_mur_armatura_tipo {
+  elementi_metallici @map("elementi metallici")
+  fibre_vegetali     @map("fibre vegetali")
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_el_acc_applicati_mat {
+  cera
+  legno
+  metalli
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_int_succ_pell_pitt_dorature_tipo {
+  doratura_a_foglia @map("doratura a foglia")
+  porporine
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_int_succ_pell_pitt_fissativi_tipo {
+  strati_oleosi_resinosi @map("strati oleosi resinosi")
+  cere
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_int_succ_pell_pitt_tipo {
+  ridipinture
+  fissativi_ravvivanti @map("fissativi/ravvivanti")
+  dorature
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_int_succ_supp_str_prep_messa_sicu {
+  velinature
+  puntelli
+
+  @@map("dip_mur_int_succ_supp_str_prep_messa sicu")
+  @@schema("servizio")
+}
+
+enum dip_mur_int_succ_supp_str_prep_stucc_mat {
+  malta
+  cemento
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_int_succ_supp_str_prep_tipo {
+  tamponature
+  integrazioni
+  stuccature
+  messa_in_sicurezza @map("messa in sicurezza")
+
+  @@schema("servizio")
+}
+
+enum dip_mur_pell_pitt_lamine_metall_doratura {
+  a_foglia     @map("a foglia")
+  a_conchiglia @map("a conchiglia")
+  missione
+
+  @@schema("servizio")
+}
+
+enum dip_mur_pell_pitt_lamine_metall_mat {
+  doratura
+  argento
+  stagno
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_pell_pitt_originale_secco_mat {
+  tempera
+  olio
+  calce
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_pell_pitt_originale_tecnica {
+  affresco
+  a_secco  @map("a secco")
+
+  @@schema("servizio")
+}
+
+enum dip_mur_pell_pitt_segni_trasp_dis {
+  battitura_a_filo @map("battitura a filo")
+  spolvero
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_segni_particolari_tipo {
+  iscrizioni
+  graffiti
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_str_prep_elementi_inseriti_mat {
+  cera
+  legno
+  metalli
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_str_prep_elementi_rilievo_mat {
+  stucco
+  malta
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_str_prep_segni_trasp_dis_tipo {
+  sinopia
+  incisioni
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_strato_prep_mat {
+  gesso
+  colla
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_supporto_tipo {
+  laterizio
+  pietra_a_secco        @map("pietra a secco")
+  pietra_legata_a_calce @map("pietra legata a calce")
+  incannucciato
+  altro
+
+  @@schema("servizio")
+}
+
+enum dip_mur_tecnica {
+  affresco
+  a_secco  @map("a secco")
 
   @@schema("servizio")
 }

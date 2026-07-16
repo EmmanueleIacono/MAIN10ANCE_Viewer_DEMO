@@ -21,8 +21,8 @@
     <div class="colonna">
       <p v-if="datiImmagine.Nome"><b>Soggetto: </b>{{datiImmagine["Nome"]}}</p>
       <p v-else><b>Soggetto: </b><i>N/A</i></p>
-      <p v-if="datiImmagine.Artista"><b>Artista: </b>{{datiImmagine["Artista"]}}</p>
-      <p v-else><b>Artista: </b><i>N/A</i></p>
+      <p v-if="autoreImmagine"><b>Autore: </b>{{ autoreImmagine }}</p>
+      <p v-else><b>Autore: </b><i>N/A</i></p>
       <p v-if="datiImmagine.Datazione"><b>Datazione: </b>{{datiImmagine["Datazione"]}}</p>
       <p v-else><b>Datazione: </b><i>N/A</i></p>
     </div>
@@ -46,6 +46,7 @@ const stateGalleria = inject('stateGalleria');
 const indiceImmagineCorrente = ref(0);
 const nomeImmagine = computed(() => stateGalleria.listaImmagini[indiceImmagineCorrente.value].percorso.split('/').pop());
 const datiImmagine = computed(() => stateGalleria.listaImmagini[indiceImmagineCorrente.value].info);
+const autoreImmagine = computed(() => datiImmagine.value.Autore || datiImmagine.value.Artista);
 
 watch(() => stateGalleria.listaImmagini, () => {
   indiceImmagineCorrente.value = 0;

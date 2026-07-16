@@ -541,21 +541,23 @@ async function uploadImmagine(files, dati, ambito) {
     const datiJson = JSON.parse(dati.dati);
     const percorso = safeStoragePath(datiJson.percorso);
     const percorsoFile = safeStoragePath(percorso, safeName);
-    const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.codice, datiJson.artista, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, percorsoFile];
+    const autoreImmagine = datiJson.autore ?? datiJson.artista;
+    const colonnaAutore = datiJson.entità === 'elementi' ? 'autore' : 'artista';
+    const arrayDatiImg = [datiJson.id_immagine, datiJson.nome, datiJson.codice, autoreImmagine, datiJson.datazione, datiJson.dimensioni, datiJson.commenti, datiJson.data_ins, datiJson.id_main10ance, percorsoFile];
     const entityMeta = getImageEntity(datiJson.entità);
     try {
         await withTransaction(async (tx) => { // QUI CONDIZIONI DA RISISTEMARE COME QUELLE IN REQTURISTA DOWNLOADIMMAGINI, GETINFOIMMAGINE
             if (datiJson.id_main10ance.startsWith('loc-pdiff')) {
                 const rid_loc_pdiff = datiJson.id_main10ance.split('|')[1];
                 // query con dati
-                await tx.query(`INSERT INTO ${qualifiedName(utility_schema, datiJson.entità)} ("${entityMeta.idColumn}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, rid_loc_pdiff]);
+                await tx.query(`INSERT INTO ${qualifiedName(utility_schema, datiJson.entità)} ("${entityMeta.idColumn}", "nome", "codice", "${colonnaAutore}", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "rid_loc_pdiff") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, rid_loc_pdiff]);
                 // caricamento immagine supabase
                 const {error} = await supabase.storage.from("generale").upload(percorsoFile, file.data, fileOptions);
                 if (error) throw error;
             }
             else {
                 // query con dati
-                await tx.query(`INSERT INTO ${qualifiedName(data_schema, datiJson.entità)} ("${entityMeta.idColumn}", "nome", "codice", "artista", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, ambito]); // e "codice"?
+                await tx.query(`INSERT INTO ${qualifiedName(data_schema, datiJson.entità)} ("${entityMeta.idColumn}", "nome", "codice", "${colonnaAutore}", "datazione", "dimensioni", "commenti", "data_ins", "id_main10ance", "immagine", "ambito") VALUES (($1), ($2), ($3), ($4), ($5), ($6), ($7), ($8), ($9), ($10), ($11));`, [...arrayDatiImg, ambito]); // e "codice"?
                 // caricamento immagine supabase
                 const {error} = await supabase.storage.from("elementi").upload(safeStoragePath(ambito, percorsoFile), file.data, fileOptions);
                 if (error) throw error;

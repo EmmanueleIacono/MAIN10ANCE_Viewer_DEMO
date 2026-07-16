@@ -18,7 +18,8 @@ const ACTIVITY_TABLE_LIST = Object.freeze(Object.values(ACTIVITY_TABLES));
 const DATA_FORM_TABLES = Object.freeze({
   ANAGRAFICA: 'scheda_anagrafica',
   ANAGRAFICA_STATUA: 'scheda_anagrafica_statua',
-  ANAGRAFICA_COPERTURA: 'scheda_anagrafica_copertura'
+  ANAGRAFICA_COPERTURA: 'scheda_anagrafica_copertura',
+  ANAGRAFICA_DIPINTI_MURALI: 'scheda_anagrafica_dipinti_murali'
 });
 
 const SERVICE_FORM_TABLES = Object.freeze({
