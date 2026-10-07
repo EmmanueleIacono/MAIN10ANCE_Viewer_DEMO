@@ -11,7 +11,9 @@
     <Storico />
   </MainPanel>
   <Explorer :colonna="'col-sm-5'">
-    <FullCalendar ref="fullCalendarPlanner" :options="calendarOptions" />
+    <div ref="calendarResizeTarget" class="calendar-resize-target">
+      <FullCalendar ref="fullCalendarPlanner" :options="calendarOptions" />
+    </div>
     <div v-if="eventoPianificazioneAperto" class="overlay-evento" @click.self="chiudiEventoPianificazione">
       <div class="dialog-evento">
         <button type="button" class="chiudi-evento" @click="chiudiEventoPianificazione">×</button>
@@ -38,7 +40,7 @@
 </template>
 
 <script setup>
-import {inject, nextTick, onActivated, reactive, ref, watch} from 'vue';
+import {inject, nextTick, onActivated, onBeforeUnmount, onDeactivated, reactive, ref, watch} from 'vue';
 import {leggiAttivitàProg, leggiPianificazioniControlliManutenzioni} from '../js/richieste';
 import FullCalendar from '@fullcalendar/vue3';
 import DayGridPlugin from '@fullcalendar/daygrid';
@@ -57,9 +59,12 @@ import SintesiLavori from './TabPlannerSintesiLavori.vue';
 
 const store = inject('store');
 const fullCalendarPlanner = ref(null);
+const calendarResizeTarget = ref(null);
 const IntegrazioneRef = ref(null);
 const EsecuzioneRef = ref(null);
 const eventoPianificazioneAperto = ref(null);
+let calendarResizeObserver = null;
+let resizeAnimationFrame = null;
 const calendarOptions = reactive({
   plugins: [DayGridPlugin],
   initialView: 'dayGridMonth',
@@ -108,6 +113,21 @@ onActivated(async () => {
   if (!store.statePlanner.datiPlannerLoaded) {
     popolaCalendario();
     await store.methods.recuperaDatiPlanner();
+  }
+  await nextTick();
+  osservaResizeCalendario();
+  programmaResizeCal();
+});
+
+onDeactivated(() => {
+  annullaResizeProgrammato();
+});
+
+onBeforeUnmount(() => {
+  annullaResizeProgrammato();
+  if (calendarResizeObserver) {
+    calendarResizeObserver.disconnect();
+    calendarResizeObserver = null;
   }
 });
 
@@ -190,11 +210,33 @@ function resizeCal() {
 
 async function programmaResizeCal(tentativi = 5) {
   await nextTick();
-  if (resizeCal()) return;
   if (tentativi <= 0) return;
+  pianificaResizeCal();
   setTimeout(() => {
     programmaResizeCal(tentativi - 1);
   }, 100);
+}
+
+function osservaResizeCalendario() {
+  if (calendarResizeObserver || !calendarResizeTarget.value || typeof window.ResizeObserver === 'undefined') return;
+  calendarResizeObserver = new window.ResizeObserver(() => {
+    if (store.state.tabAttivo === 'Tab3') pianificaResizeCal();
+  });
+  calendarResizeObserver.observe(calendarResizeTarget.value);
+}
+
+function pianificaResizeCal() {
+  annullaResizeProgrammato();
+  resizeAnimationFrame = window.requestAnimationFrame(() => {
+    resizeAnimationFrame = null;
+    resizeCal();
+  });
+}
+
+function annullaResizeProgrammato() {
+  if (!resizeAnimationFrame) return;
+  window.cancelAnimationFrame(resizeAnimationFrame);
+  resizeAnimationFrame = null;
 }
 
 function apriEventoPianificazione(evento) {
@@ -325,5 +367,10 @@ function isolaScheda(id, props) {
   color: inherit;
   background-color: transparent;
   cursor: pointer;
+}
+
+.calendar-resize-target {
+  width: 100%;
+  min-width: 0;
 }
 </style>

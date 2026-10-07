@@ -15,7 +15,7 @@
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav left tabs">
-          <li class="tab viz-dropdown">
+          <li class="tab viz-dropdown" title="Visualizzatori GIS / BIM">
             VISUALIZZATORI
             <ul class="dropdown-menu">
               <li @click="apriTab('Tab2')" :class="{active: store.state.tabAttivo==='Tab2'}" class="tab" id="apriTabGIS">GIS</li>
@@ -23,16 +23,23 @@
               <li @click="apriTab('Tab5')" :class="{active: store.state.tabAttivo==='Tab5'}" class="tab" id="apriTabCollection">GALLERIA</li>
             </ul>
           </li>
-          <li @click="apriTab('Tab6')" :class="{active: store.state.tabAttivo==='Tab6'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabAnagrafica">ANAGRAFICA</li>
-          <li @click="apriTab('Tab3')" :class="{active: store.state.tabAttivo==='Tab3'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabSchede">STRUMENTO OPERATIVO</li>
+          <li @click="apriTab('Tab6')" :class="{active: store.state.tabAttivo==='Tab6'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabAnagrafica" title="Schede anagrafiche e conoscenza">ANAGRAFICA</li>
+          <li @click="apriTab('Tab3')" :class="{active: store.state.tabAttivo==='Tab3'}" v-if="store.getters.getUsrVwList().includes('apriTabSchede')" class="tab" id="apriTabSchede" title="Strumento operativo">STRUMENTO OPERATIVO</li>
           <li @click="apriTab('Tab4')" :class="{active: store.state.tabAttivo==='Tab4'}" v-if="store.getters.getUsrVwList().includes('apriTabDashboard')" class="tab" id="apriTabDashboard">DASHBOARD</li>
           <li @click="apriDocumenti" :class="{active: $route.name==='documenti'}" v-if="store.getters.getUsrVwList().includes('apriTabDocumenti')" class="tab">DOCUMENTI</li>
         </ul>
         <div class="pull-right">
           <ul class="nav navbar-nav">
-            <li id="liUsernameNavbar">{{store.state.userSettings.user_id}}</li>
-            <li @click="apriTab('TabAuth')" v-if="!store.state.userSettings.user_id" :class="{active: store.state.tabAttivo==='TabAuth'}" class="tab" id="apriTabLogin">ACCEDI</li>
-            <li @click="logout" v-if="store.state.userSettings.user_id" class="tab" id="navbarLogout">ESCI</li>
+            <li class="tab user-dropdown" :class="{active: store.state.tabAttivo==='TabAuth'}" title="Utente">
+              <span class="glyphicon glyphicon-user"></span>
+              <ul class="dropdown-menu user-menu">
+                <li @click="apriTab('TabAuth')" v-if="!store.state.userSettings.user_id" class="tab" id="apriTabLogin">ACCEDI</li>
+                <template v-else>
+                  <li @click="apriProfilo" class="tab user-name" id="navbarUsername">{{ store.state.userSettings.user_id }}</li>
+                  <li @click="logout" class="tab" id="navbarLogout">ESCI</li>
+                </template>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
@@ -156,6 +163,10 @@ function apriDocumenti() {
   }
 }
 
+function apriProfilo() {
+  store.methods.setAlert('WIP');
+}
+
 async function logout() {
   const resRaw = await fetch("/auth/logout", {method: "GET", headers: {"content-type": "application/json"} });
   const res = await resRaw.json();
@@ -271,11 +282,13 @@ body {
   background-color: #aaa;
 }
 
-.viz-dropdown {
+.viz-dropdown,
+.user-dropdown {
   position: relative;
 }
 
-.viz-dropdown .dropdown-menu {
+.viz-dropdown .dropdown-menu,
+.user-dropdown .dropdown-menu {
   display: none;
   position: absolute;
   top: 100%;
@@ -288,27 +301,37 @@ body {
   z-index: 100;
 }
 
-.viz-dropdown .dropdown-menu .tab {
+.viz-dropdown .dropdown-menu .tab,
+.user-dropdown .dropdown-menu .tab {
   margin: 0;
   padding: 8px 16px;
   width: 100%;
   white-space: nowrap;
 }
 
-.viz-dropdown .dropdown-menu .tab:hover {
+.viz-dropdown .dropdown-menu .tab:hover,
+.user-dropdown .dropdown-menu .tab:hover {
   background-color: #aaa;
 }
 
-.viz-dropdown:hover .dropdown-menu {
+.viz-dropdown:hover .dropdown-menu,
+.user-dropdown:hover .dropdown-menu,
+.user-dropdown:focus-within .dropdown-menu {
   display: flex;
 }
 
-#liUsernameNavbar {
-  padding: 10px;
-  margin: 10px;
-  color: var(--verdeMain10ance);
-  font-weight: bold;
-  border: none;
+.user-dropdown {
+  min-width: 42px;
+  text-align: center;
+}
+
+.user-dropdown .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
+.user-dropdown .user-name {
+  color: var(--ghostWhite);
 }
 
 .panel, .panel-heading {
