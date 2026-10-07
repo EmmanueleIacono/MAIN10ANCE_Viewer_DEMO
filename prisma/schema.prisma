@@ -1719,6 +1719,9 @@ model definizioni_livello_1 {
   is_for_app_deco                  Boolean?                           @default(false)
   is_for_coperture                 Boolean?                           @default(false)
   is_for_sentieri_pav_est_muretti  Boolean?                           @default(false)
+  is_esterno                       Boolean                            @default(false)
+  is_interno                       Boolean                            @default(false)
+  is_percorso                      Boolean                            @default(false)
   elementi                         elementi[]
   scheda_anagrafica_dipinti_murali scheda_anagrafica_dipinti_murali[]
   definizioni_livello_2            definizioni_livello_2[]
@@ -1732,6 +1735,9 @@ model definizioni_livello_2 {
   def_liv_2_nome                   String                             @db.VarChar
   id_liv_1                         String                             @db.VarChar
   def_liv_2_note                   String?                            @db.VarChar
+  is_esterno                       Boolean                            @default(false)
+  is_interno                       Boolean                            @default(false)
+  is_percorso                      Boolean                            @default(false)
   elementi                         elementi[]
   scheda_anagrafica_dipinti_murali scheda_anagrafica_dipinti_murali[]
   definizioni_livello_1            definizioni_livello_1              @relation(fields: [id_liv_1], references: [id_liv_1], onDelete: NoAction, map: "definizioni_livello_2_fkey")
@@ -1746,6 +1752,9 @@ model definizioni_livello_3 {
   def_liv_3_nome                   String                             @db.VarChar
   id_liv_2                         String                             @db.VarChar
   def_liv_3_note                   String?                            @db.VarChar
+  is_esterno                       Boolean                            @default(false)
+  is_interno                       Boolean                            @default(false)
+  is_percorso                      Boolean                            @default(false)
   elementi                         elementi[]
   scheda_anagrafica_dipinti_murali scheda_anagrafica_dipinti_murali[]
   definizioni_livello_2            definizioni_livello_2              @relation(fields: [id_liv_2], references: [id_liv_2], onDelete: NoAction, map: "definizioni_livello_3_fkey")
@@ -1760,6 +1769,9 @@ model definizioni_livello_4 {
   def_liv_4_nome                   String                             @db.VarChar
   id_liv_3                         String                             @db.VarChar
   def_liv_4_note                   String?                            @db.VarChar
+  is_esterno                       Boolean                            @default(false)
+  is_interno                       Boolean                            @default(false)
+  is_percorso                      Boolean                            @default(false)
   elementi                         elementi[]
   scheda_anagrafica_dipinti_murali scheda_anagrafica_dipinti_murali[]
   definizioni_livello_3            definizioni_livello_3              @relation(fields: [id_liv_3], references: [id_liv_3], onDelete: NoAction, map: "definizioni_livello_4_fkey")
