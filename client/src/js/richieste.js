@@ -532,3 +532,18 @@ export async function cercaElementiAnagrafica(filtri) {
 export async function creaElementoAnagrafica(formData) {
     return apiRequest('/o/anagrafica/elementi', {method: 'POST', body: formData});
 }
+
+export async function leggiSchedaAnagrafica(tabella, idMain10ance, uuidElemento = null) {
+    return apiRequest('/o/anagrafica/schede', {headers: jsonHeaders({
+        tabella: JSON.stringify(tabella),
+        id_main10ance: JSON.stringify(idMain10ance || null),
+        uuid_elemento: JSON.stringify(uuidElemento || null),
+    })});
+}
+
+export async function leggiSchedaDipintiMurali(uuidElemento, idMain10ance = null) {
+    if (idMain10ance) {
+        return leggiSchedaAnagrafica('scheda_anagrafica_dipinti_murali', idMain10ance, uuidElemento);
+    }
+    return apiRequest(`/o/anagrafica/schede/dipinti-murali/${uuidElemento}`);
+}

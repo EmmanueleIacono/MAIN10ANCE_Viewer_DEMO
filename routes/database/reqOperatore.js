@@ -9,7 +9,7 @@ const {data_schema, utility_schema} = require('./schemi');
 const {supabase} = require('../../supabase_config');
 const {assertIdentifier, assertOneOf, quoteIdentifier, qualifiedName} = require('../security/sql');
 const {uploadMiddlewareOptions, asSingleFile, validateFile, safeStoragePath} = require('../security/upload');
-const {ACTIVITY_TABLES, FORM_TABLE_LIST, SERVICE_FORM_TABLE_LIST} = require('./metadata');
+const {ACTIVITY_TABLES, DATA_FORM_TABLES, FORM_TABLE_LIST, SERVICE_FORM_TABLE_LIST} = require('./metadata');
 const {jsonRoute, sendJson, successRoute} = require('../security/http');
 
 app.use(fileupload(uploadMiddlewareOptions));
@@ -154,6 +154,19 @@ app.get('/anagrafica/elementi', jsonRoute(async (req) => {
 }));
 
 app.post('/anagrafica/elementi', successRoute(req => creaElementoAnagrafica(req.files, req.body, req.signedCookies.ambito, req.signedCookies.user_id)));
+
+app.get('/anagrafica/schede', jsonRoute(async (req) => {
+    const ambito = req.signedCookies.ambito;
+    return leggiSchedaAnagrafica(req.headers, ambito);
+}));
+
+app.get('/anagrafica/schede/dipinti-murali/:uuid', jsonRoute(async (req) => {
+    const ambito = req.signedCookies.ambito;
+    return leggiSchedaAnagrafica({
+        tabella: JSON.stringify(DATA_FORM_TABLES.ANAGRAFICA_DIPINTI_MURALI),
+        uuid_elemento: JSON.stringify(req.params.uuid)
+    }, ambito);
+}));
 
 app.get('/anagrafica/artifact-viewer/interroga/:id', async (req, res) => {
     const id = req.params.id;
@@ -562,6 +575,43 @@ async function creaElementoAnagrafica(files, body, ambito, utente) {
         console.log(e);
         await supabase.storage.from('elementi').remove([storagePath]).catch(() => {});
         return false;
+    }
+}
+
+async function leggiSchedaAnagrafica(headers, ambito) {
+    const tableName = assertOneOf(
+        parseOptionalHeaderJson(headers.tabella),
+        Object.values(DATA_FORM_TABLES),
+        'tabella scheda anagrafica'
+    );
+    const idMain10ance = parseOptionalHeaderJson(headers.id_main10ance);
+    const uuidElemento = parseOptionalHeaderJson(headers.uuid_elemento);
+    if ((!idMain10ance && !uuidElemento) || !ambito) return null;
+
+    const clauses = ['ambito = $1'];
+    const values = [ambito];
+    if (idMain10ance) {
+        values.push(idMain10ance);
+        clauses.push(`id_main10ance = $${values.length}`);
+    }
+    if (uuidElemento && tableName === DATA_FORM_TABLES.ANAGRAFICA_DIPINTI_MURALI) {
+        values.push(uuidElemento);
+        clauses.push(`uuid_elemento = $${values.length}`);
+    }
+
+    try {
+        const result = await poolM10a.query(`
+            SELECT *
+            FROM ${qualifiedName(data_schema, tableName)}
+            WHERE ${clauses.join(' AND ')}
+            ORDER BY data_ultima_mod DESC, data_registrazione DESC, id_anagr DESC
+            LIMIT 1;
+        `, values);
+        return result.rows[0] || null;
+    }
+    catch(e) {
+        console.log(e);
+        return null;
     }
 }
 

@@ -53,11 +53,13 @@
                 <dd>{{ immagineSelezionata.record.autore_ultima_mod || 'N/D' }} - {{ immagineSelezionata.record.data_ultima_mod || 'N/D' }}</dd>
               </dl>
               <div v-if="isDipintoMuraleSelezionato" class="selected-actions">
+                <span v-if="caricamentoSchedaDipintiMurali" class="scheda-status">Recupero scheda...</span>
+                <span v-else-if="schedaDipintiMurali" class="scheda-status">Scheda compilata disponibile</span>
                 <BtnBIM
-                  @click="schedaDipintiMuraliVisibile = !schedaDipintiMuraliVisibile"
-                  icona="glyphicon-plus"
+                  @click="toggleSchedaDipintiMurali"
+                  :icona="schedaDipintiMurali ? 'glyphicon-list-alt' : 'glyphicon-plus'"
                   nome="sc-dipinti-murali"
-                  title="Scheda anagrafica Dipinti murali"
+                  :title="schedaDipintiMurali ? 'Consulta scheda anagrafica Dipinti murali' : 'Compila scheda anagrafica Dipinti murali'"
                   colore="verde"
                 />
               </div>
@@ -68,7 +70,9 @@
             v-if="schedaDipintiMuraliVisibile && immagineSelezionata"
             :elemento="immagineSelezionata"
             :meta="metaSchedaDipintiMurali"
+            :scheda="schedaDipintiMurali"
             @chiudi="schedaDipintiMuraliVisibile = false"
+            @salvata="ricaricaSchedaDipintiMurali"
           />
         </Details>
       </Card>
@@ -154,7 +158,7 @@
 <script setup>
 import { computed, inject, onBeforeUnmount, ref, watch } from "vue";
 import { dataCorta, dataInteger, filtraOpzioniLivelli, verificaPercorso } from "../../js/shared";
-import { cercaElementiAnagrafica, creaElementoAnagrafica, downloadImmagini } from "../../js/richieste";
+import { cercaElementiAnagrafica, creaElementoAnagrafica, downloadImmagini, leggiSchedaAnagrafica } from "../../js/richieste";
 import MainPanel from '../elementi/MainPanel.vue';
 import Explorer from '../elementi/Explorer.vue';
 import Details from '../elementi/Details.vue';
@@ -174,7 +178,10 @@ const methods_anagrafica = store_anagrafica.methods_anagrafica;
 const inputAnagraficaRef = ref(null);
 const immagineSelezionata = ref(null);
 const schedaDipintiMuraliVisibile = ref(false);
+const schedaDipintiMurali = ref(null);
+const caricamentoSchedaDipintiMurali = ref(false);
 let ricercaCounter = 0;
+let schedaCounter = 0;
 
 const opzioni_livello_2 = computed(() => filtraOpzioniLivelli(
   state_globale.gerarchia_classi_elementi,
@@ -218,14 +225,17 @@ const percorsoCartella = computed(() => {
   return parti.filter(Boolean).join('/');
 });
 
-const isDipintoMuraleSelezionato = computed(() => (
-  immagineSelezionata.value?.record.livello_3 === '600.200.100.000'
-));
+const isDipintoMuraleSelezionato = computed(() => isDipintoMurale(immagineSelezionata.value?.record));
 
 const metaSchedaDipintiMurali = computed(() => ({
   localita: immagineSelezionata.value ? nomeLocalita(immagineSelezionata.value.record.localita) : 'N/D',
   edificio: immagineSelezionata.value ? nomeEdificio(immagineSelezionata.value.record.edificio) : 'N/D',
 }));
+
+const tabellaSchedaAnagraficaSelezionata = computed(() => {
+  if (isDipintoMuraleSelezionato.value) return 'scheda_anagrafica_dipinti_murali';
+  return null;
+});
 
 watch(() => state_anagrafica.selezione.select_loc, () => {
   filtraListaEdif();
@@ -276,10 +286,53 @@ function toggleSelezione(img) {
   if (immagineSelezionata.value?.record.uuid === img.record.uuid) {
     immagineSelezionata.value = null;
     schedaDipintiMuraliVisibile.value = false;
+    schedaDipintiMurali.value = null;
     return;
   }
   immagineSelezionata.value = img;
   schedaDipintiMuraliVisibile.value = false;
+  schedaDipintiMurali.value = null;
+  if (isDipintoMurale(img.record)) {
+    ricaricaSchedaDipintiMurali();
+  }
+}
+
+function isDipintoMurale(record) {
+  if (!record) return false;
+  const codiciDipintiMurali = ['700.000.000.000', '600.200.100.000'];
+  return [
+    record.livello_1,
+    record.livello_2,
+    record.livello_3,
+    record.livello_4,
+  ].some(livello => codiciDipintiMurali.includes(livello));
+}
+
+function toggleSchedaDipintiMurali() {
+  schedaDipintiMuraliVisibile.value = !schedaDipintiMuraliVisibile.value;
+  if (schedaDipintiMuraliVisibile.value && !schedaDipintiMurali.value) {
+    ricaricaSchedaDipintiMurali();
+  }
+}
+
+async function ricaricaSchedaDipintiMurali() {
+  const record = immagineSelezionata.value?.record;
+  const tabella = tabellaSchedaAnagraficaSelezionata.value;
+  if (!record?.id_main10ance || !tabella) return;
+
+  const richiestaId = ++schedaCounter;
+  caricamentoSchedaDipintiMurali.value = true;
+  try {
+    const scheda = await leggiSchedaAnagrafica(tabella, record.id_main10ance, record.uuid);
+    if (richiestaId !== schedaCounter) return;
+    schedaDipintiMurali.value = scheda;
+  }
+  catch(e) {
+    if (richiestaId === schedaCounter) schedaDipintiMurali.value = null;
+  }
+  finally {
+    if (richiestaId === schedaCounter) caricamentoSchedaDipintiMurali.value = false;
+  }
 }
 
 function nomeLocalita(sigla) {
@@ -364,6 +417,7 @@ async function aggiornaGalleria() {
   const ricercaId = ++ricercaCounter;
   immagineSelezionata.value = null;
   schedaDipintiMuraliVisibile.value = false;
+  schedaDipintiMurali.value = null;
   methods_anagrafica.reset_state_galleria();
   if (!ricercaPronta.value) return;
 
@@ -480,7 +534,14 @@ async function aggiornaGalleria() {
 .selected-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
   margin-top: 1.2rem;
+}
+
+.scheda-status {
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .wrapper-bottoni {
