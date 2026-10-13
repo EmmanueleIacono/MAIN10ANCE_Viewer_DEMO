@@ -68,6 +68,7 @@ router.post('/login', authLimiter, async (req: Request, res: Response, next: Nex
         res.json({
           message: 'Login completato',
           id: datiUtente.username,
+          role: datiUtente.role,
           bim_vw_sets: roleSettings.bim_vw_sets,
           usr_vw: roleSettings.usr_vw,
           buckets: ambitoSettings.buckets,
@@ -115,6 +116,7 @@ router.get('/session', async (req: Request, res: Response, next: NextFunction) =
     res.json({
       message: 'Sessione attiva',
       id: user_id,
+      role,
       bim_vw_sets: roleSettings.bim_vw_sets,
       usr_vw: roleSettings.usr_vw,
       buckets: ambitoSettings.buckets,

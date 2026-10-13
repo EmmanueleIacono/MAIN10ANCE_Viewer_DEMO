@@ -61,13 +61,29 @@
   <DialogFileUpload />
   <Alert />
   <Confirm />
+  <div v-if="profiloVisibile" class="profile-dialog-backdrop" @click.self="chiudiProfilo">
+    <div class="profile-dialog">
+      <div class="profile-dialog-header">
+        <h4>Profilo utente</h4>
+        <button type="button" class="profile-close glyphicon glyphicon-remove" title="Chiudi" @click="chiudiProfilo"></button>
+      </div>
+      <dl class="profile-info">
+        <dt>Nome utente</dt>
+        <dd>{{ profiloUtente.nome }}</dd>
+        <dt>Ruolo</dt>
+        <dd>{{ profiloUtente.ruolo }}</dd>
+        <dt>Ambito</dt>
+        <dd>{{ profiloUtente.ambito }}</dd>
+      </dl>
+    </div>
+  </div>
 </div>
 </template>
 
 <script setup>
-import {provide, onMounted, watch} from 'vue';
+import {computed, provide, onMounted, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import {getTabelleGIS, getGIS, leggiDBMarkerLoc, leggiDBMarkerEdif, leggiDBMarkerLocPdiff} from './js/richieste';
+import {getTabelleGIS, getGIS, leggiDBMarkerLoc, leggiDBMarkerEdif, leggiDBMarkerLocPdiff, leggiInfoUtenteLoggato} from './js/richieste';
 import store from '@/store';
 import store_globale from './store/store_globale';
 import store_anagrafica from './store/store_anagrafica';
@@ -78,6 +94,13 @@ import DialogFileUpload from './components/DialogFileUpload.vue';
 
 const router = useRouter();
 const route = useRoute();
+const profiloVisibile = ref(false);
+
+const profiloUtente = computed(() => ({
+  nome: store.state.userSettings.user_id || 'N/D',
+  ruolo: formattaRuolo(store.state.userSettings.role),
+  ambito: store.state.userSettings.ambito_full_name || store.state.userSettings.ambito || 'N/D',
+}));
 
 provide('store', store);
 provide('store_globale', store_globale);
@@ -127,7 +150,7 @@ async function primoLoad() {
   try {
     const resRaw = await fetch('/auth/session', {method: 'GET', headers: {'content-type': 'application/json'}});
     if (resRaw.ok) {
-      const sessionInfo = await resRaw.json();
+      const sessionInfo = await completaInfoUtente(await resRaw.json());
       store.methods.setLocalStorageUserInfo(sessionInfo);
     }
     else if (resRaw.status === 401 && localStorage.user_id) {
@@ -142,6 +165,7 @@ async function primoLoad() {
       store.methods.setUserSettings();
     }
   }
+  await completaRuoloUtente();
   await store_globale.methods.popolaStoreGlobale();
 }
 
@@ -164,7 +188,44 @@ function apriDocumenti() {
 }
 
 function apriProfilo() {
-  store.methods.setAlert('WIP');
+  profiloVisibile.value = true;
+}
+
+function chiudiProfilo() {
+  profiloVisibile.value = false;
+}
+
+function formattaRuolo(ruolo) {
+  if (!valoreProfiloValido(ruolo)) return 'N/D';
+  return ruolo.charAt(0).toUpperCase() + ruolo.slice(1);
+}
+
+async function completaRuoloUtente() {
+  const username = store.state.userSettings.user_id;
+  if (!username || valoreProfiloValido(store.state.userSettings.role)) return;
+  const datiUtente = await completaInfoUtente({id: username});
+  if (valoreProfiloValido(datiUtente.role)) {
+    store.methods.setUserRole(datiUtente.role);
+  }
+}
+
+async function completaInfoUtente(info) {
+  const username = info?.id || info?.username;
+  if (!username || valoreProfiloValido(info?.role)) return info;
+  try {
+    const datiUtente = await leggiInfoUtenteLoggato(username);
+    if (valoreProfiloValido(datiUtente?.role)) {
+      return {...info, role: datiUtente.role};
+    }
+  }
+  catch {
+    return info;
+  }
+  return info;
+}
+
+function valoreProfiloValido(value) {
+  return value !== undefined && value !== null && value !== '' && value !== 'undefined' && value !== 'null';
 }
 
 async function logout() {
@@ -332,6 +393,71 @@ body {
 
 .user-dropdown .user-name {
   color: var(--ghostWhite);
+}
+
+.profile-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, .45);
+}
+
+.profile-dialog {
+  width: min(92vw, 440px);
+  background: var(--grigio);
+  border: 1px solid #777;
+  box-shadow: 0 1.2rem 3rem rgba(0, 0, 0, .35);
+}
+
+.profile-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  color: var(--verdeMain10ance);
+  background: var(--blackOlive);
+}
+
+.profile-dialog-header h4 {
+  margin: 0;
+  font-weight: 700;
+}
+
+.profile-close {
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid rgba(168, 201, 86, .45);
+  background: transparent;
+  color: var(--verdeMain10ance);
+  cursor: pointer;
+}
+
+.profile-close:hover,
+.profile-close:focus {
+  background: var(--verdeMain10ance);
+  color: var(--blackOlive);
+}
+
+.profile-info {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .9rem 1.4rem;
+  padding: 1.4rem;
+  margin: 0;
+}
+
+.profile-info dt {
+  font-weight: 700;
+}
+
+.profile-info dd {
+  margin: 0;
+  text-align: right;
 }
 
 .panel, .panel-heading {

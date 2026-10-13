@@ -80,6 +80,10 @@ export async function prendiSchedeAnagrafica() {
     return apiRequest('/o/Main10ance_DB/tabellaDB/schede-anagrafica');
 }
 
+export async function leggiInfoUtenteLoggato(username) {
+    return apiRequest(`/l/utenti/${encodeURIComponent(username)}`);
+}
+
 /////           ATTENZIONE: QUESTA UGUALE A FUNZIONE "leggiDBMarkerLocAmbito" ------> DA RISOLVERE
 export async function prendiSigleLocalitaAmbito() {
     const risultato = await fetch('/o/MarkerLoc', {method: "GET", headers: {"content-type": "application/json"}});

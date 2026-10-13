@@ -13,6 +13,7 @@ const state = reactive({
     tabAttivo: 'Tab2',
     userSettings: {
         user_id: '',
+        role: '',
         usr_vw: '',
         bkts: '',
         ambito: '',
@@ -140,7 +141,10 @@ const methods = {
     },
 
     setLocalStorageUserInfo(settingsJson) {
+        const role = settingsJson.role ?? settingsJson.ruolo;
         localStorage.user_id = settingsJson.id;
+        if (valoreSettingValido(role)) localStorage.role = role;
+        else localStorage.removeItem('role');
         localStorage.usr_vw = settingsJson.usr_vw;
         localStorage.bkts = settingsJson.buckets;
         localStorage.ambito = settingsJson.ambito; // SAREBBE MEGLIO PRENDERLO DAI COOKIE // nuovi settings 29/05/2024
@@ -151,6 +155,7 @@ const methods = {
 
     setUserSettings() {
         state.userSettings.user_id = localStorage.user_id;
+        state.userSettings.role = valoreSettingValido(localStorage.role) ? localStorage.role : '';
         state.userSettings.usr_vw = localStorage.usr_vw;
         state.userSettings.bkts = localStorage.bkts;
         state.userSettings.ambito = localStorage.ambito;
@@ -160,17 +165,29 @@ const methods = {
 
     setLogoutUserSettings() {
         localStorage.removeItem('user_id');
+        localStorage.removeItem('role');
         localStorage.removeItem('usr_vw');
         localStorage.removeItem('bkts');
         localStorage.removeItem('ambito');
         localStorage.removeItem('ambito_schema');
         localStorage.removeItem('ambito_full_name');
         state.userSettings.user_id = '';
+        state.userSettings.role = '';
         state.userSettings.usr_vw = '';
         state.userSettings.bkts = '';
         state.userSettings.ambito = '';
         state.userSettings.ambito_schema = '';
         state.userSettings.ambito_full_name = '';
+    },
+
+    setUserRole(role) {
+        if (!valoreSettingValido(role)) {
+            localStorage.removeItem('role');
+            state.userSettings.role = '';
+            return;
+        }
+        localStorage.role = role;
+        state.userSettings.role = role;
     },
 
     setAlert(messaggio) {
@@ -364,6 +381,10 @@ const getters = {
             ambito_full_name: state.userSettings.ambito_full_name,
         }
     }
+}
+
+function valoreSettingValido(value) {
+    return value !== undefined && value !== null && value !== '' && value !== 'undefined' && value !== 'null';
 }
 
 export default {

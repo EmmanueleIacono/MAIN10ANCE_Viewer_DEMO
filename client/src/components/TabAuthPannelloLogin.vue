@@ -20,6 +20,7 @@
 
 <script setup>
 import {reactive, inject} from 'vue';
+import {leggiInfoUtenteLoggato} from '../js/richieste';
 
 const emit = defineEmits(['cambioTab', 'authErr']);
 
@@ -51,7 +52,8 @@ async function submitLogin() {
     }
     else {
       emettiImpostaMessaggioErrore('');
-      store.methods.setLocalStorageUserInfo(resJson);
+      const sessionInfo = await completaInfoUtente(resJson);
+      store.methods.setLocalStorageUserInfo(sessionInfo);
       store.methods.setAlert(resJson.message);
       store.methods.setTabAttivo('Tab2');
     }
@@ -66,6 +68,25 @@ async function submitLogin() {
 
 function login(user) {
   return fetch("/auth/login", {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(user)});
+}
+
+async function completaInfoUtente(info) {
+  const username = info?.id || info?.username;
+  if (!username || valoreAuthValido(info?.role)) return info;
+  try {
+    const datiUtente = await leggiInfoUtenteLoggato(username);
+    if (valoreAuthValido(datiUtente?.role)) {
+      return {...info, role: datiUtente.role};
+    }
+  }
+  catch {
+    return info;
+  }
+  return info;
+}
+
+function valoreAuthValido(value) {
+  return value !== undefined && value !== null && value !== '' && value !== 'undefined' && value !== 'null';
 }
 </script>
 
