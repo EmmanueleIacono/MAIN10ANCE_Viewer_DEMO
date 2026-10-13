@@ -92,7 +92,9 @@ function aggiornaLarghezzaLayout() {
 }
 
 function leggiLarghezzaSalvata() {
-  const salvata = Number(localStorage.getItem(STORAGE_WIDTH_KEY));
+  const valoreSalvato = localStorage.getItem(STORAGE_WIDTH_KEY);
+  if (valoreSalvato === null) return DEFAULT_EXPLORER_WIDTH;
+  const salvata = Number(valoreSalvato);
   if (!Number.isFinite(salvata)) return DEFAULT_EXPLORER_WIDTH;
   return limitaLarghezza(salvata);
 }
