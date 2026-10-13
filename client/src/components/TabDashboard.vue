@@ -1,6 +1,6 @@
 <template>
 <div v-if="store.getters.getUsrVwList().includes('apriTabDashboard')">
-  <MainPanel :colonna="'col-sm-7'">
+  <MainPanel>
     <div class="contenitore-dashboard">
       <Overview />
       <TaskProgress />
@@ -9,7 +9,7 @@
       <GraficiDettaglio />
     </div>
   </MainPanel>
-  <Explorer :colonna="'col-sm-5'">
+  <Explorer>
     <Details summary="FILTRI">
       WIP
     </Details>

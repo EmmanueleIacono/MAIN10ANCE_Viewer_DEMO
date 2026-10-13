@@ -1,6 +1,6 @@
 <template>
 <div v-if="store.getters.getUsrVwList().includes('apriTabSchede')">
-  <MainPanel :colonna="'col-sm-7'">
+  <MainPanel>
     <br />
     <SintesiLavori v-if="store.getters.getUsrVwList().includes('pianificazione')" />
     <Pianificazione @pianificazioneAggiornata="aggiornaEventi" v-if="store.getters.getUsrVwList().includes('pianificazione')" />
@@ -10,7 +10,7 @@
     <Esecuzione ref="EsecuzioneRef" />
     <Storico />
   </MainPanel>
-  <Explorer :colonna="'col-sm-5'">
+  <Explorer>
     <div ref="calendarResizeTarget" class="calendar-resize-target">
       <FullCalendar ref="fullCalendarPlanner" :options="calendarOptions" />
     </div>

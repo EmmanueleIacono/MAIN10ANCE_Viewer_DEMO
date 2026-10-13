@@ -1,10 +1,10 @@
 <template>
 <div>
-  <MainPanel :class="`col-sm-${store.getters.getBimVwSets()[0]} fill`"><br>
+  <MainPanel><br>
     <DownloadImage @nuovaSelezione="aggiornaSelezione" ref="downloadRef" :percorsoCartella="percorsoCartella" />
     <Galleria v-if="state.datiGalleria.galleriaVisibile" />
   </MainPanel>
-  <Explorer :colonna="`col-sm-${store.getters.getBimVwSets()[1]}`">
+  <Explorer>
     <Details summary="SELEZIONE IMMAGINI" :open="true">
       <div class="wrapper-crea-percorso loading-wrapper">
         <LoadingScreen :caricamento="state.datiNavigazione.caricamento" />

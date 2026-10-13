@@ -13,7 +13,6 @@ const state = reactive({
     tabAttivo: 'Tab2',
     userSettings: {
         user_id: '',
-        bim_vw_sets: '9-3',
         usr_vw: '',
         bkts: '',
         ambito: '',
@@ -142,7 +141,6 @@ const methods = {
 
     setLocalStorageUserInfo(settingsJson) {
         localStorage.user_id = settingsJson.id;
-        localStorage.bim_vw_sets = settingsJson.bim_vw_sets;
         localStorage.usr_vw = settingsJson.usr_vw;
         localStorage.bkts = settingsJson.buckets;
         localStorage.ambito = settingsJson.ambito; // SAREBBE MEGLIO PRENDERLO DAI COOKIE // nuovi settings 29/05/2024
@@ -153,7 +151,6 @@ const methods = {
 
     setUserSettings() {
         state.userSettings.user_id = localStorage.user_id;
-        state.userSettings.bim_vw_sets = localStorage.bim_vw_sets;
         state.userSettings.usr_vw = localStorage.usr_vw;
         state.userSettings.bkts = localStorage.bkts;
         state.userSettings.ambito = localStorage.ambito;
@@ -163,14 +160,12 @@ const methods = {
 
     setLogoutUserSettings() {
         localStorage.removeItem('user_id');
-        localStorage.removeItem('bim_vw_sets');
         localStorage.removeItem('usr_vw');
         localStorage.removeItem('bkts');
         localStorage.removeItem('ambito');
         localStorage.removeItem('ambito_schema');
         localStorage.removeItem('ambito_full_name');
         state.userSettings.user_id = '';
-        state.userSettings.bim_vw_sets = '9-3';
         state.userSettings.usr_vw = '';
         state.userSettings.bkts = '';
         state.userSettings.ambito = '';
@@ -358,9 +353,6 @@ const methods = {
 const getters = {
     getUsrVwList() {
         return state.userSettings.usr_vw.split(',');
-    },
-    getBimVwSets() {
-        return state.userSettings.bim_vw_sets.split('-');
     },
     getBkts() {
         return state.userSettings.bkts.split(',');

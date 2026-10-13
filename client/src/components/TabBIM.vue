@@ -1,13 +1,13 @@
 <template>
 <div>
-  <div :class="`col-sm-${store.getters.getBimVwSets()[0]} fill`">
+  <MainPanel>
     <div id="forgeViewer">
       <div v-if="store.stateBIM.modelPlaceholder" id="contenitore-bim-viewer-placeholder">
         <img src="@/assets/img/sacro-monte-varese-c.jpg" id="bim-viewer-placeholder">
       </div>
     </div>
-  </div>
-  <Explorer :colonna="`col-sm-${store.getters.getBimVwSets()[1]}`">
+  </MainPanel>
+  <Explorer>
     <Details summary="SELEZIONE MODELLI">
       <Tree />
     </Details>
@@ -18,6 +18,7 @@
 
 <script setup>
 import {inject} from 'vue';
+import MainPanel from './elementi/MainPanel.vue';
 import Explorer from './elementi/Explorer.vue';
 import Details from './elementi/Details.vue';
 import PannelloDB from './TabBIMPannelloDB.vue';

@@ -1,9 +1,9 @@
 <template>
 <div>
-  <MainPanel :colonna="'col-sm-9'">
+  <MainPanel>
     <MappaGIS ref="mappaRef" @newMarker="updateMarker" />
   </MainPanel>
-  <Explorer :colonna="'col-sm-3'">
+  <Explorer>
     <AddMarkerAmbito />
     <br />
     <BtnBIM @click="addLocPdiff" v-if="verificaDisplayAdd()" class="btn-gis" icona="glyphicon-plus" nome="addLocPdiff" title="Aggiungi località patrimonio diffuso" colore="blu" />

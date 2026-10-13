@@ -1,6 +1,6 @@
 <template>
   <div>
-    <MainPanel :colonna="'col-sm-7'">
+    <MainPanel>
       <div class="main-card-wrapper">
         <Card>
           <Details summary="ELEMENTI" :open="true">
@@ -79,7 +79,7 @@
       </div>
     </MainPanel>
 
-    <Explorer :colonna="'col-sm-5'">
+    <Explorer>
       <Details summary="RICERCA" :open="true">
         <div class="search-fields">
         <label class="nome" for="check-localita">Località</label>
