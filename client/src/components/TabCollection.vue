@@ -128,46 +128,6 @@ const state = reactive({
     autore_scheda: null,
     autore_ultima_mod: null,
   },
-  datiModuloAnagraficaStatua: {
-    nome_statua: '',
-    codice_statua: '',
-    codici_altro: '',
-    descrizione_statua: '',
-    tecnica_esecuzione: '',
-    dimensioni: '',
-    materiale_statua: '',
-    materiale_annotazioni: '',
-    materiali_armatura: [], // enum[]
-    materiale_supporto: '', // enum
-    lamina_metallica: false, // bool
-    pellicola_pittorica_tecnica_e_mat: {
-      su_legno: '',
-      su_gesso: '',
-      su_terracotta: '',
-      altro: '',
-    },
-    strato_di_preparazione: '',
-    elementi_accessori_monili: [], // enum[]
-    materiale_elementi_accessori_monili: [], // enum[]
-    elementi_accessori_monili_annotazioni: '',
-    elementi_di_ancoraggio_a_parete: false,
-    materiale_ancoraggio_parete: '', // enum
-    ancoraggio_parete_annotazioni: '',
-    elementi_di_ancoraggio_a_pavimento: false,
-    materiale_ancoraggio_pavimento: '', // enum
-    ancoraggio_pavimento_annotazioni: '',
-    epoca: '',
-    fonti: '',
-    autore: '',
-    accessibilità: false, // bool
-    note: '',
-    docs: [], // lista nomi documenti
-    id_anagr: null,
-    data_registrazione: null,
-    data_ultima_mod: null,
-    autore_scheda: null,
-    autore_ultima_mod: null,
-  },
   datiModuloAnagraficaCoperture: {
     codice: '',
     descrizione_copertura_rapporti: '', // enum
@@ -250,7 +210,6 @@ provide('stateGalleria', state.datiGalleria);
 provide('stateAnagrafica', state.datiAnagrafica);
 provide('stateSegnalazione', state.datiSegnalazione);
 provide('stateModuloAnagrafica', state.datiModuloAnagrafica);
-provide('stateModuloAnagraficaStatua', state.datiModuloAnagraficaStatua);
 provide('stateModuloAnagraficaCoperture', state.datiModuloAnagraficaCoperture);
 provide('stateDocumenti', state.datiDocumenti);
 provide('stateModuloSegnalazione', state.datiModuloSegnalazione);
@@ -448,42 +407,6 @@ async function anagraficaImmagine() {
           state.datiModuloAnagrafica.documenti = state.datiAnagrafica.schedaAnagrafica['Documenti'];
           state.datiModuloAnagrafica.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
           state.datiModuloAnagrafica.data = state.datiAnagrafica.schedaAnagrafica['Data'];
-          break;
-
-        case 'statua':
-          state.datiAnagrafica.schedaAnagrafica = datiAnagrafica;
-          console.log('state anagrafica statua: ', state.datiAnagrafica.schedaAnagrafica);
-          state.datiModuloAnagraficaStatua.nome_statua = state.datiAnagrafica.schedaAnagrafica['Soggetto statua']; // DA TABELLA "statua"
-          state.datiModuloAnagraficaStatua.codice_statua = state.datiAnagrafica.schedaAnagrafica['Codice statua']; // DA TABELLA "statua"
-          state.datiModuloAnagraficaStatua.codici_altro = state.datiAnagrafica.schedaAnagrafica['Altri codici'];
-          state.datiModuloAnagraficaStatua.descrizione_statua = state.datiAnagrafica.schedaAnagrafica['Descrizione statua'];
-          state.datiModuloAnagraficaStatua.tecnica_esecuzione = state.datiAnagrafica.schedaAnagrafica['Tecnica di esecuzione'];
-          state.datiModuloAnagraficaStatua.dimensioni = state.datiAnagrafica.schedaAnagrafica['Dimensioni'];
-          state.datiModuloAnagraficaStatua.materiale_statua = state.datiAnagrafica.schedaAnagrafica['Materiale statua']
-          state.datiModuloAnagraficaStatua.materiale_annotazioni = state.datiAnagrafica.schedaAnagrafica['Materiale annotazioni'];
-          state.datiModuloAnagraficaStatua.materiali_armatura = state.datiAnagrafica.schedaAnagrafica['Materiali armatura'] ? state.datiAnagrafica.schedaAnagrafica['Materiali armatura'] : []; // array
-          state.datiModuloAnagraficaStatua.materiale_supporto = state.datiAnagrafica.schedaAnagrafica['Materiale supporto'];
-          state.datiModuloAnagraficaStatua.lamina_metallica = state.datiAnagrafica.schedaAnagrafica['Lamina metallica']; // bool
-          state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_legno = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su legno'];
-          state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_gesso = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su gesso'];
-          state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_terracotta = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica su terracotta'];
-          state.datiModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.altro = state.datiAnagrafica.schedaAnagrafica['Pellicola pittorica - Altro'];
-          state.datiModuloAnagraficaStatua.strato_di_preparazione = state.datiAnagrafica.schedaAnagrafica['Strato di preparazione'];
-          state.datiModuloAnagraficaStatua.elementi_accessori_monili = state.datiAnagrafica.schedaAnagrafica['Elementi accessori e monili'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Elementi accessori e monili']) : []; // array
-          state.datiModuloAnagraficaStatua.materiale_elementi_accessori_monili = state.datiAnagrafica.schedaAnagrafica['Materiale elementi accessori e monili'] ? trattaStringArray(state.datiAnagrafica.schedaAnagrafica['Materiale elementi accessori e monili']) : []; // array
-          state.datiModuloAnagraficaStatua.elementi_accessori_monili_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni elementi accessori e monili'];
-          state.datiModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete = state.datiAnagrafica.schedaAnagrafica['Elementi di ancoraggio a parete']; // bool
-          state.datiModuloAnagraficaStatua.materiale_ancoraggio_parete = state.datiAnagrafica.schedaAnagrafica['Materiale ancoraggi a parete'];
-          state.datiModuloAnagraficaStatua.ancoraggio_parete_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni ancoraggi a parete'];
-          state.datiModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento = state.datiAnagrafica.schedaAnagrafica['Elementi di ancoraggio a pavimento']; // bool
-          state.datiModuloAnagraficaStatua.materiale_ancoraggio_pavimento = state.datiAnagrafica.schedaAnagrafica['Materiale ancoraggi a pavimento'];
-          state.datiModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni = state.datiAnagrafica.schedaAnagrafica['Annotazioni ancoraggi a pavimento'];
-          state.datiModuloAnagraficaStatua.epoca = state.datiAnagrafica.schedaAnagrafica['Epoca'];
-          state.datiModuloAnagraficaStatua.fonti = state.datiAnagrafica.schedaAnagrafica['Fonti'];
-          state.datiModuloAnagraficaStatua.autore = state.datiAnagrafica.schedaAnagrafica['Autore'];
-          state.datiModuloAnagraficaStatua.accessibilità = state.datiAnagrafica.schedaAnagrafica['Accessibilità']; // bool
-          state.datiModuloAnagraficaStatua.note = state.datiAnagrafica.schedaAnagrafica['Note'];
-          state.datiDocumenti.docs = state.datiAnagrafica.schedaAnagrafica['Documenti'];
           break;
 
         case 'elementi':

@@ -3,7 +3,6 @@
     ref="schedaRef"
     class="scheda-anagrafica dipinti-murali-form"
     :class="{'readonly-mode': solaLettura}"
-    @click="gestisciClickScheda"
     @keydown.capture="bloccaModificaSolaLettura"
     @beforeinput.capture="bloccaModificaSolaLettura"
   >
@@ -34,20 +33,15 @@
       </tbody>
     </table>
 
-    <table class="form-table first-section">
-      <tbody>
-      <tr class="section-title-row"><td colspan="2"><b>OGGETTO</b></td></tr>
+    <SchedaAnagraficaSezione titolo="OGGETTO" :modalita-modifica="modalitaModifica" prima>
       <tr><th>Soggetto</th><td><input v-model="form.descrizione_dipinto"></td></tr>
       <tr><th>Autore</th><td><input v-model="form.autore"></td></tr>
       <tr><th>Datazione</th><td><input v-model="form.datazione"></td></tr>
       <tr><th>Dimensioni</th><td><input v-model="form.dimensioni"></td></tr>
       <tr><th>Note</th><td><textarea v-model="form.note"></textarea></td></tr>
-      </tbody>
-    </table>
+    </SchedaAnagraficaSezione>
 
-    <table class="form-table">
-      <tbody>
-      <tr class="section-title-row"><td colspan="2"><b>COLLOCAZIONE</b></td></tr>
+    <SchedaAnagraficaSezione titolo="COLLOCAZIONE" :modalita-modifica="modalitaModifica">
       <tr><th>Interno</th><td><input type="checkbox" v-model="form.collocazione_is_interno"></td></tr>
       <tr v-if="form.collocazione_is_interno"><th>Parete interna</th><td><input v-model="form.appartiene_a_parete_int"></td></tr>
       <tr><th>Esterno</th><td><input type="checkbox" v-model="form.collocazione_is_esterno"></td></tr>
@@ -55,12 +49,9 @@
       <tr><th>Volta</th><td><input v-model="form.appartiene_a_volta"></td></tr>
       <tr><th>Presenza elementi di protezione</th><td><input type="checkbox" v-model="form.has_elementi_di_protezione"></td></tr>
       <tr><th>Annotazioni</th><td><textarea v-model="form.collocazione_annotazioni"></textarea></td></tr>
-      </tbody>
-    </table>
+    </SchedaAnagraficaSezione>
 
-    <table class="form-table">
-      <tbody>
-      <tr class="section-title-row"><td colspan="2"><b>ICONOGRAFIA E TECNICA</b></td></tr>
+    <SchedaAnagraficaSezione titolo="ICONOGRAFIA E TECNICA" :modalita-modifica="modalitaModifica">
       <tr><th>Dipinto isolato</th><td><input type="checkbox" v-model="form.is_isolato" @change="impostaIsolato"></td></tr>
       <tr><th>Parte di un ciclo</th><td><input type="checkbox" v-model="form.is_parte_di_un_ciclo" @change="impostaParteDiCiclo"></td></tr>
       <tr><th>Annotazioni isolato/ciclo</th><td><textarea v-model="form.isolato_o_ciclo_annotazioni"></textarea></td></tr>
@@ -76,12 +67,9 @@
       <tr><th>Cronologia</th><td><textarea v-model="form.cronologia"></textarea></td></tr>
       <tr><th>Presenza intercapedine / contromuro</th><td><input type="checkbox" v-model="form.has_intercapedine"></td></tr>
       <tr v-if="form.has_intercapedine"><th>Descrizione intercapedine</th><td><textarea v-model="form.intercapedine_descrizione"></textarea></td></tr>
-      </tbody>
-    </table>
+    </SchedaAnagraficaSezione>
 
-    <table class="form-table">
-      <tbody>
-      <tr class="section-title-row"><td colspan="2"><b>SUPPORTO E STRATI PREPARATORI</b></td></tr>
+    <SchedaAnagraficaSezione titolo="SUPPORTO E STRATI PREPARATORI" :modalita-modifica="modalitaModifica">
       <tr><th>Supporto</th><td><select v-model="form.supporto"><option value=""></option><option v-for="v in opzioni.supporto" :key="v" :value="v">{{ v }}</option></select></td></tr>
       <tr><th>Descrizione supporto</th><td><textarea v-model="form.supporto_descrizione"></textarea></td></tr>
       <tr><th>Armatura</th><td><div v-for="v in opzioni.armatura" :key="v"><input :id="`arm-${v}`" type="checkbox" :value="v" v-model="form.armatura"><label :for="`arm-${v}`">{{ v }}</label></div></td></tr>
@@ -106,12 +94,9 @@
       <tr><th>Descrizione elementi a rilievo</th><td><textarea v-model="form.elementi_rilievo_str_prep_dip_descrizione"></textarea></td></tr>
       <tr><th>Elementi inseriti</th><td><select v-model="form.elementi_inseriti_str_prep_dip"><option value=""></option><option v-for="v in opzioni.elementiInseriti" :key="v" :value="v">{{ v }}</option></select></td></tr>
       <tr><th>Descrizione elementi inseriti</th><td><textarea v-model="form.elementi_inseriti_str_prep_dip_descrizione"></textarea></td></tr>
-      </tbody>
-    </table>
+    </SchedaAnagraficaSezione>
 
-    <table class="form-table">
-      <tbody>
-      <tr class="section-title-row"><td colspan="2"><b>PELLICOLA PITTORICA</b></td></tr>
+    <SchedaAnagraficaSezione titolo="PELLICOLA PITTORICA" :modalita-modifica="modalitaModifica">
       <tr><th>Segni di trasposizione del disegno</th><td><select v-model="form.segni_trasp_dis_pell_pitt_dip"><option value=""></option><option v-for="v in opzioni.segniTraspPell" :key="v" :value="v">{{ v }}</option></select></td></tr>
       <tr><th>Descrizione segni</th><td><textarea v-model="form.segni_trasp_dis_pell_pitt_dip_descrizione"></textarea></td></tr>
       <tr><th>Disegno preparatorio</th><td><textarea v-model="form.disegno_preparatorio_pell_pitt_dip"></textarea></td></tr>
@@ -125,12 +110,9 @@
       <tr><th>Altro</th><td><input type="checkbox" v-model="form.pell_pitt_dip_altro"></td></tr>
       <tr v-if="form.pell_pitt_dip_altro"><th>Specificare altro</th><td><textarea v-model="form.pell_pitt_dip_altro_specificare"></textarea></td></tr>
       <tr><th>Annotazioni</th><td><textarea v-model="form.pell_pitt_dip_annotazioni"></textarea></td></tr>
-      </tbody>
-    </table>
+    </SchedaAnagraficaSezione>
 
-    <table class="form-table">
-      <tbody>
-      <tr class="section-title-row"><td colspan="2"><b>ELEMENTI ACCESSORI, SEGNI PARTICOLARI E INTERVENTI SUCCESSIVI</b></td></tr>
+    <SchedaAnagraficaSezione titolo="ELEMENTI ACCESSORI, SEGNI PARTICOLARI E INTERVENTI SUCCESSIVI" :modalita-modifica="modalitaModifica">
       <tr><th>Elementi applicati</th><td><select v-model="form.el_accessori_applicati_dip"><option value=""></option><option v-for="v in opzioni.elApplicati" :key="v" :value="v">{{ v }}</option></select></td></tr>
       <tr><th>Altro elementi applicati</th><td><input type="checkbox" v-model="form.el_accessori_applicati_dip_altro"></td></tr>
       <tr v-if="form.el_accessori_applicati_dip_altro"><th>Specificare altro</th><td><textarea v-model="form.el_accessori_applicati_dip_altro_specificare"></textarea></td></tr>
@@ -153,66 +135,35 @@
       <tr v-if="form.interventi_successivi_dip_pell_pitt === 'fissativi/ravvivanti'"><th>Annotazioni fissativi</th><td><textarea v-model="form.interventi_successivi_dip_pell_pitt_fissativi_annotazioni"></textarea></td></tr>
       <tr v-if="form.interventi_successivi_dip_pell_pitt === 'dorature'"><th>Tipo dorature</th><td><select v-model="form.interventi_successivi_dip_pell_pitt_dorature"><option value=""></option><option v-for="v in opzioni.doratureSucc" :key="v" :value="v">{{ v }}</option></select></td></tr>
       <tr v-if="form.interventi_successivi_dip_pell_pitt === 'dorature'"><th>Annotazioni dorature</th><td><textarea v-model="form.interventi_successivi_dip_pell_pitt_dorature_annotazioni"></textarea></td></tr>
-      </tbody>
-    </table>
+    </SchedaAnagraficaSezione>
 
-    <table class="form-table">
-      <tbody>
-      <tr class="section-title-row"><td colspan="2"><b>DOCUMENTAZIONE GENERALE</b></td></tr>
+    <SchedaAnagraficaSezione titolo="DOCUMENTAZIONE GENERALE" :modalita-modifica="modalitaModifica">
       <tr><th>Epoca</th><td><input v-model="form.epoca"></td></tr>
       <tr><th>Fonti</th><td><textarea v-model="form.fonti"></textarea></td></tr>
       <tr><th>Accessibilità</th><td><input type="checkbox" v-model="form.accessibilita"></td></tr>
-      <tr v-if="documentiSalvati.length">
+      <tr>
         <th>Documenti associati</th>
         <td>
-          <ul class="documenti-associati">
-            <li v-for="doc in documentiSalvati" :key="doc">
-              <button type="button" class="documento-link" @click="apriAnteprimaDocumento(doc)">
-                {{ nomeDocumento(doc) }}
-              </button>
-            </li>
-          </ul>
+          <DocumentiSchedaAnagrafica
+            :documenti-salvati="documentiSalvati"
+            :files="form.documenti"
+            :sola-lettura="solaLettura"
+            @update:files="form.documenti = $event"
+          />
         </td>
       </tr>
-      <tr v-if="modalitaModifica"><th>Documenti</th><td><input type="file" multiple @change="gestisciDocumenti"></td></tr>
-      <tr v-if="modalitaModifica && nomiDocumenti.length"><th>Nuovi documenti selezionati</th><td><p class="user-field">{{ nomiDocumenti.join(', ') }}</p></td></tr>
-      </tbody>
-    </table>
+    </SchedaAnagraficaSezione>
 
-    <div v-if="previewDocumento.visibile" class="documento-dialog-backdrop" @click.self="chiudiAnteprimaDocumento">
-      <div class="documento-dialog">
-        <div class="documento-dialog-header">
-          <h4>{{ previewDocumento.nome }}</h4>
-          <button type="button" class="documento-close" title="Chiudi" @click="chiudiAnteprimaDocumento">
-            <span class="glyphicon glyphicon-remove"></span>
-          </button>
-        </div>
-
-        <div class="documento-preview">
-          <p v-if="previewDocumento.caricamento">Caricamento anteprima...</p>
-          <p v-else-if="previewDocumento.errore">{{ previewDocumento.errore }}</p>
-          <img v-else-if="previewDocumento.tipo === 'immagine'" :src="previewDocumento.url" :alt="previewDocumento.nome">
-          <iframe v-else-if="previewDocumento.tipo === 'pdf'" :src="previewDocumento.url" :title="previewDocumento.nome"></iframe>
-          <pre v-else-if="previewDocumento.tipo === 'testo'">{{ previewDocumento.testo }}</pre>
-          <p v-else>Anteprima non disponibile</p>
-        </div>
-
-        <div class="documento-dialog-actions">
-          <button type="button" class="documento-download" :disabled="!previewDocumento.url" @click="scaricaDocumentoPreview">
-            <span class="glyphicon glyphicon-download-alt"></span>
-            Download
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup>
-import {computed, inject, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
+import {computed, inject, nextTick, onMounted, reactive, ref, watch} from 'vue';
 import {dataCorta} from '../../js/shared';
-import {compilaScheda, downloadDocumentiSchede} from '../../js/richieste';
+import {compilaScheda} from '../../js/richieste';
 import BtnBIM from '../elementi/BottoneBIMExplorer.vue';
+import DocumentiSchedaAnagrafica from './DocumentiSchedaAnagrafica.vue';
+import SchedaAnagraficaSezione from './SchedaAnagraficaSezione.vue';
 
 const props = defineProps({
   elemento: {
@@ -359,75 +310,42 @@ const baseForm = () => {
 const form = reactive(baseForm());
 const schedaRef = ref(null);
 const modalitaModifica = ref(!props.scheda);
-const sezioniAperte = reactive(new Set());
-const previewDocumento = reactive({
-  visibile: false,
-  caricamento: false,
-  path: '',
-  nome: '',
-  url: '',
-  tipo: '',
-  testo: '',
-  errore: '',
-});
 
 const elemento = computed(() => props.elemento);
 const meta = computed(() => props.meta);
 const scheda = computed(() => props.scheda);
 const solaLettura = computed(() => !!props.scheda && !modalitaModifica.value);
 const documentiSalvati = computed(() => Array.isArray(props.scheda?.docs) ? props.scheda.docs : []);
-const nomiDocumenti = computed(() => form.documenti.map(file => file.name));
 
 watch(() => [props.elemento.record.uuid, props.scheda?.id_anagr], async () => {
   resetForm();
   modalitaModifica.value = !props.scheda;
   await nextTick();
-  inizializzaSezioniDefault();
   aggiornaCampiVuotiSolaLettura();
 });
 
 watch(solaLettura, async () => {
   await nextTick();
-  inizializzaSezioniDefault();
   aggiornaCampiVuotiSolaLettura();
 });
 
 onMounted(async () => {
   await nextTick();
-  inizializzaSezioniDefault();
   aggiornaCampiVuotiSolaLettura();
-});
-
-onBeforeUnmount(() => {
-  chiudiAnteprimaDocumento();
 });
 
 function resetForm() {
   Object.assign(form, baseForm());
 }
 
-async function entraModalitaModifica() {
+function entraModalitaModifica() {
   modalitaModifica.value = true;
-  await nextTick();
-  inizializzaSezioniDefault();
 }
 
 function bloccaModificaSolaLettura(event) {
   if (!solaLettura.value) return;
   if (!['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target?.tagName)) return;
   event.preventDefault();
-}
-
-function gestisciClickScheda(event) {
-  const titleRow = event.target.closest('.section-title-row');
-  if (!titleRow || !schedaRef.value?.contains(titleRow)) return;
-  const table = titleRow.closest('.form-table');
-  if (!table) return;
-
-  const sectionId = idSezioneTabella(table);
-  if (sezioniAperte.has(sectionId)) sezioniAperte.delete(sectionId);
-  else sezioniAperte.add(sectionId);
-  aggiornaSezioniCompatte();
 }
 
 function aggiornaCampiVuotiSolaLettura() {
@@ -442,38 +360,6 @@ function aggiornaCampiVuotiSolaLettura() {
       cella.dataset.emptyField = 'true';
     }
   });
-}
-
-function aggiornaSezioniCompatte() {
-  if (!schedaRef.value) return;
-  const tables = [...schedaRef.value.querySelectorAll('.form-table')];
-  tables.forEach(table => {
-    if (!table.querySelector('.section-title-row')) return;
-    const sectionId = idSezioneTabella(table);
-    const aperta = sezioniAperte.has(sectionId);
-    table.classList.toggle('section-collapsed', !aperta);
-    table.classList.toggle('section-open', aperta);
-    table.querySelector('.section-title-row')?.setAttribute('title', aperta ? 'Clicca per chiudere la sezione' : 'Clicca per aprire la sezione');
-  });
-}
-
-function inizializzaSezioniDefault() {
-  sezioniAperte.clear();
-  if (modalitaModifica.value) {
-    listaTabelleSezione().forEach(table => sezioniAperte.add(idSezioneTabella(table)));
-  }
-  aggiornaSezioniCompatte();
-}
-
-function listaTabelleSezione() {
-  if (!schedaRef.value) return [];
-  return [...schedaRef.value.querySelectorAll('.form-table')]
-    .filter(table => table.querySelector('.section-title-row'));
-}
-
-function idSezioneTabella(table) {
-  const titolo = table.querySelector('.section-title-row')?.textContent || '';
-  return titolo.trim().toLowerCase().replace(/\s+/g, '-');
 }
 
 async function salvaScheda() {
@@ -493,9 +379,14 @@ async function salvaScheda() {
   });
   fd.append('dati', JSON.stringify(richiesta));
 
+  let resp;
   store.methods.toggleLoaderGlobale();
-  const resp = await compilaScheda(fd);
-  store.methods.toggleLoaderGlobale();
+  try {
+    resp = await compilaScheda(fd);
+  }
+  finally {
+    store.methods.toggleLoaderGlobale();
+  }
 
   if (resp?.success) {
     store.methods.setAlert('Scheda anagrafica Dipinti murali salvata correttamente.');
@@ -515,10 +406,6 @@ function impostaIsolato() {
 function impostaParteDiCiclo() {
   if (form.is_parte_di_un_ciclo) form.is_isolato = false;
   else form.is_isolato = true;
-}
-
-function gestisciDocumenti(evt) {
-  form.documenti = [...evt.target.files];
 }
 
 function creaOggettoScheda(docs) {
@@ -657,66 +544,6 @@ function formattaDataScheda(data) {
   return String(data).split('T')[0];
 }
 
-async function apriAnteprimaDocumento(path) {
-  chiudiAnteprimaDocumento();
-  previewDocumento.visibile = true;
-  previewDocumento.caricamento = true;
-  previewDocumento.path = path;
-  previewDocumento.nome = nomeDocumento(path);
-
-  try {
-    const blob = await downloadDocumentiSchede(path);
-    if (blob?.errMsg) throw new Error(blob.errMsg);
-
-    previewDocumento.url = URL.createObjectURL(blob);
-    previewDocumento.tipo = tipoAnteprimaDocumento(blob, path);
-    if (previewDocumento.tipo === 'testo') {
-      previewDocumento.testo = await blob.text();
-    }
-  }
-  catch(e) {
-    previewDocumento.errore = 'Documento non disponibile';
-  }
-  finally {
-    previewDocumento.caricamento = false;
-  }
-}
-
-function chiudiAnteprimaDocumento() {
-  if (previewDocumento.url) URL.revokeObjectURL(previewDocumento.url);
-  previewDocumento.visibile = false;
-  previewDocumento.caricamento = false;
-  previewDocumento.path = '';
-  previewDocumento.nome = '';
-  previewDocumento.url = '';
-  previewDocumento.tipo = '';
-  previewDocumento.testo = '';
-  previewDocumento.errore = '';
-}
-
-function scaricaDocumentoPreview() {
-  if (!previewDocumento.url) return;
-  const link = document.createElement('a');
-  link.href = previewDocumento.url;
-  link.download = previewDocumento.nome;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-}
-
-function nomeDocumento(path) {
-  return String(path || '').split(/[/\\]/).filter(Boolean).pop() || 'documento';
-}
-
-function tipoAnteprimaDocumento(blob, path) {
-  const mime = blob.type || '';
-  const estensione = nomeDocumento(path).split('.').pop()?.toLowerCase();
-  if (mime.startsWith('image/')) return 'immagine';
-  if (mime === 'application/pdf' || estensione === 'pdf') return 'pdf';
-  if (mime.startsWith('text/') || ['txt', 'csv', 'json', 'xml', 'md'].includes(estensione)) return 'testo';
-  return 'non-disponibile';
-}
-
 function valoreDaSalvare(value) {
   if (value === null || value === undefined) return false;
   if (typeof value === 'string') return value.trim() !== '';
@@ -821,220 +648,4 @@ select, textarea, input:not([type=checkbox]):not([type=file]) {
   text-align: right;
 }
 
-.documenti-associati {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: .4rem;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.documento-link {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #0b5cad;
-  font-weight: 700;
-  text-align: right;
-  cursor: pointer;
-}
-
-.documento-link:hover,
-.documento-link:focus {
-  text-decoration: underline;
-}
-
-.documento-dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  background: rgba(0, 0, 0, .45);
-}
-
-.documento-dialog {
-  width: min(92vw, 900px);
-  max-height: 88vh;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border: 1px solid #777;
-  box-shadow: 0 1.2rem 3rem rgba(0, 0, 0, .35);
-}
-
-.documento-dialog-header,
-.documento-dialog-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.2rem;
-  background: var(--bluInterregTrasparenza);
-}
-
-.documento-dialog-header h4 {
-  margin: 0;
-  font-weight: 700;
-  word-break: break-word;
-}
-
-.documento-close,
-.documento-download {
-  border: 0;
-  background: var(--bluMain10ance);
-  color: #000;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.documento-close {
-  width: 3.4rem;
-  height: 3.4rem;
-}
-
-.documento-download {
-  display: inline-flex;
-  align-items: center;
-  gap: .6rem;
-  padding: .8rem 1.2rem;
-}
-
-.documento-download:disabled {
-  opacity: .45;
-  cursor: not-allowed;
-}
-
-.documento-preview {
-  min-height: 24rem;
-  overflow: auto;
-  padding: 1.2rem;
-  text-align: center;
-}
-
-.documento-preview img {
-  max-width: 100%;
-  max-height: 62vh;
-  object-fit: contain;
-}
-
-.documento-preview iframe {
-  width: 100%;
-  height: 62vh;
-  border: 0;
-}
-
-.documento-preview pre {
-  margin: 0;
-  text-align: left;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.form-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 8px;
-  margin-bottom: 1.2rem;
-}
-
-.form-table:not(.first-section) .section-title-row td {
-  border-top: 1px solid #808080;
-}
-
-.section-title-row {
-  cursor: pointer;
-  user-select: none;
-}
-
-.section-title-row td {
-  position: relative;
-  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
-}
-
-.section-title-row:hover td,
-.section-title-row:focus-within td {
-  background-color: rgba(26, 91, 167, .12);
-  box-shadow: inset 0 0 0 1px rgba(26, 91, 167, .28);
-}
-
-.section-title-row td::before {
-  content: ">";
-  position: absolute;
-  left: .8rem;
-  top: 50%;
-  width: 2rem;
-  height: 2rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(26, 91, 167, .45);
-  background: rgba(255, 255, 255, .36);
-  color: var(--bluMain10ance);
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1;
-  transform: translateY(-50%);
-  transition: background-color .15s ease, color .15s ease, transform .15s ease;
-}
-
-.section-open .section-title-row td::before {
-  content: "v";
-}
-
-.section-title-row:hover td::before,
-.section-title-row:focus-within td::before {
-  background: var(--bluMain10ance);
-  color: #fff;
-}
-
-.section-title-row td::after {
-  content: "Apri sezione";
-  position: absolute;
-  right: .8rem;
-  top: 50%;
-  padding: .25rem .7rem;
-  border: 1px solid rgba(26, 91, 167, .25);
-  background: rgba(255, 255, 255, .42);
-  color: var(--bluMain10ance);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1.2;
-  transform: translateY(-50%);
-  opacity: .9;
-}
-
-.section-open .section-title-row td::after {
-  content: "Chiudi sezione";
-}
-
-.section-title-row:hover td::after,
-.section-title-row:focus-within td::after {
-  border-color: rgba(26, 91, 167, .5);
-  background: #fff;
-  text-decoration: underline;
-}
-
-.form-table.section-collapsed tbody tr:not(.section-title-row) {
-  display: none;
-}
-
-.form-table th {
-  width: 38%;
-  vertical-align: top;
-  background-color: transparent;
-}
-
-.section-title-row td {
-  padding: 1.2rem 0 .4rem;
-  color: inherit;
-  text-align: center;
-  vertical-align: middle;
-  padding-left: 3.4rem;
-  padding-right: 11rem;
-}
 </style>

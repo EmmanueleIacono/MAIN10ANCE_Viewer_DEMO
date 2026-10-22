@@ -12,7 +12,6 @@
       </div>
       <h4 v-if="qualeScheda === 'manufatto'"><b>SCHEDA ANAGRAFICA MANUFATTO</b></h4>
       <h4 v-else-if="qualeScheda === 'dettaglio'"><b>SCHEDA ANAGRAFICA DETTAGLIO</b></h4>
-      <h4 v-else-if="qualeScheda === 'statua'"><b>SCHEDA ANAGRAFICA STATUARIA</b></h4>
       <h4 v-else-if="qualeScheda === 'coperture'"><b>SCHEDA ANAGRAFICA COPERTURA</b></h4>
       <h4 v-else><b>SCHEDA ANAGRAFICA</b></h4>
     </div>
@@ -43,256 +42,6 @@
         :model="stateModuloAnagrafica"
         @update-field="setAnagraficaSimpleField"
       />
-    </div>
-
-    <!-- Campi Statua -->
-    <div v-else-if="qualeScheda === 'statua'">
-      <table class="form-table">
-        <tbody>
-        <tr>
-          <th><label><b>Soggetto</b></label></th>
-          <td><p class="user-field">{{ stateModuloAnagraficaStatua.nome_statua }}</p></td>
-        </tr>
-        <tr>
-          <th><label><b>Codice</b></label></th>
-          <td><p class="user-field">{{ stateModuloAnagraficaStatua.codice_statua }}</p></td>
-        </tr>
-        <tr>
-          <th>
-            <label><b style="color: darkred;">Presenza di codici non univoci nell'archivio storico/cartaceo</b></label>
-            <p style="font-size: smaller; font-weight: normal;"><i>
-              Indicare (se presente) il codice, seguito dalla breve indicazione del/dei documenti e data
-              <br />
-              Es.
-              <br />
-              ... fino al ...
-            </i></p>
-          </th>
-          <td><textarea v-model="stateModuloAnagraficaStatua.codici_altro" style="height: 20px;"></textarea></td>
-        </tr>
-        <tr>
-          <th><label><b>Dimensioni</b></label></th>
-          <td><input v-model="stateModuloAnagraficaStatua.dimensioni"></td>
-        </tr>
-        <tr>
-          <th><label><b>Descrizione statua</b></label></th>
-          <td><textarea v-model="stateModuloAnagraficaStatua.descrizione_statua" style="height: 20px;"></textarea></td>
-        </tr>
-        <tr class="divider-row">
-          <td colspan="2"><hr /></td>
-        </tr>
-        
-        <tr class="section-title-row">
-          <td colspan="2"><b>ANCORAGGI</b></td>
-        </tr>
-        
-        <tr>
-          <th><label><b>A parete</b></label></th>
-          <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete"></td>
-        </tr>
-        <tr v-if="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete">
-          <th><label><i>Materiale</i></label></th>
-          <td><select v-model="stateModuloAnagraficaStatua.materiale_ancoraggio_parete" class="float-dx">
-            <option value=""></option>
-            <option v-for="mat in datiEnum.materiale_ancoraggio_parete" :key="mat" :value="mat">{{ mat }}</option>
-          </select></td>
-        </tr>
-        <tr v-if="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete">
-          <th><label><i>Annotazioni</i></label></th>
-          <td><textarea v-model="stateModuloAnagraficaStatua.ancoraggio_parete_annotazioni" style="height: 20px;"></textarea></td>
-        </tr>
-
-        <tr>
-          <th><label><b>A pavimento</b></label></th>
-          <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento"></td>
-        </tr>
-        <tr v-if="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento">
-          <th><label><i>Materiale</i></label></th>
-          <td><select v-model="stateModuloAnagraficaStatua.materiale_ancoraggio_pavimento" class="float-dx">
-            <option value=""></option>
-            <option v-for="mat in datiEnum.materiale_ancoraggio_pavimento" :key="mat" :value="mat">{{ mat }}</option>
-          </select></td>
-        </tr>
-        <tr v-if="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento">
-          <th><label><i>Annotazioni</i></label></th>
-          <td><textarea v-model="stateModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni" style="height: 20px;"></textarea></td>
-        </tr>
-
-        <tr>
-          <th><label><b>A soffitto</b></label></th>
-          <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_soffitto"></td>
-        </tr>
-        <tr v-if="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_soffitto">
-          <th><label><i>Materiale</i></label></th>
-          <td><select v-model="stateModuloAnagraficaStatua.materiale_ancoraggio_soffitto" class="float-dx">
-            <option value=""></option>
-            <option v-for="mat in datiEnum.materiale_ancoraggio_soffitto" :key="mat" :value="mat">{{ mat }}</option>
-          </select></td>
-        </tr>
-        <tr v-if="stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_soffitto">
-          <th><label><i>Annotazioni</i></label></th>
-          <td><textarea v-model="stateModuloAnagraficaStatua.ancoraggio_soffitto_annotazioni" style="height: 20px;"></textarea></td>
-        </tr>
-        <tr class="divider-row">
-          <td colspan="2"><hr /></td>
-        </tr>
-        <tr>
-          <th><label><b>Tecnica di esecuzione</b></label></th>
-          <td><input v-model="stateModuloAnagraficaStatua.tecnica_esecuzione"></td>
-        </tr>
-        <tr class="divider-row">
-          <td colspan="2"><hr /></td>
-        </tr>
-        <tr class="section-title-row">
-          <td colspan="2"><b>MATERIALI</b></td>
-        </tr>
-        <tr>
-          <th><label><b>Statua</b></label></th>
-          <td><select v-model="stateModuloAnagraficaStatua.materiale_statua" class="float-dx">
-            <option value=""></option>
-            <option v-for="mat in datiEnum.materiale_statua" :key="mat" :value="mat">{{ mat }}</option>
-          </select></td>
-        </tr>
-        <tr>
-          <th><label><b>Annotazioni</b></label></th>
-          <td><textarea v-model="stateModuloAnagraficaStatua.materiale_annotazioni" style="height: 20px;"></textarea></td>
-        </tr>
-        <tr>
-          <th><label><b>Armatura</b></label></th>
-          <td>
-            <div v-for="mat in datiEnum.materiale_armatura" :key="mat">
-              <input :id="`el-acc-cbx-${mat}`" :value="mat" v-model="stateModuloAnagraficaStatua.materiali_armatura" type="checkbox">
-              <label :for="`el-acc-cbx-${mat}`">{{ mat }}</label>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <th><label><b>Supporto</b></label></th>
-          <td><select v-model="stateModuloAnagraficaStatua.materiale_supporto" class="float-dx">
-            <option value=""></option>
-            <option v-for="mat in datiEnum.materiale_supporto" :key="mat" :value="mat">{{ mat }}</option>
-          </select></td>
-        </tr>
-        <tr class="divider-row">
-          <td colspan="2"><hr /></td>
-        </tr>
-        <tr>
-          <th><label><b>Strato di preparazione</b></label></th>
-          <td><input v-model="stateModuloAnagraficaStatua.strato_di_preparazione"></td>
-        </tr>
-        <tr>
-          <th><label><b>Pellicola pittorica</b></label></th>
-          <td v-if="stateModuloAnagraficaStatua.materiale_supporto === 'legno'">
-            <select v-model="stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_legno">
-              <option value=""></option>
-              <option v-for="mat in datiEnum.pellicola_pittorica_tecnica_e_mat.su_legno" :key="mat" :value="mat">{{ mat }}</option>
-            </select>
-          </td>
-          <td v-else-if="stateModuloAnagraficaStatua.materiale_supporto === 'gesso'">
-            <select v-model="stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_gesso">
-              <option value=""></option>
-              <option v-for="mat in datiEnum.pellicola_pittorica_tecnica_e_mat.su_gesso" :key="mat" :value="mat">{{ mat }}</option>
-            </select>
-          </td>
-          <td v-else-if="stateModuloAnagraficaStatua.materiale_supporto === 'terracotta'">
-            <select v-model="stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.su_terracotta">
-              <option value=""></option>
-              <option v-for="mat in datiEnum.pellicola_pittorica_tecnica_e_mat.su_terracotta" :key="mat" :value="mat">{{ mat }}</option>
-            </select>
-          </td>
-          <td v-else>
-            <textarea v-model="stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat.altro" style="height: 20px;"></textarea>
-          </td>
-        </tr>
-        <tr>
-          <th><label><b>Lamina metallica</b></label></th>
-          <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.lamina_metallica"></td>
-        </tr>
-        <tr class="divider-row">
-          <td colspan="2"><hr /></td>
-        </tr>
-        <tr class="section-title-row">
-          <td colspan="2">
-            <b>ELEMENTI ACCESSORI / MONILI</b>
-            <br />
-            <p style="font-size: smaller; font-weight: normal;"><i>
-              Per inserire annotazioni riferite a ciascun elemento accessorio e/o monile indicare il nome dell'elemento come compare nell'elenco, in lettere maiuscole, indicando tra parentesi tonde eventuale oggetto specifico, seguito da ":" e dalla annotazione in lettera minuscola (vedi esempio).
-              <br />
-              <br />
-              NOME ELEMENTO (elemento specifico): annotazioni
-              <br />
-              Es.
-              <br />
-              STRUMENTI MUSICALI (piffero): bastoncini in legno…
-              <br />
-              CAPIGLIATURE/BARBE (barba): paglia
-            </i></p>
-          </td>
-        </tr>
-        <tr>
-          <th><label><b>Elementi accessori / monili</b></label></th>
-          <td>
-            <div v-for="mat in datiEnum.elementi_accessori_monili" :key="mat">
-              <input :id="`el-acc-cbx-${mat}`" :value="mat" v-model="stateModuloAnagraficaStatua.elementi_accessori_monili" type="checkbox">
-              <label :for="`el-acc-cbx-${mat}`">{{ mat }}</label>
-            </div>
-          </td>
-        </tr>
-        <tr v-if="stateModuloAnagraficaStatua.elementi_accessori_monili.length > 0" class="section-title-row">
-          <td colspan="2"><b><i>Materiali</i></b></td>
-        </tr>
-        <tr v-for="(el, idx) in stateModuloAnagraficaStatua.elementi_accessori_monili" :key="el">
-          <th><label><i>{{ el }}</i></label></th>
-          <td>
-            <select v-model="stateModuloAnagraficaStatua.materiale_elementi_accessori_monili[idx]" class="float-dx">
-              <option v-for="mat in datiEnum.materiale_elementi_accessori_monili" :key="mat" :value="mat">{{ mat }}</option>
-            </select>
-          </td>
-        </tr>
-        <tr class="spacer-row" aria-hidden="true">
-          <td colspan="2"></td>
-        </tr>
-        <tr>
-          <th><label><i>Annotazioni</i></label></th>
-          <td><textarea v-model="stateModuloAnagraficaStatua.elementi_accessori_monili_annotazioni" style="height: 20px;"></textarea></td>
-        </tr>
-        <tr class="divider-row">
-          <td colspan="2"><hr /></td>
-        </tr>
-        <tr class="section-title-row">
-          <td colspan="2"><b>DOCUMENTAZIONE GENERALE</b></td>
-        </tr>
-        <tr>
-          <th><label><b>Epoca</b></label></th>
-          <td><input v-model="stateModuloAnagraficaStatua.epoca"></td>
-        </tr>
-        <tr>
-          <th><label><b>Fonti</b></label></th>
-          <td><input v-model="stateModuloAnagraficaStatua.fonti"></td>
-        </tr>
-        <tr>
-          <th><label><b>Autore</b></label></th>
-          <td><input v-model="stateModuloAnagraficaStatua.autore"></td>
-        </tr>
-        <tr class="divider-row">
-          <td colspan="2"><hr /></td>
-        </tr>
-        <tr>
-          <th>
-            <label><b>Accessibilità</b></label>
-            <p style="font-size: smaller; font-weight: normal;"><i>I beni si considerano accessibili se ad altezza uomo o raggiungibili con l'ausilio di piccoli trabattelli o scale</i></p>
-          </th>
-          <td><input type="checkbox" v-model="stateModuloAnagraficaStatua.accessibilità"></td>
-        </tr>
-        <tr class="divider-row">
-          <td colspan="2"><hr /></td>
-        </tr>
-        <tr>
-          <th><label><b>Note</b></label></th>
-          <td><textarea v-model="stateModuloAnagraficaStatua.note" style="height: 20px;"></textarea></td>
-        </tr>
-        </tbody>
-      </table>
     </div>
 
     <!-- Campi Coperture -->
@@ -706,9 +455,9 @@
 </template>
 
 <script setup>
-import { inject, computed, ref, onMounted, reactive, watch } from 'vue';
-import {dataCorta, dataInteger, trattaStringArray, filtraOpzioniLivelli} from '../js/shared';
-import {compilaScheda, leggiEnumServizio, leggiVistaDB} from '../js/richieste';
+import { inject, computed, ref, onMounted, reactive } from 'vue';
+import {dataCorta, dataInteger, filtraOpzioniLivelli} from '../js/shared';
+import {compilaScheda, leggiEnumServizio} from '../js/richieste';
 import {ANAGRAFICA_DEFAULT_FIELDS, ANAGRAFICA_DETTAGLIO_FIELDS, ANAGRAFICA_MANUFATTO_FIELDS, isSchemaEmpty, resetSchemaState} from '../js/formSchemas';
 import BtnBIM from './elementi/BottoneBIMExplorer.vue';
 import LoadingScreen from './elementi/LoadingScreen.vue';
@@ -725,22 +474,11 @@ const state_globale = store_globale.state_globale;
 const stateAnagrafica = inject('stateAnagrafica');
 const stateGalleria = inject('stateGalleria');
 const stateModuloAnagrafica = inject('stateModuloAnagrafica');
-const stateModuloAnagraficaStatua = inject('stateModuloAnagraficaStatua');
 const stateModuloAnagraficaCoperture = inject('stateModuloAnagraficaCoperture');
 const stateDocumenti = inject('stateDocumenti');
 const stateArtifact = inject('stateArtifact');
 const loadingDati = ref(false);
 const datiEnum = reactive({
-  // statua
-  materiale_statua: [],
-  materiale_armatura: [],
-  materiale_supporto: [],
-  elementi_accessori_monili: [],
-  materiale_elementi_accessori_monili: [],
-  materiale_ancoraggio_parete: [],
-  materiale_ancoraggio_pavimento: [],
-  materiale_ancoraggio_soffitto: [],
-  pellicola_pittorica_tecnica_e_mat: {},
   // copertura
   descrizione_copertura_rapporti: [],
   estensione_compl_comment: [],
@@ -765,39 +503,7 @@ const files = reactive([
 
 const fileInputs = reactive([null]); // refs per <input type="file">
 
-watch(() => stateModuloAnagraficaStatua.materiale_supporto, () => {
-  Object.keys(stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat).forEach(k => {
-    stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat[k] = null;
-  });
-});
-
-watch(() => stateModuloAnagraficaStatua.elementi_accessori_monili, () => {
-  stateModuloAnagraficaStatua.materiale_elementi_accessori_monili = [];
-}, {
-  deep: true
-});
-
 const schedaVuota = computed(() => isSchemaEmpty(anagraficaSimpleFields.value, stateModuloAnagrafica));
-
-const schedaVuotaStatua = computed(() => {
-  return !(
-    stateModuloAnagraficaStatua.descrizione_statua || stateModuloAnagraficaStatua.codici_altro
-    || stateModuloAnagraficaStatua.tecnica_esecuzione || stateModuloAnagraficaStatua.dimensioni
-    || stateModuloAnagraficaStatua.materiale_statua || stateModuloAnagraficaStatua.materiale_annotazioni
-    || stateModuloAnagraficaStatua.materiali_armatura || stateModuloAnagraficaStatua.materiale_supporto
-    || stateModuloAnagraficaStatua.lamina_metallica
-    || stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat || stateModuloAnagraficaStatua.strato_di_preparazione
-    || stateModuloAnagraficaStatua.elementi_accessori_monili || stateModuloAnagraficaStatua.materiale_elementi_accessori_monili
-    || stateModuloAnagraficaStatua.elementi_accessori_monili_annotazioni
-    || stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete || stateModuloAnagraficaStatua.materiale_ancoraggio_parete
-    || stateModuloAnagraficaStatua.ancoraggio_parete_annotazioni
-    || stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento || stateModuloAnagraficaStatua.materiale_ancoraggio_pavimento
-    || stateModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni
-    || stateModuloAnagraficaStatua.epoca || stateModuloAnagraficaStatua.fonti
-    || stateModuloAnagraficaStatua.definizione || stateModuloAnagraficaStatua.autore
-    || stateModuloAnagraficaStatua.accessibilità || stateModuloAnagraficaStatua.note
-  );
-});
 
 const schedaVuotaCoperture = computed(() => {
   return !(
@@ -842,10 +548,6 @@ const qualeScheda = computed(() => {
       scheda = 'dettaglio';
       break;
 
-    case 'statua':
-      scheda = 'statua';
-      break;
-
     case 'elementi':
       scheda = 'coperture';
       break;
@@ -872,16 +574,6 @@ const anagraficaSimpleFields = computed(() => {
 
 onMounted(async () => {
   loadingDati.value = true;
-  // statua
-  const lsMatStat = await leggiEnumServizio('stat_mat'); // materiale statua
-  const lsMatArm = await leggiEnumServizio('stat_arm_mat'); // materiale armatura
-  const lsMatSupp = await leggiEnumServizio('stat_supp_mat'); // materiale supporto
-  const lsElAccMonl = await leggiEnumServizio('stat_el_acc_monil'); // elementi accessori monili
-  const lsMatElAccMonl = await leggiEnumServizio('stat_el_acc_monil_mat'); // materiale elementi accessori monili
-  const lsMatAncPar = await leggiEnumServizio('stat_anc_par_mat'); // materiale ancoraggio parete
-  const lsMatAncPav = await leggiEnumServizio('stat_anc_pav_mat'); // materiale ancoraggio pavimento
-  const lsMatAncSoff = await leggiEnumServizio('stat_anc_sof_mat');
-  const lsMatPellStat = await leggiVistaDB('vw_stat_pell_pitt_valori', true); // type composito pellicola pittorica statua
   // copertura
   const lsDescCopRap = await leggiEnumServizio('cop_rapporti'); // descrizione copertura rapporti
   const lsEstCopComm = await leggiEnumServizio('cop_estens_comment'); // commento estensione copertura
@@ -895,29 +587,6 @@ onMounted(async () => {
   const lsStratiFunzAcc = await leggiEnumServizio('cop_strati_funz_acc'); // strati funzionali accessori
   const lsMatCopStr = await leggiEnumServizio('cop_str_legno_mat'); // materiale struttura copertura
 
-  // statua
-  datiEnum.materiale_statua = lsMatStat.map(type => type.unnest);
-  datiEnum.materiale_armatura = lsMatArm.map(type => type.unnest);
-  datiEnum.materiale_supporto = lsMatSupp.map(type => type.unnest);
-  datiEnum.elementi_accessori_monili = lsElAccMonl.map(type => type.unnest);
-  datiEnum.materiale_elementi_accessori_monili = lsMatElAccMonl.map(type => type.unnest);
-  datiEnum.materiale_ancoraggio_parete = lsMatAncPar.map(type => type.unnest);
-  datiEnum.materiale_ancoraggio_pavimento = lsMatAncPav.map(type => type.unnest);
-  if (lsMatAncSoff) {
-    datiEnum.materiale_ancoraggio_soffitto = lsMatAncSoff.map(type => type.unnest);
-  }
-  lsMatPellStat.forEach(type => {
-    // array string -> array object
-    if (type.valori
-      && typeof type.valori === 'string'
-      && type.valori.startsWith('{')
-      && type.valori.endsWith('}')
-    ) {
-      type.valori = trattaStringArray(type.valori);
-    }
-    // array di oggetti -> oggetto con array
-    datiEnum.pellicola_pittorica_tecnica_e_mat[type.tecnica] = type.valori;
-  });
   // copertura
   datiEnum.descrizione_copertura_rapporti = lsDescCopRap.map(type => type.unnest);
   datiEnum.estensione_compl_comment = lsEstCopComm.map(type => type.unnest);
@@ -952,7 +621,6 @@ async function salvaScheda() {
   if (stateGalleria.idImgSelezionate) {
     if (
       isSchedaAnagraficaSemplice.value && schedaVuota.value
-      || qualeScheda.value == 'statua' && schedaVuotaStatua.value
       || qualeScheda.value == 'coperture' && schedaVuotaCoperture.value
     ) {
       store.methods.setAlert('Non è possibile salvare una scheda vuota');
@@ -962,7 +630,6 @@ async function salvaScheda() {
     let jsonReq;
     let qualeState;
     if (isSchedaAnagraficaSemplice.value) qualeState = stateModuloAnagrafica;
-    else if (qualeScheda.value === 'statua') qualeState = stateModuloAnagraficaStatua;
     else if (qualeScheda.value === 'coperture') qualeState = stateModuloAnagraficaCoperture;
 
     if (files && files.length > 0) {
@@ -1007,49 +674,6 @@ function chiudiScheda() {
 
 function resetState() { // QUESTA MAGARI SI PUÒ SPOSTARE SU TABCOLLECTION
   switch (qualeScheda.value) {
-    case 'statua':
-      stateModuloAnagraficaStatua.nome_statua = '';
-      stateModuloAnagraficaStatua.codice_statua = '';
-      stateModuloAnagraficaStatua.codici_altro = '';
-      stateModuloAnagraficaStatua.descrizione_statua = '';
-      stateModuloAnagraficaStatua.tecnica_esecuzione = '';
-      stateModuloAnagraficaStatua.dimensioni = '';
-      stateModuloAnagraficaStatua.materiale_statua = '', // enum
-      stateModuloAnagraficaStatua.materiale_annotazioni = '';
-      stateModuloAnagraficaStatua.materiali_armatura = []; // enum[]
-      stateModuloAnagraficaStatua.materiale_supporto = ''; // enum
-      stateModuloAnagraficaStatua.lamina_metallica = false; // bool
-      stateModuloAnagraficaStatua.pellicola_pittorica_tecnica_e_mat = {
-        su_legno: '',
-        su_gesso: '',
-        su_terracotta: '',
-        altro: '',
-      };
-      stateModuloAnagraficaStatua.strato_di_preparazione = '';
-      stateModuloAnagraficaStatua.elementi_accessori_monili = []; // enum[]
-      stateModuloAnagraficaStatua.materiale_elementi_accessori_monili = []; // enum[]
-      stateModuloAnagraficaStatua.elementi_accessori_monili_annotazioni = '';
-      stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_parete = false; // bool
-      stateModuloAnagraficaStatua.materiale_ancoraggio_parete = ''; // enum
-      stateModuloAnagraficaStatua.ancoraggio_parete_annotazioni = '';
-      stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_pavimento = false; // bool
-      stateModuloAnagraficaStatua.materiale_ancoraggio_pavimento = ''; // enum
-      stateModuloAnagraficaStatua.ancoraggio_pavimento_annotazioni = '';
-      stateModuloAnagraficaStatua.elementi_di_ancoraggio_a_soffitto = false;
-      stateModuloAnagraficaStatua.materiale_ancoraggio_soffitto = '';
-      stateModuloAnagraficaStatua.ancoraggio_soffitto_annotazioni = '';
-      stateModuloAnagraficaStatua.epoca = '';
-      stateModuloAnagraficaStatua.fonti = '';
-      stateModuloAnagraficaStatua.autore = '';
-      stateModuloAnagraficaStatua.accessibilità = false; // bool
-      stateModuloAnagraficaStatua.note = '';
-      stateModuloAnagraficaStatua.id_anagr = null;
-      stateModuloAnagraficaStatua.data_registrazione = null;
-      stateModuloAnagraficaStatua.data_ultima_mod = null;
-      stateModuloAnagraficaStatua.autore_scheda = null;
-      stateModuloAnagraficaStatua.autore_ultima_mod = null;
-      break;
-
     case 'coperture':
       stateModuloAnagraficaCoperture.codice = '';
       stateModuloAnagraficaCoperture.descrizione_copertura_rapporti = ''; // enum
@@ -1137,10 +761,6 @@ function resetState() { // QUESTA MAGARI SI PUÒ SPOSTARE SU TABCOLLECTION
 function impostaMetadati() {
   let modulo;
   switch (qualeScheda.value) {
-    case 'statua':
-      modulo = stateModuloAnagraficaStatua;
-      break;
-
     case 'coperture':
       modulo = stateModuloAnagraficaCoperture;
       break;
@@ -1195,10 +815,6 @@ function nomeTabellaAnagrafica(entitàSelez) {
 
     case 'dettaglio':
       nomeTabella = 'anagrafica_dettaglio';
-      break;
-
-    case 'statua':
-      nomeTabella = 'scheda_anagrafica_statua';
       break;
 
     case 'elementi':

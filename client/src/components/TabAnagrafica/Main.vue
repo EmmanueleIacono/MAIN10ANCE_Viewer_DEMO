@@ -52,27 +52,27 @@
                 <dt>Ultima modifica</dt>
                 <dd>{{ immagineSelezionata.record.autore_ultima_mod || 'N/D' }} - {{ immagineSelezionata.record.data_ultima_mod || 'N/D' }}</dd>
               </dl>
-              <div v-if="isDipintoMuraleSelezionato" class="selected-actions">
-                <span v-if="caricamentoSchedaDipintiMurali" class="scheda-status">Recupero scheda...</span>
-                <span v-else-if="schedaDipintiMurali" class="scheda-status">Scheda compilata disponibile</span>
+              <div v-if="tipoSchedaSelezionata" class="selected-actions">
+                <span v-if="caricamentoScheda" class="scheda-status">Recupero scheda...</span>
+                <span v-else-if="schedaCorrente" class="scheda-status">Scheda compilata disponibile</span>
                 <BtnBIM
-                  @click="toggleSchedaDipintiMurali"
-                  :icona="schedaDipintiMurali ? 'glyphicon-list-alt' : 'glyphicon-plus'"
-                  nome="sc-dipinti-murali"
-                  :title="schedaDipintiMurali ? 'Consulta scheda anagrafica Dipinti murali' : 'Compila scheda anagrafica Dipinti murali'"
+                  @click="toggleScheda"
+                  :icona="schedaCorrente ? 'glyphicon-list-alt' : 'glyphicon-plus'"
+                  :nome="`sc-${tipoSchedaSelezionata.key}`"
+                  :title="schedaCorrente ? `Consulta scheda anagrafica ${tipoSchedaSelezionata.label}` : `Compila scheda anagrafica ${tipoSchedaSelezionata.label}`"
                   colore="verde"
                 />
               </div>
             </div>
           </div>
 
-          <SchedaDipintiMurali
-            v-if="schedaDipintiMuraliVisibile && immagineSelezionata"
-            :elemento="immagineSelezionata"
-            :meta="metaSchedaDipintiMurali"
-            :scheda="schedaDipintiMurali"
-            @chiudi="schedaDipintiMuraliVisibile = false"
-            @salvata="ricaricaSchedaDipintiMurali"
+          <component
+            :is="tipoSchedaSelezionata?.component"
+            v-if="schedaVisibile && immagineSelezionata && tipoSchedaSelezionata"
+            :key="`${tipoSchedaSelezionata.key}-${immagineSelezionata.record.uuid}`"
+            v-bind="propsSchedaSelezionata"
+            @chiudi="schedaVisibile = false"
+            @salvata="ricaricaScheda"
           />
         </Details>
       </Card>
@@ -167,6 +167,7 @@ import LoadingScreen from '../elementi/LoadingScreen.vue';
 import BtnBIM from '../elementi/BottoneBIMExplorer.vue';
 import UploadImmagine from "./UploadImmagine.vue";
 import SchedaDipintiMurali from "./SchedaDipintiMurali.vue";
+import SchedaStatuaria from "./SchedaStatuaria.vue";
 
 const store = inject('store');
 const store_globale = inject('store_globale');
@@ -177,9 +178,9 @@ const methods_anagrafica = store_anagrafica.methods_anagrafica;
 
 const inputAnagraficaRef = ref(null);
 const immagineSelezionata = ref(null);
-const schedaDipintiMuraliVisibile = ref(false);
-const schedaDipintiMurali = ref(null);
-const caricamentoSchedaDipintiMurali = ref(false);
+const schedaVisibile = ref(false);
+const schedaCorrente = ref(null);
+const caricamentoScheda = ref(false);
 let ricercaCounter = 0;
 let schedaCounter = 0;
 
@@ -226,15 +227,40 @@ const percorsoCartella = computed(() => {
 });
 
 const isDipintoMuraleSelezionato = computed(() => isDipintoMurale(immagineSelezionata.value?.record));
+const isStatuariaSelezionata = computed(() => isStatuaria(immagineSelezionata.value?.record));
 
 const metaSchedaDipintiMurali = computed(() => ({
   localita: immagineSelezionata.value ? nomeLocalita(immagineSelezionata.value.record.localita) : 'N/D',
   edificio: immagineSelezionata.value ? nomeEdificio(immagineSelezionata.value.record.edificio) : 'N/D',
 }));
 
-const tabellaSchedaAnagraficaSelezionata = computed(() => {
-  if (isDipintoMuraleSelezionato.value) return 'scheda_anagrafica_dipinti_murali';
+const tipoSchedaSelezionata = computed(() => {
+  if (isDipintoMuraleSelezionato.value) {
+    return {
+      key: 'dipinti-murali',
+      label: 'Dipinti murali',
+      tabella: 'scheda_anagrafica_dipinti_murali',
+      component: SchedaDipintiMurali,
+    };
+  }
+  if (isStatuariaSelezionata.value) {
+    return {
+      key: 'statuaria',
+      label: 'Statuaria',
+      tabella: 'scheda_anagrafica_statua',
+      component: SchedaStatuaria,
+    };
+  }
   return null;
+});
+
+const propsSchedaSelezionata = computed(() => {
+  const props = {
+    elemento: immagineSelezionata.value,
+    scheda: schedaCorrente.value,
+  };
+  if (tipoSchedaSelezionata.value?.key === 'dipinti-murali') props.meta = metaSchedaDipintiMurali.value;
+  return props;
 });
 
 watch(() => state_anagrafica.selezione.select_loc, () => {
@@ -285,54 +311,85 @@ function cliccaInput() {
 function toggleSelezione(img) {
   if (immagineSelezionata.value?.record.uuid === img.record.uuid) {
     immagineSelezionata.value = null;
-    schedaDipintiMuraliVisibile.value = false;
-    schedaDipintiMurali.value = null;
+    resetSchedaSelezionata();
     return;
   }
   immagineSelezionata.value = img;
-  schedaDipintiMuraliVisibile.value = false;
-  schedaDipintiMurali.value = null;
-  if (isDipintoMurale(img.record)) {
-    ricaricaSchedaDipintiMurali();
-  }
+  resetSchedaSelezionata();
+  if (tipoSchedaSelezionata.value) ricaricaScheda();
 }
 
 function isDipintoMurale(record) {
   if (!record) return false;
   const codiciDipintiMurali = ['700.000.000.000', '600.200.100.000'];
-  return [
+  if ([
     record.livello_1,
     record.livello_2,
     record.livello_3,
     record.livello_4,
-  ].some(livello => codiciDipintiMurali.includes(livello));
+  ].some(livello => codiciDipintiMurali.includes(livello))) return true;
+  return definizioniRecord(record).some(definizione => {
+    const testo = normalizzaClassificazione(`${definizione.nome} ${definizione.sigla}`);
+    return testo.includes('dipint') && testo.includes('mural');
+  });
 }
 
-function toggleSchedaDipintiMurali() {
-  schedaDipintiMuraliVisibile.value = !schedaDipintiMuraliVisibile.value;
-  if (schedaDipintiMuraliVisibile.value && !schedaDipintiMurali.value) {
-    ricaricaSchedaDipintiMurali();
+function isStatuaria(record) {
+  return definizioniRecord(record).some(definizione => {
+    const testo = normalizzaClassificazione(`${definizione.nome} ${definizione.sigla}`);
+    return testo.includes('statu');
+  });
+}
+
+function definizioniRecord(record) {
+  if (!record) return [];
+  const definizioni = [];
+  let lista = state_globale.gerarchia_classi_elementi;
+  for (let livello = 1; livello <= 4; livello++) {
+    const id = record[`livello_${livello}`];
+    if (!id || !Array.isArray(lista)) break;
+    const definizione = lista.find(item => item.id === id);
+    if (!definizione) break;
+    definizioni.push(definizione);
+    lista = definizione[`livello_${livello + 1}`] || [];
   }
+  return definizioni;
 }
 
-async function ricaricaSchedaDipintiMurali() {
+function normalizzaClassificazione(value) {
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function toggleScheda() {
+  schedaVisibile.value = !schedaVisibile.value;
+  if (schedaVisibile.value && !schedaCorrente.value) ricaricaScheda();
+}
+
+async function ricaricaScheda() {
   const record = immagineSelezionata.value?.record;
-  const tabella = tabellaSchedaAnagraficaSelezionata.value;
+  const tabella = tipoSchedaSelezionata.value?.tabella;
   if (!record?.id_main10ance || !tabella) return;
 
   const richiestaId = ++schedaCounter;
-  caricamentoSchedaDipintiMurali.value = true;
+  caricamentoScheda.value = true;
   try {
     const scheda = await leggiSchedaAnagrafica(tabella, record.id_main10ance, record.uuid);
     if (richiestaId !== schedaCounter) return;
-    schedaDipintiMurali.value = scheda;
+    schedaCorrente.value = scheda;
   }
-  catch(e) {
-    if (richiestaId === schedaCounter) schedaDipintiMurali.value = null;
+  catch {
+    if (richiestaId === schedaCounter) schedaCorrente.value = null;
   }
   finally {
-    if (richiestaId === schedaCounter) caricamentoSchedaDipintiMurali.value = false;
+    if (richiestaId === schedaCounter) caricamentoScheda.value = false;
   }
+}
+
+function resetSchedaSelezionata() {
+  schedaCounter++;
+  schedaVisibile.value = false;
+  schedaCorrente.value = null;
+  caricamentoScheda.value = false;
 }
 
 function nomeLocalita(sigla) {
@@ -416,8 +473,7 @@ function filtraListaEdif() {
 async function aggiornaGalleria() {
   const ricercaId = ++ricercaCounter;
   immagineSelezionata.value = null;
-  schedaDipintiMuraliVisibile.value = false;
-  schedaDipintiMurali.value = null;
+  resetSchedaSelezionata();
   methods_anagrafica.reset_state_galleria();
   if (!ricercaPronta.value) return;
 

@@ -45,7 +45,6 @@ const IMAGE_ENTITIES: Record<string, ImageEntityMetadata> = Object.freeze({
   dipinto_murale: {idColumn: 'id_dipmur', bucket: 'elementi', schema: 'data'},
   pavimento_decorativo: {idColumn: 'id_pd', bucket: 'elementi', schema: 'data'},
   quadro: {idColumn: 'id_quadro', bucket: 'elementi', schema: 'data'},
-  statua: {idColumn: 'id_statua', bucket: 'elementi', schema: 'data'},
   manufatto: {idColumn: 'id_man', bucket: 'generale', schema: 'utility'},
   dettaglio: {idColumn: 'id_dett', bucket: 'generale', schema: 'utility'},
   elementi: {idColumn: 'id', bucket: 'elementi', schema: 'data'}

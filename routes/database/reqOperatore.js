@@ -188,11 +188,6 @@ app.get('/anagrafica/artifact-viewer/interroga/:id', async (req, res) => {
             risposta = await interrogaAnagraficaDettaglio(id);
             break;
 
-        case 'statua':
-            console.log('richiesta statua');
-            risposta = await interrogaAnagraficaStatua(id, ambito);
-            break;
-
         case 'elementi': // TEMP, DA RISOLVERE -> quando "elementi" saranno creati correttamente
             console.log('richiesta elementi');
             risposta = await interrogaAnagraficaCopertura(id, ambito);
@@ -627,13 +622,16 @@ async function transazioneScheda(listaStrVals, all_files, docs_array, ambito) {
                     for (let i = 0; i < docs_array[ls_counter].length; i++) {
                         const docPath = docs_array[ls_counter][i];
                         const fieldName = `file_${i}`;
-                        const singleFile = all_files[fieldName];
-                        if (!singleFile) continue;
+                        const uploadedFile = all_files[fieldName];
+                        if (!uploadedFile) continue;
 
-                        const fileOptions = {contentType: singleFile.mimetype};
+                        const {file: singleFile, options: fileOptions} = validateFile(
+                            Array.isArray(uploadedFile) ? uploadedFile[0] : uploadedFile
+                        );
+                        const storagePath = safeStoragePath(ambito, docPath);
                         // gestire caso di file duplicati da scheda precedente
                         // ...
-                        const {error} = await supabase.storage.from("documenti-schede").upload(`${ambito}/${docPath}`, singleFile.data, fileOptions);
+                        const {error} = await supabase.storage.from("documenti-schede").upload(storagePath, singleFile.data, fileOptions);
                         if (error) throw error;
                     }
                 }
@@ -1283,52 +1281,6 @@ async function interrogaAnagraficaLOD4(id, ambito) {
     }
 }
 
-async function interrogaAnagraficaStatua(id, ambito) {
-    try {
-        const result_anagr = await poolM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore",
-                                                     sa.codici_altro AS "Altri codici",
-                                                     sa.descrizione_statua AS "Descrizione statua", sa.tecnica_esecuzione AS "Tecnica di esecuzione",
-                                                     sa.dimensioni AS "Dimensioni", sa.materiale_statua AS "Materiale statua",
-                                                     sa.materiale_annotazioni AS "Materiale annotazioni", sa.materiali_armatura AS "Materiali armatura",
-                                                     sa.materiale_supporto AS "Materiale supporto", sa.lamina_metallica AS "Lamina metallica",
-                                                     (sa.pellicola_pittorica_tecnica_e_mat).su_legno AS "Pellicola pittorica su legno",
-                                                     (sa.pellicola_pittorica_tecnica_e_mat).su_gesso AS "Pellicola pittorica su gesso",
-                                                     (sa.pellicola_pittorica_tecnica_e_mat).su_terracotta AS "Pellicola pittorica su terracotta",
-                                                     (sa.pellicola_pittorica_tecnica_e_mat).altro AS "Pellicola pittorica - Altro",
-                                                     sa.strato_di_preparazione AS "Strato di preparazione",
-                                                     sa.elementi_accessori_monili AS "Elementi accessori e monili", sa.materiale_elementi_accessori_monili AS "Materiale elementi accessori e monili",
-                                                     sa.elementi_accessori_monili_annotazioni AS "Annotazioni elementi accessori e monili",
-                                                     sa.elementi_di_ancoraggio_a_parete AS "Elementi di ancoraggio a parete", sa.materiale_ancoraggio_parete AS "Materiale ancoraggi a parete",
-                                                     sa.ancoraggio_parete_annotazioni AS "Annotazioni ancoraggi a parete",
-                                                     sa.elementi_di_ancoraggio_a_pavimento AS "Elementi di ancoraggio a pavimento", sa.materiale_ancoraggio_pavimento AS "Materiale ancoraggi a pavimento",
-                                                     sa.ancoraggio_pavimento_annotazioni AS "Annotazioni ancoraggi a pavimento",
-                                                     sa.epoca AS "Epoca", sa.fonti AS "Fonti",
-                                                     sa.autore AS "Autore", sa."accessibilità" AS "Accessibilità",
-                                                     sa.note AS "Note", sa.docs AS "Documenti"
-                                                     FROM ${data_schema}.scheda_anagrafica_statua AS sa
-                                                     WHERE sa.id_main10ance = $1 AND sa.ambito = $2
-                                                     ORDER BY id_anagr DESC
-                                                     LIMIT 1;`,
-                                                     [id, ambito]
-                                                   );
-
-        const result_st = await poolM10a.query(`SELECT nome AS "Soggetto statua", codice AS "Codice statua"
-                                                  FROM ${data_schema}.statua
-                                                  WHERE id_main10ance = $1 AND ambito = $2
-                                                  ORDER BY id_statua DESC
-                                                  LIMIT 1;`,
-                                                  [id, ambito]
-                                                );
-
-        const full_res = {...result_st.rows[0], ...result_anagr.rows[0]};
-        return [full_res][0];
-    }
-    catch(e) {
-        console.log(e);
-        return [];
-    }
-}
-
 async function interrogaAnagraficaCopertura(id, ambito) {
     try {
         const result_anagr = await poolM10a.query(`SELECT sa.autore_ultima_mod AS "Operatore",
@@ -1632,10 +1584,10 @@ function gestisciStringheSchede(listaOggetti, ambito) {
                 // {su_legno: ..., su_gesso: ..., etc.}
                 const pellicola = jsn.valori[idx] || {};
                 vals.push(
-                    pellicola.su_legno ?? null,
-                    pellicola.su_gesso ?? null,
-                    pellicola.su_terracotta ?? null,
-                    pellicola.altro ?? null
+                    normalizzaValoriVuoti(pellicola.su_legno),
+                    normalizzaValoriVuoti(pellicola.su_gesso),
+                    normalizzaValoriVuoti(pellicola.su_terracotta),
+                    normalizzaValoriVuoti(pellicola.altro)
                 );
                 cols.push(quoteIdentifier(col, 'colonna scheda'));
                 p += 4; // ho usato 4 parametri
