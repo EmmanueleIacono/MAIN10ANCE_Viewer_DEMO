@@ -1396,31 +1396,6 @@ model specchio_d_acqua {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model statua {
-  id_statua     BigInt                   @id
-  rid_bup       String?                  @db.VarChar
-  cl_ogg_fr     main10ance_cl_ogg_fr?
-  nome          String?                  @db.VarChar
-  artista       String?                  @db.VarChar
-  datazione     String?                  @db.VarChar
-  lunghezza     Float?
-  larghezza     Float?
-  altezza       Float?
-  peso          Float?
-  commenti      String?                  @db.VarChar
-  immagine      String                   @db.VarChar
-  geom_pun      Unsupported("geometry")?
-  data_ins      String?                  @db.VarChar
-  id_main10ance String                   @unique(map: "id_m10e_unique") @db.VarChar
-  dimensioni    String?                  @db.VarChar
-  ambito        String?                  @db.VarChar
-  codice        String?                  @db.VarChar
-  ambiti        ambiti?                  @relation(fields: [ambito], references: [ambito], onDelete: NoAction, onUpdate: NoAction, map: "ambito_fkey")
-
-  @@schema("main10ance")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model strade_sentieri_e_altri_percorsi_interni {
   oid        Int
   uuid_vms   String                   @id @db.VarChar
@@ -1628,7 +1603,6 @@ model ambiti {
   sistema_di_raccolta_acque                sistema_di_raccolta_acque[]
   sistemi_di_sicurezza                     sistemi_di_sicurezza[]
   specchio_d_acqua                         specchio_d_acqua[]
-  statua                                   statua[]
   strade_sentieri_e_altri_percorsi_interni strade_sentieri_e_altri_percorsi_interni[]
   tetto                                    tetto[]
   tratto_rete_di_approvvigionamento_idrico tratto_rete_di_approvvigionamento_idrico[]
